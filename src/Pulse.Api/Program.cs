@@ -1,10 +1,12 @@
+using System.Threading.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.AspNetCore.SignalR;
 using StackExchange.Redis;
 using MassTransit;
 using OpenTelemetry.Trace; using OpenTelemetry.Metrics; using OpenTelemetry.Resources;
-using Pulse.Api.Realtime; using Pulse.Persistence;
+using Pulse.Api.Endpoints; using Pulse.Api.Realtime; using Pulse.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
 var cfg = builder.Configuration;
@@ -22,6 +24,21 @@ builder.Services.AddSignalR().AddStackExchangeRedis(cfg.GetConnectionString("Red
 
 builder.Services.AddCors(o => o.AddDefaultPolicy(p =>
     p.WithOrigins(cfg["Cors:Origins"]!.Split(',')).AllowAnyHeader().AllowAnyMethod().AllowCredentials()));
+
+// Public read endpoints (/api/metrics, /api/map) — 60 req/min per client IP.
+// RemoteIpAddress reflects the real client thanks to ForwardedHeaders (see below).
+builder.Services.AddRateLimiter(o =>
+{
+    o.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+    o.AddPolicy("public", httpContext => RateLimitPartition.GetFixedWindowLimiter(
+        httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+        _ => new FixedWindowRateLimiterOptions
+        {
+            PermitLimit = 60,
+            Window = TimeSpan.FromMinutes(1),
+            QueueLimit = 0
+        }));
+});
 
 builder.Services.AddOpenTelemetry()
     .ConfigureResource(r => r.AddService("pulse-api"))
@@ -74,8 +91,10 @@ await app.Services.GetRequiredService<IPresenceTracker>().ClearAsync();
 
 app.UseForwardedHeaders();
 app.UseCors();
+app.UseRateLimiter();
 app.MapHub<PresenceHub>("/hub/presence");
 app.MapGet("/health", () => Results.Ok("ok"));
+app.MapPublic();
 app.Run();
 
 public partial class Program { } // for WebApplicationFactory
