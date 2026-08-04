@@ -1,0 +1,6 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <ItemGroup>
+    <ProjectReference Include="..\Pulse.Persistence\Pulse.Persistence.csproj" />
+    <ProjectReference Include="..\Pulse.Domain\Pulse.Domain.csproj" />
+  </ItemGroup>
+</Project>
