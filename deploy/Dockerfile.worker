@@ -1,0 +1,37 @@
+# syntax=docker/dockerfile:1
+#
+# Pulse.Worker — MassTransit consumer host. Build context is the REPO ROOT,
+# same layering rationale as Dockerfile.api (see that file for details).
+#
+# Build:   docker build -f deploy/Dockerfile.worker -t pulse-worker .
+# Run:     docker run pulse-worker
+
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
+WORKDIR /src
+
+# 1) Central package management files first for restore-layer caching.
+COPY global.json Directory.Build.props Directory.Packages.props ./
+
+# 2) Just the .csproj files for Pulse.Worker and its project-reference graph
+#    (Pulse.Domain, Pulse.Persistence). No source yet.
+COPY src/Pulse.Worker/Pulse.Worker.csproj src/Pulse.Worker/
+COPY src/Pulse.Domain/Pulse.Domain.csproj src/Pulse.Domain/
+COPY src/Pulse.Persistence/Pulse.Persistence.csproj src/Pulse.Persistence/
+
+RUN dotnet restore src/Pulse.Worker/Pulse.Worker.csproj
+
+# 3) Now bring in the actual source and publish.
+COPY src/Pulse.Worker/ src/Pulse.Worker/
+COPY src/Pulse.Domain/ src/Pulse.Domain/
+COPY src/Pulse.Persistence/ src/Pulse.Persistence/
+
+RUN dotnet publish src/Pulse.Worker/Pulse.Worker.csproj \
+    -c Release \
+    -o /app \
+    --no-restore
+
+FROM mcr.microsoft.com/dotnet/runtime:10.0 AS runtime
+WORKDIR /app
+COPY --from=build /app .
+
+ENTRYPOINT ["dotnet", "Pulse.Worker.dll"]

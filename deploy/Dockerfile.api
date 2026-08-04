@@ -1,0 +1,42 @@
+# syntax=docker/dockerfile:1
+#
+# Pulse.Api — build context is the REPO ROOT (not deploy/), so central package
+# management files (global.json / Directory.Build.props / Directory.Packages.props)
+# and every project's .csproj are reachable for a scoped `dotnet restore`.
+#
+# Build:   docker build -f deploy/Dockerfile.api -t pulse-api .
+# Run:     docker run -p 8080:8080 pulse-api
+
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
+WORKDIR /src
+
+# 1) Central package management files first — restore only re-runs when these
+#    (or a .csproj) change, not on every source edit.
+COPY global.json Directory.Build.props Directory.Packages.props ./
+
+# 2) Just the .csproj files for Pulse.Api and its project-reference graph
+#    (Pulse.Domain, Pulse.Persistence). No source yet.
+COPY src/Pulse.Api/Pulse.Api.csproj src/Pulse.Api/
+COPY src/Pulse.Domain/Pulse.Domain.csproj src/Pulse.Domain/
+COPY src/Pulse.Persistence/Pulse.Persistence.csproj src/Pulse.Persistence/
+
+RUN dotnet restore src/Pulse.Api/Pulse.Api.csproj
+
+# 3) Now bring in the actual source and publish.
+COPY src/Pulse.Api/ src/Pulse.Api/
+COPY src/Pulse.Domain/ src/Pulse.Domain/
+COPY src/Pulse.Persistence/ src/Pulse.Persistence/
+
+RUN dotnet publish src/Pulse.Api/Pulse.Api.csproj \
+    -c Release \
+    -o /app \
+    --no-restore
+
+FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
+WORKDIR /app
+COPY --from=build /app .
+
+ENV ASPNETCORE_URLS=http://+:8080
+EXPOSE 8080
+
+ENTRYPOINT ["dotnet", "Pulse.Api.dll"]
