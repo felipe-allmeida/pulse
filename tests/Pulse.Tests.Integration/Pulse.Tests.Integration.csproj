@@ -14,7 +14,9 @@
     <PackageReference Include="EFCore.NamingConventions" />
     <PackageReference Include="Testcontainers.PostgreSql" />
     <PackageReference Include="Testcontainers.Redis" />
+    <PackageReference Include="Testcontainers.RabbitMq" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" />
+    <PackageReference Include="MassTransit" />
   </ItemGroup>
 
   <ItemGroup>

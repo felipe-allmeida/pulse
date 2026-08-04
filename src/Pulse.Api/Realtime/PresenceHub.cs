@@ -1,6 +1,15 @@
+using MassTransit;
 using Microsoft.AspNetCore.SignalR;
+using Pulse.Api.Geo;
+using Pulse.Domain.Events;
+using Pulse.Persistence;
 namespace Pulse.Api.Realtime;
-public sealed class PresenceHub(IPresenceTracker tracker, IReactionRateLimiter rateLimiter) : Hub
+public sealed class PresenceHub(
+    IPresenceTracker tracker,
+    IReactionRateLimiter rateLimiter,
+    IGeoLocator geoLocator,
+    IPublishEndpoint publishEndpoint,
+    PulseDbContext db) : Hub
 {
     // small curated allow-list — rejects arbitrary strings (anti-abuse / anti-XSS)
     private static readonly HashSet<string> Allowed = new() { "👋", "❤️", "🔥", "👏", "🎉", "🚀", "😮", "💯" };
@@ -9,6 +18,16 @@ public sealed class PresenceHub(IPresenceTracker tracker, IReactionRateLimiter r
     {
         var count = await tracker.JoinAsync(Context.ConnectionId);
         await Clients.All.SendAsync("PresenceUpdated", count);
+
+        // Geo is resolved from the transient request IP for this lookup only — the IP is
+        // never persisted, put on the event, or forwarded downstream (privacy constraint).
+        var ip = Context.GetHttpContext()?.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+        var geo = geoLocator.Locate(ip);
+        await publishEndpoint.Publish(new VisitStarted(
+            Guid.NewGuid(), Context.ConnectionId, geo.Country, geo.City, geo.Lat, geo.Lon, DateTimeOffset.UtcNow));
+        // Flushes the bus outbox: UseBusOutbox buffers the publish above until SaveChanges.
+        await db.SaveChangesAsync();
+
         await base.OnConnectedAsync();
     }
     public override async Task OnDisconnectedAsync(Exception? ex)
