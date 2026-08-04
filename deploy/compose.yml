@@ -1,0 +1,149 @@
+# Pulse — Portainer-ready compose stack.
+#
+# Build context for the api/worker/web images is the repo root (one level up
+# from this file), so central package management files and every project are
+# reachable. Run from the repo root:
+#
+#   docker compose -f deploy/compose.yml up --build
+#
+# All values below have local-dev defaults baked in via `${VAR:-default}` so
+# the stack comes up with zero configuration. For a real deployment, put
+# overrides in a repo-root `.env` (gitignored, never committed) — e.g. a real
+# POSTGRES_PASSWORD, RABBITMQ_PASSWORD, PULSE_DOMAIN, PULSE_CORS_ORIGINS.
+#
+# `restart: unless-stopped` on every service so a container crash or a host
+# reboot (Hetzner/Portainer target) self-heals instead of leaving the stack
+# down until someone notices.
+
+services:
+  postgres:
+    image: postgres:17.2
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-pulse}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-pulse}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7.4
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  rabbitmq:
+    image: rabbitmq:3.13-management
+    restart: unless-stopped
+    environment:
+      # guest/guest is refused by RabbitMQ for any non-loopback connection, and
+      # api/worker connect over the container network (rabbitmq:5672) — so the
+      # default here MUST be a real, non-guest user or the bus never connects
+      # (ACCESS_REFUSED) and VisitStarted messages silently never leave the
+      # outbox. Override via .env for a real deployment.
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-pulse}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:-pulse_dev_pw}
+    healthcheck:
+      # rabbitmq-diagnostics ping authenticates CLI-to-node via the shared
+      # erlang cookie, not the AMQP user/pass above, so it needs no update
+      # for the guest -> non-guest user change.
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+
+  api:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile.api
+    image: ghcr.io/felipe-allmeida/pulse-api:${PULSE_TAG:-latest}
+    restart: unless-stopped
+    environment:
+      ASPNETCORE_URLS: http://+:8080
+      ConnectionStrings__Postgres: Host=postgres;Database=${POSTGRES_DB:-pulse};Username=${POSTGRES_USER:-postgres};Password=${POSTGRES_PASSWORD:-postgres}
+      ConnectionStrings__Redis: redis:6379
+      ConnectionStrings__RabbitMq: amqp://${RABBITMQ_USER:-pulse}:${RABBITMQ_PASSWORD:-pulse_dev_pw}@rabbitmq:5672
+      Cors__Origins: ${PULSE_CORS_ORIGINS:-http://localhost}
+      # Geo__DbPath intentionally UNSET here: with no .mmdb on disk the API
+      # falls back to NullGeoLocator and geo shows "Unknown" — safe local
+      # default, no secrets/binary geo database committed to the repo.
+      #
+      # In prod, mount a GeoLite2-City.mmdb (obtained separately, never
+      # committed) into the api container and point Geo__DbPath at it, e.g.:
+      #   volumes:
+      #     - /opt/pulse/GeoLite2-City.mmdb:/geo/GeoLite2-City.mmdb:ro
+      #   environment:
+      #     Geo__DbPath: /geo/GeoLite2-City.mmdb
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    expose:
+      - "8080"
+    healthcheck:
+      # curl is installed in Dockerfile.api's runtime stage specifically for
+      # this (the base aspnet:10.0 image has neither curl nor wget). The app
+      # runs its EF migration before Kestrel starts accepting connections, so
+      # this genuinely reflects "migrated and ready to serve", not just "the
+      # process exists".
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 15s
+
+  worker:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile.worker
+    image: ghcr.io/felipe-allmeida/pulse-worker:${PULSE_TAG:-latest}
+    restart: unless-stopped
+    environment:
+      ConnectionStrings__Postgres: Host=postgres;Database=${POSTGRES_DB:-pulse};Username=${POSTGRES_USER:-postgres};Password=${POSTGRES_PASSWORD:-postgres}
+      ConnectionStrings__RabbitMq: amqp://${RABBITMQ_USER:-pulse}:${RABBITMQ_PASSWORD:-pulse_dev_pw}@rabbitmq:5672
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+
+  caddy:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile.web
+    image: ghcr.io/felipe-allmeida/pulse-web:${PULSE_TAG:-latest}
+    restart: unless-stopped
+    environment:
+      # Short form (no inline value): passes PULSE_DOMAIN through only if it
+      # is actually set in the host/.env. If it's unset, this key is omitted
+      # from the container entirely — Caddy's `{$PULSE_DOMAIN::80}` then sees
+      # a genuinely-unset variable and falls back to its ":80" default. (An
+      # inline `${PULSE_DOMAIN:-}` here would instead set the var to an
+      # explicit empty string, which Caddy treats as "set" and would break
+      # the fallback.)
+      - PULSE_DOMAIN
+    depends_on:
+      api:
+        condition: service_healthy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - caddy_data:/data
+      - caddy_config:/config
+
+volumes:
+  pgdata:
+  caddy_data:
+  caddy_config:

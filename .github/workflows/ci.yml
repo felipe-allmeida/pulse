@@ -1,0 +1,77 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend:
+    name: Backend (.NET)
+    # Testcontainers (Pulse.Tests.Integration) needs a Docker daemon —
+    # ubuntu-latest ships with one.
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+
+      - name: Restore
+        run: dotnet restore Pulse.sln
+
+      - name: Build
+        run: dotnet build Pulse.sln -c Release --no-restore
+
+      - name: Test
+        run: dotnet test Pulse.sln -c Release --no-build
+
+      - name: Check for vulnerable NuGet packages
+        # dotnet list package --vulnerable exits 0 no matter what it finds, so the
+        # pass/fail signal has to come from parsing its output ourselves. Structured
+        # --format json + jq keeps this locale-independent — a plain-text grep for an
+        # English phrase like "has the following vulnerable packages" would silently
+        # stop working the moment a runner's culture/output differs.
+        run: |
+          dotnet list Pulse.sln package --vulnerable --include-transitive --format json > vulnerable-packages.json
+          if jq -e '[.projects[].frameworks[]? | select(.topLevelPackages or .transitivePackages) | (.topLevelPackages // []) + (.transitivePackages // []) | .[] | select(.vulnerabilities | length > 0)] | length > 0' vulnerable-packages.json > /dev/null; then
+            echo "::error::Vulnerable NuGet packages detected"
+            dotnet list Pulse.sln package --vulnerable --include-transitive
+            exit 1
+          fi
+          echo "No vulnerable packages."
+
+  frontend:
+    name: Frontend (web)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: web/pnpm-lock.yaml
+
+      - name: Install dependencies
+        run: pnpm -C web install --frozen-lockfile
+
+      - name: Build
+        run: pnpm -C web build
+
+      - name: Typecheck
+        run: pnpm -C web exec tsc --noEmit

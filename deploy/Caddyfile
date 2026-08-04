@@ -1,0 +1,31 @@
+# Pulse — single front door: serves the built SPA and reverse-proxies the API.
+#
+# {$PULSE_DOMAIN::80} — Caddy's env-var-with-default syntax. Locally
+# PULSE_DOMAIN is unset, so this resolves to plain ":80" (no TLS, works over
+# bare HTTP for `docker compose up`). In prod, set PULSE_DOMAIN to a real
+# hostname (e.g. "pulse.example.com") and Caddy automatically provisions and
+# renews a Let's Encrypt certificate for it.
+{$PULSE_DOMAIN::80} {
+	# SignalR negotiate + REST endpoints.
+	handle /api/* {
+		reverse_proxy api:8080
+	}
+
+	# SignalR hub — Caddy proxies the WebSocket upgrade automatically.
+	handle /hub/* {
+		reverse_proxy api:8080
+	}
+
+	# Health check — proxied straight to the api (not served by the SPA
+	# fallback), so hitting Caddy's own :80 actually reflects api liveness.
+	handle /health {
+		reverse_proxy api:8080
+	}
+
+	# Everything else: the built SPA, with client-side-router fallback.
+	handle {
+		root * /srv
+		try_files {path} /index.html
+		file_server
+	}
+}

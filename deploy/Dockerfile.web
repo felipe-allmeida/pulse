@@ -1,0 +1,27 @@
+# syntax=docker/dockerfile:1
+#
+# Pulse web SPA — built with the pnpm-managed Vite app in web/, then served
+# (and reverse-proxied to Pulse.Api) by a single Caddy container: the "front
+# door" for the whole stack. Build context is the REPO ROOT.
+#
+# Build:   docker build -f deploy/Dockerfile.web -t pulse-web .
+# Run:     docker run -p 80:80 pulse-web
+
+FROM node:22-alpine AS build
+WORKDIR /web
+
+# Enable Corepack-managed pnpm (web/package.json pins no packageManager field,
+# so activate a current pnpm explicitly rather than relying on a shim default).
+RUN corepack enable && corepack prepare pnpm@10 --activate
+
+# Lockfile + manifest first for a cacheable, reproducible install layer.
+COPY web/package.json web/pnpm-lock.yaml ./
+RUN pnpm install --frozen-lockfile
+
+# Now the rest of the SPA source and build.
+COPY web/ .
+RUN pnpm build
+
+FROM caddy:2-alpine
+COPY deploy/Caddyfile /etc/caddy/Caddyfile
+COPY --from=build /web/dist /srv
