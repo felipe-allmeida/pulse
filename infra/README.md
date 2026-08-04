@@ -2,7 +2,9 @@
 
 Provisions the Hetzner Cloud server that hosts the Pulse `docker compose`
 stack (`deploy/compose.yml`): Docker Engine + Portainer CE, a firewall
-(22/80/443 only), an SSH key, and an optional Hetzner DNS `A` record.
+(22/80/443 only), and an SSH key. DNS is a manual step (see "Point your
+DNS" below) — this config doesn't touch DNS at all, since the domain may
+not even live on Hetzner DNS.
 
 **Nothing here is applied automatically.** `terraform apply` and supplying
 real credentials are Felipe's manual steps — this config never embeds a
@@ -14,8 +16,6 @@ token, and no agent runs `plan`/`apply` on his behalf.
 - A Hetzner Cloud API token (Hetzner Console -> Project -> Security -> API
   Tokens -> read+write)
 - Your SSH public key (e.g. `~/.ssh/id_ed25519.pub`)
-- Optional: a Hetzner DNS API token and zone ID, only if you want Terraform
-  to manage a DNS record (`manage_dns = true`)
 
 ## Apply
 
@@ -24,11 +24,9 @@ cd infra
 
 # 1. Credentials — environment only, never written to a file.
 export TF_VAR_hcloud_token="<your Hetzner Cloud API token>"
-# only if you set manage_dns = true below:
-export TF_VAR_hetznerdns_token="<your Hetzner DNS API token>"
 
-# 2. Your inputs — copy the example and fill in your SSH key (and DNS
-#    settings if you want them). terraform.tfvars is gitignored.
+# 2. Your inputs — copy the example and fill in your SSH key.
+#    terraform.tfvars is gitignored.
 cp terraform.tfvars.example terraform.tfvars
 $EDITOR terraform.tfvars   # set ssh_public_key at minimum
 
@@ -45,6 +43,23 @@ terraform output server_ipv4
 terraform output portainer_url
 ```
 
+## Point your DNS
+
+This config does not manage DNS — your domain may not even be hosted on
+Hetzner DNS, so picking a DNS provider here would be an unsafe assumption.
+Once you have `server_ipv4` from the output above, go to wherever your
+domain's DNS is actually hosted (Hetzner DNS, Cloudflare, your registrar,
+etc.) and create:
+
+```
+A   pulse.<your-domain>   ->   <server_ipv4>
+```
+
+Then set `PULSE_DOMAIN=pulse.<your-domain>` for the `caddy` service (see
+`deploy/compose.yml` / `deploy/Caddyfile`) — Caddy automatically provisions
+and renews a Let's Encrypt TLS certificate for that hostname on first
+request, no extra config needed.
+
 Then deploy the app stack itself onto the new server (copy `deploy/` up and
 run `docker compose -f deploy/compose.yml up -d`, or manage it through
 Portainer) — that part is outside this Terraform config's scope.
@@ -60,9 +75,8 @@ Portainer) — that part is outside this Terraform config's scope.
   a named `portainer_data` volume.
 - `hcloud_firewall` — inbound allowed on **22** (SSH), **80** and **443**
   (Caddy / Let's Encrypt) only. Nothing else is opened.
-- Optional `hetznerdns_record` (`count = var.manage_dns ? 1 : 0`, off by
-  default) — an `A` record for `var.domain` in the zone `var.dns_zone_id`,
-  pointing at the server's IPv4.
+
+No DNS resource is created by this config — see "Point your DNS" above.
 
 ## Portainer access model
 
@@ -81,18 +95,18 @@ own IP(s) rather than opening it to `0.0.0.0/0`.
 
 ## Security posture
 
-- **No credentials in the repo.** `hcloud_token` and `hetznerdns_token` are
-  `sensitive = true` Terraform variables with no committed values — they
-  come only from `TF_VAR_hcloud_token` / `TF_VAR_hetznerdns_token` at apply
-  time.
+- **No credentials in the repo.** `hcloud_token` is a `sensitive = true`
+  Terraform variable with no committed value — it comes only from
+  `TF_VAR_hcloud_token` at apply time.
 - `.gitignore` excludes `*.tfvars` (real values), `.terraform/` (provider
   plugin cache), and `*.tfstate*` (state may contain resource attributes).
   `.terraform.lock.hcl` and `*.tfvars.example` ARE committed intentionally
   (provider version pinning; placeholder template).
 - SSH key auth only — no root password is set anywhere in this config.
 - Firewall is default-deny inbound aside from 22/80/443.
-- DNS management is opt-in (`manage_dns = false` by default) since Felipe
-  may manage DNS through a different registrar/provider.
+- Only one provider (`hcloud`) is declared, so nothing gets configured or
+  called that isn't actually used — see "Point your DNS" for why DNS is a
+  manual step instead of a second, conditionally-used provider.
 
 ## Verify without touching real infrastructure
 

@@ -16,8 +16,3 @@ output "portainer_url" {
   EOT
   value       = "https://${hcloud_server.this.ipv4_address}:9443"
 }
-
-output "dns_record_fqdn" {
-  description = "The DNS record created when manage_dns = true (null otherwise)."
-  value       = var.manage_dns ? "${var.domain} (zone ${var.dns_zone_id}) -> ${hcloud_server.this.ipv4_address}" : null
-}
