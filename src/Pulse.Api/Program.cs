@@ -39,8 +39,17 @@ builder.Services.AddSingleton<Pulse.Api.Geo.IGeoLocator>(_ =>
 });
 
 // Forwarded headers so Context.GetHttpContext() sees the real client IP behind Caddy.
+// KnownNetworks/KnownProxies default to loopback only, but Caddy runs as a separate
+// container (not loopback) in this deploy topology, so the header would otherwise be
+// silently ignored. Clearing the allow-lists is safe here specifically because the
+// firewall (Task 9/10) exposes only 80/443 -> Caddy, and the API container is never
+// directly internet-reachable — Caddy is the only peer that can ever call this API.
 builder.Services.Configure<ForwardedHeadersOptions>(o =>
-    o.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto);
+{
+    o.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+    o.KnownIPNetworks.Clear();
+    o.KnownProxies.Clear();
+});
 
 // Outbox in the same tx as business writes.
 builder.Services.AddMassTransit(x =>
