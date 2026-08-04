@@ -8,7 +8,7 @@ who else is there right now (presence), a live world map of where visitors are
 connecting from, and the system's own public metrics — updating in real time,
 in your browser. The "cool" surface is a thin client for a real distributed,
 event-driven, observable, infrastructure-as-code-deployed backend, built to be
-a legitimate senior/staff engineering artifact, not a toy demo.
+a production-grade engineering reference, not a toy demo.
 
 ## Live demo
 
