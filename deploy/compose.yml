@@ -44,9 +44,17 @@ services:
     image: rabbitmq:3.13-management
     restart: unless-stopped
     environment:
-      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-guest}
-      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:-guest}
+      # guest/guest is refused by RabbitMQ for any non-loopback connection, and
+      # api/worker connect over the container network (rabbitmq:5672) — so the
+      # default here MUST be a real, non-guest user or the bus never connects
+      # (ACCESS_REFUSED) and VisitStarted messages silently never leave the
+      # outbox. Override via .env for a real deployment.
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-pulse}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:-pulse_dev_pw}
     healthcheck:
+      # rabbitmq-diagnostics ping authenticates CLI-to-node via the shared
+      # erlang cookie, not the AMQP user/pass above, so it needs no update
+      # for the guest -> non-guest user change.
       test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
       interval: 10s
       timeout: 10s
@@ -56,12 +64,13 @@ services:
     build:
       context: ..
       dockerfile: deploy/Dockerfile.api
+    image: ghcr.io/felipe-allmeida/pulse-api:${PULSE_TAG:-latest}
     restart: unless-stopped
     environment:
       ASPNETCORE_URLS: http://+:8080
       ConnectionStrings__Postgres: Host=postgres;Database=${POSTGRES_DB:-pulse};Username=${POSTGRES_USER:-postgres};Password=${POSTGRES_PASSWORD:-postgres}
       ConnectionStrings__Redis: redis:6379
-      ConnectionStrings__RabbitMq: amqp://${RABBITMQ_USER:-guest}:${RABBITMQ_PASSWORD:-guest}@rabbitmq:5672
+      ConnectionStrings__RabbitMq: amqp://${RABBITMQ_USER:-pulse}:${RABBITMQ_PASSWORD:-pulse_dev_pw}@rabbitmq:5672
       Cors__Origins: ${PULSE_CORS_ORIGINS:-http://localhost}
       # Geo__DbPath intentionally UNSET here: with no .mmdb on disk the API
       # falls back to NullGeoLocator and geo shows "Unknown" — safe local
@@ -98,10 +107,11 @@ services:
     build:
       context: ..
       dockerfile: deploy/Dockerfile.worker
+    image: ghcr.io/felipe-allmeida/pulse-worker:${PULSE_TAG:-latest}
     restart: unless-stopped
     environment:
       ConnectionStrings__Postgres: Host=postgres;Database=${POSTGRES_DB:-pulse};Username=${POSTGRES_USER:-postgres};Password=${POSTGRES_PASSWORD:-postgres}
-      ConnectionStrings__RabbitMq: amqp://${RABBITMQ_USER:-guest}:${RABBITMQ_PASSWORD:-guest}@rabbitmq:5672
+      ConnectionStrings__RabbitMq: amqp://${RABBITMQ_USER:-pulse}:${RABBITMQ_PASSWORD:-pulse_dev_pw}@rabbitmq:5672
     depends_on:
       postgres:
         condition: service_healthy
@@ -112,6 +122,7 @@ services:
     build:
       context: ..
       dockerfile: deploy/Dockerfile.web
+    image: ghcr.io/felipe-allmeida/pulse-web:${PULSE_TAG:-latest}
     restart: unless-stopped
     environment:
       # Short form (no inline value): passes PULSE_DOMAIN through only if it

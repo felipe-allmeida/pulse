@@ -1,7 +1,6 @@
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Pulse.Persistence;
-using Pulse.Worker;
 using Pulse.Worker.Consumers;
 
 var builder = Host.CreateApplicationBuilder(args);
@@ -19,8 +18,6 @@ builder.Services.AddMassTransit(x =>
         cfg2.ConfigureEndpoints(c);
     });
 });
-
-builder.Services.AddHostedService<Worker>();
 
 var host = builder.Build();
 host.Run();
