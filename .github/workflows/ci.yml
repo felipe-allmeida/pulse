@@ -1,0 +1,71 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend:
+    name: Backend (.NET)
+    # Testcontainers (Pulse.Tests.Integration) needs a Docker daemon —
+    # ubuntu-latest ships with one.
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+
+      - name: Restore
+        run: dotnet restore Pulse.sln
+
+      - name: Build
+        run: dotnet build Pulse.sln -c Release --no-restore
+
+      - name: Test
+        run: dotnet test Pulse.sln -c Release --no-build
+
+      - name: Check for vulnerable NuGet packages
+        run: |
+          set -o pipefail
+          dotnet list Pulse.sln package --vulnerable --include-transitive 2>&1 | tee vulnerable-packages.log
+          if grep -qi "has the following vulnerable packages" vulnerable-packages.log; then
+            echo "::error::Vulnerable NuGet packages detected — see log above and run 'dotnet list package --vulnerable --include-transitive' locally to inspect."
+            exit 1
+          fi
+
+  frontend:
+    name: Frontend (web)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: web/pnpm-lock.yaml
+
+      - name: Install dependencies
+        run: pnpm -C web install --frozen-lockfile
+
+      - name: Build
+        run: pnpm -C web build
+
+      - name: Typecheck
+        run: pnpm -C web exec tsc --noEmit
