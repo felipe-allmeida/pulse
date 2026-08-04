@@ -1,0 +1,40 @@
+#cloud-config
+# Pulse — Hetzner server bootstrap: Docker Engine + Portainer CE.
+#
+# Runs once on first boot (cloud-init default). The install script itself
+# guards every step so re-running it by hand (e.g. after `cloud-init clean
+# && cloud-init init`) is a no-op instead of erroring on "already exists".
+
+package_update: true
+packages:
+  - ca-certificates
+  - curl
+
+write_files:
+  - path: /root/install-docker-portainer.sh
+    permissions: "0755"
+    content: |
+      #!/usr/bin/env bash
+      set -euo pipefail
+
+      # --- Docker Engine (official convenience script) ---
+      if ! command -v docker >/dev/null 2>&1; then
+        curl -fsSL https://get.docker.com | sh
+      fi
+      systemctl enable --now docker
+
+      # --- Portainer CE ---
+      docker volume inspect portainer_data >/dev/null 2>&1 || docker volume create portainer_data
+
+      if ! docker ps -a --format '{{.Names}}' | grep -qx portainer; then
+        docker run -d \
+          --name portainer \
+          --restart=always \
+          -p 9443:9443 \
+          -v /var/run/docker.sock:/var/run/docker.sock \
+          -v portainer_data:/data \
+          portainer/portainer-ce:latest
+      fi
+
+runcmd:
+  - /root/install-docker-portainer.sh

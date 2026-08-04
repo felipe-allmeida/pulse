@@ -3,3 +3,14 @@ bin/
 obj/
 .env
 .DS_Store
+
+# Terraform (infra/)
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+!*.tfvars.example
+crash.log
+crash.*.log
+# NOTE: .terraform.lock.hcl is intentionally NOT ignored — commit it so
+# provider versions are pinned/reproducible across machines.
