@@ -10,10 +10,15 @@
 # the stack comes up with zero configuration. For a real deployment, put
 # overrides in a repo-root `.env` (gitignored, never committed) — e.g. a real
 # POSTGRES_PASSWORD, RABBITMQ_PASSWORD, PULSE_DOMAIN, PULSE_CORS_ORIGINS.
+#
+# `restart: unless-stopped` on every service so a container crash or a host
+# reboot (Hetzner/Portainer target) self-heals instead of leaving the stack
+# down until someone notices.
 
 services:
   postgres:
-    image: postgres:17
+    image: postgres:17.2
+    restart: unless-stopped
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-pulse}
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
@@ -27,7 +32,8 @@ services:
       retries: 10
 
   redis:
-    image: redis:7
+    image: redis:7.4
+    restart: unless-stopped
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 5s
@@ -35,7 +41,8 @@ services:
       retries: 10
 
   rabbitmq:
-    image: rabbitmq:3-management
+    image: rabbitmq:3.13-management
+    restart: unless-stopped
     environment:
       RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-guest}
       RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:-guest}
@@ -49,6 +56,7 @@ services:
     build:
       context: ..
       dockerfile: deploy/Dockerfile.api
+    restart: unless-stopped
     environment:
       ASPNETCORE_URLS: http://+:8080
       ConnectionStrings__Postgres: Host=postgres;Database=${POSTGRES_DB:-pulse};Username=${POSTGRES_USER:-postgres};Password=${POSTGRES_PASSWORD:-postgres}
@@ -74,11 +82,23 @@ services:
         condition: service_healthy
     expose:
       - "8080"
+    healthcheck:
+      # curl is installed in Dockerfile.api's runtime stage specifically for
+      # this (the base aspnet:10.0 image has neither curl nor wget). The app
+      # runs its EF migration before Kestrel starts accepting connections, so
+      # this genuinely reflects "migrated and ready to serve", not just "the
+      # process exists".
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 15s
 
   worker:
     build:
       context: ..
       dockerfile: deploy/Dockerfile.worker
+    restart: unless-stopped
     environment:
       ConnectionStrings__Postgres: Host=postgres;Database=${POSTGRES_DB:-pulse};Username=${POSTGRES_USER:-postgres};Password=${POSTGRES_PASSWORD:-postgres}
       ConnectionStrings__RabbitMq: amqp://${RABBITMQ_USER:-guest}:${RABBITMQ_PASSWORD:-guest}@rabbitmq:5672
@@ -92,6 +112,7 @@ services:
     build:
       context: ..
       dockerfile: deploy/Dockerfile.web
+    restart: unless-stopped
     environment:
       # Short form (no inline value): passes PULSE_DOMAIN through only if it
       # is actually set in the host/.env. If it's unset, this key is omitted
@@ -102,7 +123,8 @@ services:
       # the fallback.)
       - PULSE_DOMAIN
     depends_on:
-      - api
+      api:
+        condition: service_healthy
     ports:
       - "80:80"
       - "443:443"

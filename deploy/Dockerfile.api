@@ -34,6 +34,15 @@ RUN dotnet publish src/Pulse.Api/Pulse.Api.csproj \
 
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
 WORKDIR /app
+
+# curl is used by compose.yml's healthcheck to poll GET /health. The base
+# aspnet:10.0 image (Ubuntu 24.04) ships with neither curl nor wget, so it's
+# installed explicitly here rather than inventing a healthcheck that can't
+# actually reach the process (e.g. a check that always exits 0).
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends curl \
+    && rm -rf /var/lib/apt/lists/*
+
 COPY --from=build /app .
 
 ENV ASPNETCORE_URLS=http://+:8080

@@ -5,3 +5,5 @@ web/dist/
 .git/
 .superpowers/
 docs/
+.env
+.env.*
