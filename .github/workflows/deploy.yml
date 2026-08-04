@@ -61,10 +61,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Call Portainer stack webhook
+        env:
+          PORTAINER_WEBHOOK: ${{ secrets.PORTAINER_WEBHOOK }}
         run: |
-          if [ -z "${{ secrets.PORTAINER_WEBHOOK }}" ]; then
+          if [ -z "$PORTAINER_WEBHOOK" ]; then
             echo "PORTAINER_WEBHOOK secret is not set — skipping redeploy trigger."
             echo "Set it in repo Settings > Secrets and variables > Actions to enable this step."
             exit 0
           fi
-          curl -fsSL -X POST "${{ secrets.PORTAINER_WEBHOOK }}"
+          curl -fsSL -X POST "$PORTAINER_WEBHOOK"
