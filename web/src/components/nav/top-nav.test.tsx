@@ -5,7 +5,7 @@ import {
   createRoute,
   createRouter,
 } from '@tanstack/react-router';
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, within } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import { TopNav } from './top-nav';
 
@@ -46,6 +46,18 @@ describe('TopNav', () => {
     renderTopNav();
 
     expect(await screen.findByRole('button', { name: /open menu/i })).toBeInTheDocument();
+  });
+
+  it('opens the mobile menu with Home/About/Projects links and a Download CV control', async () => {
+    renderTopNav();
+
+    fireEvent.click(await screen.findByRole('button', { name: /open menu/i }));
+
+    const mobileNav = await screen.findByRole('navigation', { name: /mobile/i });
+    expect(within(mobileNav).getByRole('link', { name: /home/i })).toBeInTheDocument();
+    expect(within(mobileNav).getByRole('link', { name: /about/i })).toBeInTheDocument();
+    expect(within(mobileNav).getByRole('link', { name: /projects/i })).toBeInTheDocument();
+    expect(within(mobileNav).getByRole('link', { name: /download cv/i })).toBeInTheDocument();
   });
 
   it('highlights the active route link', async () => {

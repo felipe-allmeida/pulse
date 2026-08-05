@@ -6,6 +6,7 @@ import {
   Sheet,
   SheetClose,
   SheetContent,
+  SheetDescription,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
@@ -48,6 +49,9 @@ export function TopNav() {
           <SheetContent side="right">
             <SheetHeader>
               <SheetTitle>Menu</SheetTitle>
+              <SheetDescription className="sr-only">
+                Navigate to Home, About, or Projects, or download the CV.
+              </SheetDescription>
             </SheetHeader>
             <nav aria-label="Mobile" className="flex flex-col gap-4 px-4">
               {NAV_LINKS.map((link) => (
