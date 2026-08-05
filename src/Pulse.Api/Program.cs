@@ -45,14 +45,18 @@ builder.Services.AddOpenTelemetry()
     .WithTracing(t => t.AddAspNetCoreInstrumentation().AddOtlpExporter())
     .WithMetrics(m => m.AddAspNetCoreInstrumentation().AddOtlpExporter());
 
-// Geo locator — real GeoLite2 if the .mmdb exists, else a safe null-object (Unknown).
-// Lazy factory (not `new DatabaseReader(...)` at registration) so the API boots with no .mmdb.
+// Geo locator — real GeoLite2 if the .mmdb exists; otherwise a demo fallback that spreads
+// visits across real cities so the map/chart come alive out of the box (set
+// Geo:DemoFallback=false to fall back to "Unknown" instead). Lazy factory (not
+// `new DatabaseReader(...)` at registration) so the API boots with no .mmdb.
 builder.Services.AddSingleton<Pulse.Api.Geo.IGeoLocator>(_ =>
 {
     var path = builder.Configuration["Geo:DbPath"];
-    return !string.IsNullOrWhiteSpace(path) && File.Exists(path)
-        ? new Pulse.Api.Geo.GeoLocator(new MaxMind.GeoIP2.DatabaseReader(path))
-        : new Pulse.Api.Geo.NullGeoLocator();
+    if (!string.IsNullOrWhiteSpace(path) && File.Exists(path))
+        return new Pulse.Api.Geo.GeoLocator(new MaxMind.GeoIP2.DatabaseReader(path));
+
+    var demo = builder.Configuration.GetValue("Geo:DemoFallback", true);
+    return demo ? new Pulse.Api.Geo.DemoGeoLocator() : new Pulse.Api.Geo.NullGeoLocator();
 });
 
 // Forwarded headers so Context.GetHttpContext() sees the real client IP behind Caddy.
