@@ -1,6 +1,6 @@
 // lucide-react's brand icon set (Github, etc.) was removed upstream; a
 // generic external-link glyph is used for repo/demo links instead.
-import { ExternalLink } from 'lucide-react';
+import { ExternalLink, Lock } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { buttonVariants } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -68,7 +68,10 @@ export function ProjectCard({ project }: ProjectCardProps) {
             ))}
           </div>
         ) : (
-          <span className="text-sm text-muted-foreground">Professional work &mdash; private</span>
+          <span className="flex items-center gap-1.5 text-sm text-muted-foreground">
+            <Lock aria-hidden="true" className="size-3.5" />
+            Private
+          </span>
         )}
       </CardFooter>
     </Card>

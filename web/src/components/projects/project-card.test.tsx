@@ -44,6 +44,6 @@ describe('ProjectCard', () => {
 
     expect(screen.getByText('Ulbra Atende')).toBeInTheDocument();
     expect(screen.queryByRole('link')).not.toBeInTheDocument();
-    expect(screen.getByText(/professional work.*private/i)).toBeInTheDocument();
+    expect(screen.getByText('Private')).toBeInTheDocument();
   });
 });
