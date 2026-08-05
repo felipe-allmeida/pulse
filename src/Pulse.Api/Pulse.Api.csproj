@@ -14,4 +14,7 @@
     <ProjectReference Include="..\Pulse.Persistence\Pulse.Persistence.csproj" />
     <ProjectReference Include="..\Pulse.Domain\Pulse.Domain.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Assistant/profile.md" />
+  </ItemGroup>
 </Project>
