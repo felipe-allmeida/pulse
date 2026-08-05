@@ -5,7 +5,7 @@ import type { Topology, GeometryCollection } from 'topojson-specification';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { countryCounts, matchCountryName } from '@/lib/geo';
 import { useVisits } from '@/lib/api';
-import type { VisitPoint } from '@/types/pulse';
+import { byNewest, EMPTY_POINTS } from '@/lib/points';
 import countriesTopology from '@/assets/countries-110m.json';
 
 const WIDTH = 800;
@@ -23,21 +23,13 @@ const world = feature(topology, topology.objects.countries);
 const projection = geoNaturalEarth1().fitSize([WIDTH, HEIGHT], world);
 const path = geoPath(projection);
 
-const EMPTY_POINTS: VisitPoint[] = [];
-
-function mostRecent(points: VisitPoint[], count: number): VisitPoint[] {
-  return [...points]
-    .sort((a, b) => new Date(b.at).getTime() - new Date(a.at).getTime())
-    .slice(0, count);
-}
-
 export function LiveMap() {
   const { data } = useVisits();
   const points = data ?? EMPTY_POINTS;
 
   const counts = useMemo(() => countryCounts(points), [points]);
   const maxCount = useMemo(() => Math.max(0, ...counts.values()), [counts]);
-  const pings = useMemo(() => mostRecent(points, RECENT_PING_COUNT), [points]);
+  const pings = useMemo(() => byNewest(points, RECENT_PING_COUNT), [points]);
 
   const loggedUnmatchedRef = useRef<Set<string>>(new Set());
   useEffect(() => {

@@ -3,9 +3,7 @@ import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YA
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useVisits } from '@/lib/api';
 import { bucketByHour } from '@/lib/geo';
-import type { VisitPoint } from '@/types/pulse';
-
-const EMPTY_POINTS: VisitPoint[] = [];
+import { EMPTY_POINTS } from '@/lib/points';
 
 /**
  * Formats a bucketed hour key (e.g. "2026-08-04T21:00") as a short local

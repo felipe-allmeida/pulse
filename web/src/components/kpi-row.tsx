@@ -3,6 +3,7 @@ import { StatCard } from '@/components/stat-card';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useMetrics } from '@/lib/api';
+import { useMetricHistory } from '@/hooks/use-metric-history';
 
 function StatCardSkeleton() {
   return (
@@ -20,6 +21,7 @@ function StatCardSkeleton() {
 
 export function KpiRow() {
   const { data, isLoading } = useMetrics();
+  const history = useMetricHistory();
 
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -30,8 +32,13 @@ export function KpiRow() {
         </>
       ) : (
         <>
-          <StatCard label="Active connections" value={data.activeConnections} icon={Activity} />
-          <StatCard label="Total visits" value={data.totalVisits} icon={Users} />
+          <StatCard
+            label="Active connections"
+            value={data.activeConnections}
+            icon={Activity}
+            series={history.activeConnections}
+          />
+          <StatCard label="Total visits" value={data.totalVisits} icon={Users} series={history.totalVisits} />
         </>
       )}
     </div>

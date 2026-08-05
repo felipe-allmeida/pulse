@@ -6,12 +6,15 @@ import { Reactions } from '@/components/reactions';
 import { RecentVisitsTable } from '@/components/recent-visits-table';
 import { VisitsChart } from '@/components/visits-chart';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useVisitFeed } from '@/hooks/use-visit-feed';
 
 export const Route = createFileRoute('/')({
   component: Index,
 });
 
 function Index() {
+  useVisitFeed();
+
   return (
     <div className="flex flex-col gap-6 pb-24">
       <KpiRow />

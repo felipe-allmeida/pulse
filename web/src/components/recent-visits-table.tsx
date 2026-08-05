@@ -4,42 +4,12 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useVisits } from '@/lib/api';
+import { formatRelativeTime } from '@/lib/format';
+import { byNewest, EMPTY_POINTS } from '@/lib/points';
 import type { VisitPoint } from '@/types/pulse';
 
 const MAX_ROWS = 15;
 const SKELETON_ROWS = 5;
-
-const MINUTE = 60;
-const HOUR = MINUTE * 60;
-const DAY = HOUR * 24;
-
-const relativeTimeFormatter = new Intl.RelativeTimeFormat('en', { numeric: 'auto' });
-
-/**
- * Pure helper: formats `at` relative to `now`. Kept pure (no Date.now() inside)
- * so tests can pass a fixed `now` and get a deterministic string.
- */
-export function formatRelativeTime(at: string, now: Date = new Date()): string {
-  const diffSeconds = Math.round((new Date(at).getTime() - now.getTime()) / 1000);
-  const absSeconds = Math.abs(diffSeconds);
-
-  if (absSeconds < MINUTE) {
-    return relativeTimeFormatter.format(diffSeconds, 'second');
-  }
-  if (absSeconds < HOUR) {
-    return relativeTimeFormatter.format(Math.round(diffSeconds / MINUTE), 'minute');
-  }
-  if (absSeconds < DAY) {
-    return relativeTimeFormatter.format(Math.round(diffSeconds / HOUR), 'hour');
-  }
-  return relativeTimeFormatter.format(Math.round(diffSeconds / DAY), 'day');
-}
-
-function newestFirst(points: VisitPoint[], limit: number): VisitPoint[] {
-  return [...points].sort((a, b) => new Date(b.at).getTime() - new Date(a.at).getTime()).slice(0, limit);
-}
-
-const EMPTY_POINTS: VisitPoint[] = [];
 
 type RecentVisitsTableProps = {
   /** Reference instant for relative-time formatting. Defaults to the real current time. */
@@ -62,7 +32,7 @@ function buildColumns(now: Date) {
 
 export function RecentVisitsTable({ now = new Date() }: RecentVisitsTableProps = {}) {
   const { data, isLoading } = useVisits();
-  const points = useMemo(() => newestFirst(data ?? EMPTY_POINTS, MAX_ROWS), [data]);
+  const points = useMemo(() => byNewest(data ?? EMPTY_POINTS, MAX_ROWS), [data]);
   const columns = useMemo(() => buildColumns(now), [now]);
 
   const table = useReactTable({

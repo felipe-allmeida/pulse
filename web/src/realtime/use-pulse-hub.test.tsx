@@ -1,5 +1,7 @@
+import { useState } from 'react';
 import { act, render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { queryClient } from '@/lib/query-client';
 import { useEventStore } from '@/stores/event-store';
 import { PulseHubProvider, usePulseHub } from './use-pulse-hub';
 
@@ -85,6 +87,57 @@ describe('PulseHubProvider / usePulseHub', () => {
       label: 'Reaction 🎉',
       at: '2026-08-04T10:00:00Z',
     });
+  });
+
+  it('does not invalidate visits or metrics queries on ReactionReceived (presence is handled via setCount)', async () => {
+    const invalidateSpy = vi.spyOn(queryClient, 'invalidateQueries');
+
+    render(
+      <PulseHubProvider>
+        <Probe />
+      </PulseHubProvider>,
+    );
+
+    await act(async () => {
+      fakeHub.fire('ReactionReceived', { emoji: '🎉', at: '2026-08-04T10:00:00Z' });
+    });
+
+    expect(invalidateSpy).not.toHaveBeenCalled();
+    invalidateSpy.mockRestore();
+  });
+
+  it('keeps a stable context value reference across unrelated re-renders', async () => {
+    const seen: unknown[] = [];
+
+    function ValueProbe() {
+      seen.push(usePulseHub());
+      return null;
+    }
+
+    function Wrapper() {
+      const [, setTick] = useState(0);
+      return (
+        <PulseHubProvider>
+          <ValueProbe />
+          <button onClick={() => setTick((t) => t + 1)}>tick</button>
+        </PulseHubProvider>
+      );
+    }
+
+    render(<Wrapper />);
+    // Let the hub's start() promise settle so `connection` stabilizes before
+    // we capture the reference we compare against.
+    await act(async () => {
+      await Promise.resolve();
+    });
+    const first = seen[seen.length - 1];
+
+    await act(async () => {
+      screen.getByText('tick').click();
+    });
+    const second = seen[seen.length - 1];
+
+    expect(second).toBe(first);
   });
 
   it('invokes React on the hub when react() is called', async () => {

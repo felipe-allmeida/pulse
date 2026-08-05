@@ -1,6 +1,6 @@
 import { Heart, MapPin } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { formatRelativeTime } from '@/components/recent-visits-table';
+import { formatRelativeTime } from '@/lib/format';
 import { useEventStore } from '@/stores/event-store';
 import type { PulseEvent } from '@/types/pulse';
 

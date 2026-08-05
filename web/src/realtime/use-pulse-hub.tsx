@@ -1,6 +1,5 @@
-import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import type { HubConnection } from '@microsoft/signalr';
-import { queryClient } from '@/lib/query-client';
 import { useEventStore } from '@/stores/event-store';
 import type { Reaction } from '@/types/pulse';
 import { buildHub } from './hub';
@@ -33,9 +32,11 @@ export function PulseHubProvider({ children }: { children: ReactNode }) {
 
     const onPresenceUpdated = (n: number) => setCount(n);
     const onReactionReceived = (reaction: Reaction) => {
+      // A reaction doesn't change visits or metrics server-side (presence is
+      // handled separately via PresenceUpdated/setCount), so there's nothing
+      // to invalidate here — metrics and visits already refetch on their own
+      // polling intervals (3s / 10s respectively).
       useEventStore.getState().push({ kind: 'reaction', label: `Reaction ${reaction.emoji}`, at: reaction.at });
-      queryClient.invalidateQueries({ queryKey: ['visits'] });
-      queryClient.invalidateQueries({ queryKey: ['metrics'] });
     };
 
     hub.on('PresenceUpdated', onPresenceUpdated);
@@ -81,11 +82,16 @@ export function PulseHubProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
-  const react = (emoji: string) => {
+  const react = useCallback((emoji: string) => {
     connectionRef.current?.invoke('React', emoji).catch(() => {});
-  };
+  }, []);
 
-  return <PulseHubContext.Provider value={{ count, connection, react }}>{children}</PulseHubContext.Provider>;
+  const value = useMemo<PulseHubContextValue>(
+    () => ({ count, connection, react }),
+    [count, connection, react],
+  );
+
+  return <PulseHubContext.Provider value={value}>{children}</PulseHubContext.Provider>;
 }
 
 export function usePulseHub(): PulseHubContextValue {

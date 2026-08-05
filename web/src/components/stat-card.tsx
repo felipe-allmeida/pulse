@@ -14,7 +14,7 @@ export function StatCard({ label, value, icon: Icon, series }: StatCardProps) {
     <Card>
       <CardHeader className="flex-row items-center justify-between gap-2 space-y-0 pb-2">
         <CardTitle className="text-sm font-medium text-muted-foreground">{label}</CardTitle>
-        <Icon className="size-4 text-muted-foreground" />
+        <Icon className="size-4 text-muted-foreground" aria-hidden="true" />
       </CardHeader>
       <CardContent>
         <div className="text-2xl font-bold text-foreground">{value.toLocaleString()}</div>
