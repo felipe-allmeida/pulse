@@ -35,4 +35,24 @@ public class AskRateGuardTests : IAsyncLifetime
         Assert.True(await guard.TryConsumeAsync("2.2.2.2"));
         Assert.False(await guard.TryConsumeAsync("3.3.3.3")); // global cap hit despite per-IP budget remaining
     }
+
+    [Fact]
+    public async Task TryConsume_RejectedPerIpRequests_DoNotConsumeGlobalBudget()
+    {
+        // DailyCap is small enough that if the abuser's rejected requests leaked into the global
+        // counter, it would be exhausted well before a different IP gets a turn.
+        var guard = new RedisAskRateGuard(_mux, Options.Create(new AskOptions { DailyCap = 3, PerIpDailyCap = 2 }));
+
+        // Abuser IP: 2 allowed (consumes its per-IP cap), then hammer well past it — all rejected.
+        Assert.True(await guard.TryConsumeAsync("9.9.9.9"));
+        Assert.True(await guard.TryConsumeAsync("9.9.9.9"));
+        for (var i = 0; i < 10; i++)
+        {
+            Assert.False(await guard.TryConsumeAsync("9.9.9.9"));
+        }
+
+        // A different IP must still have global budget left — the abuser's 10 rejected requests
+        // must not have touched the shared global counter (only its 2 allowed ones did).
+        Assert.True(await guard.TryConsumeAsync("8.8.8.8"));
+    }
 }
