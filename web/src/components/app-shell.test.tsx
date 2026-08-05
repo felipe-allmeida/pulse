@@ -1,3 +1,10 @@
+import {
+  RouterProvider,
+  createMemoryHistory,
+  createRootRoute,
+  createRoute,
+  createRouter,
+} from '@tanstack/react-router';
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -7,15 +14,32 @@ vi.mock('@/realtime/use-pulse-hub', () => ({
 
 const { AppShell } = await import('./app-shell');
 
-describe('AppShell', () => {
-  it('renders the wordmark, status widgets, and children', () => {
-    render(
+function renderAppShell() {
+  const rootRoute = createRootRoute({
+    component: () => (
       <AppShell>
         <div>page content</div>
-      </AppShell>,
-    );
+      </AppShell>
+    ),
+  });
+  const indexRoute = createRoute({ getParentRoute: () => rootRoute, path: '/', component: () => null });
+  const aboutRoute = createRoute({ getParentRoute: () => rootRoute, path: '/about', component: () => null });
+  const projectsRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: '/projects',
+    component: () => null,
+  });
+  const routeTree = rootRoute.addChildren([indexRoute, aboutRoute, projectsRoute]);
+  const router = createRouter({ routeTree, history: createMemoryHistory({ initialEntries: ['/'] }) });
 
-    expect(screen.getByText('Pulse')).toBeInTheDocument();
+  return render(<RouterProvider router={router} />);
+}
+
+describe('AppShell', () => {
+  it('renders the wordmark, status widgets, and children', async () => {
+    renderAppShell();
+
+    expect(await screen.findByText('Pulse')).toBeInTheDocument();
     expect(screen.getByText(/connected/i)).toBeInTheDocument();
     expect(screen.getByText('4 online')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /toggle theme/i })).toBeInTheDocument();
