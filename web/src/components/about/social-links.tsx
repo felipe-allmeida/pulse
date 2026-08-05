@@ -16,7 +16,7 @@ export function SocialLinks() {
           rel="noreferrer"
           className={cn(buttonVariants({ variant: 'outline', size: 'sm' }))}
         >
-          <ExternalLink />
+          <ExternalLink aria-hidden />
           {social.label}
         </a>
       ))}

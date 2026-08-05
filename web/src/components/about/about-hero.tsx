@@ -3,12 +3,8 @@ import { profile } from '@/content/profile';
 
 // TODO: swap the initials placeholder for a real photo once web/public/felipe.jpg lands.
 export function AboutHero() {
-  const initials = profile.name
-    .split(' ')
-    .map((part) => part[0])
-    .join('')
-    .slice(0, 2)
-    .toUpperCase();
+  const nameParts = profile.name.trim().split(/\s+/);
+  const initials = (nameParts[0][0] + nameParts[nameParts.length - 1][0]).toUpperCase();
 
   return (
     <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center">

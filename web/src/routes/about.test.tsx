@@ -14,6 +14,13 @@ describe('AboutPage', () => {
     expect(screen.getAllByText(/Kota\.io/).length).toBeGreaterThan(0);
   });
 
+  it('renders the initials-avatar placeholder as first + last name initials', () => {
+    render(<AboutPage />);
+
+    // The avatar is aria-hidden, so it's queried by text rather than by role/name.
+    expect(screen.getByText('FA')).toBeInTheDocument();
+  });
+
   it('renders exactly one h1', () => {
     render(<AboutPage />);
 
