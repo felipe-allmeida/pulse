@@ -102,6 +102,44 @@ with a European/GDPR-conscious audience in mind:
   Redis TTL set; there is no durable record of *which* connections were
   present, only aggregate counts.
 
+## AI assistant
+
+A floating chat widget lets a recruiter ask questions about Felipe — "Does
+he have Kubernetes experience?", "What's he working on now?" — and get a
+streamed, grounded answer instead of skimming a CV.
+
+- **Grounded, not a general chatbot.**
+  [`src/Pulse.Api/Assistant/profile.md`](src/Pulse.Api/Assistant/profile.md)
+  is the **single curated source** the assistant knows about Felipe —
+  experience, skills, projects, an FAQ. The system prompt restricts answers
+  to that file's content (third person, English) and the file is meant to be
+  edited freely as things change; there's no other data source, no resume
+  upload, no web lookup.
+- **Streamed.** `POST /api/ask` streams the response token-by-token over the
+  wire so the widget renders it incrementally, like a normal chat reply.
+- **Keyless-graceful.** With no OpenAI API key configured, the API still
+  boots and `/api/ask` still responds — it just replies that the assistant
+  isn't configured yet, instead of erroring or refusing to start.
+- **Capped by design.** A per-IP rate limit, a per-day question cap, and
+  caps on question length / conversation history / output tokens keep a
+  single visitor (or a bot) from running up API spend.
+
+**Config** (all under `OpenAI__*` / `Ask__*`, e.g. as environment variables
+or in `appsettings.json` under `OpenAI` / `Ask`):
+
+| Key | Purpose | Default |
+|---|---|---|
+| `OpenAI__ApiKey` | OpenAI (or OpenAI-compatible) API key. Unset → keyless-graceful mode. | *(empty)* |
+| `OpenAI__Model` | Chat completion model. | `gpt-4o-mini` |
+| `OpenAI__BaseUrl` | API base URL — any OpenAI-compatible endpoint works, not just OpenAI itself. | `https://api.openai.com/v1` |
+| `Ask__DailyCap` | Max questions served per day, across all visitors. | `500` |
+| `Ask__MaxOutputTokens` | Max tokens in a single answer. | `400` |
+| `Ask__MaxQuestionChars` | Max characters accepted in a question. | `500` |
+| `Ask__MaxHistory` | Max prior turns kept as conversation context. | `4` |
+
+No API key is committed anywhere in this repo — see [Deploy](#deploy) for
+how it's supplied in production.
+
 ## Run locally
 
 ```bash
