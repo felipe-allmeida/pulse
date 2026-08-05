@@ -18,13 +18,13 @@ describe('VisitsChart', () => {
       ],
     });
     expect(() => render(<VisitsChart />)).not.toThrow();
-    expect(screen.getByText('Recent visits')).toBeInTheDocument();
+    expect(screen.getByText('Visits over time')).toBeInTheDocument();
   });
 
   it('renders an empty state when there is no data yet', () => {
     useVisitsMock.mockReturnValue({ data: undefined });
     render(<VisitsChart />);
-    expect(screen.getByText('Recent visits')).toBeInTheDocument();
+    expect(screen.getByText('Visits over time')).toBeInTheDocument();
     expect(screen.getByText('No visits yet.')).toBeInTheDocument();
   });
 });

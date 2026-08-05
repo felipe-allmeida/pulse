@@ -18,7 +18,7 @@ function formatHourLabel(hour: string): string {
 }
 
 /**
- * "Recent visits" area chart: hourly visit counts over the visitor points
+ * "Visits over time" area chart: hourly visit counts over the visitor points
  * currently held by the API. This is NOT an all-time trend — `/api/map`
  * only ever returns the last 100 tracked points, so the chart reflects
  * recent activity, not full history.
@@ -31,7 +31,7 @@ export function VisitsChart() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Recent visits</CardTitle>
+        <CardTitle>Visits over time</CardTitle>
         <CardDescription>Hourly activity across the last 100 tracked visits</CardDescription>
       </CardHeader>
       <CardContent>

@@ -24,7 +24,10 @@ export function Reactions() {
   const { react } = usePulseHub();
   const events = useEventStore((s) => s.events);
   const [floating, setFloating] = useState<FloatingReaction[]>([]);
-  const lastSeenRef = useRef<PulseEvent | null>(null);
+  // Seed with whatever is already newest in the store at mount time, so an
+  // existing reaction that was already the newest event does NOT float on
+  // first render — only reactions pushed *after* mount should animate.
+  const lastSeenRef = useRef<PulseEvent | null>(useEventStore.getState().events[0] ?? null);
   const nextIdRef = useRef(0);
 
   useEffect(() => {
