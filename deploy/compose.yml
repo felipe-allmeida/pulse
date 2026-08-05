@@ -82,6 +82,18 @@ services:
       #     - /opt/pulse/GeoLite2-City.mmdb:/geo/GeoLite2-City.mmdb:ro
       #   environment:
       #     Geo__DbPath: /geo/GeoLite2-City.mmdb
+      #
+      # AI recruiter chat (/api/ask) — keyless-graceful: with OpenAI__ApiKey
+      # unset the API still boots and /api/ask still responds, just with a
+      # canned "not configured" message instead of a real completion. In
+      # prod, OpenAI__ApiKey is set via /opt/pulse/.env (never committed).
+      # OpenAI__ApiKey:
+      # OpenAI__Model:            # default: gpt-4o-mini
+      # OpenAI__BaseUrl:          # default: https://api.openai.com/v1 (any OpenAI-compatible endpoint works)
+      # Ask__DailyCap:            # default: 500
+      # Ask__MaxOutputTokens:     # default: 400
+      # Ask__MaxQuestionChars:    # default: 500
+      # Ask__MaxHistory:          # default: 4
     depends_on:
       postgres:
         condition: service_healthy

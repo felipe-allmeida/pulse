@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.SignalR;
 using StackExchange.Redis;
 using MassTransit;
 using OpenTelemetry.Trace; using OpenTelemetry.Metrics; using OpenTelemetry.Resources;
+using Pulse.Api.Assistant;
 using Pulse.Api.Endpoints; using Pulse.Api.Realtime; using Pulse.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -38,6 +39,16 @@ builder.Services.AddRateLimiter(o =>
             Window = TimeSpan.FromMinutes(1),
             QueueLimit = 0
         }));
+    // AI recruiter chat (/api/ask) — 10 req/min per client IP, tighter than "public"
+    // since each request streams an LLM completion.
+    o.AddPolicy("ask", httpContext => RateLimitPartition.GetFixedWindowLimiter(
+        httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+        _ => new FixedWindowRateLimiterOptions
+        {
+            PermitLimit = 10,
+            Window = TimeSpan.FromMinutes(1),
+            QueueLimit = 0
+        }));
 });
 
 builder.Services.AddOpenTelemetry()
@@ -58,6 +69,19 @@ builder.Services.AddSingleton<Pulse.Api.Geo.IGeoLocator>(_ =>
     var demo = builder.Configuration.GetValue("Geo:DemoFallback", true);
     return demo ? new Pulse.Api.Geo.DemoGeoLocator() : new Pulse.Api.Geo.NullGeoLocator();
 });
+
+// AI recruiter chat (/api/ask) — profile-grounded Q&A about Felipe, keyless-graceful.
+builder.Services.Configure<OpenAiOptions>(cfg.GetSection("OpenAI"));
+builder.Services.Configure<AskOptions>(cfg.GetSection("Ask"));
+builder.Services.AddSingleton<IProfileProvider, EmbeddedProfileProvider>();
+builder.Services.AddSingleton<AskMessageBuilder>();
+builder.Services.AddSingleton<IAskRateGuard, RedisAskRateGuard>();
+// No API key configured -> app still boots and /api/ask still works, just with a
+// canned "not configured" response instead of a real OpenAI-backed completion.
+if (!string.IsNullOrWhiteSpace(cfg["OpenAI:ApiKey"]))
+    builder.Services.AddHttpClient<IAiClient, OpenAiClient>();
+else
+    builder.Services.AddSingleton<IAiClient, NullAiClient>();
 
 // Forwarded headers so Context.GetHttpContext() sees the real client IP behind Caddy.
 // KnownNetworks/KnownProxies default to loopback only, but Caddy runs as a separate
@@ -99,6 +123,7 @@ app.UseRateLimiter();
 app.MapHub<PresenceHub>("/hub/presence");
 app.MapGet("/health", () => Results.Ok("ok"));
 app.MapPublic();
+app.MapAsk();
 app.Run();
 
 public partial class Program { } // for WebApplicationFactory
