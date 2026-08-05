@@ -1,10 +1,5 @@
 import { useMemo } from 'react';
-import { flexRender } from '@tanstack/react-table';
-// @tanstack/react-table v9 replaced `useReactTable`/`getCoreRowModel` with a new
-// feature-slot `useTable` API. `/legacy` is the first-party v8-compat entry point
-// that keeps the familiar `useReactTable`-shaped API we don't need row-model
-// features (sorting/filtering/pagination) beyond the always-on core row model.
-import { getCoreRowModel, useLegacyTable, type LegacyColumnDef } from '@tanstack/react-table/legacy';
+import { createColumnHelper, flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-table';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -51,16 +46,17 @@ type RecentVisitsTableProps = {
   now?: Date;
 };
 
-function buildColumns(now: Date): LegacyColumnDef<VisitPoint>[] {
+const columnHelper = createColumnHelper<VisitPoint>();
+
+function buildColumns(now: Date) {
   return [
-    { id: 'city', header: 'City', accessorKey: 'city' },
-    { id: 'country', header: 'Country', accessorKey: 'country' },
-    {
+    columnHelper.accessor('city', { id: 'city', header: 'City' }),
+    columnHelper.accessor('country', { id: 'country', header: 'Country' }),
+    columnHelper.accessor('at', {
       id: 'when',
       header: 'When',
-      accessorKey: 'at',
-      cell: ({ getValue }) => formatRelativeTime(getValue<string>(), now),
-    },
+      cell: ({ getValue }) => formatRelativeTime(getValue(), now),
+    }),
   ];
 }
 
@@ -69,7 +65,7 @@ export function RecentVisitsTable({ now = new Date() }: RecentVisitsTableProps =
   const points = useMemo(() => newestFirst(data ?? EMPTY_POINTS, MAX_ROWS), [data]);
   const columns = useMemo(() => buildColumns(now), [now]);
 
-  const table = useLegacyTable({
+  const table = useReactTable({
     data: points,
     columns,
     getCoreRowModel: getCoreRowModel(),
