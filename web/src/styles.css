@@ -118,3 +118,18 @@ body {
   transform-box: fill-box;
   animation: live-map-ping 1.8s ease-out infinite;
 }
+
+@keyframes reaction-float {
+  0% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-2.5rem);
+    opacity: 0;
+  }
+}
+
+.animate-reaction-float {
+  animation: reaction-float 1.2s ease-out forwards;
+}
