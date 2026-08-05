@@ -127,4 +127,45 @@ describe('PulseHubProvider / usePulseHub', () => {
       vi.useRealTimers();
     }
   });
+
+  it('recovers from a failed initial start by retrying after 5s, without throwing', async () => {
+    vi.useFakeTimers();
+    const unhandledRejections: unknown[] = [];
+    const onUnhandledRejection = (event: Event) => {
+      unhandledRejections.push((event as PromiseRejectionEvent).reason);
+    };
+    window.addEventListener('unhandledrejection', onUnhandledRejection);
+
+    try {
+      // First start() rejects (handshake failure at page load); subsequent
+      // calls fall back to the default resolved implementation.
+      fakeHub.start.mockImplementationOnce(() => Promise.reject(new Error('handshake failed')));
+
+      render(
+        <PulseHubProvider>
+          <Probe />
+        </PulseHubProvider>,
+      );
+
+      // Let the rejected start() promise settle.
+      await act(async () => {
+        await Promise.resolve();
+        await Promise.resolve();
+      });
+
+      expect(fakeHub.start).toHaveBeenCalledTimes(1);
+      expect(screen.getByTestId('connection').textContent).toBe('offline');
+
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(5_000);
+      });
+
+      expect(fakeHub.start).toHaveBeenCalledTimes(2);
+      expect(screen.getByTestId('connection').textContent).toBe('connected');
+      expect(unhandledRejections).toEqual([]);
+    } finally {
+      window.removeEventListener('unhandledrejection', onUnhandledRejection);
+      vi.useRealTimers();
+    }
+  });
 });
