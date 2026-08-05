@@ -16,7 +16,8 @@ public static class AskEndpoints
                 return Results.BadRequest("Ask a question between 1 and " + opts.Value.MaxQuestionChars + " characters.");
 
             ctx.Response.ContentType = "text/plain; charset=utf-8";
-            if (!await guard.TryConsumeAsync())
+            var clientIp = ctx.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+            if (!await guard.TryConsumeAsync(clientIp))
             {
                 await ctx.Response.WriteAsync("The assistant is resting for today — please try again tomorrow.", ctx.RequestAborted);
                 return Results.Empty;

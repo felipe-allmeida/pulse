@@ -1,15 +1,23 @@
 using StackExchange.Redis; using Microsoft.Extensions.Options;
 namespace Pulse.Api.Assistant;
-public interface IAskRateGuard { Task<bool> TryConsumeAsync(); }
+public interface IAskRateGuard { Task<bool> TryConsumeAsync(string clientIp); }
 public sealed class RedisAskRateGuard(IConnectionMultiplexer mux, IOptions<AskOptions> opts) : IAskRateGuard
 {
     private readonly int _cap = opts.Value.DailyCap;
-    public async Task<bool> TryConsumeAsync()
+    private readonly int _ipCap = opts.Value.PerIpDailyCap;
+    public async Task<bool> TryConsumeAsync(string clientIp)
     {
         var db = mux.GetDatabase();
-        var key = (RedisKey)$"pulse:ask:daily:{DateTime.UtcNow:yyyyMMdd}";
-        var n = await db.StringIncrementAsync(key);
-        if (n == 1) await db.KeyExpireAsync(key, TimeSpan.FromHours(48));
-        return n <= _cap;
+        var date = DateTime.UtcNow.ToString("yyyyMMdd");
+        var globalKey = (RedisKey)$"pulse:ask:daily:{date}";
+        var ipKey = (RedisKey)$"pulse:ask:daily:ip:{clientIp}:{date}";
+
+        var globalCount = await db.StringIncrementAsync(globalKey);
+        if (globalCount == 1) await db.KeyExpireAsync(globalKey, TimeSpan.FromHours(48));
+
+        var ipCount = await db.StringIncrementAsync(ipKey);
+        if (ipCount == 1) await db.KeyExpireAsync(ipKey, TimeSpan.FromHours(48));
+
+        return globalCount <= _cap && ipCount <= _ipCap;
     }
 }

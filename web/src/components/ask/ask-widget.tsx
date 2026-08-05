@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { MessageCircle, Send } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -29,6 +29,13 @@ export function AskWidget() {
   const [input, setInput] = useState('');
   const [isStreaming, setIsStreaming] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const abortRef = useRef<AbortController | null>(null);
+
+  useEffect(() => {
+    return () => {
+      abortRef.current?.abort();
+    };
+  }, []);
 
   async function submit(question: string) {
     const trimmed = question.trim();
@@ -42,10 +49,14 @@ export function AskWidget() {
     setMessages((prev) => [...prev, { role: 'user', content: trimmed }, { role: 'assistant', content: '' }]);
     setIsStreaming(true);
 
+    const controller = new AbortController();
+    abortRef.current = controller;
+
     try {
       await streamAsk({
         question: trimmed,
         history,
+        signal: controller.signal,
         onChunk: (chunk) => {
           setMessages((prev) => {
             const next = [...prev];
@@ -57,8 +68,10 @@ export function AskWidget() {
           });
         },
       });
-    } catch {
-      setError("Sorry, something went wrong. Please try again in a moment.");
+    } catch (err) {
+      if (!(err instanceof Error && err.name === 'AbortError')) {
+        setError("Sorry, something went wrong. Please try again in a moment.");
+      }
     } finally {
       setIsStreaming(false);
     }
@@ -73,8 +86,14 @@ export function AskWidget() {
     void submit(question);
   }
 
+  function handleOpenChange(open: boolean) {
+    if (!open) {
+      abortRef.current?.abort();
+    }
+  }
+
   return (
-    <Sheet>
+    <Sheet onOpenChange={handleOpenChange}>
       <SheetTrigger asChild>
         <Button
           className="fixed bottom-6 right-6 z-50 shadow-lg"
@@ -136,6 +155,7 @@ export function AskWidget() {
             value={input}
             maxLength={500}
             placeholder="Ask about Felipe's experience..."
+            aria-label="Ask about Felipe"
             onChange={(event) => setInput(event.target.value)}
             className="min-h-10"
           />

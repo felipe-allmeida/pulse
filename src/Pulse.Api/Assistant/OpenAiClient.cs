@@ -26,7 +26,7 @@ public sealed class OpenAiClient(HttpClient http, IOptions<OpenAiOptions> ai, IO
         string? line;
         while ((line = await reader.ReadLineAsync(ct)) is not null)
         {
-            if (!line.StartsWith("data:")) continue;
+            if (!line.StartsWith("data:", StringComparison.Ordinal)) continue;
             var data = line["data:".Length..].Trim();
             if (data is "[DONE]") yield break;
             var token = ParseDelta(data);
