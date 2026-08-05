@@ -6,7 +6,9 @@
 
 **Architecture:** React 19 + Vite SPA using TanStack Router (file-based) + TanStack Query (REST reads) + a SignalR realtime provider that invalidates queries on live events. shadcn/ui (Radix + Tailwind 4) for the component system, Recharts for charts/sparklines, react-simple-maps for a choropleth world map. Same API contract (`/api/metrics`, `/api/map`, `/hub/presence`).
 
-**Tech Stack:** React 19, Vite 6, TanStack Router + Query v5, shadcn/ui (new-york/neutral), Tailwind CSS 4, class-variance-authority, clsx, tailwind-merge, lucide-react, Recharts, react-simple-maps, world-atlas (topojson), zustand, @microsoft/signalr, vitest + @testing-library/react, pnpm.
+**Tech Stack:** React 19, Vite 6, TanStack Router + Query v5, shadcn/ui (new-york/neutral), Tailwind CSS 4, class-variance-authority, clsx, tailwind-merge, lucide-react, Recharts, **d3-geo + topojson-client** (SVG world map — React-19-safe, no third-party React map component), world-atlas (topojson data), zustand, @microsoft/signalr, vitest + @testing-library/react, pnpm.
+
+> **Map library note (amended 2026-08-04):** `react-simple-maps@3` declares peer React `^16 || 17 || 18` (not 19) and relies on `defaultProps` on function components, which React 19 ignores — likely a broken/blank map. We render the map directly with **`d3-geo`** (`geoNaturalEarth1` projection + `geoPath`) over **`world-atlas`** topojson decoded via **`topojson-client`**, as plain SVG `<path>`/`<circle>`. No third-party React component in the render path. If `react-simple-maps` was installed by Task 1, it is unused — remove it.
 
 ## Global Constraints
 
@@ -304,7 +306,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 - Consumes: `useVisits`, react-simple-maps, `world-atlas`.
 - Produces: `countryCounts`, `matchCountryName`, `LiveMap`.
 
-- [ ] **Step 1:** Add the topojson asset — copy `node_modules/world-atlas/countries-110m.json` to `src/assets/countries-110m.json` (bundled locally; no runtime fetch).
+- [ ] **Step 1:** Add deps + the topojson asset. `pnpm add d3-geo topojson-client && pnpm add -D @types/d3-geo @types/topojson-client`; `pnpm remove react-simple-maps @types/react-simple-maps` (unused). Copy `node_modules/world-atlas/countries-110m.json` to `src/assets/countries-110m.json` (bundled locally; no runtime fetch).
 - [ ] **Step 2: Write the failing test** — `geo.test.ts`:
 
 ```ts
@@ -325,7 +327,13 @@ it('aggregates visit points by normalized country', () => {
 - [ ] **Step 3: Run** — FAIL.
 - [ ] **Step 4: Implement** `lib/geo.ts` — `matchCountryName(name)` lowercases/trims + applies a small alias map for the few GeoLite2↔topojson mismatches (`'united states of america' → 'united states'`, `'russia'/'russian federation'`, `'south korea'/'republic of korea'`, `'czechia'/'czech republic'`, a handful more; default = normalized input). `countryCounts(points)` returns a `Map<normalizedName, count>`. Also add `bucketByHour` here (used in Task 8).
 - [ ] **Step 5: Run** — PASS.
-- [ ] **Step 6: Implement** `live-map.tsx` — a shadcn `Card` titled "Live locations" containing react-simple-maps `ComposableMap`/`Geographies` over the local topojson. Each geography fills by count via a sequential scale (transparent/`--muted` at 0 → `--chart-1` at max) using `countryCounts` + `matchCountryName(geo.properties.name)`; wrap each in a shadcn `Tooltip` showing `country — N visits`. Overlay `Marker`s for the most recent ~20 points with a CSS ping-pulse animation (keyframes in `styles.css`). Unmatched country names simply render at 0 (no crash) — log once in dev.
+- [ ] **Step 6: Implement** `live-map.tsx` with **d3-geo** (no react-simple-maps). A shadcn `Card` titled "Live locations" wrapping a responsive `<svg viewBox="0 0 W H">`:
+  - Decode countries once: `const world = feature(topo as any, (topo as any).objects.countries)` (`topojson-client` `feature`), `topo` = the imported `countries-110m.json`.
+  - Projection: `geoNaturalEarth1().fitSize([W, H], world)`; `const path = geoPath(projection)`.
+  - Choropleth: one `<path key d={path(geo)}>` per `world.features`; fill via a sequential scale from `--color-muted` (count 0) toward `--color-chart-1` (max count), where count = `countryCounts(points).get(matchCountryName(geo.properties.name)) ?? 0`. Give each a `<title>` (`{name} — {n} visits`) for a native tooltip (or a shadcn `Tooltip` if simple).
+  - Pings: for the most recent ~20 points, `const [x,y] = projection([p.lon, p.lat])!` → render a `<circle cx=x cy=y>` with a CSS ping-pulse animation (keyframes in `styles.css`).
+  - Unmatched country names simply count 0 (no crash) — dev-log the set of unmatched names once.
+  - Guard: `projection([lon,lat])` can return `null` for off-earth coords — skip those markers.
 - [ ] **Step 7: Verify** — `pnpm build` clean; a quick render test that `<LiveMap/>` mounts with mocked `useVisits` data without throwing.
 - [ ] **Step 8: Commit** — `git add -A && git commit -m "feat(web): choropleth live map with pings"`
 
