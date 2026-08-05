@@ -28,7 +28,7 @@ export const projects: Project[] = [
     name: 'Ulbra Atende',
     tagline: 'Support & ticketing platform.',
     description:
-      'An internal support/ticketing platform: a .NET 10 modular monolith with event-driven messaging (transactional outbox), granular roles and teams, ticket templates with stages and tasks, and a React dashboard.',
+      'An internal support and ticketing platform built with .NET and React — role-based access and configurable ticket workflows for internal teams.',
     tech: ['.NET 10', 'PostgreSQL', 'RabbitMQ', 'React', 'SignalR'],
     role: 'Software engineer',
     period: 'Professional work',
@@ -40,7 +40,7 @@ export const projects: Project[] = [
     name: 'Ulbra One',
     tagline: 'Internal ERP replacing legacy systems.',
     description:
-      'A modular, integrated internal ERP built to replace legacy systems — a .NET 10 modular monolith on PostgreSQL with a React front end, following the same architecture patterns as the ticketing platform.',
+      'An internal ERP built to replace legacy systems — a modular .NET platform on PostgreSQL with a React front end, covering core internal business operations.',
     tech: ['.NET 10', 'PostgreSQL', 'EF Core', 'React', 'Tailwind'],
     role: 'Software engineer',
     period: 'Professional work',
