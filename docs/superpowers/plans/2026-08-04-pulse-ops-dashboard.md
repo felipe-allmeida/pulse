@@ -122,16 +122,30 @@ export default defineConfig({
 ```
 
 - [ ] **Step 3:** `tsconfig.app.json` — `"strict": true`, `"jsx": "react-jsx"`, `"paths": { "@/*": ["./src/*"] }`, `"types": ["vitest/globals", "@testing-library/jest-dom"]`. `components.json` — exactly the shadcn config from Global Constraints. `src/test/setup.ts` — `import '@testing-library/jest-dom';`.
-- [ ] **Step 4:** `src/styles.css` — Tailwind 4 import + shadcn neutral CSS-variable tokens for `:root` and `.dark` (background, foreground, card, muted, border, primary, ring, plus a `--chart-1..5` set for Recharts). Dark is the default look.
+- [ ] **Step 4:** `src/styles.css` — Tailwind 4 import + shadcn neutral tokens for `:root`/`.dark` **AND a `@theme inline` block mapping them into Tailwind v4's `--color-*` namespace** (REQUIRED — in Tailwind v4 bare `:root` variables are invisible to the utility generator, so `bg-primary`/`text-foreground`/`bg-card` etc. won't emit without this). Dark is the default look.
 
 ```css
 @import "tailwindcss";
 @custom-variant dark (&:is(.dark *));
-:root { /* neutral shadcn light tokens: --background, --foreground, --card, --muted, --border, --primary, --ring, --chart-1..5 */ }
+:root { /* neutral shadcn light tokens (H S% L% triplets): --background, --foreground, --card(+-foreground), --popover(+-foreground), --primary(+-foreground), --secondary(+-foreground), --muted(+-foreground), --accent(+-foreground), --destructive(+-foreground), --border, --input, --ring, --radius, --chart-1..5 */ }
 .dark { /* neutral shadcn dark tokens */ }
+@theme inline {
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+  --color-card: hsl(var(--card)); --color-card-foreground: hsl(var(--card-foreground));
+  --color-popover: hsl(var(--popover)); --color-popover-foreground: hsl(var(--popover-foreground));
+  --color-primary: hsl(var(--primary)); --color-primary-foreground: hsl(var(--primary-foreground));
+  --color-secondary: hsl(var(--secondary)); --color-secondary-foreground: hsl(var(--secondary-foreground));
+  --color-muted: hsl(var(--muted)); --color-muted-foreground: hsl(var(--muted-foreground));
+  --color-accent: hsl(var(--accent)); --color-accent-foreground: hsl(var(--accent-foreground));
+  --color-destructive: hsl(var(--destructive)); --color-destructive-foreground: hsl(var(--destructive-foreground));
+  --color-border: hsl(var(--border)); --color-input: hsl(var(--input)); --color-ring: hsl(var(--ring));
+  --color-chart-1: hsl(var(--chart-1)); /* …through --color-chart-5 */
+}
 * { border-color: hsl(var(--border)); }
 body { background: hsl(var(--background)); color: hsl(var(--foreground)); }
 ```
+**Verify the mapping works:** after `pnpm build`, grep `dist/assets/*.css` for `.bg-primary{` and `.text-foreground{` — they must emit.
 
 - [ ] **Step 5:** `src/lib/utils.ts` (`cn`), `src/lib/query-client.ts` (`export const queryClient = new QueryClient()`), `src/stores/theme-store.ts`:
 
