@@ -43,9 +43,10 @@ Consolidate into `web/src/components/ui/` (or `components/signal/`) so every pag
 - **`social-links.tsx` → contact** — replaced/extended by `ContactButtons` (Calendly · Email · LinkedIn · WhatsApp). Add a "Get in touch" block.
 - `about-page.tsx` composes them in the signal layout; one `<h1>`.
 
-### 4.2 Projects (`routes/projects.tsx` + `components/projects/project-card.tsx`)
-- **`project-card.tsx`** — the signal card: screenshot slot (glow for the featured `pulse`), title + mono-aqua tagline, description, tech `Chip`s, a role/period line, and links **only for public** projects (`visibility:'public'`) / a muted "🔒 Private" indicator for private ones. **The `visibility` gate is unchanged** — private cards render no link in any locale. `pulse` is the featured (wide) card.
-- Projects route: `SectionEyebrow` + responsive grid; one `<h1>`.
+### 4.2 Projects — index + a dedicated page per project
+- **`project-card.tsx`** — the signal card: screenshot slot (glow for the featured `pulse`), title + mono-aqua tagline, description, tech `Chip`s, a role/period line. **The whole card links to `/projects/<slug>`** (its dedicated page). External links (GitHub/live) show **only for public** projects (`visibility:'public'`); private ones show a muted "🔒 Private" indicator. **The `visibility` gate is unchanged** — private cards render no external link in any locale. `pulse` is the featured (wide) card.
+- **Projects index** (`routes/projects.tsx`): `SectionEyebrow` + responsive grid of cards; one `<h1>`.
+- **Dedicated per-project page** (`routes/projects.$slug.tsx` + `components/projects/project-detail.tsx`): a full signal page per project — name (`<h1>`), tagline, tech, role/period, an overview + highlights, a screenshot area, and — **only for `visibility:'public'`** — the external links; private projects show the "Private" indicator and **no external link** (the invariant holds on the detail page too, both locales). Unknown slug → a localized not-found linking back to `/projects`. Content: `Project` gains a `detail` block (`highlights: LocalizedString[]` and/or `overview: LocalizedString`), en/pt-BR — Ulbra copy stays high-level (product/role/stack, no proprietary detail), Felipe reviews.
 
 ### 4.3 Nav / AppShell (`components/app-shell.tsx`, `components/nav/*`)
 - Refresh the header to the signal nav: the wordmark with the aqua dot, the links (Home · About · Projects · **Contact**), the mono PT/EN + theme toggles, and the "Ask the AI" button (opens the shared Ask store). Keep the live `ConnectionStatus`/`PresenceBadge` (restyled to fit) — this is a live system, the header can show it tastefully. Mobile Sheet menu adopts the same look.

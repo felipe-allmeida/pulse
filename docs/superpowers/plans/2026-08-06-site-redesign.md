@@ -57,16 +57,25 @@
 ### Task 3: Projects page in the signal language (invariant preserved)
 
 **Files:**
-- Modify: `web/src/components/projects/project-card.tsx`, `web/src/routes/projects.tsx`
-- Test: `web/src/components/projects/project-card.test.tsx` (extend)
+- Modify: `web/src/components/projects/project-card.tsx`, `web/src/routes/projects.tsx`, `web/src/content/projects.ts` (extend `Project` with detail content)
+- Create: `web/src/routes/projects.$slug.tsx` (dedicated per-project page), `web/src/components/projects/project-detail.tsx`
+- Test: `web/src/components/projects/project-card.test.tsx` (extend), `web/src/routes/project-detail.test.tsx` (new)
 
-**Interfaces:** Consumes `Chip`/`SectionEyebrow`, `projects` (localized), `useLocalized`.
+**Interfaces:** Consumes `Chip`/`SectionEyebrow`, `projects` (localized), `useLocalized`. Produces the `/projects/$slug` route.
 
-- [ ] **Step 1: failing test** — public `pulse` card renders its links (GitHub/live); a private card (`ulbra-atende`) renders NO link (`queryByRole('link')` absent) + the "Private" indicator, in BOTH en and pt-BR; a tech `Chip` renders; the featured card is marked. (Keep `content.test.ts` green — invariant untouched.)
+**Project content extension:** add to `Project` a `detail` block for the dedicated page — e.g. `highlights: LocalizedString[]` (2–5 bullet points) and/or a longer `overview: LocalizedString`. Draft en + pt-BR: for `pulse` from public facts; for `ulbra-atende`/`ulbra-one` **high-level only** (product/role/stack — no proprietary/internal detail, same confidentiality bar as the description). Mark the Ulbra detail copy for Felipe's review in the report.
+
+- [ ] **Step 1: failing tests** —
+  - `project-card.test.tsx`: each card is a **link to `/projects/<slug>`** (the whole card navigates to its detail page); public `pulse` shows its external links (GitHub/live) AND the detail link; a private card (`ulbra-atende`) shows the detail link + the "Private" indicator but **NO external/repo link** (`queryByRole('link')` for a repo/github href absent), in BOTH locales; a tech `Chip` renders; `pulse` is the featured card.
+  - `project-detail.test.tsx`: rendering the `/projects/$slug` component for `pulse` shows name, overview/highlights, tech chips, and the external links; for `ulbra-atende` (private) shows the high-level detail + "Private" indicator and **NO external/repo link** (invariant on the detail page too), in both locales; an unknown slug renders a not-found state (no crash). One `<h1>` (the project name) per detail page.
 - [ ] **Step 2: run** → FAIL.
-- [ ] **Step 3: implement** — the signal `project-card` (screenshot slot w/ glow for featured `pulse`; title + mono-aqua tagline; description; tech `Chip`s; role/period line; links only under `visibility === 'public'`, else the muted "🔒 Private" indicator — **gate unchanged**). `projects.tsx`: `SectionEyebrow` + responsive grid, `pulse` featured (wide); one `<h1>`.
-- [ ] **Step 4: run** → PASS (incl. existing invariant tests); build + tsc clean.
-- [ ] **Step 5: commit** — `feat(web): redesign Projects in the signal language`
+- [ ] **Step 3: implement** —
+  - Extend `projects.ts` with the `detail` content (en/pt-BR; Ulbra high-level).
+  - Signal `project-card`: screenshot slot (glow for featured `pulse`), title + mono-aqua tagline, description, tech `Chip`s, role/period line; **the whole card links to `/projects/<slug>`**; external links (GitHub/live) shown only under `visibility === 'public'`, else the muted "🔒 Private" indicator — **the visibility gate is unchanged**.
+  - `projects.tsx`: `SectionEyebrow` + responsive grid, `pulse` featured (wide); one `<h1>`.
+  - `routes/projects.$slug.tsx` + `project-detail.tsx`: look up the project by `slug` from `projects`; render the signal detail page (hero with name/tagline/tech/role/period, overview + highlights, screenshot area, and — **only for `visibility:'public'`** — the external links; private → "Private" indicator, no link). Unknown slug → a localized not-found (link back to `/projects`). One `<h1>`.
+- [ ] **Step 4: run** → PASS (incl. `content.test.ts` invariant untouched); `pnpm -C web build` (routeTree regenerates the new route) + tsc clean.
+- [ ] **Step 5: commit** — `feat(web): redesign Projects + dedicated per-project pages`
 
 ---
 
