@@ -163,21 +163,6 @@ body {
   animation: reaction-float 1.2s ease-out forwards;
 }
 
-@keyframes event-slide-in {
-  0% {
-    transform: translateY(-0.5rem);
-    opacity: 0;
-  }
-  100% {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
-
-.animate-event-slide-in {
-  animation: event-slide-in 0.35s ease-out;
-}
-
 @keyframes signal-edge {
   0% {
     left: 0%;

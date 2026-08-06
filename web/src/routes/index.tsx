@@ -43,14 +43,20 @@ function Index() {
 
       {/*
         Portfolio-first home (visual coherence Task 2): the full ops-console
-        widget stack (KpiRow's every card, RecentVisitsTable, VisitsChart)
+        widget stack (RecentVisitsTable, VisitsChart)
         moved to /live — a 2126px dashboard was over half the page and read
         as an ops console bolted onto a portfolio. What stays here is a
         compact, self-contained "live proof" slice: the map + 2 real stats +
         the event stream + a way to react, all pointing at /live for anyone
         who wants the rest.
+
+        `dark` is pinned here like every other content surface (hero, showcase,
+        about, projects, /live) so these widgets never render light while the
+        sections above stay dark — that split is exactly the two-systems
+        problem this pass removed. It also keeps `text-signal` on a dark
+        ground, where it meets AA.
       */}
-      <section className="px-6 py-16 sm:px-10 md:py-20">
+      <section className="dark bg-background px-6 py-16 text-foreground sm:px-10 md:py-20">
         <div className="mx-auto flex w-full max-w-5xl flex-col gap-6">
           <SectionEyebrow>{t('home:liveProof.eyebrow')}</SectionEyebrow>
 
