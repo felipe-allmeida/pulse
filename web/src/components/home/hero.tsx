@@ -4,6 +4,7 @@ import { Link } from '@tanstack/react-router';
 import { CvButton } from '@/components/nav/cv-button';
 import { HeroMap } from '@/components/home/hero-map';
 import { Chip } from '@/components/signal/chip';
+import { Pill } from '@/components/signal/pill';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { profile } from '@/content/profile';
 import { useLocalized } from '@/i18n/use-localized';
@@ -36,13 +37,7 @@ export function Hero() {
       <HeroMap className="z-0" />
 
       <div className="relative z-10 mx-auto flex w-full max-w-5xl flex-col gap-8">
-        <span className="inline-flex w-fit items-center gap-2 rounded-full border border-signal/30 bg-signal-muted/40 px-3 py-1 font-mono text-xs text-signal">
-          <span className="relative flex size-1.5">
-            <span className="absolute inline-flex size-full rounded-full bg-signal opacity-75 motion-safe:animate-ping" />
-            <span className="relative inline-flex size-1.5 rounded-full bg-signal" />
-          </span>
-          {t('home:live.online', { count: onlineCount })}
-        </span>
+        <Pill dot>{t('home:live.online', { count: onlineCount })}</Pill>
 
         <div className="flex flex-col gap-4">
           <h1 className="text-5xl font-bold tracking-tight text-foreground sm:text-6xl md:text-7xl">

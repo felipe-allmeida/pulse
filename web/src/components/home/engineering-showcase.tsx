@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next';
 import { ArchitectureDiagram } from '@/components/home/architecture-diagram';
 import { EventStream } from '@/components/home/event-stream';
 import { StatTiles } from '@/components/home/stat-tiles';
+import { Pill } from '@/components/signal/pill';
 
 /**
  * The engineering showcase band under the hero: real-metric stat tiles, a
@@ -15,9 +16,7 @@ export function EngineeringShowcase() {
   return (
     <section className="dark bg-background px-6 py-16 text-foreground sm:px-10 md:py-20">
       <div className="mx-auto flex w-full max-w-5xl flex-col gap-8">
-        <span className="inline-flex w-fit items-center gap-2 rounded-full border border-signal/30 bg-signal-muted/40 px-3 py-1 font-mono text-xs text-signal">
-          {t('home:showcase.eyebrow')}
-        </span>
+        <Pill>{t('home:showcase.eyebrow')}</Pill>
 
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-5">
           <div className="lg:col-span-3">
