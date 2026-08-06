@@ -67,7 +67,10 @@ export function ArchitectureDiagram() {
         </div>
       </div>
 
-      <p className="mt-2 max-w-3xl font-mono text-xs leading-relaxed text-muted-foreground">
+      {/* The mechanism explanation is a full sentence meant to be read — sans,
+          not mono. Node labels/details above stay mono: they're short data
+          labels, not prose. */}
+      <p className="mt-2 max-w-[65ch] text-sm leading-relaxed text-muted-foreground">
         {t('home:arch.caption')}
       </p>
     </div>

@@ -59,7 +59,7 @@ export function ProjectDetail({ slug }: ProjectDetailProps) {
 
           <div className="flex flex-col gap-2">
             <h1 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">{project.name}</h1>
-            <p className="font-mono text-sm text-signal sm:text-base">{L(project.tagline)}</p>
+            <p className="text-base font-medium text-foreground/80 sm:text-lg">{L(project.tagline)}</p>
           </div>
 
           <p className="font-mono text-xs text-muted-foreground">

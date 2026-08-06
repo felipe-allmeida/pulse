@@ -1,5 +1,5 @@
 import { ArrowRight, Sparkles } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
 import { Link } from '@tanstack/react-router';
 import { CvButton } from '@/components/nav/cv-button';
 import { HeroMap } from '@/components/home/hero-map';
@@ -47,8 +47,19 @@ export function Hero() {
           <p className="max-w-2xl text-base text-muted-foreground">{localize(profile.tagline)}</p>
         </div>
 
-        <p className="max-w-2xl font-mono text-sm leading-relaxed text-signal/80 sm:text-base">
-          {t('home:hero.hook', { count: onlineCount })}
+        {/*
+          The main sales sentence — prose meant to be read, not data. Sans,
+          a readable ~65ch measure, normal leading. The live count is the
+          single aqua emphasis inside it; everything else is plain
+          muted-foreground so the accent doesn't compete with itself.
+        */}
+        <p className="max-w-[65ch] text-base leading-relaxed text-muted-foreground sm:text-lg">
+          <Trans
+            t={t}
+            i18nKey="home:hero.hook"
+            values={{ count: onlineCount }}
+            components={{ strong: <span className="font-semibold text-signal" /> }}
+          />
         </p>
 
         <div className="flex flex-wrap items-center gap-3">

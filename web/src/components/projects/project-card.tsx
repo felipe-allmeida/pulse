@@ -14,8 +14,11 @@ interface ProjectCardProps {
 }
 
 /**
- * The signal project card: screenshot slot, title + mono-aqua tagline,
- * description, tech chips, role/period line. The whole card is a stretched
+ * The signal project card: screenshot slot, title + sans tagline,
+ * description, tech chips, role/period line. Tagline/description are prose
+ * (sans, not aqua — aqua stays an accent, used on the featured glow/border
+ * and hover states, not as a body-text color); the tech chips and
+ * role/period line stay mono, they're data. The whole card is a stretched
  * link to its dedicated `/projects/$slug` page — the external links (only
  * for `visibility: 'public'`) sit above the overlay so they stay
  * independently clickable rather than nesting an `<a>` inside an `<a>`.
@@ -39,7 +42,7 @@ export function ProjectCard({ project, className }: ProjectCardProps) {
 
       <div className="flex flex-col gap-1">
         <h3 className="text-lg font-semibold text-foreground">{project.name}</h3>
-        <p className="font-mono text-xs text-signal sm:text-sm">{L(project.tagline)}</p>
+        <p className="text-sm font-medium text-foreground/80">{L(project.tagline)}</p>
       </div>
 
       <p className="text-sm text-muted-foreground">{L(project.description)}</p>
