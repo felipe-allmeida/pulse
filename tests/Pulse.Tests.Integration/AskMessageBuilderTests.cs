@@ -63,6 +63,7 @@ public class AskMessageBuilderTests
 
         Assert.Equal("system", msgs[0].Role);
         Assert.Contains("Brazilian Portuguese", msgs[0].Content);
+        Assert.DoesNotContain("in English", msgs[0].Content); // no contradictory English directive alongside it
         Assert.Contains("PROFILE-TEXT", msgs[0].Content); // profile unchanged
         Assert.Contains("don't have that information", msgs[0].Content); // grounding unchanged
         Assert.DoesNotContain(msgs.Skip(1), m => m.Role == "system"); // still a single system message

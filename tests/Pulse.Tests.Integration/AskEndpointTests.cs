@@ -108,6 +108,7 @@ public class AskEndpointTests : IAsyncLifetime
         Assert.Equal(HttpStatusCode.OK, res.StatusCode);
         Assert.NotNull(capturing.LastMessages);
         Assert.Contains("Brazilian Portuguese", capturing.LastMessages![0].Content);
+        Assert.DoesNotContain("in English", capturing.LastMessages![0].Content); // no contradictory language directive
     }
 
     [Fact]
