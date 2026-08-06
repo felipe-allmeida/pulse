@@ -8,7 +8,8 @@ using Testcontainers.Redis;
 public sealed class PulseApiFactory(string pg, string redis, string rabbitMq) : WebApplicationFactory<Program>
 {
     protected override void ConfigureWebHost(IWebHostBuilder b) =>
-        b.UseSetting("ConnectionStrings:Postgres", pg)
+        b.UseEnvironment("Testing")
+         .UseSetting("ConnectionStrings:Postgres", pg)
          .UseSetting("ConnectionStrings:Redis", redis)
          .UseSetting("ConnectionStrings:RabbitMq", rabbitMq)
          .UseSetting("Cors:Origins", "http://localhost:5173");

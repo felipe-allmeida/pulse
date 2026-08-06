@@ -94,6 +94,14 @@ export function LiveMap() {
             })}
           </g>
         </svg>
+        <a
+          href="https://db-ip.com"
+          target="_blank"
+          rel="noreferrer"
+          className="mt-2 block text-right text-xs text-muted-foreground hover:underline"
+        >
+          {t('dashboard:ipAttribution')}
+        </a>
       </CardContent>
     </Card>
   );

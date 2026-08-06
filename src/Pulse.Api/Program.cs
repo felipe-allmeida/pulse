@@ -1,3 +1,4 @@
+using System.Net;
 using System.Threading.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -83,17 +84,25 @@ if (!string.IsNullOrWhiteSpace(cfg["OpenAI:ApiKey"]))
 else
     builder.Services.AddSingleton<IAiClient, NullAiClient>();
 
-// Forwarded headers so Context.GetHttpContext() sees the real client IP behind Caddy.
-// KnownNetworks/KnownProxies default to loopback only, but Caddy runs as a separate
-// container (not loopback) in this deploy topology, so the header would otherwise be
-// silently ignored. Clearing the allow-lists is safe here specifically because the
-// firewall (Task 9/10) exposes only 80/443 -> Caddy, and the API container is never
-// directly internet-reachable — Caddy is the only peer that can ever call this API.
+// Forwarded headers so Context.GetHttpContext() sees the real client IP behind
+// NPM + Caddy. KnownNetworks/KnownProxies default to loopback only, but neither
+// NPM nor Caddy runs as loopback in this deploy topology, so the header would
+// otherwise be silently ignored. ForwardLimit=2 lets ASP.NET Core walk both hops
+// (NPM -> Caddy -> API) instead of stopping at the first (Caddy's own IP).
+// Trusting the private container/network ranges instead of clearing the
+// allow-lists is safe here specifically because the firewall (Task 9/10)
+// exposes only 80/443 -> NPM -> Caddy, and the API container is never directly
+// internet-reachable — NPM and Caddy are the only peers that can ever call this
+// API, and both sit inside these private ranges.
 builder.Services.Configure<ForwardedHeadersOptions>(o =>
 {
     o.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+    o.ForwardLimit = 2; // NPM -> Caddy -> API
     o.KnownIPNetworks.Clear();
     o.KnownProxies.Clear();
+    o.KnownIPNetworks.Add(new System.Net.IPNetwork(IPAddress.Parse("10.0.0.0"), 8));
+    o.KnownIPNetworks.Add(new System.Net.IPNetwork(IPAddress.Parse("172.16.0.0"), 12));
+    o.KnownIPNetworks.Add(new System.Net.IPNetwork(IPAddress.Parse("192.168.0.0"), 16));
 });
 
 // Outbox in the same tx as business writes.
@@ -124,6 +133,13 @@ app.MapHub<PresenceHub>("/hub/presence");
 app.MapGet("/health", () => Results.Ok("ok"));
 app.MapPublic();
 app.MapAsk();
+
+// Test-only: echoes the resolved RemoteIpAddress so integration tests can prove
+// ForwardedHeaders correctly unwinds the NPM -> Caddy -> API hop chain, without
+// adding any surface to the production API (never mapped outside "Testing").
+if (app.Environment.IsEnvironment("Testing"))
+    app.MapGet("/__ip", (HttpContext ctx) => ctx.Connection.RemoteIpAddress?.ToString() ?? "unknown");
+
 app.Run();
 
 public partial class Program { } // for WebApplicationFactory

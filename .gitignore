@@ -14,3 +14,6 @@ crash.log
 crash.*.log
 # NOTE: .terraform.lock.hcl is intentionally NOT ignored — commit it so
 # provider versions are pinned/reproducible across machines.
+
+# Licensed geo databases (DB-IP Lite / GeoLite2) — never commit
+*.mmdb

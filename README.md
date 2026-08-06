@@ -81,8 +81,9 @@ Privacy is treated as a feature, not an afterthought — this system is built
 with a European/GDPR-conscious audience in mind:
 
 - **Coarse geo only.** The API resolves country/city (and an approximate
-  lat/lon) from the connecting IP using a local MaxMind GeoLite2 database.
-  That's the only use the IP is ever put to.
+  lat/lon) from the connecting IP using a local IP-to-city database (DB-IP
+  Lite by default; any MaxMind-format `.mmdb` works). That's the only use the
+  IP is ever put to.
 - **The raw IP is never persisted, never queued, never broadcast.** It exists
   only as a transient local variable for the duration of the lookup call. The
   `VisitStarted` domain event that crosses the outbox → RabbitMQ → Worker →
@@ -94,9 +95,10 @@ with a European/GDPR-conscious audience in mind:
       string Country, string City, double Lat, double Lon,
       DateTimeOffset OccurredAt);
   ```
-- **No GeoLite2 database, no geo.** If the deployment has no `.mmdb` file
-  configured, the API falls back to a null geolocator and every visit
-  resolves to `"Unknown"` — the system degrades safely rather than reaching
+- **No geo database, no external lookup.** If the deployment has no `.mmdb`
+  file configured, the API resolves geo from a local demo fallback (a synthetic
+  spread across real cities, the default) — or `"Unknown"` if that's disabled
+  (`Geo:DemoFallback=false`). Either way it degrades safely rather than reaching
   out to a third-party geo API with visitor IPs.
 - **Presence is ephemeral by construction.** Who's online lives only in a
   Redis TTL set; there is no durable record of *which* connections were
@@ -173,6 +175,33 @@ builds the `api`/`worker`/`web` images, pushes them to GHCR, then calls a
 Portainer stack webhook so the running stack redeploys with the new images.
 That webhook URL is supplied via the repo secret `PORTAINER_WEBHOOK`; if it's
 unset, the redeploy step logs and no-ops rather than failing the pipeline.
+
+### Real visitor geolocation
+
+By default the production stack runs with **no geo database mounted** — the
+API's lazy `GeoLocator` factory falls back to a demo spread (or `"Unknown"`
+with `Geo__DemoFallback=false`), so the stack boots and serves traffic fine
+without it. To switch on real coarse geo (country/city/lat-lon from the
+visitor's IP):
+
+1. Download `dbip-city-lite.mmdb` — free, **no account required** — from
+   [db-ip.com/db/download/ip-to-city-lite](https://db-ip.com/db/download/ip-to-city-lite).
+2. Place it on the Hetzner box, e.g. `/opt/pulse/geo/dbip-city-lite.mmdb`.
+3. In `deploy/compose.prod.yml`, uncomment the `volumes:` block under the
+   `api` service's "Real visitor geo (DB-IP Lite)" comment, and add
+   `Geo__DbPath: /geo/city.mmdb` and `Geo__DemoFallback: "false"` to that
+   service's `environment:`.
+4. Redeploy the stack (Portainer "Update the stack" with "Re-pull image", or
+   the stack webhook) so the container picks up the new mount + env.
+
+The DB-IP CC-BY attribution link is already rendered under the live map in
+the UI (no further UI work needed once real geo is on). Monthly refresh is
+optional — DB-IP republishes the Lite file monthly; drop the new file in
+place at the same host path and redeploy to pick it up, no compose changes
+required. `dbip-city-lite.mmdb` is a licensed, redistributable-but-attributed
+(CC-BY) download — it is **never committed** to this repo, and if it's ever
+missing or removed from the box the app degrades safely back to the
+demo/unknown fallback rather than failing to start.
 
 ## Status
 
