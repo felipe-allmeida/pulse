@@ -10,7 +10,7 @@ vi.mock('@/lib/api', () => ({
   useVisits: () => useVisitsMock(),
 }));
 
-const { StatTiles } = await import('./stat-tiles');
+const { StatTiles, countDistinctGeo } = await import('./stat-tiles');
 
 const points = [
   { lat: 38.7, lon: -9.1, city: 'Lisbon', country: 'Portugal', at: '2026-08-04T10:00:00Z' },
@@ -18,6 +18,15 @@ const points = [
   { lat: 35.7, lon: 139.7, city: 'Tokyo', country: 'Japan', at: '2026-08-04T11:05:00Z' },
   // Same city name, different country — must not collapse into the Lisbon count.
   { lat: -33.4, lon: -70.6, city: 'Lisbon', country: 'Chile', at: '2026-08-04T11:10:00Z' },
+];
+
+// Deliberately distinct countries/cities counts (1 country, 2 cities) so
+// assertions on both numbers are unambiguous — the fixture above has both
+// counts land on 4, which would make a `getByText` assertion on the raw
+// cities number collide with the countries number.
+const singleCountryPoints = [
+  { lat: 38.7, lon: -9.1, city: 'Lisbon', country: 'Portugal', at: '2026-08-04T10:00:00Z' },
+  { lat: 41.1, lon: -8.6, city: 'Porto', country: 'Portugal', at: '2026-08-04T10:05:00Z' },
 ];
 
 describe('StatTiles', () => {
@@ -71,5 +80,41 @@ describe('StatTiles', () => {
     await renderWithI18n(<StatTiles />, { locale: 'pt-BR' });
 
     expect(screen.getByText(/online agora/i)).toBeInTheDocument();
+  });
+
+  it('renders the distinct cities count in the countries tile caption', async () => {
+    useMetricsMock.mockReturnValue({ data: { activeConnections: 12, totalVisits: 4231 } });
+    useVisitsMock.mockReturnValue({ data: singleCountryPoints });
+
+    await renderWithI18n(<StatTiles />);
+
+    // 1 distinct country (Portugal), 2 distinct city+country pairs (Lisbon, Porto).
+    expect(screen.getByText('1')).toBeInTheDocument();
+    expect(screen.getByText('2 cities (recent)')).toBeInTheDocument();
+  });
+});
+
+describe('countDistinctGeo', () => {
+  it('counts distinct countries and distinct city+country pairs independently', () => {
+    expect(countDistinctGeo(singleCountryPoints)).toEqual({ countries: 1, cities: 2 });
+  });
+
+  it('does not collapse two different countries that share a city name', () => {
+    expect(countDistinctGeo(points)).toEqual({ countries: 4, cities: 4 });
+  });
+
+  it('is not fooled by a delimiter character appearing inside a city or country name', () => {
+    const withDelimiterLikeNames = [
+      { lat: 0, lon: 0, city: 'A|B', country: 'C', at: '2026-08-04T10:00:00Z' },
+      { lat: 0, lon: 0, city: 'A', country: 'B|C', at: '2026-08-04T10:00:00Z' },
+    ];
+    // Naive `${city}|${country}` keys would both stringify to "A|B|C" and
+    // falsely collapse to 1 distinct pair; the two points are genuinely
+    // different (city, country) tuples.
+    expect(countDistinctGeo(withDelimiterLikeNames).cities).toBe(2);
+  });
+
+  it('returns zero counts for undefined points', () => {
+    expect(countDistinctGeo(undefined)).toEqual({ countries: 0, cities: 0 });
   });
 });

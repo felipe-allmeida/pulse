@@ -77,4 +77,15 @@ describe('EventStream', () => {
 
     expect(container.querySelector('[data-motion="static"]')).toBeInTheDocument();
   });
+
+  it('animates the slide-in when motion is not reduced', async () => {
+    mockMatchMedia(false);
+    useEventStore
+      .getState()
+      .push({ kind: 'visit', city: 'Lisbon', country: 'Portugal', at: '2026-08-04T09:55:00Z' });
+
+    const { container } = await renderWithI18n(<EventStream />);
+
+    expect(container.querySelector('[data-motion="animated"]')).toBeInTheDocument();
+  });
 });
