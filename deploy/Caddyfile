@@ -12,21 +12,36 @@
 # can collide on a shared proxy network and route to the WRONG backend — so
 # prod sets PULSE_API_UPSTREAM to the stack-unique container name (e.g.
 # `pulse-api:8080`), which resolves unambiguously.
+#
+# trusted_proxies private_ranges — in prod this Caddy sits behind NPM
+# (another private-network hop), so without this Caddy would treat NPM as the
+# client and either drop or overwrite the X-Forwarded-For it set for the real
+# visitor. Trusting the RFC1918 ranges makes Caddy accept NPM's X-Forwarded-For
+# and append its own hop, so the api (ForwardLimit=2) sees the full
+# NPM -> Caddy chain and can resolve the original visitor IP. Locally, with no
+# NPM in front, there's simply no untrusted hop to strip — the directly
+# connecting client IP is preserved either way.
 {$PULSE_DOMAIN::80} {
 	# SignalR negotiate + REST endpoints.
 	handle /api/* {
-		reverse_proxy {$PULSE_API_UPSTREAM:api:8080}
+		reverse_proxy {$PULSE_API_UPSTREAM:api:8080} {
+			trusted_proxies private_ranges
+		}
 	}
 
 	# SignalR hub — Caddy proxies the WebSocket upgrade automatically.
 	handle /hub/* {
-		reverse_proxy {$PULSE_API_UPSTREAM:api:8080}
+		reverse_proxy {$PULSE_API_UPSTREAM:api:8080} {
+			trusted_proxies private_ranges
+		}
 	}
 
 	# Health check — proxied straight to the api (not served by the SPA
 	# fallback), so hitting Caddy's own :80 actually reflects api liveness.
 	handle /health {
-		reverse_proxy {$PULSE_API_UPSTREAM:api:8080}
+		reverse_proxy {$PULSE_API_UPSTREAM:api:8080} {
+			trusted_proxies private_ranges
+		}
 	}
 
 	# Everything else: the built SPA, with client-side-router fallback.
