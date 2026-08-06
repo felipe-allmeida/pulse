@@ -9,7 +9,6 @@
   "cta": {
     "projects": "See the projects",
     "about": "About me",
-    "cv": "Download CV",
     "ask": "Ask the AI about me"
   },
   "showcase": {
@@ -20,7 +19,7 @@
   },
   "stats": {
     "online": "online now",
-    "events": "events tracked",
+    "events": "visits tracked",
     "countries": "countries (recent)",
     "cities": "cities (recent)"
   },

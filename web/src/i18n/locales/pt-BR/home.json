@@ -9,7 +9,6 @@
   "cta": {
     "projects": "Ver os projetos",
     "about": "Sobre mim",
-    "cv": "Baixar currículo",
     "ask": "Pergunte à IA sobre mim"
   },
   "showcase": {
@@ -20,7 +19,7 @@
   },
   "stats": {
     "online": "online agora",
-    "events": "eventos registrados",
+    "events": "visitas registradas",
     "countries": "países (recentes)",
     "cities": "cidades (recentes)"
   },

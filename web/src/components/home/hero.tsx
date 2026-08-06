@@ -35,10 +35,7 @@ export function Hero() {
       <HeroMap className="z-0" />
 
       <div className="relative z-10 mx-auto flex w-full max-w-5xl flex-col gap-8">
-        <span
-          aria-live="polite"
-          className="inline-flex w-fit items-center gap-2 rounded-full border border-signal/30 bg-signal-muted/40 px-3 py-1 font-mono text-xs text-signal"
-        >
+        <span className="inline-flex w-fit items-center gap-2 rounded-full border border-signal/30 bg-signal-muted/40 px-3 py-1 font-mono text-xs text-signal">
           <span className="relative flex size-1.5">
             <span className="absolute inline-flex size-full rounded-full bg-signal opacity-75 motion-safe:animate-ping" />
             <span className="relative inline-flex size-1.5 rounded-full bg-signal" />

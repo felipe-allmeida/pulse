@@ -38,7 +38,7 @@ describe('StatTiles', () => {
 
     expect(screen.getByText('12')).toBeInTheDocument();
     expect(screen.getByText('4,231')).toBeInTheDocument();
-    // 3 distinct countries: Portugal, United States, Japan, Chile → 4
+    // 4 distinct countries: Portugal, United States, Japan, Chile
     expect(screen.getByText('4')).toBeInTheDocument();
     // 4 distinct city+country pairs (two "Lisbon"s are different countries)
     expect(screen.getByText(/online now/i)).toBeInTheDocument();

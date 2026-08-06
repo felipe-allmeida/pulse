@@ -31,7 +31,9 @@ function Index() {
         which reads as a visible frame around the "immersive" dark band
         (most obvious in light theme, where the gutter turns white). This
         cancels just that padding/max-width for these two sections; nothing
-        else on the page (or any other route) is affected.
+        else on the page (or any other route) is affected. The `w-screen`
+        (100vw) here can overflow past a classic (non-overlay) scrollbar's
+        width; the `overflow-x: hidden` on `body` in styles.css clips that.
       */}
       <div className="-mt-6 ml-[calc(50%-50vw)] mr-[calc(50%-50vw)] w-screen">
         <Hero />
