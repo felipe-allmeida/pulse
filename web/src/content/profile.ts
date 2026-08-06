@@ -7,7 +7,7 @@ export interface Profile {
   bio: LocalizedString;
   social: { label: string; href: string }[];
   skills: { group: LocalizedString; items: string[] }[];
-  experience: { role: LocalizedString; org: string; period: string; summary: LocalizedString }[];
+  experience: { role: LocalizedString; org: string; period: LocalizedString; summary: LocalizedString }[];
 }
 
 export const profile: Profile = {
@@ -49,7 +49,7 @@ export const profile: Profile = {
     {
       role: { en: 'Senior Product Engineer', 'pt-BR': 'Senior Product Engineer' },
       org: 'Kota.io',
-      period: 'Current',
+      period: { en: 'Current', 'pt-BR': 'Atual' },
       summary: {
         en: 'Health-insurance infrastructure for the European market.',
         'pt-BR': 'Infraestrutura de seguro-saúde para o mercado europeu.',
@@ -58,7 +58,7 @@ export const profile: Profile = {
     {
       role: { en: 'Lead Software Engineer', 'pt-BR': 'Lead Software Engineer' },
       org: 'ADP Brazil Labs',
-      period: 'Past',
+      period: { en: 'Past', 'pt-BR': 'Anterior' },
       summary: {
         en: 'Led engineering on payroll/HR platform work.',
         'pt-BR': 'Liderou a engenharia de uma plataforma de folha de pagamento/RH.',
@@ -67,7 +67,7 @@ export const profile: Profile = {
     {
       role: { en: 'Head of Technology', 'pt-BR': 'Head of Technology' },
       org: 'Dietbox',
-      period: 'Past',
+      period: { en: 'Past', 'pt-BR': 'Anterior' },
       summary: {
         en: 'Owned technology and architecture.',
         'pt-BR': 'Responsável por tecnologia e arquitetura.',
@@ -76,7 +76,7 @@ export const profile: Profile = {
     {
       role: { en: 'Founder', 'pt-BR': 'Fundador' },
       org: 'Pampa Devs',
-      period: 'Ongoing',
+      period: { en: 'Ongoing', 'pt-BR': 'Em andamento' },
       summary: {
         en: 'Open-source templates, tutorials, and tools for the developer community.',
         'pt-BR': 'Templates open-source, tutoriais e ferramentas para a comunidade de desenvolvedores.',

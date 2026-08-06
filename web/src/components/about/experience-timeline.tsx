@@ -10,7 +10,7 @@ export function ExperienceTimeline() {
           <p className="text-sm font-medium">
             {L(entry.role)} <span className="text-muted-foreground">@ {entry.org}</span>
           </p>
-          <p className="text-xs text-muted-foreground">{entry.period}</p>
+          <p className="text-xs text-muted-foreground">{L(entry.period)}</p>
           <p className="mt-1 text-sm">{L(entry.summary)}</p>
         </li>
       ))}

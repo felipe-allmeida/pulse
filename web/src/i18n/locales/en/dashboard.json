@@ -29,6 +29,7 @@
     "reaction": "Reaction {{emoji}}"
   },
   "reactions": {
+    "title": "React",
     "ariaLabel": "React with {{emoji}}"
   },
   "connectionStatus": {

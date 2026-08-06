@@ -53,4 +53,10 @@ describe('AboutPage', () => {
     expect(screen.getByText('Experiência')).toBeInTheDocument();
     expect(screen.getByText(profile.tagline['pt-BR'])).toBeInTheDocument();
   });
+
+  it('renders the experience period localized in pt-BR', async () => {
+    await renderWithI18n(<AboutPage />, { locale: 'pt-BR' });
+
+    expect(screen.getByText('Atual')).toBeInTheDocument();
+  });
 });
