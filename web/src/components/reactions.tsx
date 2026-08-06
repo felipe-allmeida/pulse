@@ -15,12 +15,6 @@ type FloatingReaction = {
   emoji: string;
 };
 
-/** Reaction event labels are produced as `Reaction ${emoji}` (see use-pulse-hub.tsx). */
-function emojiFromReactionLabel(label: string): string | null {
-  const [prefix, emoji] = label.split(' ');
-  return prefix === 'Reaction' && emoji ? emoji : null;
-}
-
 export function Reactions() {
   const { t } = useTranslation('dashboard');
   const { react } = usePulseHub();
@@ -38,11 +32,9 @@ export function Reactions() {
     lastSeenRef.current = latest;
 
     if (latest.kind !== 'reaction') return;
-    const emoji = emojiFromReactionLabel(latest.label);
-    if (!emoji) return;
 
     const id = nextIdRef.current++;
-    setFloating((current) => [...current, { id, emoji }]);
+    setFloating((current) => [...current, { id, emoji: latest.emoji }]);
     const timeout = setTimeout(() => {
       setFloating((current) => current.filter((f) => f.id !== id));
     }, FLOAT_DURATION_MS);

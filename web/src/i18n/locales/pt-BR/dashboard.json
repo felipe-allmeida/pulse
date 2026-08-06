@@ -24,7 +24,9 @@
   },
   "eventFeed": {
     "title": "Atividade ao vivo",
-    "empty": "Nenhum evento ainda."
+    "empty": "Nenhum evento ainda.",
+    "visit": "Visita de {{city}}, {{country}}",
+    "reaction": "Reação {{emoji}}"
   },
   "reactions": {
     "ariaLabel": "Reagir com {{emoji}}"

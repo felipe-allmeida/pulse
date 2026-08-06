@@ -84,7 +84,7 @@ describe('PulseHubProvider / usePulseHub', () => {
 
     expect(useEventStore.getState().events[0]).toEqual({
       kind: 'reaction',
-      label: 'Reaction 🎉',
+      emoji: '🎉',
       at: '2026-08-04T10:00:00Z',
     });
   });

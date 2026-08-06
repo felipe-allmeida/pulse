@@ -45,7 +45,7 @@ describe('Reactions', () => {
   });
 
   it('does not float an emoji on mount when the store already has a reaction as its newest event', async () => {
-    useEventStore.getState().push({ kind: 'reaction', label: 'Reaction 🎉', at: '2026-08-04T10:00:00Z' });
+    useEventStore.getState().push({ kind: 'reaction', emoji: '🎉', at: '2026-08-04T10:00:00Z' });
 
     await renderWithI18n(<Reactions />);
 
@@ -58,7 +58,7 @@ describe('Reactions', () => {
     expect(floatingEmojiEls()).toHaveLength(0);
 
     act(() => {
-      useEventStore.getState().push({ kind: 'reaction', label: 'Reaction 🚀', at: '2026-08-04T10:01:00Z' });
+      useEventStore.getState().push({ kind: 'reaction', emoji: '🚀', at: '2026-08-04T10:01:00Z' });
     });
 
     const floating = floatingEmojiEls();

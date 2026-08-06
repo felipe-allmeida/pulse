@@ -31,10 +31,14 @@ export function EventFeed({ now = new Date() }: EventFeedProps = {}) {
           <ul className="flex max-h-80 flex-col gap-3 overflow-y-auto">
             {events.map((event: PulseEvent, index) => {
               const Icon = KIND_ICON[event.kind];
+              const label =
+                event.kind === 'visit'
+                  ? t('dashboard:eventFeed.visit', { city: event.city, country: event.country })
+                  : t('dashboard:eventFeed.reaction', { emoji: event.emoji });
               return (
                 <li key={`${event.at}-${index}`} className="flex items-start gap-2 text-sm">
                   <Icon className="mt-0.5 size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
-                  <span className="flex-1">{event.label}</span>
+                  <span className="flex-1">{label}</span>
                   <span className="shrink-0 text-xs text-muted-foreground">
                     {formatRelativeTime(event.at, now, i18n.language)}
                   </span>
