@@ -2,11 +2,13 @@ import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 import enCommon from './locales/en/common.json';
+import enNav from './locales/en/nav.json';
 import ptCommon from './locales/pt-BR/common.json';
+import ptNav from './locales/pt-BR/nav.json';
 
 export const resources = {
-  en: { common: enCommon },
-  'pt-BR': { common: ptCommon },
+  en: { common: enCommon, nav: enNav },
+  'pt-BR': { common: ptCommon, nav: ptNav },
 } as const;
 
 i18n
@@ -18,7 +20,7 @@ i18n
     supportedLngs: ['en', 'pt-BR'],
     load: 'currentOnly',
     defaultNS: 'common',
-    ns: ['common'],
+    ns: ['common', 'nav'],
     interpolation: { escapeValue: false },
     detection: {
       order: ['localStorage', 'navigator'],
