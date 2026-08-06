@@ -1,83 +1,88 @@
-// lucide-react's brand icon set (Github, etc.) was removed upstream; a
-// generic external-link glyph is used for repo/demo links instead.
+import { Link } from '@tanstack/react-router';
 import { ExternalLink, Lock } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { Badge } from '@/components/ui/badge';
-import { buttonVariants } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { FEATURED_PROJECT_SLUG } from '@/components/projects/featured';
+import { ProjectScreenshot } from '@/components/projects/project-screenshot';
+import { Chip } from '@/components/signal/chip';
 import type { Project } from '@/content/projects';
 import { useLocalized } from '@/i18n/use-localized';
 import { cn } from '@/lib/utils';
 
 interface ProjectCardProps {
   project: Project;
+  className?: string;
 }
 
-export function ProjectCard({ project }: ProjectCardProps) {
+/**
+ * The signal project card: screenshot slot, title + mono-aqua tagline,
+ * description, tech chips, role/period line. The whole card is a stretched
+ * link to its dedicated `/projects/$slug` page — the external links (only
+ * for `visibility: 'public'`) sit above the overlay so they stay
+ * independently clickable rather than nesting an `<a>` inside an `<a>`.
+ * `pulse` renders with the ambient featured glow.
+ */
+export function ProjectCard({ project, className }: ProjectCardProps) {
   const { t } = useTranslation('projects');
   const L = useLocalized();
+  const featured = project.slug === FEATURED_PROJECT_SLUG;
+
   return (
-    <Card className="flex flex-col overflow-hidden">
-      {project.screenshot ? (
-        <img
-          src={project.screenshot}
-          alt={`${project.name} screenshot`}
-          className="h-48 w-full object-cover"
-        />
-      ) : (
-        <div
-          aria-hidden="true"
-          className="flex h-48 w-full items-center justify-center bg-muted text-sm text-muted-foreground"
-        >
-          {t('projects:screenshotPlaceholder')}
-        </div>
+    <article
+      data-featured={featured}
+      className={cn(
+        'group relative flex flex-col gap-5 overflow-hidden rounded-2xl border border-signal/20 bg-signal-muted/10 p-6 transition-colors hover:border-signal/40',
+        featured && 'shadow-[0_0_60px_-15px_var(--color-signal)]',
+        className,
       )}
+    >
+      <ProjectScreenshot glow={featured} />
 
-      <CardHeader>
-        <CardTitle className="text-lg">{project.name}</CardTitle>
-        <CardDescription>{L(project.tagline)}</CardDescription>
-      </CardHeader>
+      <div className="flex flex-col gap-1">
+        <h3 className="text-lg font-semibold text-foreground">{project.name}</h3>
+        <p className="font-mono text-xs text-signal sm:text-sm">{L(project.tagline)}</p>
+      </div>
 
-      <CardContent className="flex flex-1 flex-col gap-4">
-        <p className="text-sm text-muted-foreground">{L(project.description)}</p>
+      <p className="text-sm text-muted-foreground">{L(project.description)}</p>
 
-        <div className="flex flex-wrap gap-2">
-          {project.tech.map((tech) => (
-            <Badge key={tech} variant="secondary">
-              {tech}
-            </Badge>
-          ))}
-        </div>
+      <div className="flex flex-wrap gap-2">
+        {project.tech.map((tech) => (
+          <Chip key={tech}>{tech}</Chip>
+        ))}
+      </div>
 
-        <p className="text-sm text-muted-foreground">
-          {L(project.role)}
-          {project.period ? ` · ${L(project.period)}` : ''}
-        </p>
-      </CardContent>
+      <p className="font-mono text-xs text-muted-foreground">
+        {L(project.role)}
+        {project.period ? ` · ${L(project.period)}` : ''}
+      </p>
 
-      <CardFooter>
+      <div className="relative z-10 flex flex-wrap items-center gap-3 pt-1">
         {project.visibility === 'public' ? (
-          <div className="flex flex-wrap gap-2">
-            {project.links.map((link) => (
-              <a
-                key={link.href}
-                href={link.href}
-                target="_blank"
-                rel="noreferrer"
-                className={cn(buttonVariants({ variant: 'outline', size: 'sm' }))}
-              >
-                <ExternalLink aria-hidden="true" />
-                {link.label}
-              </a>
-            ))}
-          </div>
+          project.links.map((link) => (
+            <a
+              key={link.href}
+              href={link.href}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1.5 rounded-full border border-signal/30 px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:border-signal/60 hover:text-signal"
+            >
+              <ExternalLink aria-hidden className="size-3.5" />
+              {link.label}
+            </a>
+          ))
         ) : (
-          <span className="flex items-center gap-1.5 text-sm text-muted-foreground">
-            <Lock aria-hidden="true" className="size-3.5" />
+          <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
+            <Lock aria-hidden className="size-3.5" />
             {t('projects:privateLabel')}
           </span>
         )}
-      </CardFooter>
-    </Card>
+      </div>
+
+      <Link
+        to="/projects/$slug"
+        params={{ slug: project.slug }}
+        aria-label={t('projects:viewDetails', { name: project.name })}
+        className="absolute inset-0 z-0 rounded-2xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-signal"
+      />
+    </article>
   );
 }

@@ -1,5 +1,12 @@
 {
   "pageTitle": "Projects",
+  "pageEyebrow": "/projects",
   "screenshotPlaceholder": "Screenshot coming",
-  "privateLabel": "Private"
+  "privateLabel": "Private",
+  "viewDetails": "View {{name}} details",
+  "backToProjects": "All projects",
+  "overviewHeading": "Overview",
+  "highlightsHeading": "Highlights",
+  "notFoundHeading": "Project not found",
+  "notFoundBody": "We couldn't find a project at that address."
 }
