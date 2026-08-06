@@ -25,15 +25,6 @@
     "heading": "Live dashboard",
     "description": "Every metric, the live map, recent visits, and the raw event stream — the full panel behind the numbers on the home page."
   },
-  "stats": {
-    "online": "online now",
-    "events": "visits tracked",
-    "countries": "countries (recent)",
-    "cities": "cities (recent)"
-  },
-  "eventStream": {
-    "live": "live"
-  },
   "arch": {
     "web": "Web",
     "api": "API",

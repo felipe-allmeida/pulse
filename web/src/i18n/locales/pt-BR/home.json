@@ -25,15 +25,6 @@
     "heading": "Painel ao vivo",
     "description": "Todas as métricas, o mapa ao vivo, as visitas recentes e o fluxo bruto de eventos — o painel completo por trás dos números da página inicial."
   },
-  "stats": {
-    "online": "online agora",
-    "events": "visitas registradas",
-    "countries": "países (recentes)",
-    "cities": "cidades (recentes)"
-  },
-  "eventStream": {
-    "live": "ao vivo"
-  },
   "arch": {
     "web": "Web",
     "api": "API",
