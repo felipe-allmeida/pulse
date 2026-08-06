@@ -11,5 +11,26 @@
     "about": "Sobre mim",
     "cv": "Baixar currículo",
     "ask": "Pergunte à IA sobre mim"
+  },
+  "showcase": {
+    "eyebrow": "o que você está vendo · ao vivo"
+  },
+  "stats": {
+    "online": "online agora",
+    "events": "eventos registrados",
+    "countries": "países (recentes)",
+    "cities": "cidades (recentes)"
+  },
+  "eventStream": {
+    "live": "ao vivo"
+  },
+  "arch": {
+    "web": "Web",
+    "api": "API",
+    "apiDetail": "SignalR · Redis",
+    "queue": "RabbitMQ",
+    "worker": "Worker",
+    "db": "Postgres",
+    "caption": "O pipeline por trás desta página, ao vivo: seu navegador mantém uma conexão SignalR com a API, presença e geolocalização passam pelo Redis, eventos entram na fila do RabbitMQ para o worker, e tudo é gravado no Postgres."
   }
 }

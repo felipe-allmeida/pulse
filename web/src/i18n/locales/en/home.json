@@ -11,5 +11,26 @@
     "about": "About me",
     "cv": "Download CV",
     "ask": "Ask the AI about me"
+  },
+  "showcase": {
+    "eyebrow": "what you're looking at · live"
+  },
+  "stats": {
+    "online": "online now",
+    "events": "events tracked",
+    "countries": "countries (recent)",
+    "cities": "cities (recent)"
+  },
+  "eventStream": {
+    "live": "live"
+  },
+  "arch": {
+    "web": "Web",
+    "api": "API",
+    "apiDetail": "SignalR · Redis",
+    "queue": "RabbitMQ",
+    "worker": "Worker",
+    "db": "Postgres",
+    "caption": "The request pipeline behind this page, live: your browser holds a SignalR connection through the API, presence and geolocation flow through Redis, events queue on RabbitMQ for the worker, and everything lands in Postgres."
   }
 }
