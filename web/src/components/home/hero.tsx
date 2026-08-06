@@ -60,7 +60,7 @@ export function Hero() {
             to="/projects"
             className={cn(
               buttonVariants({ size: 'lg' }),
-              'border-transparent bg-signal text-zinc-950 hover:bg-signal/90',
+              'border-transparent bg-signal text-signal-foreground hover:bg-signal/90',
             )}
           >
             {t('home:cta.projects')}

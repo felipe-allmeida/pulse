@@ -4,6 +4,7 @@ import LanguageDetector from 'i18next-browser-languagedetector';
 import enAbout from './locales/en/about.json';
 import enAsk from './locales/en/ask.json';
 import enCommon from './locales/en/common.json';
+import enContact from './locales/en/contact.json';
 import enDashboard from './locales/en/dashboard.json';
 import enHome from './locales/en/home.json';
 import enNav from './locales/en/nav.json';
@@ -11,6 +12,7 @@ import enProjects from './locales/en/projects.json';
 import ptAbout from './locales/pt-BR/about.json';
 import ptAsk from './locales/pt-BR/ask.json';
 import ptCommon from './locales/pt-BR/common.json';
+import ptContact from './locales/pt-BR/contact.json';
 import ptDashboard from './locales/pt-BR/dashboard.json';
 import ptHome from './locales/pt-BR/home.json';
 import ptNav from './locales/pt-BR/nav.json';
@@ -25,6 +27,7 @@ export const resources = {
     dashboard: enDashboard,
     ask: enAsk,
     home: enHome,
+    contact: enContact,
   },
   'pt-BR': {
     common: ptCommon,
@@ -34,6 +37,7 @@ export const resources = {
     dashboard: ptDashboard,
     ask: ptAsk,
     home: ptHome,
+    contact: ptContact,
   },
 } as const;
 
@@ -46,7 +50,7 @@ i18n
     supportedLngs: ['en', 'pt-BR'],
     load: 'currentOnly',
     defaultNS: 'common',
-    ns: ['common', 'nav', 'about', 'projects', 'dashboard', 'ask', 'home'],
+    ns: ['common', 'nav', 'about', 'projects', 'dashboard', 'ask', 'home', 'contact'],
     interpolation: { escapeValue: false },
     detection: {
       order: ['localStorage', 'navigator'],

@@ -1,5 +1,13 @@
 import type { LocalizedString } from './types';
 
+export interface ContactConfig {
+  /** Empty string until Felipe fills in a real Calendly link before merge. */
+  calendly: string;
+  email: string;
+  linkedin: string;
+  whatsapp: string;
+}
+
 export interface Profile {
   name: string;
   title: LocalizedString;
@@ -8,6 +16,7 @@ export interface Profile {
   social: { label: string; href: string }[];
   skills: { group: LocalizedString; items: string[] }[];
   experience: { role: LocalizedString; org: string; period: LocalizedString; summary: LocalizedString }[];
+  contact: ContactConfig;
 }
 
 export const profile: Profile = {
@@ -29,6 +38,13 @@ export const profile: Profile = {
     { label: 'GitHub', href: 'https://github.com/felipe-allmeida' },
     { label: 'LinkedIn', href: 'https://www.linkedin.com/in/felipe-allmeida' },
   ],
+  contact: {
+    // Placeholder — Felipe fills in the real Calendly link before merge.
+    calendly: '',
+    email: 'contato@felipealmeida.tech',
+    linkedin: 'https://www.linkedin.com/in/felipe-allmeida',
+    whatsapp: 'https://wa.me/5551983468863',
+  },
   skills: [
     { group: { en: 'Languages', 'pt-BR': 'Linguagens' }, items: ['C#', 'TypeScript', 'JavaScript', 'SQL'] },
     {
