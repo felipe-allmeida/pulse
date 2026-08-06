@@ -62,8 +62,14 @@ function Index() {
         </div>
       </section>
 
-      <div className="fixed bottom-6 right-6 z-50">
-        <Card className="shadow-lg">
+      {/*
+        bottom-left: the Ask widget's floating trigger (ask-widget.tsx) is
+        anchored bottom-right. Both are `fixed` at the same `bottom-6`, so
+        keeping them on opposite sides is what keeps them from colliding —
+        see routes/index.test.tsx's "separate corners" assertion.
+      */}
+      <div className="fixed bottom-6 left-6 z-50">
+        <Card className="border-signal/20 shadow-lg">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm">{t('dashboard:reactions.title')}</CardTitle>
           </CardHeader>

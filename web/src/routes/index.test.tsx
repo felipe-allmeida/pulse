@@ -3,6 +3,7 @@ import { render, screen } from '@testing-library/react';
 import { I18nextProvider } from 'react-i18next';
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 import i18n from '@/i18n';
+import { AskWidget } from '@/components/ask/ask-widget';
 import { profile } from '@/content/profile';
 import { useEventStore } from '@/stores/event-store';
 import type { Locale } from '@/content/types';
@@ -47,7 +48,15 @@ async function renderIndexRoute(locale: Locale = 'en') {
 
   return render(
     <I18nextProvider i18n={i18n}>
+      {/*
+        AskWidget isn't part of the `/` route tree in production — it's
+        mounted once in `__root.tsx`, alongside the route's <Outlet />. It's
+        rendered here too so the "separate corners" test below reflects the
+        real composed page, where both floating elements are on screen at
+        once.
+      */}
       <RouterProvider router={router} />
+      <AskWidget />
     </I18nextProvider>,
   );
 }
@@ -94,6 +103,23 @@ describe('Index dashboard route', () => {
 
     // Exactly one h1 on the whole composed page
     expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
+  });
+
+  it('keeps the floating Reactions card and the Ask widget trigger in separate corners (no overlap)', async () => {
+    await renderIndexRoute();
+
+    const reactionsCard = screen.getByText('React').closest('.fixed');
+    const askTrigger = screen.getByRole('button', { name: /ask about felipe/i });
+
+    // Both are `fixed bottom-6 …`, so distinct left/right anchoring is what
+    // keeps them apart on every breakpoint — see the comment above the
+    // Reactions wrapper in routes/index.tsx.
+    expect(reactionsCard).not.toBeNull();
+    expect(reactionsCard).toHaveClass('left-6');
+    expect(reactionsCard).not.toHaveClass('right-6');
+
+    expect(askTrigger).toHaveClass('right-6');
+    expect(askTrigger).not.toHaveClass('left-6');
   });
 
   it('shows pt-BR hero copy on the composed home', async () => {
