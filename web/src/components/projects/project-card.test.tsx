@@ -55,7 +55,27 @@ function renderCard(project: Project, locale?: Locale) {
   return renderWithI18n(<RouterProvider router={router} />, { locale });
 }
 
+const projectWithScreenshot: Project = {
+  ...publicProject,
+  screenshot: 'https://example.com/pulse-screenshot.png',
+};
+
 describe('ProjectCard', () => {
+  it('renders no empty placeholder box/img when the project has no screenshot', async () => {
+    await renderCard(publicProject);
+
+    expect(screen.queryByRole('img')).not.toBeInTheDocument();
+    expect(screen.queryByText(/screenshot coming|captura de tela em breve/i)).not.toBeInTheDocument();
+  });
+
+  it('renders the screenshot image with a meaningful alt when project.screenshot is set', async () => {
+    await renderCard(projectWithScreenshot);
+
+    const image = await screen.findByRole('img', { name: /pulse screenshot/i });
+    expect(image).toHaveAttribute('src', 'https://example.com/pulse-screenshot.png');
+    expect(image).toHaveAttribute('loading', 'lazy');
+  });
+
   it('links the whole card to its dedicated /projects/<slug> page', async () => {
     await renderCard(publicProject);
 

@@ -96,7 +96,11 @@ export function ProjectDetail({ slug }: ProjectDetailProps) {
           )}
         </div>
 
-        <ProjectScreenshot glow={project.slug === FEATURED_PROJECT_SLUG} className="h-64" />
+        <ProjectScreenshot
+          src={project.screenshot}
+          alt={t('projects:screenshotAlt', { name: project.name })}
+          glow={project.slug === FEATURED_PROJECT_SLUG}
+        />
 
         {project.detail?.overview ? (
           <section className="flex flex-col gap-3">

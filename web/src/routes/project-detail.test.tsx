@@ -39,6 +39,13 @@ describe('ProjectDetail', () => {
     expect(repoLink).toHaveAttribute('rel', expect.stringContaining('noreferrer'));
   });
 
+  it('renders no empty placeholder box/img on the detail page when the project has no screenshot', async () => {
+    await renderDetail('pulse');
+
+    expect(screen.queryByRole('img')).not.toBeInTheDocument();
+    expect(screen.queryByText(/screenshot coming|captura de tela em breve/i)).not.toBeInTheDocument();
+  });
+
   it('renders one h1 and high-level detail for a private project, with a Private indicator and NO external link', async () => {
     await renderDetail('ulbra-atende');
 

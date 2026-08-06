@@ -1,7 +1,7 @@
 {
   "pageTitle": "Projetos",
   "pageEyebrow": "/projects",
-  "screenshotPlaceholder": "Captura de tela em breve",
+  "screenshotAlt": "Captura de tela de {{name}}",
   "privateLabel": "Privado",
   "viewDetails": "Ver detalhes de {{name}}",
   "backToProjects": "Todos os projetos",
