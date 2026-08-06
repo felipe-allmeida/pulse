@@ -81,8 +81,9 @@ Privacy is treated as a feature, not an afterthought — this system is built
 with a European/GDPR-conscious audience in mind:
 
 - **Coarse geo only.** The API resolves country/city (and an approximate
-  lat/lon) from the connecting IP using a local MaxMind GeoLite2 database.
-  That's the only use the IP is ever put to.
+  lat/lon) from the connecting IP using a local IP-to-city database (DB-IP
+  Lite by default; any MaxMind-format `.mmdb` works). That's the only use the
+  IP is ever put to.
 - **The raw IP is never persisted, never queued, never broadcast.** It exists
   only as a transient local variable for the duration of the lookup call. The
   `VisitStarted` domain event that crosses the outbox → RabbitMQ → Worker →
@@ -94,9 +95,10 @@ with a European/GDPR-conscious audience in mind:
       string Country, string City, double Lat, double Lon,
       DateTimeOffset OccurredAt);
   ```
-- **No GeoLite2 database, no geo.** If the deployment has no `.mmdb` file
-  configured, the API falls back to a null geolocator and every visit
-  resolves to `"Unknown"` — the system degrades safely rather than reaching
+- **No geo database, no external lookup.** If the deployment has no `.mmdb`
+  file configured, the API resolves geo from a local demo fallback (a synthetic
+  spread across real cities, the default) — or `"Unknown"` if that's disabled
+  (`Geo:DemoFallback=false`). Either way it degrades safely rather than reaching
   out to a third-party geo API with visitor IPs.
 - **Presence is ephemeral by construction.** Who's online lives only in a
   Redis TTL set; there is no durable record of *which* connections were
