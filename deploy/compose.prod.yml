@@ -1,0 +1,141 @@
+# ═══════════════════════════════════════════════════════════════════════════════════════════════
+# pulse — PRODUCTION stack (Portainer, Hetzner), fronted by Nginx Proxy Manager.
+# ═══════════════════════════════════════════════════════════════════════════════════════════════
+# Pulls prebuilt images from GHCR (make the 3 packages public). Only `web` is reached by NPM,
+# over the shared external `ghost_web` network. Update flow: git push main → GH Actions publishes
+# :latest to GHCR → in Portainer "Update the stack" with "Re-pull image" (or the stack webhook).
+#
+# Secrets come from the stack's Environment variables in Portainer (never committed) — see the
+# table in README/deploy docs. NPM proxies https://pulse.felipealmeida.tech → pulse-web:80
+# (Websockets Support ON, Let's Encrypt cert).
+# ═══════════════════════════════════════════════════════════════════════════════════════════════
+
+services:
+  postgres:
+    image: postgres:17.2
+    container_name: pulse-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD é obrigatório}
+      POSTGRES_DB: ${POSTGRES_DB:-pulse}
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    networks: [internal]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-pulse}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7.4-alpine
+    container_name: pulse-redis
+    restart: unless-stopped
+    command: redis-server --requirepass ${REDIS_PASSWORD:?REDIS_PASSWORD é obrigatório}
+    volumes:
+      - redis_data:/data
+    networks: [internal]
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  rabbitmq:
+    image: rabbitmq:3.13-management
+    container_name: pulse-rabbitmq
+    restart: unless-stopped
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-pulse}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:?RABBITMQ_PASSWORD é obrigatório}
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks: [internal]
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+
+  api:
+    image: ghcr.io/felipe-allmeida/pulse-api:${IMAGE_TAG:-latest}
+    container_name: pulse-api
+    restart: unless-stopped
+    depends_on:
+      postgres: { condition: service_healthy }
+      redis: { condition: service_healthy }
+      rabbitmq: { condition: service_healthy }
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: http://+:8080
+      ConnectionStrings__Postgres: "Host=postgres;Port=5432;Database=${POSTGRES_DB:-pulse};Username=${POSTGRES_USER:-postgres};Password=${POSTGRES_PASSWORD}"
+      ConnectionStrings__Redis: "redis:6379,password=${REDIS_PASSWORD}"
+      ConnectionStrings__RabbitMq: "amqp://${RABBITMQ_USER:-pulse}:${RABBITMQ_PASSWORD}@rabbitmq:5672"
+      Cors__Origins: ${APP_BASE_URL:-https://pulse.felipealmeida.tech}
+      # AI recruiter chat — VAZIO = degrada gracioso ("not configured"), não quebra.
+      OpenAI__ApiKey: ${OPENAI_API_KEY:-}
+    networks: [internal]
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:8080/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
+
+  worker:
+    image: ghcr.io/felipe-allmeida/pulse-worker:${IMAGE_TAG:-latest}
+    container_name: pulse-worker
+    restart: unless-stopped
+    depends_on:
+      postgres: { condition: service_healthy }
+      rabbitmq: { condition: service_healthy }
+    environment:
+      ConnectionStrings__Postgres: "Host=postgres;Port=5432;Database=${POSTGRES_DB:-pulse};Username=${POSTGRES_USER:-postgres};Password=${POSTGRES_PASSWORD}"
+      ConnectionStrings__RabbitMq: "amqp://${RABBITMQ_USER:-pulse}:${RABBITMQ_PASSWORD}@rabbitmq:5672"
+    networks: [internal]
+
+  # Único serviço alcançado pelo NPM. Caddy serve a SPA e proxia /api + /hub → o upstream abaixo.
+  # PULSE_API_UPSTREAM aponta pro nome ÚNICO `pulse-api` (não o `api` cru) — senão, numa rede
+  # compartilhada onde outra stack (ex.: pd-crm) também tem um serviço `api`, o nome colide e o
+  # tráfego vaza pro backend errado.
+  web:
+    image: ghcr.io/felipe-allmeida/pulse-web:${IMAGE_TAG:-latest}
+    container_name: pulse-web
+    restart: unless-stopped
+    environment:
+      PULSE_API_UPSTREAM: pulse-api:8080
+    depends_on:
+      api: { condition: service_healthy }
+    networks: [internal, ghost_web]
+
+  backup:
+    image: prodrigestivill/postgres-backup-local:17
+    container_name: pulse-pg-backup
+    restart: unless-stopped
+    depends_on:
+      postgres: { condition: service_healthy }
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_DB: ${POSTGRES_DB:-pulse}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      SCHEDULE: ${BACKUP_SCHEDULE:-@daily}
+      BACKUP_KEEP_DAYS: ${BACKUP_KEEP_DAYS:-7}
+      BACKUP_KEEP_WEEKS: ${BACKUP_KEEP_WEEKS:-4}
+      BACKUP_KEEP_MONTHS: ${BACKUP_KEEP_MONTHS:-6}
+    volumes:
+      - pg_backups:/backups
+    networks: [internal]
+
+volumes:
+  pg_data:
+  redis_data:
+  rabbitmq_data:
+  pg_backups:
+
+networks:
+  internal:
+  # Rede compartilhada do stack Ghost/NPM (nome real: ghost_web). É por ela que o NPM alcança pulse-web.
+  ghost_web:
+    external: true
