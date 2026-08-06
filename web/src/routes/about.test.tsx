@@ -1,34 +1,35 @@
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import { AboutPage } from '@/components/about/about-page';
 import { profile } from '@/content/profile';
+import { renderWithI18n } from '@/test/render-with-i18n';
 
 describe('AboutPage', () => {
-  it('renders the profile name, tagline, a skill, and an experience org', () => {
-    render(<AboutPage />);
+  it('renders the profile name, tagline, a skill, and an experience org', async () => {
+    await renderWithI18n(<AboutPage />);
 
     expect(screen.getByRole('heading', { level: 1, name: profile.name })).toBeInTheDocument();
-    expect(screen.getByText(profile.tagline)).toBeInTheDocument();
+    expect(screen.getByText(profile.tagline.en)).toBeInTheDocument();
     expect(screen.getByText('Kubernetes')).toBeInTheDocument();
     expect(screen.getByText('.NET / ASP.NET Core')).toBeInTheDocument();
     expect(screen.getAllByText(/Kota\.io/).length).toBeGreaterThan(0);
   });
 
-  it('renders the initials-avatar placeholder as first + last name initials', () => {
-    render(<AboutPage />);
+  it('renders the initials-avatar placeholder as first + last name initials', async () => {
+    await renderWithI18n(<AboutPage />);
 
     // The avatar is aria-hidden, so it's queried by text rather than by role/name.
     expect(screen.getByText('FA')).toBeInTheDocument();
   });
 
-  it('renders exactly one h1', () => {
-    render(<AboutPage />);
+  it('renders exactly one h1', async () => {
+    await renderWithI18n(<AboutPage />);
 
     expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
   });
 
-  it('renders social links that open in a new tab safely', () => {
-    render(<AboutPage />);
+  it('renders social links that open in a new tab safely', async () => {
+    await renderWithI18n(<AboutPage />);
 
     for (const social of profile.social) {
       const link = screen.getByRole('link', { name: new RegExp(social.label, 'i') });
@@ -38,9 +39,24 @@ describe('AboutPage', () => {
     }
   });
 
-  it('renders a Download CV control', () => {
-    render(<AboutPage />);
+  it('renders a Download CV control', async () => {
+    await renderWithI18n(<AboutPage />);
 
     expect(screen.getByRole('link', { name: /download cv/i })).toBeInTheDocument();
+  });
+
+  it('renders pt-BR section headings and localized content', async () => {
+    await renderWithI18n(<AboutPage />, { locale: 'pt-BR' });
+
+    expect(screen.getByText('Biografia')).toBeInTheDocument();
+    expect(screen.getByText('Habilidades')).toBeInTheDocument();
+    expect(screen.getByText('Experiência')).toBeInTheDocument();
+    expect(screen.getByText(profile.tagline['pt-BR'])).toBeInTheDocument();
+  });
+
+  it('renders the experience period localized in pt-BR', async () => {
+    await renderWithI18n(<AboutPage />, { locale: 'pt-BR' });
+
+    expect(screen.getByText('Atual')).toBeInTheDocument();
   });
 });

@@ -56,5 +56,39 @@ public class AskMessageBuilderTests
         Assert.Equal(10, historyMsg.Content.Length);
     }
 
+    [Fact]
+    public void Build_WithPtBrLocale_InstructsAssistantToRespondInBrazilianPortuguese()
+    {
+        var msgs = Builder("PROFILE-TEXT").Build("Does he know Kubernetes?", [], "pt-BR");
+
+        Assert.Equal("system", msgs[0].Role);
+        Assert.Contains("Brazilian Portuguese", msgs[0].Content);
+        Assert.DoesNotContain("in English", msgs[0].Content); // no contradictory English directive alongside it
+        Assert.Contains("PROFILE-TEXT", msgs[0].Content); // profile unchanged
+        Assert.Contains("don't have that information", msgs[0].Content); // grounding unchanged
+        Assert.DoesNotContain(msgs.Skip(1), m => m.Role == "system"); // still a single system message
+    }
+
+    [Theory]
+    [InlineData("en")]
+    [InlineData("fr")]
+    [InlineData("")]
+    public void Build_WithNonPtBrLocale_InstructsAssistantToRespondInEnglish(string locale)
+    {
+        var msgs = Builder("PROFILE-TEXT").Build("Does he know Kubernetes?", [], locale);
+
+        Assert.Contains("English", msgs[0].Content);
+        Assert.DoesNotContain("Brazilian Portuguese", msgs[0].Content);
+    }
+
+    [Fact]
+    public void Build_WithoutLocaleArgument_DefaultsToEnglish()
+    {
+        var msgs = Builder("PROFILE-TEXT").Build("Does he know Kubernetes?", []);
+
+        Assert.Contains("English", msgs[0].Content);
+        Assert.DoesNotContain("Brazilian Portuguese", msgs[0].Content);
+    }
+
     private sealed class StubProfile(string p = "PROFILE-TEXT") : IProfileProvider { public string Profile => p; }
 }

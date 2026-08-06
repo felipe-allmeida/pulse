@@ -1,4 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
+import { useTranslation } from 'react-i18next';
 import { EventFeed } from '@/components/event-feed';
 import { KpiRow } from '@/components/kpi-row';
 import { LiveMap } from '@/components/live-map';
@@ -13,6 +14,7 @@ export const Route = createFileRoute('/')({
 });
 
 function Index() {
+  const { t } = useTranslation('dashboard');
   useVisitFeed();
 
   return (
@@ -34,7 +36,7 @@ function Index() {
       <div className="fixed bottom-6 right-6 z-50">
         <Card className="shadow-lg">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm">React</CardTitle>
+            <CardTitle className="text-sm">{t('dashboard:reactions.title')}</CardTitle>
           </CardHeader>
           <CardContent>
             <Reactions />

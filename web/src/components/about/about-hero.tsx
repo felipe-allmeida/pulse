@@ -1,8 +1,10 @@
 import { CvButton } from '@/components/nav/cv-button';
 import { profile } from '@/content/profile';
+import { useLocalized } from '@/i18n/use-localized';
 
 // TODO: swap the initials placeholder for a real photo once web/public/felipe.jpg lands.
 export function AboutHero() {
+  const L = useLocalized();
   const nameParts = profile.name.trim().split(/\s+/);
   const initials = (nameParts[0][0] + nameParts[nameParts.length - 1][0]).toUpperCase();
 
@@ -17,8 +19,8 @@ export function AboutHero() {
 
       <div className="flex flex-1 flex-col gap-1">
         <h1 className="text-2xl font-semibold">{profile.name}</h1>
-        <p className="text-muted-foreground">{profile.title}</p>
-        <p className="text-sm">{profile.tagline}</p>
+        <p className="text-muted-foreground">{L(profile.title)}</p>
+        <p className="text-sm">{L(profile.tagline)}</p>
       </div>
 
       <CvButton />

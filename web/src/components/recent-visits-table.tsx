@@ -1,5 +1,7 @@
 import { useMemo } from 'react';
 import { createColumnHelper, flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-table';
+import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -18,22 +20,23 @@ type RecentVisitsTableProps = {
 
 const columnHelper = createColumnHelper<VisitPoint>();
 
-function buildColumns(now: Date) {
+function buildColumns(now: Date, locale: string, t: TFunction) {
   return [
-    columnHelper.accessor('city', { id: 'city', header: 'City' }),
-    columnHelper.accessor('country', { id: 'country', header: 'Country' }),
+    columnHelper.accessor('city', { id: 'city', header: t('dashboard:recentVisits.city') }),
+    columnHelper.accessor('country', { id: 'country', header: t('dashboard:recentVisits.country') }),
     columnHelper.accessor('at', {
       id: 'when',
-      header: 'When',
-      cell: ({ getValue }) => formatRelativeTime(getValue(), now),
+      header: t('dashboard:recentVisits.when'),
+      cell: ({ getValue }) => formatRelativeTime(getValue(), now, locale),
     }),
   ];
 }
 
 export function RecentVisitsTable({ now = new Date() }: RecentVisitsTableProps = {}) {
+  const { t, i18n } = useTranslation('dashboard');
   const { data, isLoading } = useVisits();
   const points = useMemo(() => byNewest(data ?? EMPTY_POINTS, MAX_ROWS), [data]);
-  const columns = useMemo(() => buildColumns(now), [now]);
+  const columns = useMemo(() => buildColumns(now, i18n.language, t), [now, i18n.language, t]);
 
   const table = useReactTable({
     data: points,
@@ -44,7 +47,7 @@ export function RecentVisitsTable({ now = new Date() }: RecentVisitsTableProps =
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Recent visits</CardTitle>
+        <CardTitle>{t('dashboard:recentVisits.title')}</CardTitle>
       </CardHeader>
       <CardContent>
         <Table>
@@ -73,7 +76,7 @@ export function RecentVisitsTable({ now = new Date() }: RecentVisitsTableProps =
             ) : table.getRowModel().rows.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={columns.length} className="text-center text-muted-foreground">
-                  No visits yet.
+                  {t('dashboard:recentVisits.empty')}
                 </TableCell>
               </TableRow>
             ) : (

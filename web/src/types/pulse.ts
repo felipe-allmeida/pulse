@@ -16,8 +16,6 @@ export type Reaction = {
   at: string;
 };
 
-export type PulseEvent = {
-  kind: 'visit' | 'reaction';
-  label: string;
-  at: string;
-};
+export type PulseEvent =
+  | { kind: 'visit'; city: string; country: string; at: string }
+  | { kind: 'reaction'; emoji: string; at: string };

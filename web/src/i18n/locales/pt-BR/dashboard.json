@@ -1,0 +1,44 @@
+{
+  "kpi": {
+    "activeConnections": "Conexões ativas",
+    "totalVisits": "Total de visitas"
+  },
+  "liveMap": {
+    "title": "Localizações ao vivo",
+    "ariaLabel": "Mapa-múndi das localizações de visitantes ao vivo",
+    "visitCount_one": "{{count}} visita",
+    "visitCount_other": "{{count}} visitas"
+  },
+  "visitsChart": {
+    "title": "Visitas ao longo do tempo",
+    "description": "Atividade por hora nas últimas 100 visitas registradas",
+    "empty": "Nenhuma visita ainda.",
+    "tooltipLabel": "Visitas"
+  },
+  "recentVisits": {
+    "title": "Visitas recentes",
+    "city": "Cidade",
+    "country": "País",
+    "when": "Quando",
+    "empty": "Nenhuma visita ainda."
+  },
+  "eventFeed": {
+    "title": "Atividade ao vivo",
+    "empty": "Nenhum evento ainda.",
+    "visit": "Visita de {{city}}, {{country}}",
+    "reaction": "Reação {{emoji}}"
+  },
+  "reactions": {
+    "title": "Reagir",
+    "ariaLabel": "Reagir com {{emoji}}"
+  },
+  "connectionStatus": {
+    "connected": "Conectado",
+    "reconnecting": "Reconectando",
+    "offline": "Offline"
+  },
+  "presence": {
+    "online_one": "{{formattedCount}} online",
+    "online_other": "{{formattedCount}} online"
+  }
+}

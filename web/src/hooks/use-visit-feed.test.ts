@@ -50,7 +50,7 @@ describe('useVisitFeed', () => {
     act(() => rerender());
 
     expect(useEventStore.getState().events).toEqual([
-      { kind: 'visit', label: 'Visit from NYC, United States', at: nyc.at },
+      { kind: 'visit', city: 'NYC', country: 'United States', at: nyc.at },
     ]);
   });
 

@@ -89,6 +89,52 @@ public class AskEndpointTests : IAsyncLifetime
     }
 
     [Fact]
+    public async Task Ask_WithPtBrLocale_InstructsAssistantInBrazilianPortuguese()
+    {
+        var capturing = new CapturingAi();
+        using var factory = _factory.WithWebHostBuilder(b => b.ConfigureTestServices(s =>
+        {
+            s.RemoveAll<IAiClient>();
+            s.AddSingleton<IAiClient>(capturing);
+        }));
+
+        var res = await factory.CreateClient().PostAsJsonAsync("/api/ask", new
+        {
+            question = "hi",
+            history = Array.Empty<object>(),
+            locale = "pt-BR",
+        });
+
+        Assert.Equal(HttpStatusCode.OK, res.StatusCode);
+        Assert.NotNull(capturing.LastMessages);
+        Assert.Contains("Brazilian Portuguese", capturing.LastMessages![0].Content);
+        Assert.DoesNotContain("in English", capturing.LastMessages![0].Content); // no contradictory language directive
+    }
+
+    [Fact]
+    public async Task Ask_WithOutOfAllowListLocale_CoercesToEnglish_AndDoesNotReturnBadRequest()
+    {
+        var capturing = new CapturingAi();
+        using var factory = _factory.WithWebHostBuilder(b => b.ConfigureTestServices(s =>
+        {
+            s.RemoveAll<IAiClient>();
+            s.AddSingleton<IAiClient>(capturing);
+        }));
+
+        var res = await factory.CreateClient().PostAsJsonAsync("/api/ask", new
+        {
+            question = "hi",
+            history = Array.Empty<object>(),
+            locale = "xx-YY",
+        });
+
+        Assert.Equal(HttpStatusCode.OK, res.StatusCode);
+        Assert.NotNull(capturing.LastMessages);
+        Assert.Contains("English", capturing.LastMessages![0].Content);
+        Assert.DoesNotContain("Brazilian Portuguese", capturing.LastMessages![0].Content);
+    }
+
+    [Fact]
     public async Task Ask_NeverForwardsClientSuppliedSystemRoleHistory_ToTheAiClient()
     {
         var capturing = new CapturingAi();

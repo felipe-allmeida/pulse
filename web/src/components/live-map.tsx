@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef } from 'react';
 import { geoNaturalEarth1, geoPath } from 'd3-geo';
 import { feature } from 'topojson-client';
 import type { Topology, GeometryCollection } from 'topojson-specification';
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { countryCounts, matchCountryName } from '@/lib/geo';
 import { useVisits } from '@/lib/api';
@@ -24,6 +25,7 @@ const projection = geoNaturalEarth1().fitSize([WIDTH, HEIGHT], world);
 const path = geoPath(projection);
 
 export function LiveMap() {
+  const { t } = useTranslation('dashboard');
   const { data } = useVisits();
   const points = data ?? EMPTY_POINTS;
 
@@ -47,10 +49,15 @@ export function LiveMap() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Live locations</CardTitle>
+        <CardTitle>{t('dashboard:liveMap.title')}</CardTitle>
       </CardHeader>
       <CardContent>
-        <svg viewBox={`0 0 ${WIDTH} ${HEIGHT}`} className="h-auto w-full" role="img" aria-label="World map of live visitor locations">
+        <svg
+          viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
+          className="h-auto w-full"
+          role="img"
+          aria-label={t('dashboard:liveMap.ariaLabel')}
+        >
           <g>
             {world.features.map((geo) => {
               const count = counts.get(matchCountryName(geo.properties.name)) ?? 0;
@@ -59,7 +66,7 @@ export function LiveMap() {
               return (
                 <path key={geo.id ?? geo.properties.name} d={path(geo) ?? undefined} fill={fill} stroke="var(--color-background)" strokeWidth={0.5}>
                   <title>
-                    {geo.properties.name} — {count} visit{count === 1 ? '' : 's'}
+                    {geo.properties.name} — {t('dashboard:liveMap.visitCount', { count })}
                   </title>
                 </path>
               );

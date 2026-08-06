@@ -41,7 +41,8 @@ export function useVisitFeed(): void {
       seenRef.current.add(visitIdentity(point));
       useEventStore.getState().push({
         kind: 'visit',
-        label: `Visit from ${point.city}, ${point.country}`,
+        city: point.city,
+        country: point.country,
         at: point.at,
       });
     }

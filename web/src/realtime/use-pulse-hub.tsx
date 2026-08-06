@@ -36,7 +36,7 @@ export function PulseHubProvider({ children }: { children: ReactNode }) {
       // handled separately via PresenceUpdated/setCount), so there's nothing
       // to invalidate here — metrics and visits already refetch on their own
       // polling intervals (3s / 10s respectively).
-      useEventStore.getState().push({ kind: 'reaction', label: `Reaction ${reaction.emoji}`, at: reaction.at });
+      useEventStore.getState().push({ kind: 'reaction', emoji: reaction.emoji, at: reaction.at });
     };
 
     hub.on('PresenceUpdated', onPresenceUpdated);
