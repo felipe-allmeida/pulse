@@ -11,9 +11,13 @@ export function CvButton({ className }: { className?: string }) {
       href="/cv.pdf"
       download
       aria-label={t('nav:downloadCv')}
-      className={cn(buttonVariants({ variant: 'outline', size: 'sm' }), className)}
+      className={cn(
+        buttonVariants({ variant: 'outline', size: 'sm' }),
+        'border-signal/40 font-mono text-signal hover:border-signal/60 hover:bg-signal/10 hover:text-signal',
+        className,
+      )}
     >
-      <Download />
+      <Download aria-hidden className="size-3.5" />
       {t('nav:cvShort')}
     </a>
   );

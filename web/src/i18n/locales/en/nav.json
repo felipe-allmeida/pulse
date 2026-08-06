@@ -7,7 +7,8 @@
   "cvShort": "CV",
   "openMenu": "Open menu",
   "menu": "Menu",
-  "mobileNavDescription": "Navigate to Home, About, or Projects, or download the CV.",
+  "mobileNavDescription": "Navigate to Home, About, Projects, or Contact, or download the CV.",
   "mainNav": "Main",
-  "mobileNav": "Mobile"
+  "mobileNav": "Mobile",
+  "askAi": "Ask the AI"
 }

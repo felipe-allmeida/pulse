@@ -31,7 +31,7 @@ export function AboutPage() {
           <SkillGroups />
         </section>
 
-        <section>
+        <section id="contact" className="scroll-mt-24">
           <AboutContact />
         </section>
       </div>
