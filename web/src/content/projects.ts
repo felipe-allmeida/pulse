@@ -89,26 +89,22 @@ export const projects: Project[] = [
     links: [],
     detail: {
       overview: {
-        en: 'An internal support and ticketing platform — a .NET modular monolith with role-based access, configurable ticket workflows, and team-based routing for internal support staff.',
+        en: 'An internal support and ticketing platform — a .NET modular monolith with role-based access and configurable ticket workflows for internal support staff.',
         'pt-BR':
-          'Uma plataforma interna de suporte e chamados — um monólito modular em .NET com acesso baseado em papéis, fluxos de chamados configuráveis e roteamento por time para as equipes de suporte.',
+          'Uma plataforma interna de suporte e chamados — um monólito modular em .NET com acesso baseado em papéis e fluxos de chamados configuráveis para as equipes de suporte.',
       },
       highlights: [
         {
-          en: 'Role-based access across coordinators, agents, and requesters.',
-          'pt-BR': 'Acesso baseado em papéis entre coordenadores, agentes e solicitantes.',
+          en: 'Role-based access for internal teams.',
+          'pt-BR': 'Acesso baseado em papéis para times internos.',
         },
         {
-          en: 'Configurable ticket workflows with templates, stages, and tasks.',
-          'pt-BR': 'Fluxos de chamados configuráveis com templates, etapas e tarefas.',
+          en: 'Configurable ticket workflows and role-based routing across support teams.',
+          'pt-BR': 'Fluxos de chamados configuráveis e roteamento baseado em papéis entre times de suporte.',
         },
         {
           en: 'Real-time ticket notifications over SignalR.',
           'pt-BR': 'Notificações de chamados em tempo real via SignalR.',
-        },
-        {
-          en: 'Team-based routing so coordinators see tickets across their teams.',
-          'pt-BR': 'Roteamento por time, para que coordenadores vejam os chamados de todos os seus times.',
         },
       ],
     },
@@ -146,8 +142,8 @@ export const projects: Project[] = [
           'pt-BR': 'Migra operações centrais de sistemas legados para uma plataforma unificada.',
         },
         {
-          en: 'PostgreSQL persistence via EF Core, code-first.',
-          'pt-BR': 'Persistência em PostgreSQL via EF Core, code-first.',
+          en: 'PostgreSQL persistence via EF Core.',
+          'pt-BR': 'Persistência em PostgreSQL via EF Core.',
         },
         {
           en: 'A modern React + Tailwind front end replacing older internal tools.',

@@ -46,7 +46,7 @@ describe('ProjectDetail', () => {
     expect(headings).toHaveLength(1);
     expect(headings[0]).toHaveTextContent('Ulbra Atende');
 
-    expect(screen.getByText(/across coordinators, agents, and requesters/i)).toBeInTheDocument();
+    expect(screen.getByText(/role-based routing across support teams/i)).toBeInTheDocument();
     expect(screen.getByText('Private')).toBeInTheDocument();
     expect(screen.queryByRole('link', { name: /github|repo/i })).not.toBeInTheDocument();
     // No external/repo link should exist at all on a private project's detail page.
@@ -61,7 +61,7 @@ describe('ProjectDetail', () => {
     expect(headings).toHaveLength(1);
     expect(headings[0]).toHaveTextContent('Ulbra Atende');
 
-    expect(screen.getByText(/entre coordenadores, agentes e solicitantes/i)).toBeInTheDocument();
+    expect(screen.getByText(/roteamento baseado em papéis entre times de suporte/i)).toBeInTheDocument();
     expect(screen.getByText('Privado')).toBeInTheDocument();
     const externalLikeLinks = screen.queryAllByRole('link').filter((link) => link.getAttribute('target') === '_blank');
     expect(externalLikeLinks).toHaveLength(0);
