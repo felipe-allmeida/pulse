@@ -1,0 +1,38 @@
+{
+  "live": {
+    "online_one": "{{count}} online now",
+    "online_other": "{{count}} online now"
+  },
+  "hero": {
+    "hook": "You're one of {{count}} people here right now — and this page is a live distributed system, streaming presence, geolocation, and events in real time."
+  },
+  "cta": {
+    "projects": "See the projects",
+    "about": "About me",
+    "ask": "Ask the AI about me"
+  },
+  "showcase": {
+    "eyebrow": "what you're looking at · live"
+  },
+  "dashboard": {
+    "heading": "Live dashboard"
+  },
+  "stats": {
+    "online": "online now",
+    "events": "visits tracked",
+    "countries": "countries (recent)",
+    "cities": "cities (recent)"
+  },
+  "eventStream": {
+    "live": "live"
+  },
+  "arch": {
+    "web": "Web",
+    "api": "API",
+    "apiDetail": "SignalR · Redis",
+    "queue": "RabbitMQ",
+    "worker": "Worker",
+    "db": "Postgres",
+    "caption": "The request pipeline behind this page, live: your browser holds a SignalR connection through the API, presence and geolocation flow through Redis, events queue on RabbitMQ for the worker, and everything lands in Postgres."
+  }
+}

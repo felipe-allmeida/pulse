@@ -12,6 +12,7 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet';
 import { streamAsk } from '@/lib/ask';
+import { useAskWidgetStore } from '@/stores/ask-widget-store';
 import { cn } from '@/lib/utils';
 import type { Locale } from '@/content/types';
 
@@ -28,6 +29,8 @@ export function AskWidget() {
   const [isStreaming, setIsStreaming] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const abortRef = useRef<AbortController | null>(null);
+  const isOpen = useAskWidgetStore((s) => s.isOpen);
+  const setOpen = useAskWidgetStore((s) => s.setOpen);
 
   const suggestedQuestions = [
     t('ask:suggestions.kubernetes'),
@@ -92,18 +95,16 @@ export function AskWidget() {
   }
 
   function handleOpenChange(open: boolean) {
+    setOpen(open);
     if (!open) {
       abortRef.current?.abort();
     }
   }
 
   return (
-    <Sheet onOpenChange={handleOpenChange}>
+    <Sheet open={isOpen} onOpenChange={handleOpenChange}>
       <SheetTrigger asChild>
-        <Button
-          className="fixed bottom-6 right-6 z-50 shadow-lg"
-          size="lg"
-        >
+        <Button className="fixed bottom-6 right-6 z-50 shadow-lg" size="lg">
           <MessageCircle />
           {t('ask:trigger')}
         </Button>

@@ -1,0 +1,38 @@
+{
+  "live": {
+    "online_one": "{{count}} online agora",
+    "online_other": "{{count}} online agora"
+  },
+  "hero": {
+    "hook": "Você é uma de {{count}} pessoas aqui agora mesmo — e esta página é um sistema distribuído ao vivo, transmitindo presença, geolocalização e eventos em tempo real."
+  },
+  "cta": {
+    "projects": "Ver os projetos",
+    "about": "Sobre mim",
+    "ask": "Pergunte à IA sobre mim"
+  },
+  "showcase": {
+    "eyebrow": "o que você está vendo · ao vivo"
+  },
+  "dashboard": {
+    "heading": "Painel ao vivo"
+  },
+  "stats": {
+    "online": "online agora",
+    "events": "visitas registradas",
+    "countries": "países (recentes)",
+    "cities": "cidades (recentes)"
+  },
+  "eventStream": {
+    "live": "ao vivo"
+  },
+  "arch": {
+    "web": "Web",
+    "api": "API",
+    "apiDetail": "SignalR · Redis",
+    "queue": "RabbitMQ",
+    "worker": "Worker",
+    "db": "Postgres",
+    "caption": "O pipeline por trás desta página, ao vivo: seu navegador mantém uma conexão SignalR com a API, presença e geolocalização passam pelo Redis, eventos entram na fila do RabbitMQ para o worker, e tudo é gravado no Postgres."
+  }
+}

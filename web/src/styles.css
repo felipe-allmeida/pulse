@@ -36,6 +36,13 @@
   --color-chart-3: hsl(var(--chart-3));
   --color-chart-4: hsl(var(--chart-4));
   --color-chart-5: hsl(var(--chart-5));
+
+  /* "Signal" accent — the single aqua highlight for the immersive home hero/showcase
+     (live pill, primary CTA, data highlights). Fixed, not theme-switched: unlike the
+     tokens above it does not flip with .dark, since the hero always commits to the
+     dark treatment regardless of the site-wide theme toggle. */
+  --color-signal: #3ae0c4;
+  --color-signal-muted: #1f4d45;
 }
 
 :root {
@@ -100,6 +107,15 @@
 body {
   background: hsl(var(--background));
   color: hsl(var(--foreground));
+  /* The home route's full-bleed hero/showcase breakout (routes/index.tsx)
+     uses a `width: 100vw` + negative-margin trick to escape AppShell's
+     max-w-7xl container. `100vw` includes the vertical scrollbar's width,
+     so on classic (non-overlay) scrollbars — Windows, Linux — that
+     protrudes past the visible viewport by the scrollbar's width and
+     produces a spurious horizontal scrollbar for the whole page. Browsers
+     propagate a non-`visible` overflow from `body` to the viewport, so this
+     clips that protrusion without affecting layout anywhere else. */
+  overflow-x: hidden;
 }
 
 @keyframes live-map-ping {
@@ -132,4 +148,36 @@ body {
 
 .animate-reaction-float {
   animation: reaction-float 1.2s ease-out forwards;
+}
+
+@keyframes event-slide-in {
+  0% {
+    transform: translateY(-0.5rem);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.animate-event-slide-in {
+  animation: event-slide-in 0.35s ease-out;
+}
+
+@keyframes signal-edge {
+  0% {
+    left: 0%;
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  85% {
+    opacity: 1;
+  }
+  100% {
+    left: 100%;
+    opacity: 0;
+  }
 }
