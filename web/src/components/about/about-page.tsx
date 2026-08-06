@@ -4,6 +4,7 @@ import { AboutContact } from '@/components/about/social-links';
 import { ExperienceTimeline } from '@/components/about/experience-timeline';
 import { SkillGroups } from '@/components/about/skill-groups';
 import { SectionEyebrow } from '@/components/signal/section-eyebrow';
+import { SubsectionHeading } from '@/components/signal/subsection-heading';
 
 /** The signal-language About page: hero, experience timeline, skills, contact. Exactly one `<h1>` (in `AboutHero`). */
 export function AboutPage() {
@@ -18,16 +19,12 @@ export function AboutPage() {
         </section>
 
         <section className="flex flex-col gap-6">
-          <h2 className="font-mono text-xs tracking-[0.2em] text-muted-foreground uppercase">
-            {t('about:experienceHeading')}
-          </h2>
+          <SubsectionHeading>{t('about:experienceHeading')}</SubsectionHeading>
           <ExperienceTimeline />
         </section>
 
         <section className="flex flex-col gap-6">
-          <h2 className="font-mono text-xs tracking-[0.2em] text-muted-foreground uppercase">
-            {t('about:skillsHeading')}
-          </h2>
+          <SubsectionHeading>{t('about:skillsHeading')}</SubsectionHeading>
           <SkillGroups />
         </section>
 

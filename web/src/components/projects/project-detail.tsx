@@ -5,6 +5,7 @@ import { FEATURED_PROJECT_SLUG } from '@/components/projects/featured';
 import { ProjectScreenshot } from '@/components/projects/project-screenshot';
 import { Chip } from '@/components/signal/chip';
 import { SectionEyebrow } from '@/components/signal/section-eyebrow';
+import { SubsectionHeading } from '@/components/signal/subsection-heading';
 import { projects } from '@/content/projects';
 import { useLocalized } from '@/i18n/use-localized';
 
@@ -99,18 +100,14 @@ export function ProjectDetail({ slug }: ProjectDetailProps) {
 
         {project.detail?.overview ? (
           <section className="flex flex-col gap-3">
-            <h2 className="font-mono text-xs tracking-[0.2em] text-muted-foreground uppercase">
-              {t('projects:overviewHeading')}
-            </h2>
+            <SubsectionHeading>{t('projects:overviewHeading')}</SubsectionHeading>
             <p className="max-w-2xl text-base leading-relaxed text-muted-foreground">{L(project.detail.overview)}</p>
           </section>
         ) : null}
 
         {project.detail?.highlights && project.detail.highlights.length > 0 ? (
           <section className="flex flex-col gap-3">
-            <h2 className="font-mono text-xs tracking-[0.2em] text-muted-foreground uppercase">
-              {t('projects:highlightsHeading')}
-            </h2>
+            <SubsectionHeading>{t('projects:highlightsHeading')}</SubsectionHeading>
             <ul className="flex flex-col gap-3 border-l border-signal/25 pl-6">
               {project.detail.highlights.map((highlight) => (
                 <li key={L(highlight)} className="relative text-sm text-muted-foreground">

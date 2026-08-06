@@ -13,7 +13,6 @@ export interface Profile {
   title: LocalizedString;
   tagline: LocalizedString;
   bio: LocalizedString;
-  social: { label: string; href: string }[];
   skills: { group: LocalizedString; items: string[] }[];
   experience: { role: LocalizedString; org: string; period: LocalizedString; summary: LocalizedString }[];
   contact: ContactConfig;
@@ -34,10 +33,6 @@ export const profile: Profile = {
     'pt-BR':
       'Engenheiro e arquiteto de software focado em sistemas distribuídos, arquitetura orientada a eventos e CI/CD. Atualmente Senior Product Engineer na Kota.io, construindo infraestrutura de seguro-saúde na Europa. Fundador da Pampa Devs, uma comunidade brasileira de desenvolvedores.',
   },
-  social: [
-    { label: 'GitHub', href: 'https://github.com/felipe-allmeida' },
-    { label: 'LinkedIn', href: 'https://www.linkedin.com/in/felipe-allmeida' },
-  ],
   contact: {
     // Placeholder — Felipe fills in the real Calendly link before merge.
     calendly: '',

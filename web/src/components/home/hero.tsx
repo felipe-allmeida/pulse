@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Link } from '@tanstack/react-router';
 import { CvButton } from '@/components/nav/cv-button';
 import { HeroMap } from '@/components/home/hero-map';
+import { Chip } from '@/components/signal/chip';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { profile } from '@/content/profile';
 import { useLocalized } from '@/i18n/use-localized';
@@ -82,10 +83,10 @@ export function Hero() {
           </Button>
         </div>
 
-        <ul className="flex flex-wrap gap-x-4 gap-y-2 border-t border-border/60 pt-6 font-mono text-xs text-muted-foreground">
+        <ul className="flex flex-wrap gap-x-3 gap-y-2 border-t border-border/60 pt-6">
           {HOME_STACK.map((tech) => (
-            <li key={tech} className="rounded-full border border-signal/20 px-2.5 py-1">
-              {tech}
+            <li key={tech}>
+              <Chip>{tech}</Chip>
             </li>
           ))}
         </ul>
