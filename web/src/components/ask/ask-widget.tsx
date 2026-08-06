@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/sheet';
 import { streamAsk } from '@/lib/ask';
 import { cn } from '@/lib/utils';
+import type { Locale } from '@/content/types';
 
 interface ChatMessage {
   role: 'user' | 'assistant';
@@ -20,7 +21,8 @@ interface ChatMessage {
 }
 
 export function AskWidget() {
-  const { t } = useTranslation('ask');
+  const { t, i18n } = useTranslation('ask');
+  const locale: Locale = i18n.language === 'pt-BR' ? 'pt-BR' : 'en';
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [isStreaming, setIsStreaming] = useState(false);
@@ -58,6 +60,7 @@ export function AskWidget() {
       await streamAsk({
         question: trimmed,
         history,
+        locale,
         signal: controller.signal,
         onChunk: (chunk) => {
           setMessages((prev) => {
