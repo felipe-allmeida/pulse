@@ -1,0 +1,15 @@
+{
+  "live": {
+    "online_one": "{{count}} online now",
+    "online_other": "{{count}} online now"
+  },
+  "hero": {
+    "hook": "You're one of {{count}} people here right now — and this page is a live distributed system, streaming presence, geolocation, and events in real time."
+  },
+  "cta": {
+    "projects": "See the projects",
+    "about": "About me",
+    "cv": "Download CV",
+    "ask": "Ask the AI about me"
+  }
+}

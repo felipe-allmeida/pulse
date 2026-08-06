@@ -101,6 +101,7 @@ export function AskWidget() {
     <Sheet onOpenChange={handleOpenChange}>
       <SheetTrigger asChild>
         <Button
+          id="ask-widget-trigger"
           className="fixed bottom-6 right-6 z-50 shadow-lg"
           size="lg"
         >

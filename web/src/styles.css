@@ -36,6 +36,13 @@
   --color-chart-3: hsl(var(--chart-3));
   --color-chart-4: hsl(var(--chart-4));
   --color-chart-5: hsl(var(--chart-5));
+
+  /* "Signal" accent — the single aqua highlight for the immersive home hero/showcase
+     (live pill, primary CTA, data highlights). Fixed, not theme-switched: unlike the
+     tokens above it does not flip with .dark, since the hero always commits to the
+     dark treatment regardless of the site-wide theme toggle. */
+  --color-signal: #3ae0c4;
+  --color-signal-muted: #1f4d45;
 }
 
 :root {
