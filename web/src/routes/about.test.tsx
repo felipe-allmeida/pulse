@@ -5,14 +5,19 @@ import { profile } from '@/content/profile';
 import { renderWithI18n } from '@/test/render-with-i18n';
 
 describe('AboutPage', () => {
-  it('renders the profile name, tagline, a skill, and an experience org', async () => {
+  it('renders exactly one h1, and it is the profile name', async () => {
     await renderWithI18n(<AboutPage />);
 
-    expect(screen.getByRole('heading', { level: 1, name: profile.name })).toBeInTheDocument();
-    expect(screen.getByText(profile.tagline.en)).toBeInTheDocument();
-    expect(screen.getByText('Kubernetes')).toBeInTheDocument();
-    expect(screen.getByText('.NET / ASP.NET Core')).toBeInTheDocument();
-    expect(screen.getAllByText(/Kota\.io/).length).toBeGreaterThan(0);
+    const headings = screen.getAllByRole('heading', { level: 1 });
+    expect(headings).toHaveLength(1);
+    expect(headings[0]).toHaveTextContent(profile.name);
+  });
+
+  it('renders the status pill availability text and positioning detail', async () => {
+    await renderWithI18n(<AboutPage />);
+
+    expect(screen.getByText(/available now/i)).toBeInTheDocument();
+    expect(screen.getByText(/open to staff \/ principal/i)).toBeInTheDocument();
   });
 
   it('renders the initials-avatar placeholder as first + last name initials', async () => {
@@ -22,21 +27,11 @@ describe('AboutPage', () => {
     expect(screen.getByText('FA')).toBeInTheDocument();
   });
 
-  it('renders exactly one h1', async () => {
+  it('renders a localized experience org and a skill chip', async () => {
     await renderWithI18n(<AboutPage />);
 
-    expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
-  });
-
-  it('renders social links that open in a new tab safely', async () => {
-    await renderWithI18n(<AboutPage />);
-
-    for (const social of profile.social) {
-      const link = screen.getByRole('link', { name: new RegExp(social.label, 'i') });
-      expect(link).toHaveAttribute('href', social.href);
-      expect(link).toHaveAttribute('target', '_blank');
-      expect(link).toHaveAttribute('rel', expect.stringContaining('noreferrer'));
-    }
+    expect(screen.getAllByText(/Kota\.io/).length).toBeGreaterThan(0);
+    expect(screen.getByText('Kubernetes')).toBeInTheDocument();
   });
 
   it('renders a Download CV control', async () => {
@@ -45,18 +40,44 @@ describe('AboutPage', () => {
     expect(screen.getByRole('link', { name: /download cv/i })).toBeInTheDocument();
   });
 
-  it('renders pt-BR section headings and localized content', async () => {
-    await renderWithI18n(<AboutPage />, { locale: 'pt-BR' });
+  it('renders the 4 contact CTAs with correct hrefs when calendly is configured', async () => {
+    const originalCalendly = profile.contact.calendly;
+    profile.contact.calendly = 'https://calendly.com/felipe/30min';
 
-    expect(screen.getByText('Biografia')).toBeInTheDocument();
-    expect(screen.getByText('Habilidades')).toBeInTheDocument();
-    expect(screen.getByText('Experiência')).toBeInTheDocument();
-    expect(screen.getByText(profile.tagline['pt-BR'])).toBeInTheDocument();
+    try {
+      await renderWithI18n(<AboutPage />);
+
+      expect(screen.getAllByRole('link', { name: /book a call/i })).toHaveLength(1);
+      expect(screen.getByRole('link', { name: /book a call/i })).toHaveAttribute(
+        'href',
+        'https://calendly.com/felipe/30min',
+      );
+      expect(screen.getByRole('link', { name: /^email$/i })).toHaveAttribute(
+        'href',
+        `mailto:${profile.contact.email}`,
+      );
+      expect(screen.getByRole('link', { name: /linkedin/i })).toHaveAttribute('href', profile.contact.linkedin);
+      expect(screen.getByRole('link', { name: /whatsapp/i })).toHaveAttribute('href', profile.contact.whatsapp);
+    } finally {
+      profile.contact.calendly = originalCalendly;
+    }
   });
 
-  it('renders the experience period localized in pt-BR', async () => {
+  it('opens the contact CTAs in a new tab safely', async () => {
+    await renderWithI18n(<AboutPage />);
+
+    for (const name of [/^email$/i, /linkedin/i, /whatsapp/i]) {
+      const link = screen.getByRole('link', { name });
+      expect(link).toHaveAttribute('target', '_blank');
+      expect(link).toHaveAttribute('rel', 'noreferrer');
+    }
+  });
+
+  it('renders pt-BR section headings and a pt-BR string', async () => {
     await renderWithI18n(<AboutPage />, { locale: 'pt-BR' });
 
+    expect(screen.getByText('Experiência')).toBeInTheDocument();
+    expect(screen.getByText('Habilidades')).toBeInTheDocument();
     expect(screen.getByText('Atual')).toBeInTheDocument();
   });
 });

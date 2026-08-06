@@ -1,25 +1,17 @@
-// lucide-react's brand icon set (Github, Linkedin, etc.) was removed upstream; a
-// generic external-link glyph is used for every entry instead.
-import { ExternalLink } from 'lucide-react';
-import { buttonVariants } from '@/components/ui/button';
-import { profile } from '@/content/profile';
-import { cn } from '@/lib/utils';
+import { useTranslation } from 'react-i18next';
+import { ContactButtons } from '@/components/signal/contact-buttons';
 
-export function SocialLinks() {
+/**
+ * "Get in touch" — the About page's contact block. Replaces the old
+ * GitHub/LinkedIn social-link row with the shared `ContactButtons` CTA row
+ * (Calendly · Email · LinkedIn · WhatsApp).
+ */
+export function AboutContact() {
+  const { t } = useTranslation('contact');
   return (
-    <div className="flex flex-wrap gap-2">
-      {profile.social.map((social) => (
-        <a
-          key={social.href}
-          href={social.href}
-          target="_blank"
-          rel="noreferrer"
-          className={cn(buttonVariants({ variant: 'outline', size: 'sm' }))}
-        >
-          <ExternalLink aria-hidden />
-          {social.label}
-        </a>
-      ))}
+    <div className="flex flex-col gap-4">
+      <h2 className="font-mono text-xs tracking-[0.2em] text-muted-foreground uppercase">{t('contact:heading')}</h2>
+      <ContactButtons />
     </div>
   );
 }
