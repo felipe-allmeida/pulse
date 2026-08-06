@@ -2,6 +2,7 @@ import { ArrowRight, Sparkles } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link } from '@tanstack/react-router';
 import { CvButton } from '@/components/nav/cv-button';
+import { HeroMap } from '@/components/home/hero-map';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { profile } from '@/content/profile';
 import { useLocalized } from '@/i18n/use-localized';
@@ -36,7 +37,9 @@ export function Hero() {
 
   return (
     <section className="dark relative isolate flex flex-col justify-center overflow-hidden bg-background px-6 py-20 text-foreground sm:px-10 md:min-h-[85vh] md:py-28">
-      <div className="mx-auto flex w-full max-w-5xl flex-col gap-8">
+      <HeroMap className="z-0" />
+
+      <div className="relative z-10 mx-auto flex w-full max-w-5xl flex-col gap-8">
         <span
           aria-live="polite"
           className="inline-flex w-fit items-center gap-2 rounded-full border border-signal/30 bg-signal-muted/40 px-3 py-1 font-mono text-xs text-signal"

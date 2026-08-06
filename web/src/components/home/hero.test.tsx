@@ -12,9 +12,11 @@ import { profile } from '@/content/profile';
 import { renderWithI18n } from '@/test/render-with-i18n';
 
 const useMetricsMock = vi.fn();
+const useVisitsMock = vi.fn(() => ({ data: undefined }));
 
 vi.mock('@/lib/api', () => ({
   useMetrics: () => useMetricsMock(),
+  useVisits: () => useVisitsMock(),
 }));
 
 const { Hero } = await import('./hero');

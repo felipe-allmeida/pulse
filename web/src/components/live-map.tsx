@@ -1,25 +1,15 @@
 import { useEffect, useMemo, useRef } from 'react';
 import { geoNaturalEarth1, geoPath } from 'd3-geo';
-import { feature } from 'topojson-client';
-import type { Topology, GeometryCollection } from 'topojson-specification';
 import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { countryCounts, matchCountryName } from '@/lib/geo';
 import { useVisits } from '@/lib/api';
 import { byNewest, EMPTY_POINTS } from '@/lib/points';
-import countriesTopology from '@/assets/countries-110m.json';
+import { world } from '@/lib/world';
 
 const WIDTH = 800;
 const HEIGHT = 420;
 const RECENT_PING_COUNT = 20;
-
-type CountryProperties = { name: string };
-
-const topology = countriesTopology as unknown as Topology<{
-  countries: GeometryCollection<CountryProperties>;
-}>;
-
-const world = feature(topology, topology.objects.countries);
 
 const projection = geoNaturalEarth1().fitSize([WIDTH, HEIGHT], world);
 const path = geoPath(projection);
