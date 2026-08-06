@@ -3,6 +3,7 @@ import { render, screen } from '@testing-library/react';
 import { I18nextProvider } from 'react-i18next';
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 import i18n from '@/i18n';
+import { AskWidget } from '@/components/ask/ask-widget';
 import { profile } from '@/content/profile';
 import { useEventStore } from '@/stores/event-store';
 import type { Locale } from '@/content/types';
@@ -47,7 +48,15 @@ async function renderIndexRoute(locale: Locale = 'en') {
 
   return render(
     <I18nextProvider i18n={i18n}>
+      {/*
+        AskWidget isn't part of the `/` route tree in production — it's
+        mounted once in `__root.tsx`, alongside the route's <Outlet />. It's
+        rendered here too so the "separate corners" test below reflects the
+        real composed page, where both floating elements are on screen at
+        once.
+      */}
       <RouterProvider router={router} />
+      <AskWidget />
     </I18nextProvider>,
   );
 }
@@ -94,6 +103,46 @@ describe('Index dashboard route', () => {
 
     // Exactly one h1 on the whole composed page
     expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
+  });
+
+  it('keeps the floating Reactions card and the Ask widget trigger from overlapping, including on phone widths', async () => {
+    await renderIndexRoute();
+
+    const reactionsCard = screen.getByText('React').closest('.fixed');
+    const askTrigger = screen.getByRole('button', { name: /ask about felipe/i });
+
+    expect(reactionsCard).not.toBeNull();
+
+    // jsdom does no real layout (getBoundingClientRect is stubbed to
+    // zeros), so a bounding-box check can't tell us anything — instead
+    // this asserts the specific classes that are what actually prevents
+    // the overlap, so a regression to any of them fails this test.
+    //
+    // A left/right corner-anchor check alone is NOT enough: on phone
+    // widths (320–414px) both elements are `fixed` at the same
+    // `bottom-6` row, the Reactions card has no width cap of its own
+    // (Card/CardHeader/CardContent are unconstrained, so its 8-icon row
+    // shrink-to-fits to ~344px), and the Ask trigger's own text is
+    // `whitespace-nowrap` — together those alone can already approach a
+    // 375px viewport's width, so `left-6`/`right-6` anchoring is not
+    // sufficient by itself to keep them apart. Below `md:` the Reactions
+    // card is moved off the bottom row entirely (`top-24`) instead of
+    // sharing it, and `max-w-[216px]` keeps it compact everywhere
+    // (including at `md:` and up, where it does share the bottom row
+    // with the trigger — see the space math in routes/index.tsx's
+    // comment and task-5-report.md's "Fix round 1" section).
+    expect(reactionsCard).toHaveClass('max-w-[216px]');
+    expect(reactionsCard).toHaveClass('top-24');
+    expect(reactionsCard).toHaveClass('md:top-auto');
+    expect(reactionsCard).toHaveClass('md:bottom-6');
+
+    // Still true, and still worth asserting: from `md:` up, where the
+    // card rejoins the bottom row, left/right anchoring is what keeps it
+    // on the opposite side from the trigger.
+    expect(reactionsCard).toHaveClass('left-6');
+    expect(reactionsCard).not.toHaveClass('right-6');
+    expect(askTrigger).toHaveClass('right-6');
+    expect(askTrigger).not.toHaveClass('left-6');
   });
 
   it('shows pt-BR hero copy on the composed home', async () => {

@@ -11,6 +11,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet';
+import { Chip } from '@/components/signal/chip';
 import { streamAsk } from '@/lib/ask';
 import { useAskWidgetStore } from '@/stores/ask-widget-store';
 import { cn } from '@/lib/utils';
@@ -104,16 +105,22 @@ export function AskWidget() {
   return (
     <Sheet open={isOpen} onOpenChange={handleOpenChange}>
       <SheetTrigger asChild>
-        <Button className="fixed bottom-6 right-6 z-50 shadow-lg" size="lg">
+        <Button
+          size="lg"
+          className="fixed right-6 bottom-6 z-50 rounded-full border border-signal/40 bg-signal font-mono text-signal-foreground shadow-[0_0_24px_-6px_var(--color-signal)] hover:bg-signal/90"
+        >
           <MessageCircle />
           {t('ask:trigger')}
         </Button>
       </SheetTrigger>
-      <SheetContent side="right" className="flex w-full flex-col sm:max-w-md">
-        <SheetHeader>
-          <SheetTitle>{t('ask:title')}</SheetTitle>
+      <SheetContent
+        side="right"
+        className="dark flex w-full flex-col border-signal/15 bg-background text-foreground sm:max-w-md"
+      >
+        <SheetHeader className="border-b border-signal/10">
+          <SheetTitle className="font-mono text-signal">{t('ask:title')}</SheetTitle>
           <SheetDescription>{t('ask:description')}</SheetDescription>
-          <p className="text-xs text-muted-foreground">{t('ask:disclaimer')}</p>
+          <p className="font-mono text-xs text-muted-foreground">{t('ask:disclaimer')}</p>
         </SheetHeader>
 
         <div className="flex flex-wrap gap-2 px-4">
@@ -123,9 +130,9 @@ export function AskWidget() {
               type="button"
               onClick={() => handleSuggestion(question)}
               disabled={isStreaming}
-              className="rounded-full border border-input bg-transparent px-3 py-1 text-xs text-foreground transition-colors hover:bg-accent disabled:pointer-events-none disabled:opacity-50"
+              className="rounded-full transition-opacity hover:opacity-80 disabled:pointer-events-none disabled:opacity-50"
             >
-              {question}
+              <Chip>{question}</Chip>
             </button>
           ))}
         </div>
@@ -140,8 +147,8 @@ export function AskWidget() {
                 className={cn(
                   'max-w-[85%] rounded-lg px-3 py-2 text-sm',
                   message.role === 'user'
-                    ? 'bg-primary text-primary-foreground'
-                    : 'bg-muted text-foreground'
+                    ? 'bg-signal text-signal-foreground'
+                    : 'border border-signal/10 bg-signal-muted/15 text-foreground'
                 )}
                 aria-live={message.role === 'assistant' ? 'polite' : undefined}
               >
@@ -149,19 +156,28 @@ export function AskWidget() {
               </div>
             </div>
           ))}
-          {error && <p className="text-sm text-destructive">{error}</p>}
+          {error && (
+            <p className="rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive">
+              {error}
+            </p>
+          )}
         </div>
 
-        <div className="flex items-end gap-2 border-t p-4">
+        <div className="flex items-end gap-2 border-t border-signal/10 p-4">
           <Textarea
             value={input}
             maxLength={500}
             placeholder={t('ask:inputPlaceholder')}
             aria-label={t('ask:inputAriaLabel')}
             onChange={(event) => setInput(event.target.value)}
-            className="min-h-10"
+            className="min-h-10 border-signal/20 bg-signal-muted/10 focus-visible:border-signal focus-visible:ring-signal/30"
           />
-          <Button size="icon" onClick={handleSend} disabled={isStreaming || !input.trim()}>
+          <Button
+            size="icon"
+            onClick={handleSend}
+            disabled={isStreaming || !input.trim()}
+            className="bg-signal text-signal-foreground hover:bg-signal/90"
+          >
             <Send />
             <span className="sr-only">{t('ask:send')}</span>
           </Button>

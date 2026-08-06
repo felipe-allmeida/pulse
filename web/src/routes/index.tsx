@@ -62,8 +62,32 @@ function Index() {
         </div>
       </section>
 
-      <div className="fixed bottom-6 right-6 z-50">
-        <Card className="shadow-lg">
+      {/*
+        Ask widget's floating trigger (ask-widget.tsx) is anchored
+        `fixed right-6 bottom-6`. Two things keep this card from colliding
+        with it, not just the opposite `left-6` anchor:
+
+        1. `max-w-[216px]` caps this card's width everywhere. Left
+           unconstrained, `Card`/`CardHeader`/`CardContent` have no width of
+           their own, so the 8-icon `Reactions` row (flex-wrap, ~344px of
+           unwrapped content) sizes the card up to its max-content width —
+           216px forces it to wrap to 4 icons/row instead, which also bounds
+           how far its right edge can reach on the shared bottom row above
+           `md:`.
+        2. Below `md:` (768px) it sits at `top-24 left-6` instead — off the
+           bottom row entirely, so on real phone widths (320–414px, where
+           the Ask trigger's own text can already approach the full
+           viewport width) there's no shared row to collide on in the first
+           place. `top-24` (96px) clears the sticky header (~60–64px tall)
+           with margin to spare. From `md:` up there's enough width for
+           both the capped card and the trigger on the same bottom row —
+           see the space math in task-5-report.md's "Fix round 1" section.
+
+        routes/index.test.tsx locks all of this: the left/right corner
+        classes, the width cap, and the mobile top-position classes.
+      */}
+      <div className="fixed top-24 left-6 z-50 max-w-[216px] md:top-auto md:bottom-6">
+        <Card className="border-signal/20 shadow-lg">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm">{t('dashboard:reactions.title')}</CardTitle>
           </CardHeader>

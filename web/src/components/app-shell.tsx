@@ -22,16 +22,37 @@ export function AppShell({ children }: { children: ReactNode }) {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <header className="flex items-center gap-4 border-b px-6 py-3">
-        <Link to="/" className="text-lg font-semibold tracking-tight">
-          Pulse
-        </Link>
-        <TopNav />
-        <ConnectionStatus />
-        <PresenceBadge />
-        <div className="ml-auto flex items-center gap-1">
-          <LanguageToggle />
-          <ThemeToggle />
+      {/*
+        The header commits to the signal dark treatment unconditionally,
+        like every other redesigned surface (Hero, About, Projects) — it
+        sits directly above content that is itself always dark, so letting
+        it follow the site-wide theme toggle would reintroduce the exact
+        "looks left-behind" seam this redesign closes. `ThemeToggle` still
+        controls the rest of the (not-yet-redesigned) app.
+      */}
+      <header className="dark sticky top-0 z-40 border-b border-signal/15 bg-background/85 text-foreground backdrop-blur supports-[backdrop-filter]:bg-background/70">
+        <div className="mx-auto flex max-w-7xl items-center gap-4 px-6 py-3 sm:px-10">
+          <Link
+            to="/"
+            className="flex shrink-0 items-center gap-2 font-mono text-base font-semibold tracking-tight text-foreground"
+          >
+            <span
+              aria-hidden
+              className="size-2 rounded-full bg-signal shadow-[0_0_6px_var(--color-signal)]"
+            />
+            pulse
+          </Link>
+          <TopNav />
+          <div className="ml-auto flex items-center gap-3">
+            <div className="hidden items-center gap-2 sm:flex">
+              <ConnectionStatus />
+              <PresenceBadge />
+            </div>
+            <div className="flex items-center gap-1 border-l border-border/60 pl-2">
+              <LanguageToggle />
+              <ThemeToggle />
+            </div>
+          </div>
         </div>
       </header>
       <main className="mx-auto max-w-7xl p-6">{children}</main>

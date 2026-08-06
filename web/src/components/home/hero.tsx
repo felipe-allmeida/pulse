@@ -3,6 +3,8 @@ import { useTranslation } from 'react-i18next';
 import { Link } from '@tanstack/react-router';
 import { CvButton } from '@/components/nav/cv-button';
 import { HeroMap } from '@/components/home/hero-map';
+import { Chip } from '@/components/signal/chip';
+import { Pill } from '@/components/signal/pill';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { profile } from '@/content/profile';
 import { useLocalized } from '@/i18n/use-localized';
@@ -35,13 +37,7 @@ export function Hero() {
       <HeroMap className="z-0" />
 
       <div className="relative z-10 mx-auto flex w-full max-w-5xl flex-col gap-8">
-        <span className="inline-flex w-fit items-center gap-2 rounded-full border border-signal/30 bg-signal-muted/40 px-3 py-1 font-mono text-xs text-signal">
-          <span className="relative flex size-1.5">
-            <span className="absolute inline-flex size-full rounded-full bg-signal opacity-75 motion-safe:animate-ping" />
-            <span className="relative inline-flex size-1.5 rounded-full bg-signal" />
-          </span>
-          {t('home:live.online', { count: onlineCount })}
-        </span>
+        <Pill dot>{t('home:live.online', { count: onlineCount })}</Pill>
 
         <div className="flex flex-col gap-4">
           <h1 className="text-5xl font-bold tracking-tight text-foreground sm:text-6xl md:text-7xl">
@@ -60,7 +56,7 @@ export function Hero() {
             to="/projects"
             className={cn(
               buttonVariants({ size: 'lg' }),
-              'border-transparent bg-signal text-zinc-950 hover:bg-signal/90',
+              'border-transparent bg-signal text-signal-foreground hover:bg-signal/90',
             )}
           >
             {t('home:cta.projects')}
@@ -82,10 +78,10 @@ export function Hero() {
           </Button>
         </div>
 
-        <ul className="flex flex-wrap gap-x-4 gap-y-2 border-t border-border/60 pt-6 font-mono text-xs text-muted-foreground">
+        <ul className="flex flex-wrap gap-x-3 gap-y-2 border-t border-border/60 pt-6">
           {HOME_STACK.map((tech) => (
-            <li key={tech} className="rounded-full border border-signal/20 px-2.5 py-1">
-              {tech}
+            <li key={tech}>
+              <Chip>{tech}</Chip>
             </li>
           ))}
         </ul>

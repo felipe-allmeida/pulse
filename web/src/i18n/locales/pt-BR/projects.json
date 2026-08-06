@@ -1,5 +1,12 @@
 {
   "pageTitle": "Projetos",
+  "pageEyebrow": "/projects",
   "screenshotPlaceholder": "Captura de tela em breve",
-  "privateLabel": "Privado"
+  "privateLabel": "Privado",
+  "viewDetails": "Ver detalhes de {{name}}",
+  "backToProjects": "Todos os projetos",
+  "overviewHeading": "Visão geral",
+  "highlightsHeading": "Destaques",
+  "notFoundHeading": "Projeto não encontrado",
+  "notFoundBody": "Não encontramos um projeto nesse endereço."
 }

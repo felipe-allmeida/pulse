@@ -7,7 +7,8 @@
   "cvShort": "CV",
   "openMenu": "Abrir menu",
   "menu": "Menu",
-  "mobileNavDescription": "Navegue para Início, Sobre ou Projetos, ou baixe o currículo.",
+  "mobileNavDescription": "Navegue para Início, Sobre, Projetos ou Contato, ou baixe o currículo.",
   "mainNav": "Principal",
-  "mobileNav": "Móvel"
+  "mobileNav": "Móvel",
+  "askAi": "Pergunte à IA"
 }

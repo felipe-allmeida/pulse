@@ -6,9 +6,10 @@ import {
   createRouter,
 } from '@tanstack/react-router';
 import { fireEvent, screen, within } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 import type { Locale } from '@/content/types';
 import { renderWithI18n } from '@/test/render-with-i18n';
+import { useAskWidgetStore } from '@/stores/ask-widget-store';
 import { TopNav } from './top-nav';
 
 function renderTopNav(initialPath = '/', locale?: Locale) {
@@ -30,12 +31,35 @@ function renderTopNav(initialPath = '/', locale?: Locale) {
 }
 
 describe('TopNav', () => {
-  it('renders links to Home, About and Projects', async () => {
+  beforeEach(() => {
+    useAskWidgetStore.setState({ isOpen: false });
+  });
+
+  it('renders links to Home, About, Projects and Contact', async () => {
     await renderTopNav();
 
     expect(await screen.findByRole('link', { name: /home/i })).toBeInTheDocument();
     expect(screen.getAllByRole('link', { name: /about/i }).length).toBeGreaterThan(0);
     expect(screen.getAllByRole('link', { name: /projects/i }).length).toBeGreaterThan(0);
+    expect(screen.getAllByRole('link', { name: /contact/i }).length).toBeGreaterThan(0);
+  });
+
+  it('points the Contact link at the About contact anchor', async () => {
+    await renderTopNav();
+
+    const contactLinks = await screen.findAllByRole('link', { name: /contact/i });
+    expect(contactLinks[0]).toHaveAttribute('href', '/about#contact');
+  });
+
+  it('renders an Ask the AI trigger that opens the shared Ask widget store', async () => {
+    await renderTopNav();
+
+    const askButtons = await screen.findAllByRole('button', { name: /ask the ai/i });
+    expect(askButtons.length).toBeGreaterThan(0);
+
+    fireEvent.click(askButtons[0]);
+
+    expect(useAskWidgetStore.getState().isOpen).toBe(true);
   });
 
   it('renders a Download CV control', async () => {
@@ -50,7 +74,7 @@ describe('TopNav', () => {
     expect(await screen.findByRole('button', { name: /open menu/i })).toBeInTheDocument();
   });
 
-  it('opens the mobile menu with Home/About/Projects links and a Download CV control', async () => {
+  it('opens the mobile menu with Home/About/Projects/Contact links and a Download CV control', async () => {
     await renderTopNav();
 
     fireEvent.click(await screen.findByRole('button', { name: /open menu/i }));
@@ -59,6 +83,7 @@ describe('TopNav', () => {
     expect(within(mobileNav).getByRole('link', { name: /home/i })).toBeInTheDocument();
     expect(within(mobileNav).getByRole('link', { name: /about/i })).toBeInTheDocument();
     expect(within(mobileNav).getByRole('link', { name: /projects/i })).toBeInTheDocument();
+    expect(within(mobileNav).getByRole('link', { name: /contact/i })).toBeInTheDocument();
     expect(within(mobileNav).getByRole('link', { name: /download cv/i })).toBeInTheDocument();
   });
 
@@ -76,6 +101,7 @@ describe('TopNav', () => {
     expect(await screen.findByRole('link', { name: /início/i })).toBeInTheDocument();
     expect(screen.getAllByRole('link', { name: /sobre/i }).length).toBeGreaterThan(0);
     expect(screen.getAllByRole('link', { name: /projetos/i }).length).toBeGreaterThan(0);
+    expect(screen.getAllByRole('link', { name: /contato/i }).length).toBeGreaterThan(0);
     expect(screen.getAllByRole('link', { name: /baixar currículo/i }).length).toBeGreaterThan(0);
   });
 });

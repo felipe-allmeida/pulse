@@ -5,7 +5,7 @@ import {
   createRoute,
   createRouter,
 } from '@tanstack/react-router';
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('@/realtime/use-pulse-hub', () => ({
@@ -39,10 +39,19 @@ describe('AppShell', () => {
   it('renders the wordmark, status widgets, and children', async () => {
     renderAppShell();
 
-    expect(await screen.findByText('Pulse')).toBeInTheDocument();
+    expect(await screen.findByText(/pulse/i)).toBeInTheDocument();
     expect(screen.getByText(/connected/i)).toBeInTheDocument();
     expect(screen.getByText('4 online')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /toggle theme/i })).toBeInTheDocument();
     expect(screen.getByText('page content')).toBeInTheDocument();
+  });
+
+  it('renders the header inside a banner landmark with the nav links and the Ask trigger', async () => {
+    renderAppShell();
+
+    const banner = await screen.findByRole('banner');
+    expect(within(banner).getByRole('link', { name: /home/i })).toBeInTheDocument();
+    expect(within(banner).getAllByRole('link', { name: /contact/i }).length).toBeGreaterThan(0);
+    expect(within(banner).getAllByRole('button', { name: /ask the ai/i }).length).toBeGreaterThan(0);
   });
 });

@@ -10,9 +10,9 @@ const STATUS_KEY = {
 } as const;
 
 const STATUS_CLASS = {
-  connected: 'border-transparent bg-emerald-500/15 text-emerald-600 dark:text-emerald-400',
-  reconnecting: 'border-transparent bg-amber-500/15 text-amber-600 dark:text-amber-400',
-  offline: 'border-transparent bg-destructive/15 text-destructive',
+  connected: 'border-emerald-500/30 bg-emerald-500/10 text-emerald-400',
+  reconnecting: 'border-amber-500/30 bg-amber-500/10 text-amber-400',
+  offline: 'border-destructive/30 bg-destructive/10 text-destructive',
 } as const;
 
 export function ConnectionStatus() {
@@ -20,7 +20,10 @@ export function ConnectionStatus() {
   const { connection } = usePulseHub();
 
   return (
-    <Badge variant="outline" className={cn(STATUS_CLASS[connection])}>
+    <Badge
+      variant="outline"
+      className={cn('font-mono text-[11px] tracking-wide uppercase', STATUS_CLASS[connection])}
+    >
       {t(`dashboard:connectionStatus.${STATUS_KEY[connection]}`)}
     </Badge>
   );

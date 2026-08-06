@@ -43,6 +43,7 @@
      dark treatment regardless of the site-wide theme toggle. */
   --color-signal: #3ae0c4;
   --color-signal-muted: #1f4d45;
+  --color-signal-foreground: #05201b;
 }
 
 :root {
