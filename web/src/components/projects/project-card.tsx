@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { buttonVariants } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import type { Project } from '@/content/projects';
+import { useLocalized } from '@/i18n/use-localized';
 import { cn } from '@/lib/utils';
 
 interface ProjectCardProps {
@@ -12,6 +13,7 @@ interface ProjectCardProps {
 }
 
 export function ProjectCard({ project }: ProjectCardProps) {
+  const L = useLocalized();
   return (
     <Card className="flex flex-col overflow-hidden">
       {project.screenshot ? (
@@ -31,11 +33,11 @@ export function ProjectCard({ project }: ProjectCardProps) {
 
       <CardHeader>
         <CardTitle className="text-lg">{project.name}</CardTitle>
-        <CardDescription>{project.tagline}</CardDescription>
+        <CardDescription>{L(project.tagline)}</CardDescription>
       </CardHeader>
 
       <CardContent className="flex flex-1 flex-col gap-4">
-        <p className="text-sm text-muted-foreground">{project.description}</p>
+        <p className="text-sm text-muted-foreground">{L(project.description)}</p>
 
         <div className="flex flex-wrap gap-2">
           {project.tech.map((tech) => (
@@ -46,8 +48,8 @@ export function ProjectCard({ project }: ProjectCardProps) {
         </div>
 
         <p className="text-sm text-muted-foreground">
-          {project.role}
-          {project.period ? ` · ${project.period}` : ''}
+          {L(project.role)}
+          {project.period ? ` · ${L(project.period)}` : ''}
         </p>
       </CardContent>
 

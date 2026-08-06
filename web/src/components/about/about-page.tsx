@@ -4,8 +4,10 @@ import { SkillGroups } from '@/components/about/skill-groups';
 import { SocialLinks } from '@/components/about/social-links';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { profile } from '@/content/profile';
+import { useLocalized } from '@/i18n/use-localized';
 
 export function AboutPage() {
+  const L = useLocalized();
   return (
     <div className="mx-auto flex max-w-3xl flex-col gap-8 pb-24">
       <AboutHero />
@@ -17,7 +19,7 @@ export function AboutPage() {
           <CardTitle>Bio</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-muted-foreground">{profile.bio}</p>
+          <p className="text-sm text-muted-foreground">{L(profile.bio)}</p>
         </CardContent>
       </Card>
 
