@@ -56,6 +56,7 @@ export function Reactions() {
           type="button"
           variant="outline"
           size="icon"
+          className="border-signal/20 hover:border-signal/40 hover:bg-signal-muted/20"
           aria-label={t('dashboard:reactions.ariaLabel', { emoji })}
           onClick={() => react(emoji)}
         >

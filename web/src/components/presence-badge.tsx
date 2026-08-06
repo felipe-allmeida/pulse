@@ -10,7 +10,7 @@ export function PresenceBadge() {
   return (
     <Badge
       variant="outline"
-      className="gap-1.5 border-signal/30 bg-signal-muted/20 font-mono text-[11px] tracking-wide text-signal uppercase"
+      className="gap-1.5 border-signal/30 bg-signal-muted/20 font-mono text-[11px] tracking-wide tabular-nums text-signal uppercase"
     >
       <span aria-hidden className="text-signal">
         ●

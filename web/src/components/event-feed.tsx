@@ -1,6 +1,7 @@
 import { Heart, MapPin } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { SubsectionHeading } from '@/components/signal/subsection-heading';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { formatRelativeTime } from '@/lib/format';
 import { useEventStore } from '@/stores/event-store';
 import type { PulseEvent } from '@/types/pulse';
@@ -20,9 +21,9 @@ export function EventFeed({ now = new Date() }: EventFeedProps = {}) {
   const events = useEventStore((s) => s.events);
 
   return (
-    <Card>
+    <Card className="border-signal/20 bg-signal-muted/10">
       <CardHeader>
-        <CardTitle>{t('dashboard:eventFeed.title')}</CardTitle>
+        <SubsectionHeading>{t('dashboard:eventFeed.title')}</SubsectionHeading>
       </CardHeader>
       <CardContent>
         {events.length === 0 ? (
@@ -37,9 +38,9 @@ export function EventFeed({ now = new Date() }: EventFeedProps = {}) {
                   : t('dashboard:eventFeed.reaction', { emoji: event.emoji });
               return (
                 <li key={`${event.at}-${index}`} className="flex items-start gap-2 text-sm">
-                  <Icon className="mt-0.5 size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
-                  <span className="flex-1">{label}</span>
-                  <span className="shrink-0 text-xs text-muted-foreground">
+                  <Icon className="mt-0.5 size-4 shrink-0 text-signal" aria-hidden="true" />
+                  <span className="flex-1 text-foreground/90">{label}</span>
+                  <span className="shrink-0 font-mono text-xs tabular-nums text-muted-foreground">
                     {formatRelativeTime(event.at, now, i18n.language)}
                   </span>
                 </li>

@@ -1,7 +1,8 @@
 import { useMemo } from 'react';
 import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { useTranslation } from 'react-i18next';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { SubsectionHeading } from '@/components/signal/subsection-heading';
+import { Card, CardContent, CardDescription, CardHeader } from '@/components/ui/card';
 import { useVisits } from '@/lib/api';
 import { bucketByHour } from '@/lib/geo';
 import { EMPTY_POINTS } from '@/lib/points';
@@ -30,9 +31,9 @@ export function VisitsChart() {
   const visitsLabel = t('dashboard:visitsChart.tooltipLabel');
 
   return (
-    <Card>
+    <Card className="border-signal/20 bg-signal-muted/10">
       <CardHeader>
-        <CardTitle>{t('dashboard:visitsChart.title')}</CardTitle>
+        <SubsectionHeading>{t('dashboard:visitsChart.title')}</SubsectionHeading>
         <CardDescription>{t('dashboard:visitsChart.description')}</CardDescription>
       </CardHeader>
       <CardContent>
@@ -41,7 +42,7 @@ export function VisitsChart() {
             {t('dashboard:visitsChart.empty')}
           </div>
         ) : (
-          <div className="h-48 w-full">
+          <div className="h-48 w-full font-mono tabular-nums">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={buckets} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" vertical={false} />
