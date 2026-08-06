@@ -17,7 +17,7 @@ Software Engineer & Architect, and engineering leader. Distributed systems, clou
 ## Location & remote
 
 - Based in **Porto Alegre, Brazil** (GMT-3).
-- **Remote:** [PREENCHER — ex.: remote-first, EU-friendly hours?]
+- **Remote:** Open to remote, Europe-friendly hours.
 - **Relocation:** [PREENCHER — aberto? pra onde (Europa)? condições?]
 
 ## Languages & work authorization
@@ -30,7 +30,7 @@ Software Engineer & Architect, and engineering leader. Distributed systems, clou
 - **Founder & Software Engineer/Architect, Pampa Devs** (current, freelance) — his software studio; internal enterprise platforms (support/ticketing + ERP) in .NET & React. Impact: [PREENCHER — clientes/alcance/projetos]
 - **Senior Product Engineer, Kota.io** ([PREENCHER período]) — API-driven employee-benefits & health-insurance platform for European teams. Impact: [PREENCHER — o que entregou / resultado]
 - **Lead Software Engineer, ADP Brazil Labs** ([PREENCHER período]) — engineering hub of the global payroll/HCM leader. Impact: [PREENCHER — escala, time liderado, resultado]
-- **Head of Technology, Dietbox** ([PREENCHER período]) — led engineering for Brazil's most-used nutrition-software SaaS (200k+ professionals). Impact: [PREENCHER — tamanho do time/org, o que construiu, resultado]
+- **Head of Technology, Dietbox** ([PREENCHER período]) — led engineering for a Brazilian nutrition-software SaaS. Impact: [PREENCHER — porte/alcance do produto, tamanho do time/org, o que construiu, resultado]
 - **Total experience:** [PREENCHER — anos]
 
 ## Skills
