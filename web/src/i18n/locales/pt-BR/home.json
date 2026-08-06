@@ -15,6 +15,9 @@
   "showcase": {
     "eyebrow": "o que você está vendo · ao vivo"
   },
+  "dashboard": {
+    "heading": "Painel ao vivo"
+  },
   "stats": {
     "online": "online agora",
     "events": "eventos registrados",

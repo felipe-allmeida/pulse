@@ -3,6 +3,7 @@ import { render, screen } from '@testing-library/react';
 import { I18nextProvider } from 'react-i18next';
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 import i18n from '@/i18n';
+import { profile } from '@/content/profile';
 import { useEventStore } from '@/stores/event-store';
 import type { Locale } from '@/content/types';
 
@@ -69,5 +70,39 @@ describe('Index dashboard route', () => {
     await renderIndexRoute('pt-BR');
 
     expect(screen.getByText('Reagir')).toBeInTheDocument();
+  });
+
+  it('composes the hero, engineering showcase, and the existing live dashboard with exactly one h1', async () => {
+    useMetricsMock.mockReturnValue({ data: { activeConnections: 7, totalVisits: 120 }, isLoading: false });
+    useVisitsMock.mockReturnValue({
+      data: [{ lat: 38.7, lon: -9.1, city: 'Lisbon', country: 'Portugal', at: '2026-08-04T10:00:00Z' }],
+      isLoading: false,
+    });
+
+    await renderIndexRoute();
+
+    // Hero
+    expect(await screen.findByRole('heading', { level: 1, name: profile.name })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /see the projects/i })).toHaveAttribute('href', '/projects');
+
+    // EngineeringShowcase
+    expect(screen.getByText(/what you're looking at/i)).toBeInTheDocument();
+
+    // Existing dashboard, still present and mounted below
+    expect(screen.getByText('Live dashboard')).toBeInTheDocument();
+    expect(screen.getByRole('img', { name: /world map of live visitor locations/i })).toBeInTheDocument();
+
+    // Exactly one h1 on the whole composed page
+    expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
+  });
+
+  it('shows pt-BR hero copy on the composed home', async () => {
+    useMetricsMock.mockReturnValue({ data: { activeConnections: 7, totalVisits: 120 }, isLoading: false });
+    useVisitsMock.mockReturnValue({ data: [], isLoading: false });
+
+    await renderIndexRoute('pt-BR');
+
+    expect(await screen.findByText(/sistema distribuído ao vivo/)).toBeInTheDocument();
+    expect(screen.getByText('Painel ao vivo')).toBeInTheDocument();
   });
 });

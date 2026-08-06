@@ -15,6 +15,9 @@
   "showcase": {
     "eyebrow": "what you're looking at · live"
   },
+  "dashboard": {
+    "heading": "Live dashboard"
+  },
   "stats": {
     "online": "online now",
     "events": "events tracked",

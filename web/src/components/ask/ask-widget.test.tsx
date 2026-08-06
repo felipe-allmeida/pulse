@@ -1,6 +1,7 @@
 import { screen, fireEvent, waitFor } from '@testing-library/react';
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { renderWithI18n } from '@/test/render-with-i18n';
+import { useAskWidgetStore } from '@/stores/ask-widget-store';
 
 vi.mock('@/lib/ask', () => ({ streamAsk: vi.fn(async ({ onChunk }) => { onChunk('Yes, '); onChunk('extensively.'); }) }));
 
@@ -8,6 +9,10 @@ import { streamAsk } from '@/lib/ask';
 import { AskWidget } from './ask-widget';
 
 describe('AskWidget', () => {
+  beforeEach(() => {
+    useAskWidgetStore.setState({ isOpen: false });
+  });
+
   it('opens, sends, and streams an answer', async () => {
     await renderWithI18n(<AskWidget />);
     fireEvent.click(screen.getByRole('button', { name: /ask about felipe/i }));

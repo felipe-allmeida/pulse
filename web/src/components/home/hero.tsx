@@ -7,6 +7,7 @@ import { Button, buttonVariants } from '@/components/ui/button';
 import { profile } from '@/content/profile';
 import { useLocalized } from '@/i18n/use-localized';
 import { useMetrics } from '@/lib/api';
+import { useAskWidgetStore } from '@/stores/ask-widget-store';
 import { cn } from '@/lib/utils';
 
 // Proper nouns / stack names — intentionally not translated.
@@ -22,18 +23,12 @@ const HOME_STACK = [
   'Terraform',
 ] as const;
 
-// The Ask widget (mounted once in __root.tsx) is a fully self-contained Radix
-// Sheet with no exposed open() API. Until a shared open-state exists, invoke
-// its real trigger button directly — this is a no-op if it isn't mounted yet.
-function openAskWidget() {
-  document.getElementById('ask-widget-trigger')?.click();
-}
-
 export function Hero() {
   const { t } = useTranslation('home');
   const localize = useLocalized();
   const { data } = useMetrics();
   const onlineCount = data?.activeConnections ?? 0;
+  const openAskWidget = useAskWidgetStore((s) => s.open);
 
   return (
     <section className="dark relative isolate flex flex-col justify-center overflow-hidden bg-background px-6 py-20 text-foreground sm:px-10 md:min-h-[85vh] md:py-28">
