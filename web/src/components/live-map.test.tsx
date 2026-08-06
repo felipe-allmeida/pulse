@@ -33,4 +33,19 @@ describe('LiveMap', () => {
     await renderWithI18n(<LiveMap />, { locale: 'pt-BR' });
     expect(screen.getByText('Localizações ao vivo')).toBeInTheDocument();
   });
+
+  it('renders a DB-IP attribution link', async () => {
+    useVisitsMock.mockReturnValue({ data: undefined });
+    await renderWithI18n(<LiveMap />);
+    const link = screen.getByRole('link', { name: 'IP data by DB-IP' });
+    expect(link).toHaveAttribute('href', 'https://db-ip.com');
+    expect(link).toHaveAttribute('target', '_blank');
+    expect(link).toHaveAttribute('rel', 'noreferrer');
+  });
+
+  it('renders the pt-BR DB-IP attribution link', async () => {
+    useVisitsMock.mockReturnValue({ data: undefined });
+    await renderWithI18n(<LiveMap />, { locale: 'pt-BR' });
+    expect(screen.getByRole('link', { name: 'Dados de IP por DB-IP' })).toBeInTheDocument();
+  });
 });

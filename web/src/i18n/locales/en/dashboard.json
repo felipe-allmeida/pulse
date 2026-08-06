@@ -9,6 +9,7 @@
     "visitCount_one": "{{count}} visit",
     "visitCount_other": "{{count}} visits"
   },
+  "ipAttribution": "IP data by DB-IP",
   "visitsChart": {
     "title": "Visits over time",
     "description": "Hourly activity across the last 100 tracked visits",
