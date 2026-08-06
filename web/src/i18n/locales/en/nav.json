@@ -3,11 +3,12 @@
   "home": "Home",
   "about": "About",
   "projects": "Projects",
+  "live": "Live",
   "downloadCv": "Download CV",
   "cvShort": "CV",
   "openMenu": "Open menu",
   "menu": "Menu",
-  "mobileNavDescription": "Navigate to Home, About, Projects, or Contact, or download the CV.",
+  "mobileNavDescription": "Navigate to Home, About, Projects, Live, or Contact, or download the CV.",
   "mainNav": "Main",
   "mobileNav": "Mobile",
   "askAi": "Ask the AI"

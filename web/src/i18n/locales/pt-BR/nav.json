@@ -3,11 +3,12 @@
   "home": "Início",
   "about": "Sobre",
   "projects": "Projetos",
+  "live": "Ao vivo",
   "downloadCv": "Baixar currículo",
   "cvShort": "CV",
   "openMenu": "Abrir menu",
   "menu": "Menu",
-  "mobileNavDescription": "Navegue para Início, Sobre, Projetos ou Contato, ou baixe o currículo.",
+  "mobileNavDescription": "Navegue para Início, Sobre, Projetos, Ao vivo ou Contato, ou baixe o currículo.",
   "mainNav": "Principal",
   "mobileNav": "Móvel",
   "askAi": "Pergunte à IA"

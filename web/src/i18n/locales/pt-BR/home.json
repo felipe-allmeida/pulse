@@ -14,8 +14,16 @@
   "showcase": {
     "eyebrow": "o que você está vendo · ao vivo"
   },
-  "dashboard": {
-    "heading": "Painel ao vivo"
+  "liveProof": {
+    "eyebrow": "prova ao vivo",
+    "heading": "Veja acontecendo",
+    "description": "Uma fatia ao vivo do mesmo sistema por trás desta página: visitantes reais, localizações reais, chegando em tempo real.",
+    "cta": "Ver o painel completo"
+  },
+  "livePanel": {
+    "eyebrow": "/live",
+    "heading": "Painel ao vivo",
+    "description": "Todas as métricas, o mapa ao vivo, as visitas recentes e o fluxo bruto de eventos — o painel completo por trás dos números da página inicial."
   },
   "stats": {
     "online": "online agora",

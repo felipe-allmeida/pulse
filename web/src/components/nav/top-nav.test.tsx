@@ -21,7 +21,8 @@ function renderTopNav(initialPath = '/', locale?: Locale) {
     path: '/projects',
     component: () => null,
   });
-  const routeTree = rootRoute.addChildren([indexRoute, aboutRoute, projectsRoute]);
+  const liveRoute = createRoute({ getParentRoute: () => rootRoute, path: '/live', component: () => null });
+  const routeTree = rootRoute.addChildren([indexRoute, aboutRoute, projectsRoute, liveRoute]);
   const router = createRouter({
     routeTree,
     history: createMemoryHistory({ initialEntries: [initialPath] }),
@@ -35,13 +36,21 @@ describe('TopNav', () => {
     useAskWidgetStore.setState({ isOpen: false });
   });
 
-  it('renders links to Home, About, Projects and Contact', async () => {
+  it('renders links to Home, About, Projects, Live and Contact', async () => {
     await renderTopNav();
 
     expect(await screen.findByRole('link', { name: /home/i })).toBeInTheDocument();
     expect(screen.getAllByRole('link', { name: /about/i }).length).toBeGreaterThan(0);
     expect(screen.getAllByRole('link', { name: /projects/i }).length).toBeGreaterThan(0);
+    expect(screen.getAllByRole('link', { name: /^live$/i }).length).toBeGreaterThan(0);
     expect(screen.getAllByRole('link', { name: /contact/i }).length).toBeGreaterThan(0);
+  });
+
+  it('points the Live link at /live', async () => {
+    await renderTopNav();
+
+    const liveLinks = await screen.findAllByRole('link', { name: /^live$/i });
+    expect(liveLinks[0]).toHaveAttribute('href', '/live');
   });
 
   it('points the Contact link at the About contact anchor', async () => {
@@ -83,6 +92,7 @@ describe('TopNav', () => {
     expect(within(mobileNav).getByRole('link', { name: /home/i })).toBeInTheDocument();
     expect(within(mobileNav).getByRole('link', { name: /about/i })).toBeInTheDocument();
     expect(within(mobileNav).getByRole('link', { name: /projects/i })).toBeInTheDocument();
+    expect(within(mobileNav).getByRole('link', { name: /^live$/i })).toBeInTheDocument();
     expect(within(mobileNav).getByRole('link', { name: /contact/i })).toBeInTheDocument();
     expect(within(mobileNav).getByRole('link', { name: /download cv/i })).toBeInTheDocument();
   });
@@ -101,6 +111,7 @@ describe('TopNav', () => {
     expect(await screen.findByRole('link', { name: /início/i })).toBeInTheDocument();
     expect(screen.getAllByRole('link', { name: /sobre/i }).length).toBeGreaterThan(0);
     expect(screen.getAllByRole('link', { name: /projetos/i }).length).toBeGreaterThan(0);
+    expect(screen.getAllByRole('link', { name: /^ao vivo$/i }).length).toBeGreaterThan(0);
     expect(screen.getAllByRole('link', { name: /contato/i }).length).toBeGreaterThan(0);
     expect(screen.getAllByRole('link', { name: /baixar currículo/i }).length).toBeGreaterThan(0);
   });

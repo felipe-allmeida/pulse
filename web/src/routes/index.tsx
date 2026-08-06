@@ -1,4 +1,5 @@
-import { createFileRoute } from '@tanstack/react-router';
+import { Link, createFileRoute } from '@tanstack/react-router';
+import { ArrowRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { EngineeringShowcase } from '@/components/home/engineering-showcase';
 import { Hero } from '@/components/home/hero';
@@ -6,8 +7,7 @@ import { EventFeed } from '@/components/event-feed';
 import { KpiRow } from '@/components/kpi-row';
 import { LiveMap } from '@/components/live-map';
 import { Reactions } from '@/components/reactions';
-import { RecentVisitsTable } from '@/components/recent-visits-table';
-import { VisitsChart } from '@/components/visits-chart';
+import { SectionEyebrow } from '@/components/signal/section-eyebrow';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useVisitFeed } from '@/hooks/use-visit-feed';
 
@@ -18,8 +18,9 @@ export const Route = createFileRoute('/')({
 function Index() {
   const { t } = useTranslation(['home', 'dashboard']);
   // Mounted once here: bridges polled visit data into the live event store
-  // that both the hero's engineering showcase and the dashboard's EventFeed
-  // read from.
+  // that both the hero's engineering showcase and this page's own EventFeed
+  // (below, in the live-proof block) read from. /live mounts its own
+  // instance for when that route is the one on screen instead.
   useVisitFeed();
 
   return (
@@ -40,11 +41,34 @@ function Index() {
         <EngineeringShowcase />
       </div>
 
+      {/*
+        Portfolio-first home (visual coherence Task 2): the full ops-console
+        widget stack (KpiRow's every card, RecentVisitsTable, VisitsChart)
+        moved to /live — a 2126px dashboard was over half the page and read
+        as an ops console bolted onto a portfolio. What stays here is a
+        compact, self-contained "live proof" slice: the map + 2 real stats +
+        the event stream + a way to react, all pointing at /live for anyone
+        who wants the rest.
+      */}
       <section className="px-6 py-16 sm:px-10 md:py-20">
         <div className="mx-auto flex w-full max-w-5xl flex-col gap-6">
-          <h2 className="text-2xl font-semibold tracking-tight text-foreground">
-            {t('home:dashboard.heading')}
-          </h2>
+          <SectionEyebrow>{t('home:liveProof.eyebrow')}</SectionEyebrow>
+
+          <div className="flex flex-wrap items-end justify-between gap-4">
+            <div className="flex flex-col gap-2">
+              <h2 className="text-2xl font-semibold tracking-tight text-foreground">
+                {t('home:liveProof.heading')}
+              </h2>
+              <p className="max-w-prose text-sm text-muted-foreground">{t('home:liveProof.description')}</p>
+            </div>
+            <Link
+              to="/live"
+              className="inline-flex shrink-0 items-center gap-1.5 text-sm font-medium text-signal hover:underline"
+            >
+              {t('home:liveProof.cta')}
+              <ArrowRight className="size-4" aria-hidden="true" />
+            </Link>
+          </div>
 
           <KpiRow />
 
@@ -52,50 +76,29 @@ function Index() {
             <div className="lg:col-span-2">
               <LiveMap />
             </div>
-            <RecentVisitsTable />
-          </div>
-
-          <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-            <VisitsChart />
             <EventFeed />
           </div>
+
+          {/*
+            Reactions used to float `fixed` bottom-left, which sat on top of
+            the hero's CTAs/copy since the hero is full-height — any
+            viewport-anchored element lands over it regardless of which
+            section is "underneath" in the document. Docking it here instead
+            is correct, not just a fix: reacting is part of the live demo
+            this block is proving, not page chrome. The Ask widget's floating
+            trigger (ask-widget.tsx, fixed right-6 bottom-6) is now the only
+            fixed-position element on the site.
+          */}
+          <Card className="border-signal/20 bg-signal-muted/10">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm">{t('dashboard:reactions.title')}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Reactions />
+            </CardContent>
+          </Card>
         </div>
       </section>
-
-      {/*
-        Ask widget's floating trigger (ask-widget.tsx) is anchored
-        `fixed right-6 bottom-6`. Two things keep this card from colliding
-        with it, not just the opposite `left-6` anchor:
-
-        1. `max-w-[216px]` caps this card's width everywhere. Left
-           unconstrained, `Card`/`CardHeader`/`CardContent` have no width of
-           their own, so the 8-icon `Reactions` row (flex-wrap, ~344px of
-           unwrapped content) sizes the card up to its max-content width —
-           216px forces it to wrap to 4 icons/row instead, which also bounds
-           how far its right edge can reach on the shared bottom row above
-           `md:`.
-        2. Below `md:` (768px) it sits at `top-24 left-6` instead — off the
-           bottom row entirely, so on real phone widths (320–414px, where
-           the Ask trigger's own text can already approach the full
-           viewport width) there's no shared row to collide on in the first
-           place. `top-24` (96px) clears the sticky header (~60–64px tall)
-           with margin to spare. From `md:` up there's enough width for
-           both the capped card and the trigger on the same bottom row —
-           see the space math in task-5-report.md's "Fix round 1" section.
-
-        routes/index.test.tsx locks all of this: the left/right corner
-        classes, the width cap, and the mobile top-position classes.
-      */}
-      <div className="fixed top-24 left-6 z-50 max-w-[216px] md:top-auto md:bottom-6">
-        <Card className="border-signal/20 shadow-lg">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm">{t('dashboard:reactions.title')}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Reactions />
-          </CardContent>
-        </Card>
-      </div>
     </div>
   );
 }

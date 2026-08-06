@@ -19,6 +19,7 @@ const NAV_LINKS = [
   { to: '/', key: 'home' },
   { to: '/about', key: 'about' },
   { to: '/projects', key: 'projects' },
+  { to: '/live', key: 'live' },
 ] as const;
 
 const DESKTOP_LINK_CLASS = 'text-sm font-medium text-muted-foreground transition-colors hover:text-foreground';
