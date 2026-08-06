@@ -41,5 +41,8 @@
   "presence": {
     "online_one": "{{formattedCount}} online",
     "online_other": "{{formattedCount}} online"
+  },
+  "liveIndicator": {
+    "ariaLabel": "{{status}} — {{count}}"
   }
 }

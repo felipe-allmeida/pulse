@@ -6,10 +6,9 @@ import {
   createRouter,
 } from '@tanstack/react-router';
 import { fireEvent, screen, within } from '@testing-library/react';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import type { Locale } from '@/content/types';
 import { renderWithI18n } from '@/test/render-with-i18n';
-import { useAskWidgetStore } from '@/stores/ask-widget-store';
 import { TopNav } from './top-nav';
 
 function renderTopNav(initialPath = '/', locale?: Locale) {
@@ -32,10 +31,6 @@ function renderTopNav(initialPath = '/', locale?: Locale) {
 }
 
 describe('TopNav', () => {
-  beforeEach(() => {
-    useAskWidgetStore.setState({ isOpen: false });
-  });
-
   it('renders links to Home, About, Projects, Live and Contact', async () => {
     await renderTopNav();
 
@@ -60,15 +55,10 @@ describe('TopNav', () => {
     expect(contactLinks[0]).toHaveAttribute('href', '/about#contact');
   });
 
-  it('renders an Ask the AI trigger that opens the shared Ask widget store', async () => {
+  it('does not render an Ask the AI trigger in the header (the hero CTA and floating trigger cover it)', async () => {
     await renderTopNav();
 
-    const askButtons = await screen.findAllByRole('button', { name: /ask the ai/i });
-    expect(askButtons.length).toBeGreaterThan(0);
-
-    fireEvent.click(askButtons[0]);
-
-    expect(useAskWidgetStore.getState().isOpen).toBe(true);
+    expect(screen.queryAllByRole('button', { name: /ask the ai/i })).toHaveLength(0);
   });
 
   it('renders a Download CV control', async () => {
@@ -95,6 +85,7 @@ describe('TopNav', () => {
     expect(within(mobileNav).getByRole('link', { name: /^live$/i })).toBeInTheDocument();
     expect(within(mobileNav).getByRole('link', { name: /contact/i })).toBeInTheDocument();
     expect(within(mobileNav).getByRole('link', { name: /download cv/i })).toBeInTheDocument();
+    expect(within(mobileNav).queryAllByRole('button', { name: /ask the ai/i })).toHaveLength(0);
   });
 
   it('highlights the active route link', async () => {
