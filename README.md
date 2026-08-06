@@ -174,6 +174,33 @@ Portainer stack webhook so the running stack redeploys with the new images.
 That webhook URL is supplied via the repo secret `PORTAINER_WEBHOOK`; if it's
 unset, the redeploy step logs and no-ops rather than failing the pipeline.
 
+### Real visitor geolocation
+
+By default the production stack runs with **no geo database mounted** — the
+API's lazy `GeoLocator` factory falls back to a demo spread (or `"Unknown"`
+with `Geo__DemoFallback=false`), so the stack boots and serves traffic fine
+without it. To switch on real coarse geo (country/city/lat-lon from the
+visitor's IP):
+
+1. Download `dbip-city-lite.mmdb` — free, **no account required** — from
+   [db-ip.com/db/download/ip-to-city-lite](https://db-ip.com/db/download/ip-to-city-lite).
+2. Place it on the Hetzner box, e.g. `/opt/pulse/geo/dbip-city-lite.mmdb`.
+3. In `deploy/compose.prod.yml`, uncomment the `volumes:` block under the
+   `api` service's "Real visitor geo (DB-IP Lite)" comment, and add
+   `Geo__DbPath: /geo/city.mmdb` and `Geo__DemoFallback: "false"` to that
+   service's `environment:`.
+4. Redeploy the stack (Portainer "Update the stack" with "Re-pull image", or
+   the stack webhook) so the container picks up the new mount + env.
+
+The DB-IP CC-BY attribution link is already rendered under the live map in
+the UI (no further UI work needed once real geo is on). Monthly refresh is
+optional — DB-IP republishes the Lite file monthly; drop the new file in
+place at the same host path and redeploy to pick it up, no compose changes
+required. `dbip-city-lite.mmdb` is a licensed, redistributable-but-attributed
+(CC-BY) download — it is **never committed** to this repo, and if it's ever
+missing or removed from the box the app degrades safely back to the
+demo/unknown fallback rather than failing to start.
+
 ## Status
 
 Phase 1 (MVP): presence, live world map, public metrics, ephemeral reactions,

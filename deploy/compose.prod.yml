@@ -75,6 +75,13 @@ services:
       Cors__Origins: ${APP_BASE_URL:-https://pulse.felipealmeida.tech}
       # AI recruiter chat — VAZIO = degrada gracioso ("not configured"), não quebra.
       OpenAI__ApiKey: ${OPENAI_API_KEY:-}
+    # ── Real visitor geo (DB-IP Lite) ─────────────────────────────────────────────
+    # Download dbip-city-lite.mmdb (free, no account): https://db-ip.com/db/download/ip-to-city-lite
+    # Put it on the box, then UNCOMMENT the volume below + add the two env vars to `environment:` above:
+    #   Geo__DbPath: /geo/city.mmdb
+    #   Geo__DemoFallback: "false"
+    # volumes:
+    #   - ${GEO_DB_HOST_PATH:-/opt/pulse/geo/dbip-city-lite.mmdb}:/geo/city.mmdb:ro
     networks: [internal]
     healthcheck:
       test: ["CMD-SHELL", "curl -sf http://localhost:8080/health || exit 1"]
