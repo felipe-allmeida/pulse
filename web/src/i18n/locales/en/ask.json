@@ -1,0 +1,15 @@
+{
+  "trigger": "Ask about Felipe",
+  "title": "Ask about Felipe",
+  "description": "Ask anything about Felipe's experience, skills, or availability.",
+  "disclaimer": "AI assistant — answers may be imperfect and come only from Felipe's profile.",
+  "inputPlaceholder": "Ask about Felipe's experience...",
+  "inputAriaLabel": "Ask about Felipe",
+  "send": "Send",
+  "error": "Sorry, something went wrong. Please try again in a moment.",
+  "suggestions": {
+    "kubernetes": "Does Felipe have Kubernetes experience?",
+    "stack": "What's Felipe's strongest tech stack?",
+    "remote": "Is Felipe open to remote roles?"
+  }
+}

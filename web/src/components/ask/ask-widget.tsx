@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { MessageCircle, Send } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import {
@@ -18,18 +19,19 @@ interface ChatMessage {
   content: string;
 }
 
-const SUGGESTED_QUESTIONS = [
-  'Does Felipe have Kubernetes experience?',
-  "What's Felipe's strongest tech stack?",
-  'Is Felipe open to remote roles?',
-];
-
 export function AskWidget() {
+  const { t } = useTranslation('ask');
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [isStreaming, setIsStreaming] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const abortRef = useRef<AbortController | null>(null);
+
+  const suggestedQuestions = [
+    t('ask:suggestions.kubernetes'),
+    t('ask:suggestions.stack'),
+    t('ask:suggestions.remote'),
+  ];
 
   useEffect(() => {
     return () => {
@@ -70,7 +72,7 @@ export function AskWidget() {
       });
     } catch (err) {
       if (!(err instanceof Error && err.name === 'AbortError')) {
-        setError("Sorry, something went wrong. Please try again in a moment.");
+        setError(t('ask:error'));
       }
     } finally {
       setIsStreaming(false);
@@ -100,22 +102,18 @@ export function AskWidget() {
           size="lg"
         >
           <MessageCircle />
-          Ask about Felipe
+          {t('ask:trigger')}
         </Button>
       </SheetTrigger>
       <SheetContent side="right" className="flex w-full flex-col sm:max-w-md">
         <SheetHeader>
-          <SheetTitle>Ask about Felipe</SheetTitle>
-          <SheetDescription>
-            Ask anything about Felipe&apos;s experience, skills, or availability.
-          </SheetDescription>
-          <p className="text-xs text-muted-foreground">
-            AI assistant — answers may be imperfect and come only from Felipe&apos;s profile.
-          </p>
+          <SheetTitle>{t('ask:title')}</SheetTitle>
+          <SheetDescription>{t('ask:description')}</SheetDescription>
+          <p className="text-xs text-muted-foreground">{t('ask:disclaimer')}</p>
         </SheetHeader>
 
         <div className="flex flex-wrap gap-2 px-4">
-          {SUGGESTED_QUESTIONS.map((question) => (
+          {suggestedQuestions.map((question) => (
             <button
               key={question}
               type="button"
@@ -154,14 +152,14 @@ export function AskWidget() {
           <Textarea
             value={input}
             maxLength={500}
-            placeholder="Ask about Felipe's experience..."
-            aria-label="Ask about Felipe"
+            placeholder={t('ask:inputPlaceholder')}
+            aria-label={t('ask:inputAriaLabel')}
             onChange={(event) => setInput(event.target.value)}
             className="min-h-10"
           />
           <Button size="icon" onClick={handleSend} disabled={isStreaming || !input.trim()}>
             <Send />
-            <span className="sr-only">Send</span>
+            <span className="sr-only">{t('ask:send')}</span>
           </Button>
         </div>
       </SheetContent>

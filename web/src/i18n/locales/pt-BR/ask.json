@@ -1,0 +1,15 @@
+{
+  "trigger": "Pergunte sobre o Felipe",
+  "title": "Pergunte sobre o Felipe",
+  "description": "Pergunte qualquer coisa sobre a experiência, as habilidades ou a disponibilidade do Felipe.",
+  "disclaimer": "Assistente de IA — as respostas podem ser imperfeitas e vêm apenas do perfil do Felipe.",
+  "inputPlaceholder": "Pergunte sobre a experiência do Felipe...",
+  "inputAriaLabel": "Pergunte sobre o Felipe",
+  "send": "Enviar",
+  "error": "Desculpe, algo deu errado. Tente novamente em instantes.",
+  "suggestions": {
+    "kubernetes": "O Felipe tem experiência com Kubernetes?",
+    "stack": "Qual é a stack mais forte do Felipe?",
+    "remote": "O Felipe está aberto a vagas remotas?"
+  }
+}

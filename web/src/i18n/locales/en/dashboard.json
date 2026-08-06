@@ -1,0 +1,41 @@
+{
+  "kpi": {
+    "activeConnections": "Active connections",
+    "totalVisits": "Total visits"
+  },
+  "liveMap": {
+    "title": "Live locations",
+    "ariaLabel": "World map of live visitor locations",
+    "visitCount_one": "{{count}} visit",
+    "visitCount_other": "{{count}} visits"
+  },
+  "visitsChart": {
+    "title": "Visits over time",
+    "description": "Hourly activity across the last 100 tracked visits",
+    "empty": "No visits yet.",
+    "tooltipLabel": "Visits"
+  },
+  "recentVisits": {
+    "title": "Recent visits",
+    "city": "City",
+    "country": "Country",
+    "when": "When",
+    "empty": "No visits yet."
+  },
+  "eventFeed": {
+    "title": "Live activity",
+    "empty": "No events yet."
+  },
+  "reactions": {
+    "ariaLabel": "React with {{emoji}}"
+  },
+  "connectionStatus": {
+    "connected": "Connected",
+    "reconnecting": "Reconnecting",
+    "offline": "Offline"
+  },
+  "presence": {
+    "online_one": "{{formattedCount}} online",
+    "online_other": "{{formattedCount}} online"
+  }
+}

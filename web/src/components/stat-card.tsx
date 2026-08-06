@@ -1,5 +1,6 @@
 import type { LucideIcon } from 'lucide-react';
 import { Area, AreaChart, ResponsiveContainer } from 'recharts';
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 type StatCardProps = {
@@ -10,6 +11,9 @@ type StatCardProps = {
 };
 
 export function StatCard({ label, value, icon: Icon, series }: StatCardProps) {
+  const { i18n } = useTranslation();
+  const formattedValue = new Intl.NumberFormat(i18n.language).format(value);
+
   return (
     <Card>
       <CardHeader className="flex-row items-center justify-between gap-2 space-y-0 pb-2">
@@ -17,7 +21,7 @@ export function StatCard({ label, value, icon: Icon, series }: StatCardProps) {
         <Icon className="size-4 text-muted-foreground" aria-hidden="true" />
       </CardHeader>
       <CardContent>
-        <div className="text-2xl font-bold text-foreground">{value.toLocaleString()}</div>
+        <div className="text-2xl font-bold text-foreground">{formattedValue}</div>
         {series && series.length > 0 && (
           <div className="mt-2 h-12 w-full">
             <ResponsiveContainer width="100%" height="100%">

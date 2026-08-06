@@ -1,3 +1,13 @@
 {
-  "language": "Language"
+  "language": "Language",
+  "home": "Home",
+  "about": "About",
+  "projects": "Projects",
+  "downloadCv": "Download CV",
+  "cvShort": "CV",
+  "openMenu": "Open menu",
+  "menu": "Menu",
+  "mobileNavDescription": "Navigate to Home, About, or Projects, or download the CV.",
+  "mainNav": "Main",
+  "mobileNav": "Mobile"
 }

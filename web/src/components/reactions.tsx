@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { usePulseHub } from '@/realtime/use-pulse-hub';
 import { useEventStore } from '@/stores/event-store';
@@ -21,6 +22,7 @@ function emojiFromReactionLabel(label: string): string | null {
 }
 
 export function Reactions() {
+  const { t } = useTranslation('dashboard');
   const { react } = usePulseHub();
   const events = useEventStore((s) => s.events);
   const [floating, setFloating] = useState<FloatingReaction[]>([]);
@@ -62,7 +64,7 @@ export function Reactions() {
           type="button"
           variant="outline"
           size="icon"
-          aria-label={`React with ${emoji}`}
+          aria-label={t('dashboard:reactions.ariaLabel', { emoji })}
           onClick={() => react(emoji)}
         >
           {emoji}

@@ -1,11 +1,12 @@
+import { useTranslation } from 'react-i18next';
 import { Badge } from '@/components/ui/badge';
 import { usePulseHub } from '@/realtime/use-pulse-hub';
 import { cn } from '@/lib/utils';
 
-const STATUS_LABEL = {
-  connected: 'Connected',
-  reconnecting: 'Reconnecting',
-  offline: 'Offline',
+const STATUS_KEY = {
+  connected: 'connected',
+  reconnecting: 'reconnecting',
+  offline: 'offline',
 } as const;
 
 const STATUS_CLASS = {
@@ -15,11 +16,12 @@ const STATUS_CLASS = {
 } as const;
 
 export function ConnectionStatus() {
+  const { t } = useTranslation('dashboard');
   const { connection } = usePulseHub();
 
   return (
     <Badge variant="outline" className={cn(STATUS_CLASS[connection])}>
-      {STATUS_LABEL[connection]}
+      {t(`dashboard:connectionStatus.${STATUS_KEY[connection]}`)}
     </Badge>
   );
 }

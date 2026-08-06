@@ -1,4 +1,5 @@
 import { Activity, Users } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { StatCard } from '@/components/stat-card';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -20,6 +21,7 @@ function StatCardSkeleton() {
 }
 
 export function KpiRow() {
+  const { t } = useTranslation('dashboard');
   const { data, isLoading } = useMetrics();
   const history = useMetricHistory();
 
@@ -33,12 +35,17 @@ export function KpiRow() {
       ) : (
         <>
           <StatCard
-            label="Active connections"
+            label={t('dashboard:kpi.activeConnections')}
             value={data.activeConnections}
             icon={Activity}
             series={history.activeConnections}
           />
-          <StatCard label="Total visits" value={data.totalVisits} icon={Users} series={history.totalVisits} />
+          <StatCard
+            label={t('dashboard:kpi.totalVisits')}
+            value={data.totalVisits}
+            icon={Users}
+            series={history.totalVisits}
+          />
         </>
       )}
     </div>

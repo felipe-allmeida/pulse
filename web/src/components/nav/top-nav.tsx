@@ -1,5 +1,6 @@
 import { Link } from '@tanstack/react-router';
 import { Menu } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { CvButton } from '@/components/nav/cv-button';
 import { Button } from '@/components/ui/button';
 import {
@@ -13,14 +14,16 @@ import {
 } from '@/components/ui/sheet';
 
 const NAV_LINKS = [
-  { to: '/', label: 'Home' },
-  { to: '/about', label: 'About' },
-  { to: '/projects', label: 'Projects' },
+  { to: '/', key: 'home' },
+  { to: '/about', key: 'about' },
+  { to: '/projects', key: 'projects' },
 ] as const;
 
 export function TopNav() {
+  const { t } = useTranslation('nav');
+
   return (
-    <nav aria-label="Main" className="flex items-center gap-2">
+    <nav aria-label={t('nav:mainNav')} className="flex items-center gap-2">
       <div className="hidden items-center gap-6 md:flex">
         {NAV_LINKS.map((link) => (
           <Link
@@ -30,7 +33,7 @@ export function TopNav() {
             activeProps={{ className: 'text-foreground', 'aria-current': 'page' }}
             className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
           >
-            {link.label}
+            {t(`nav:${link.key}`)}
           </Link>
         ))}
       </div>
@@ -42,18 +45,16 @@ export function TopNav() {
       <div className="md:hidden">
         <Sheet>
           <SheetTrigger asChild>
-            <Button variant="ghost" size="icon" aria-label="Open menu">
+            <Button variant="ghost" size="icon" aria-label={t('nav:openMenu')}>
               <Menu />
             </Button>
           </SheetTrigger>
           <SheetContent side="right">
             <SheetHeader>
-              <SheetTitle>Menu</SheetTitle>
-              <SheetDescription className="sr-only">
-                Navigate to Home, About, or Projects, or download the CV.
-              </SheetDescription>
+              <SheetTitle>{t('nav:menu')}</SheetTitle>
+              <SheetDescription className="sr-only">{t('nav:mobileNavDescription')}</SheetDescription>
             </SheetHeader>
-            <nav aria-label="Mobile" className="flex flex-col gap-4 px-4">
+            <nav aria-label={t('nav:mobileNav')} className="flex flex-col gap-4 px-4">
               {NAV_LINKS.map((link) => (
                 <SheetClose asChild key={link.to}>
                   <Link
@@ -62,7 +63,7 @@ export function TopNav() {
                     activeProps={{ className: 'text-foreground', 'aria-current': 'page' }}
                     className="text-base font-medium text-muted-foreground transition-colors hover:text-foreground"
                   >
-                    {link.label}
+                    {t(`nav:${link.key}`)}
                   </Link>
                 </SheetClose>
               ))}

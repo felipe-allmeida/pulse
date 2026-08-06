@@ -2,17 +2,28 @@ import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 import enAbout from './locales/en/about.json';
+import enAsk from './locales/en/ask.json';
 import enCommon from './locales/en/common.json';
+import enDashboard from './locales/en/dashboard.json';
 import enNav from './locales/en/nav.json';
 import enProjects from './locales/en/projects.json';
 import ptAbout from './locales/pt-BR/about.json';
+import ptAsk from './locales/pt-BR/ask.json';
 import ptCommon from './locales/pt-BR/common.json';
+import ptDashboard from './locales/pt-BR/dashboard.json';
 import ptNav from './locales/pt-BR/nav.json';
 import ptProjects from './locales/pt-BR/projects.json';
 
 export const resources = {
-  en: { common: enCommon, nav: enNav, about: enAbout, projects: enProjects },
-  'pt-BR': { common: ptCommon, nav: ptNav, about: ptAbout, projects: ptProjects },
+  en: { common: enCommon, nav: enNav, about: enAbout, projects: enProjects, dashboard: enDashboard, ask: enAsk },
+  'pt-BR': {
+    common: ptCommon,
+    nav: ptNav,
+    about: ptAbout,
+    projects: ptProjects,
+    dashboard: ptDashboard,
+    ask: ptAsk,
+  },
 } as const;
 
 i18n
@@ -24,7 +35,7 @@ i18n
     supportedLngs: ['en', 'pt-BR'],
     load: 'currentOnly',
     defaultNS: 'common',
-    ns: ['common', 'nav', 'about', 'projects'],
+    ns: ['common', 'nav', 'about', 'projects', 'dashboard', 'ask'],
     interpolation: { escapeValue: false },
     detection: {
       order: ['localStorage', 'navigator'],
