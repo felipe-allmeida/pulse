@@ -44,4 +44,13 @@ describe('AboutPage', () => {
 
     expect(screen.getByRole('link', { name: /download cv/i })).toBeInTheDocument();
   });
+
+  it('renders pt-BR section headings and localized content', async () => {
+    await renderWithI18n(<AboutPage />, { locale: 'pt-BR' });
+
+    expect(screen.getByText('Biografia')).toBeInTheDocument();
+    expect(screen.getByText('Habilidades')).toBeInTheDocument();
+    expect(screen.getByText('Experiência')).toBeInTheDocument();
+    expect(screen.getByText(profile.tagline['pt-BR'])).toBeInTheDocument();
+  });
 });

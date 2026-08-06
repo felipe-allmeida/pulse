@@ -1,6 +1,7 @@
 // lucide-react's brand icon set (Github, etc.) was removed upstream; a
 // generic external-link glyph is used for repo/demo links instead.
 import { ExternalLink, Lock } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { Badge } from '@/components/ui/badge';
 import { buttonVariants } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -13,6 +14,7 @@ interface ProjectCardProps {
 }
 
 export function ProjectCard({ project }: ProjectCardProps) {
+  const { t } = useTranslation('projects');
   const L = useLocalized();
   return (
     <Card className="flex flex-col overflow-hidden">
@@ -27,7 +29,7 @@ export function ProjectCard({ project }: ProjectCardProps) {
           aria-hidden="true"
           className="flex h-48 w-full items-center justify-center bg-muted text-sm text-muted-foreground"
         >
-          Screenshot coming
+          {t('projects:screenshotPlaceholder')}
         </div>
       )}
 
@@ -72,7 +74,7 @@ export function ProjectCard({ project }: ProjectCardProps) {
         ) : (
           <span className="flex items-center gap-1.5 text-sm text-muted-foreground">
             <Lock aria-hidden="true" className="size-3.5" />
-            Private
+            {t('projects:privateLabel')}
           </span>
         )}
       </CardFooter>

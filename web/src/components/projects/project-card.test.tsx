@@ -47,4 +47,12 @@ describe('ProjectCard', () => {
     expect(screen.queryByRole('link')).not.toBeInTheDocument();
     expect(screen.getByText('Private')).toBeInTheDocument();
   });
+
+  it('renders no repo link and a pt-BR private label for a private project', async () => {
+    await renderWithI18n(<ProjectCard project={privateProject} />, { locale: 'pt-BR' });
+
+    expect(screen.getByText('Ulbra Atende')).toBeInTheDocument();
+    expect(screen.queryByRole('link')).not.toBeInTheDocument();
+    expect(screen.getByText('Privado')).toBeInTheDocument();
+  });
 });
