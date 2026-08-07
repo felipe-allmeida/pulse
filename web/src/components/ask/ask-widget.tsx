@@ -32,6 +32,8 @@ export function AskWidget() {
   const abortRef = useRef<AbortController | null>(null);
   const isOpen = useAskWidgetStore((s) => s.isOpen);
   const setOpen = useAskWidgetStore((s) => s.setOpen);
+  const pendingQuestion = useAskWidgetStore((s) => s.pendingQuestion);
+  const clearPendingQuestion = useAskWidgetStore((s) => s.clearPendingQuestion);
 
   const suggestedQuestions = [
     t('ask:suggestions.kubernetes'),
@@ -85,6 +87,23 @@ export function AskWidget() {
       setIsStreaming(false);
     }
   }
+
+  // A suggestion chip elsewhere in the tree (e.g. the home page's "ask
+  // chips") opened the widget with a question already chosen. Submit it
+  // once, as if the visitor had typed and sent it themselves. Clearing
+  // `pendingQuestion` immediately (before the async submit resolves) is
+  // what makes this idempotent: a second effect run — a re-render, or
+  // React StrictMode's dev double-invoke — sees `pendingQuestion` already
+  // `null` and does nothing. Waiting on `!isStreaming` means a pending
+  // question that arrives mid-stream is submitted once the current one
+  // finishes, rather than being dropped or interleaved.
+  useEffect(() => {
+    if (isOpen && pendingQuestion && !isStreaming) {
+      const question = pendingQuestion;
+      clearPendingQuestion();
+      void submit(question);
+    }
+  }, [isOpen, pendingQuestion, isStreaming]);
 
   function handleSend() {
     void submit(input);

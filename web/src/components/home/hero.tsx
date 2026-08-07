@@ -81,7 +81,7 @@ export function Hero() {
             type="button"
             variant="ghost"
             size="lg"
-            onClick={openAskWidget}
+            onClick={() => openAskWidget()}
             className="border border-signal/30 text-signal hover:bg-signal/10 hover:text-signal"
           >
             <Sparkles />

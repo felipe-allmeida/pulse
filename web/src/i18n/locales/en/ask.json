@@ -11,5 +11,8 @@
     "kubernetes": "Does Felipe have Kubernetes experience?",
     "stack": "What's Felipe's strongest tech stack?",
     "remote": "Is Felipe open to remote roles?"
+  },
+  "chips": {
+    "heading": "Ask about me"
   }
 }

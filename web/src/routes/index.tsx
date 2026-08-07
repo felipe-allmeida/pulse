@@ -1,6 +1,7 @@
 import { Link, createFileRoute } from '@tanstack/react-router';
 import { ArrowRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { AskChips } from '@/components/ask/ask-chips';
 import { EngineeringShowcase } from '@/components/home/engineering-showcase';
 import { Hero } from '@/components/home/hero';
 import { EventFeed } from '@/components/event-feed';
@@ -84,6 +85,20 @@ function Index() {
             </div>
             <EventFeed />
           </div>
+        </div>
+      </section>
+
+      {/*
+        Ask chips (visual coherence Task 2): right after the live-proof
+        block, the recruiter has just watched the system prove itself —
+        this is the highest-attention moment to offer the actual
+        conversation. Kept as its own quiet section (not stacked inside
+        live-proof) so it doesn't get lost as "just another stat"; `dark`
+        for the same reason as every other content surface on this page.
+      */}
+      <section className="dark bg-background px-6 py-12 text-foreground sm:px-10">
+        <div className="mx-auto w-full max-w-5xl">
+          <AskChips />
         </div>
       </section>
     </div>
