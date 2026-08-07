@@ -124,12 +124,20 @@ export function AskWidget() {
   return (
     <Sheet open={isOpen} onOpenChange={handleOpenChange}>
       <SheetTrigger asChild>
+        {/*
+          Compact on phones: with the full label this trigger was 252px wide on
+          a 375px viewport (67% of the screen) and sat on top of page content,
+          at 40px tall — under the 44px touch target. Below `sm` it collapses
+          to a 48px circular icon button (label still announced via
+          aria-label); from `sm` up the label comes back.
+        */}
         <Button
           size="lg"
-          className="fixed right-6 bottom-6 z-50 rounded-full border border-signal/40 bg-signal font-mono text-signal-foreground shadow-[0_0_24px_-6px_var(--color-signal)] hover:bg-signal/90"
+          aria-label={t('ask:trigger')}
+          className="fixed right-6 bottom-6 z-50 size-12 rounded-full border border-signal/40 bg-signal p-0 font-mono text-signal-foreground shadow-[0_0_24px_-6px_var(--color-signal)] hover:bg-signal/90 sm:h-12 sm:w-auto sm:px-6"
         >
           <MessageCircle />
-          {t('ask:trigger')}
+          <span className="hidden sm:inline">{t('ask:trigger')}</span>
         </Button>
       </SheetTrigger>
       <SheetContent
