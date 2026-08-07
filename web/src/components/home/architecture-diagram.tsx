@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from 'react';
 import { Database, Globe, Server, Timer, Workflow } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useReducedMotion } from '@/hooks/use-reduced-motion';
@@ -9,16 +10,52 @@ type Node = {
   detail?: string;
 };
 
+const NODE_COUNT = 5;
+const EDGE_COUNT = NODE_COUNT - 1;
+const TRAVERSAL_EDGE_DURATION_MS = 550;
+const TRAVERSAL_EDGE_STAGGER_MS = 350;
+const TRAVERSAL_TOTAL_MS = (EDGE_COUNT - 1) * TRAVERSAL_EDGE_STAGGER_MS + TRAVERSAL_EDGE_DURATION_MS;
+
+type ArchitectureDiagramProps = {
+  /**
+   * Bump this (e.g. an incrementing counter) to play one traversal of the
+   * signal across every edge, left to right — the visible "a pulse just
+   * went through the pipeline" moment. Ignored under
+   * `prefers-reduced-motion` and on first mount. Leave undefined for the
+   * diagram's own ambient animation only.
+   */
+  traversalKey?: number;
+};
+
 /**
  * The horizontal request/event pipeline behind this page: browser → API
  * (SignalR + Redis for presence/pubsub) → RabbitMQ → background worker →
  * Postgres. A signal pulse travels the connecting edges to sell the "this
  * page is a live distributed system" claim at a glance; frozen to a static
- * dot under `prefers-reduced-motion`.
+ * dot under `prefers-reduced-motion`. Passing `traversalKey` additionally
+ * plays one brighter, one-shot traversal on top of the ambient animation —
+ * used by "send a pulse" to show a real event crossing the pipeline.
  */
-export function ArchitectureDiagram() {
+export function ArchitectureDiagram({ traversalKey }: ArchitectureDiagramProps) {
   const { t } = useTranslation('home');
   const reducedMotion = useReducedMotion();
+  const [traversing, setTraversing] = useState(false);
+  const mountedRef = useRef(false);
+
+  useEffect(() => {
+    if (!mountedRef.current) {
+      mountedRef.current = true;
+      return;
+    }
+    if (traversalKey === undefined || reducedMotion) return;
+
+    setTraversing(true);
+    const timeout = setTimeout(() => setTraversing(false), TRAVERSAL_TOTAL_MS);
+    return () => clearTimeout(timeout);
+    // Only the key change should replay the traversal — reducedMotion is
+    // read at trigger time, not tracked as its own retrigger source.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [traversalKey]);
 
   const nodes: Node[] = [
     { key: 'web', icon: Globe, label: t('home:arch.web') },
@@ -33,6 +70,7 @@ export function ArchitectureDiagram() {
       <div className="overflow-x-auto">
         <div
           data-motion={reducedMotion ? 'static' : 'animated'}
+          data-traversal={traversing ? 'playing' : 'idle'}
           className="relative flex min-w-max items-center gap-0 py-6 font-mono"
         >
           {nodes.map((node, index) => (
@@ -58,6 +96,16 @@ export function ArchitectureDiagram() {
                     <span
                       aria-hidden="true"
                       className="absolute top-1/2 left-1/2 size-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-signal/60"
+                    />
+                  )}
+                  {traversing && (
+                    <span
+                      aria-hidden="true"
+                      className="absolute top-1/2 left-0 size-2.5 -translate-y-1/2 -translate-x-1/2 rounded-full bg-signal shadow-[0_0_10px_2px_var(--color-signal)]"
+                      style={{
+                        animation: `signal-edge ${TRAVERSAL_EDGE_DURATION_MS}ms ease-in-out 1`,
+                        animationDelay: `${index * TRAVERSAL_EDGE_STAGGER_MS}ms`,
+                      }}
                     />
                   )}
                 </div>

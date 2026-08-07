@@ -52,8 +52,8 @@ async function renderIndexRoute(locale: Locale = 'en') {
         AskWidget isn't part of the `/` route tree in production — it's
         mounted once in `__root.tsx`, alongside the route's <Outlet />. It's
         rendered here too so the "doesn't overlap" test below reflects the
-        real composed page, where the Ask trigger and the (now inline)
-        Reactions block are both on screen at once.
+        real composed page, where the Ask trigger and the "send a pulse"
+        button are both on screen at once.
       */}
       <RouterProvider router={router} />
       <AskWidget />
@@ -69,16 +69,16 @@ describe('Index route (portfolio home)', () => {
     usePulseHubMock.mockReturnValue({ count: 0, connection: 'connected', react: vi.fn() });
   });
 
-  it('renders the "React" reactions title in en', async () => {
+  it('renders the "Send a pulse" button in en', async () => {
     await renderIndexRoute('en');
 
-    expect(screen.getByText('React')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /send a pulse/i })).toBeInTheDocument();
   });
 
-  it('renders the "Reagir" reactions title in pt-BR', async () => {
+  it('renders the "Enviar um pulso" button in pt-BR', async () => {
     await renderIndexRoute('pt-BR');
 
-    expect(screen.getByText('Reagir')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /enviar um pulso/i })).toBeInTheDocument();
   });
 
   it('composes the hero, engineering showcase, and a compact live-proof block, with exactly one h1', async () => {
@@ -119,11 +119,11 @@ describe('Index route (portfolio home)', () => {
     expect(screen.queryByText('Recent visits')).not.toBeInTheDocument();
   });
 
-  it('renders the Reactions block inline, not as a viewport-fixed element overlapping the hero', async () => {
+  it('renders "send a pulse" inline in the showcase, not as a viewport-fixed element overlapping the hero', async () => {
     await renderIndexRoute();
 
-    const reactionsCard = screen.getByText('React').closest('.fixed');
-    expect(reactionsCard).toBeNull();
+    const pulseButton = screen.getByRole('button', { name: /send a pulse/i }).closest('.fixed');
+    expect(pulseButton).toBeNull();
 
     // The Ask widget's floating trigger stays the only fixed bottom-right element.
     const askTrigger = screen.getByRole('button', { name: /ask about felipe/i });

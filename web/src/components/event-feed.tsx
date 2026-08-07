@@ -35,7 +35,7 @@ export function EventFeed({ now = new Date() }: EventFeedProps = {}) {
               const label =
                 event.kind === 'visit'
                   ? t('dashboard:eventFeed.visit', { city: event.city, country: event.country })
-                  : t('dashboard:eventFeed.reaction', { emoji: event.emoji });
+                  : t('dashboard:eventFeed.pulse', { emoji: event.emoji });
               return (
                 <li key={`${event.at}-${index}`} className="flex items-start gap-2 text-sm">
                   <Icon className="mt-0.5 size-4 shrink-0 text-signal" aria-hidden="true" />

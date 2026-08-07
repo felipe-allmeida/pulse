@@ -6,9 +6,7 @@ import { Hero } from '@/components/home/hero';
 import { EventFeed } from '@/components/event-feed';
 import { KpiRow } from '@/components/kpi-row';
 import { LiveMap } from '@/components/live-map';
-import { Reactions } from '@/components/reactions';
 import { SectionEyebrow } from '@/components/signal/section-eyebrow';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useVisitFeed } from '@/hooks/use-visit-feed';
 
 export const Route = createFileRoute('/')({
@@ -16,7 +14,7 @@ export const Route = createFileRoute('/')({
 });
 
 function Index() {
-  const { t } = useTranslation(['home', 'dashboard']);
+  const { t } = useTranslation('home');
   // Mounted once here: bridges polled visit data into the live event store
   // that both the hero's engineering showcase and this page's own EventFeed
   // (below, in the live-proof block) read from. /live mounts its own
@@ -47,8 +45,10 @@ function Index() {
         moved to /live — a 2126px dashboard was over half the page and read
         as an ops console bolted onto a portfolio. What stays here is a
         compact, self-contained "live proof" slice: the map + 2 real stats +
-        the event stream + a way to react, all pointing at /live for anyone
-        who wants the rest.
+        the event stream, pointing at /live for anyone who wants the rest.
+        "Send a pulse" (the old docked Reactions widget's replacement) lives
+        in EngineeringShowcase above, next to the diagram it animates —
+        proving the pipeline is not this block's job.
 
         `dark` is pinned here like every other content surface (hero, showcase,
         about, projects, /live) so these widgets never render light while the
@@ -84,25 +84,6 @@ function Index() {
             </div>
             <EventFeed />
           </div>
-
-          {/*
-            Reactions used to float `fixed` bottom-left, which sat on top of
-            the hero's CTAs/copy since the hero is full-height — any
-            viewport-anchored element lands over it regardless of which
-            section is "underneath" in the document. Docking it here instead
-            is correct, not just a fix: reacting is part of the live demo
-            this block is proving, not page chrome. The Ask widget's floating
-            trigger (ask-widget.tsx, fixed right-6 bottom-6) is now the only
-            fixed-position element on the site.
-          */}
-          <Card className="border-signal/20 bg-signal-muted/10">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm">{t('dashboard:reactions.title')}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Reactions />
-            </CardContent>
-          </Card>
         </div>
       </section>
     </div>

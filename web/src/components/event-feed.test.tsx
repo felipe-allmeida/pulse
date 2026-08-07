@@ -19,7 +19,7 @@ describe('EventFeed', () => {
     await renderWithI18n(<EventFeed />);
 
     expect(screen.getByText('Visit from Lisbon, Portugal')).toBeInTheDocument();
-    expect(screen.getByText('Reaction 🔥')).toBeInTheDocument();
+    expect(screen.getByText('Pulse 🔥')).toBeInTheDocument();
   });
 
   it('shows newest first', async () => {
@@ -48,7 +48,7 @@ describe('EventFeed', () => {
     expect(screen.getByText(/nenhum evento ainda/i)).toBeInTheDocument();
   });
 
-  it('renders pt-BR visit and reaction events with no English fragments', async () => {
+  it('renders pt-BR visit and pulse events with no English fragments', async () => {
     useEventStore
       .getState()
       .push({ kind: 'visit', city: 'Lisboa', country: 'Portugal', at: '2026-08-04T09:55:00Z' });
@@ -57,6 +57,6 @@ describe('EventFeed', () => {
     await renderWithI18n(<EventFeed />, { locale: 'pt-BR' });
 
     expect(screen.getByText('Visita de Lisboa, Portugal')).toBeInTheDocument();
-    expect(screen.getByText('Reação 🔥')).toBeInTheDocument();
+    expect(screen.getByText('Pulso 🔥')).toBeInTheDocument();
   });
 });

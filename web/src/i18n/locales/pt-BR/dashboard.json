@@ -27,11 +27,7 @@
     "title": "Atividade ao vivo",
     "empty": "Nenhum evento ainda.",
     "visit": "Visita de {{city}}, {{country}}",
-    "reaction": "Reação {{emoji}}"
-  },
-  "reactions": {
-    "title": "Reagir",
-    "ariaLabel": "Reagir com {{emoji}}"
+    "pulse": "Pulso {{emoji}}"
   },
   "connectionStatus": {
     "connected": "Conectado",

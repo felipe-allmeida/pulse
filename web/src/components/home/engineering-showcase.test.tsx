@@ -11,11 +11,18 @@ function mockMatchMedia(matches: boolean) {
   })) as unknown as typeof window.matchMedia;
 }
 
+const usePulseHubMock = vi.fn();
+
+vi.mock('@/realtime/use-pulse-hub', () => ({
+  usePulseHub: () => usePulseHubMock(),
+}));
+
 const { EngineeringShowcase } = await import('./engineering-showcase');
 
 describe('EngineeringShowcase', () => {
   beforeEach(() => {
     mockMatchMedia(false);
+    usePulseHubMock.mockReturnValue({ count: 3, connection: 'connected', react: vi.fn().mockResolvedValue(undefined) });
   });
 
   it('renders the localized eyebrow', async () => {
@@ -37,5 +44,11 @@ describe('EngineeringShowcase', () => {
     // in the live-proof block (routes/index.tsx) — not here.
     expect(screen.queryByText(/online now/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/no events yet/i)).not.toBeInTheDocument();
+  });
+
+  it('hosts the "send a pulse" button next to the diagram', async () => {
+    await renderWithI18n(<EngineeringShowcase />);
+
+    expect(screen.getByRole('button', { name: /send a pulse/i })).toBeInTheDocument();
   });
 });
