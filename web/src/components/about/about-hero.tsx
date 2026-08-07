@@ -18,7 +18,7 @@ export function AboutHero() {
       <div className="flex flex-col items-start gap-6 sm:flex-row sm:items-center">
         <div
           aria-hidden
-          className="flex size-20 shrink-0 items-center justify-center rounded-2xl border-2 border-signal/50 bg-signal-muted/20 font-mono text-2xl font-semibold text-signal"
+          className="flex size-20 shrink-0 items-center justify-center rounded-2xl border-2 border-signal/50 bg-signal-muted/20 font-mono text-2xl font-semibold text-signal-strong"
         >
           {initials}
         </div>

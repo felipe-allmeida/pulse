@@ -142,10 +142,10 @@ export function AskWidget() {
       </SheetTrigger>
       <SheetContent
         side="right"
-        className="dark flex w-full flex-col border-signal/15 bg-background text-foreground sm:max-w-md"
+        className="flex w-full flex-col border-signal/15 bg-background text-foreground sm:max-w-md"
       >
         <SheetHeader className="border-b border-signal/10">
-          <SheetTitle className="font-mono text-signal">{t('ask:title')}</SheetTitle>
+          <SheetTitle className="font-mono text-signal-strong">{t('ask:title')}</SheetTitle>
           <SheetDescription>{t('ask:description')}</SheetDescription>
           <p className="font-mono text-xs text-muted-foreground">{t('ask:disclaimer')}</p>
         </SheetHeader>
@@ -197,7 +197,7 @@ export function AskWidget() {
             placeholder={t('ask:inputPlaceholder')}
             aria-label={t('ask:inputAriaLabel')}
             onChange={(event) => setInput(event.target.value)}
-            className="min-h-10 border-signal/20 bg-signal-muted/10 focus-visible:border-signal focus-visible:ring-signal/30"
+            className="min-h-10 border-signal/20 bg-signal-muted/10 focus-visible:border-signal-strong focus-visible:ring-signal-strong/30"
           />
           <Button
             size="icon"

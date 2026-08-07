@@ -201,6 +201,19 @@ describe('SendPulse', () => {
     expect(onPulse).toHaveBeenCalledTimes(1);
   });
 
+  it('aligns to the section rhythm instead of a fixed width — full-width on mobile, natural width from sm upward', async () => {
+    usePulseHubMock.mockReturnValue({ count: 0, connection: 'connected', react: vi.fn() });
+
+    await renderWithI18n(<SendPulse />);
+
+    const button = screen.getByRole('button', { name: /send a pulse/i });
+    // The old fixed `min-w-44` (176px) misaligned the button with its
+    // neighbors — it must be gone in favor of edge-to-edge/rhythm sizing.
+    expect(button.className).not.toMatch(/min-w-44\b/);
+    expect(button.className).toMatch(/w-full/);
+    expect(button.className).toMatch(/sm:w-auto/);
+  });
+
   it('renders the localized pt-BR button label', async () => {
     usePulseHubMock.mockReturnValue({ count: 0, connection: 'connected', react: vi.fn() });
 

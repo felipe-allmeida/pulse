@@ -31,7 +31,7 @@ export function AskChips() {
             key={question}
             type="button"
             onClick={() => open(question)}
-            className="inline-flex min-h-11 items-center justify-center rounded-full transition-opacity hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+            className="inline-flex min-h-11 items-center justify-center rounded-full transition-opacity hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal-strong focus-visible:ring-offset-2 focus-visible:ring-offset-background"
           >
             <Chip>{question}</Chip>
           </button>

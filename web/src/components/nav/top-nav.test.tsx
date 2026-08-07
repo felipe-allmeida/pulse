@@ -106,4 +106,32 @@ describe('TopNav', () => {
     expect(screen.getAllByRole('link', { name: /contato/i }).length).toBeGreaterThan(0);
     expect(screen.getAllByRole('link', { name: /baixar currículo/i }).length).toBeGreaterThan(0);
   });
+
+  it('opens the mobile menu as a bottom sheet, not a side drawer', async () => {
+    await renderTopNav();
+
+    fireEvent.click(await screen.findByRole('button', { name: /open menu/i }));
+
+    const dialog = await screen.findByRole('dialog');
+    // side="bottom" styling: anchored to the bottom edge, not the right edge.
+    expect(dialog.className).toMatch(/\bbottom-0\b/);
+    expect(dialog.className).not.toMatch(/\bright-0\b/);
+    expect(dialog.className).toMatch(/rounded-t/);
+  });
+
+  it('gives every mobile menu row a >=44px touch target', async () => {
+    await renderTopNav();
+
+    fireEvent.click(await screen.findByRole('button', { name: /open menu/i }));
+
+    const mobileNav = await screen.findByRole('navigation', { name: /mobile/i });
+    const rows = [
+      ...within(mobileNav).getAllByRole('link'),
+      ...within(mobileNav).queryAllByRole('button'),
+    ];
+    expect(rows.length).toBeGreaterThan(0);
+    for (const row of rows) {
+      expect(row.className).toMatch(/min-h-11|h-11|min-h-\[44px\]/);
+    }
+  });
 });

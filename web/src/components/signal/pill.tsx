@@ -31,7 +31,7 @@ export function Pill({ children, dot = false, className }: PillProps) {
     <span
       data-motion={dot ? (reducedMotion ? 'static' : 'animated') : undefined}
       className={cn(
-        'inline-flex w-fit items-center gap-2 rounded-full border border-signal/30 bg-signal-muted/40 px-3 py-1 font-mono text-xs text-signal',
+        'inline-flex w-fit items-center gap-2 rounded-full border border-signal/30 bg-signal-muted/40 px-3 py-1 font-mono text-xs text-signal-strong',
         className,
       )}
     >

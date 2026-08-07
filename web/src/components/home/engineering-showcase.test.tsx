@@ -51,4 +51,16 @@ describe('EngineeringShowcase', () => {
 
     expect(screen.getByRole('button', { name: /send a pulse/i })).toBeInTheDocument();
   });
+
+  it('places "send a pulse" before the diagram in DOM order, so it reads as the section\'s call-to-action near the heading — not buried after it', async () => {
+    await renderWithI18n(<EngineeringShowcase />);
+
+    const button = screen.getByRole('button', { name: /send a pulse/i });
+    const diagramNode = screen.getByText('RabbitMQ');
+
+    // DOCUMENT_POSITION_FOLLOWING on the diagram (from the button's
+    // perspective) means the button comes first in the DOM.
+    // eslint-disable-next-line no-bitwise
+    expect(button.compareDocumentPosition(diagramNode) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
 });

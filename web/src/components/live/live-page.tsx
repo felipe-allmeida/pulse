@@ -23,7 +23,7 @@ export function LivePage() {
   useVisitFeed();
 
   return (
-    <div className="dark bg-background text-foreground">
+    <div className="bg-background text-foreground">
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-6 py-16 pb-24 sm:px-10">
         <div className="flex flex-col gap-3">
           <SectionEyebrow>{t('home:livePanel.eyebrow')}</SectionEyebrow>

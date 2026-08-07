@@ -37,12 +37,21 @@
   --color-chart-4: hsl(var(--chart-4));
   --color-chart-5: hsl(var(--chart-5));
 
-  /* "Signal" accent — the single aqua highlight for the immersive home hero/showcase
-     (live pill, primary CTA, data highlights). Fixed, not theme-switched: unlike the
-     tokens above it does not flip with .dark, since the hero always commits to the
-     dark treatment regardless of the site-wide theme toggle. */
+  /* "Signal" accent — the aqua highlight used across the home hero/showcase,
+     nav, cards, and chips (live pill, primary CTA, data highlights).
+     --color-signal (the bright aqua fill) and --color-signal-foreground (its
+     on-fill text) stay fixed across themes: they're always used as a paired
+     fill+foreground (buttons, dots, glows), so contrast comes from that
+     pairing, not from the page surface, and the bright aqua reads fine as a
+     filled chip on either a light or a dark page.
+     --color-signal-strong and --color-signal-muted DO flip with .dark (see
+     :root/.dark below) — they're the accent-text and panel-tint tokens,
+     rendered directly against the page surface, so they need a per-theme
+     value: the bright aqua fails AA as text on a white surface (~1.7:1), and
+     the dark panel wash reads as a muddy smudge rather than a card on white. */
   --color-signal: #3ae0c4;
-  --color-signal-muted: #1f4d45;
+  --color-signal-strong: hsl(var(--signal-strong));
+  --color-signal-muted: hsl(var(--signal-muted));
   --color-signal-foreground: #05201b;
 }
 
@@ -76,6 +85,14 @@
   --chart-3: 185 35% 40%;
   --chart-4: 160 25% 35%;
   --chart-5: 180 12% 50%;
+  /* Signal accent-text on light: same hue as --color-signal (#3ae0c4 ≈
+     170deg) darkened to clear 4.5:1 text contrast against a white surface
+     (verified: hsl(170 80% 26%) on white ≈ 5.4:1). Matches --chart-1's
+     lightness/saturation family so text and data-viz read as one system. */
+  --signal-strong: 170 80% 26%;
+  /* Signal panel tint on light: a pale mint wash so bg-signal-muted/NN reads
+     as a subtle card on white instead of the dark theme's dark-teal smudge. */
+  --signal-muted: 170 40% 95%;
 }
 
 .dark {
@@ -111,6 +128,12 @@
   --chart-3: 185 30% 60%;
   --chart-4: 160 20% 50%;
   --chart-5: 180 10% 70%;
+  /* Signal accent-text on dark: the same bright aqua as --color-signal
+     (#3ae0c4 == hsl(170 73% 55%)) — this is the treatment the whole site
+     used to pin unconditionally, kept as-is for the dark theme. */
+  --signal-strong: 170 73% 55%;
+  /* Signal panel tint on dark: the original dark-teal wash, unchanged. */
+  --signal-muted: 170 43% 21%;
 }
 
 * {

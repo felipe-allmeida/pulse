@@ -38,7 +38,7 @@ export function EventFeed({ now = new Date() }: EventFeedProps = {}) {
                   : t('dashboard:eventFeed.pulse', { emoji: event.emoji });
               return (
                 <li key={`${event.at}-${index}`} className="flex items-start gap-2 text-sm">
-                  <Icon className="mt-0.5 size-4 shrink-0 text-signal" aria-hidden="true" />
+                  <Icon className="mt-0.5 size-4 shrink-0 text-signal-strong" aria-hidden="true" />
                   <span className="flex-1 text-foreground/90">{label}</span>
                   <span className="shrink-0 font-mono text-xs tabular-nums text-muted-foreground">
                     {formatRelativeTime(event.at, now, i18n.language)}

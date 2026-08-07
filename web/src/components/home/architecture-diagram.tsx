@@ -76,7 +76,7 @@ export function ArchitectureDiagram({ traversalKey }: ArchitectureDiagramProps) 
           {nodes.map((node, index) => (
             <div key={node.key} className="flex items-center">
               <div className="flex w-24 flex-col items-center gap-2 text-center">
-                <div className="flex size-11 items-center justify-center rounded-full border border-signal/40 bg-background text-signal">
+                <div className="flex size-11 items-center justify-center rounded-full border border-signal/40 bg-background text-signal-strong">
                   <node.icon className="size-5" aria-hidden="true" />
                 </div>
                 <div className="text-xs font-medium text-foreground">{node.label}</div>

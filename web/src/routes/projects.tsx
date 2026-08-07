@@ -13,7 +13,7 @@ export const Route = createFileRoute('/projects')({
 function ProjectsPage() {
   const { t } = useTranslation('projects');
   return (
-    <div className="dark bg-background text-foreground">
+    <div className="bg-background text-foreground">
       <div className="mx-auto flex w-full max-w-5xl flex-col gap-8 px-6 py-16 pb-24 sm:px-10">
         <div className="flex flex-col gap-3">
           <SectionEyebrow>{t('projects:pageEyebrow')}</SectionEyebrow>

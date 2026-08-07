@@ -37,7 +37,7 @@ export function LiveIndicator() {
       role="status"
       aria-label={label}
       title={label}
-      className="inline-flex w-fit items-center gap-1.5 rounded-full border border-signal/30 bg-signal-muted/20 px-2.5 py-1 font-mono text-[11px] tracking-wide tabular-nums text-signal uppercase"
+      className="inline-flex w-fit items-center gap-1.5 rounded-full border border-signal/30 bg-signal-muted/20 px-2.5 py-1 font-mono text-[11px] tracking-wide tabular-nums text-signal-strong uppercase"
     >
       <span aria-hidden className={cn('size-1.5 shrink-0 rounded-full', DOT_CLASS[connection])} />
       {countLabel}

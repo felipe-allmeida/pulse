@@ -33,7 +33,7 @@ export function Hero() {
   const openAskWidget = useAskWidgetStore((s) => s.open);
 
   return (
-    <section className="dark relative isolate flex flex-col justify-center overflow-hidden bg-background px-6 py-20 text-foreground sm:px-10 md:min-h-[85vh] md:py-28">
+    <section className="relative isolate flex flex-col justify-center overflow-hidden bg-background px-6 py-20 text-foreground sm:px-10 md:min-h-[85vh] md:py-28">
       <HeroMap className="z-0" />
 
       <div className="relative z-10 mx-auto flex w-full max-w-5xl flex-col gap-8">
@@ -58,35 +58,50 @@ export function Hero() {
             t={t}
             i18nKey="home:hero.hook"
             values={{ count: onlineCount }}
-            components={{ strong: <span className="font-semibold text-signal" /> }}
+            components={{ strong: <span className="font-semibold text-signal-strong" /> }}
           />
         </p>
 
-        <div className="flex flex-wrap items-center gap-3">
-          <Link
-            to="/projects"
-            className={cn(
-              buttonVariants({ size: 'lg' }),
-              'border-transparent bg-signal text-signal-foreground hover:bg-signal/90',
-            )}
-          >
-            {t('home:cta.projects')}
-            <ArrowRight />
-          </Link>
-          <Link to="/about" className={buttonVariants({ variant: 'outline', size: 'lg' })}>
-            {t('home:cta.about')}
-          </Link>
-          <CvButton className="h-10 px-6" />
-          <Button
-            type="button"
-            variant="ghost"
-            size="lg"
-            onClick={() => openAskWidget()}
-            className="border border-signal/30 text-signal hover:bg-signal/10 hover:text-signal"
-          >
-            <Sparkles />
-            {t('home:cta.ask')}
-          </Button>
+        <div className="flex flex-col gap-4">
+          {/*
+            The two prominent actions: full-width and stacked on mobile so
+            they never wrap raggedly (each row is a deliberate choice, not
+            an overflow), sized naturally side by side from sm upward.
+          */}
+          <div data-testid="hero-cta-primary" className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+            <Link
+              to="/projects"
+              className={cn(
+                buttonVariants({ size: 'lg' }),
+                'h-11 w-full justify-center border-transparent bg-signal text-signal-foreground hover:bg-signal/90 sm:w-auto',
+              )}
+            >
+              {t('home:cta.projects')}
+              <ArrowRight />
+            </Link>
+            <Button
+              type="button"
+              variant="ghost"
+              size="lg"
+              onClick={() => openAskWidget()}
+              className="h-11 w-full justify-center border border-signal/30 text-signal-strong hover:bg-signal/10 hover:text-signal-strong sm:w-auto"
+            >
+              <Sparkles />
+              {t('home:cta.ask')}
+            </Button>
+          </div>
+
+          {/* Demoted secondary actions: quiet text link + outline CV button,
+              still a full 44px tap target apiece. */}
+          <div data-testid="hero-cta-secondary" className="flex flex-wrap items-center gap-x-5 gap-y-2">
+            <Link
+              to="/about"
+              className="inline-flex min-h-11 items-center px-1 text-sm font-medium text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+            >
+              {t('home:cta.about')}
+            </Link>
+            <CvButton className="h-11" />
+          </div>
         </div>
 
         <ul className="flex flex-wrap gap-x-3 gap-y-2 border-t border-border/60 pt-6">

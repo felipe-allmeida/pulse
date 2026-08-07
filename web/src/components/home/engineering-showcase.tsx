@@ -14,24 +14,27 @@ import { Pill } from '@/components/signal/pill';
  * twice, once mono/inline and once as dashboard cards a scroll away, read as
  * two different systems reporting the same thing.
  *
- * SendPulse sits right next to the diagram — the diagram explains the
- * pipeline, the button proves it: clicking it plays one traversal across
- * these same nodes and reports the genuinely measured round-trip. This
- * component owns `traversalKey` as the one piece of state bridging the two,
- * bumped by `SendPulse`'s `onPulse` callback.
+ * SendPulse sits right next to the eyebrow, above the diagram — the
+ * section's call to action, not something buried after the whole pipeline
+ * explanation. The diagram explains the pipeline, the button proves it:
+ * clicking it plays one traversal across these same nodes and reports the
+ * genuinely measured round-trip. This component owns `traversalKey` as the
+ * one piece of state bridging the two, bumped by `SendPulse`'s `onPulse`
+ * callback.
  */
 export function EngineeringShowcase() {
   const { t } = useTranslation('home');
   const [traversalKey, setTraversalKey] = useState(0);
 
   return (
-    <section className="dark bg-background px-6 py-16 text-foreground sm:px-10 md:py-20">
-      <div className="mx-auto flex w-full max-w-5xl flex-col gap-8">
-        <Pill>{t('home:showcase.eyebrow')}</Pill>
+    <section className="bg-background px-6 py-14 text-foreground sm:px-10 md:py-20">
+      <div className="mx-auto flex w-full max-w-5xl flex-col gap-6">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <Pill>{t('home:showcase.eyebrow')}</Pill>
+          <SendPulse onPulse={() => setTraversalKey((key) => key + 1)} />
+        </div>
 
         <ArchitectureDiagram traversalKey={traversalKey} />
-
-        <SendPulse onPulse={() => setTraversalKey((key) => key + 1)} />
       </div>
     </section>
   );

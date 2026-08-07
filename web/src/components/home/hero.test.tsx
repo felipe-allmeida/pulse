@@ -5,7 +5,7 @@ import {
   createRoute,
   createRouter,
 } from '@tanstack/react-router';
-import { screen } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import type { Locale } from '@/content/types';
 import { profile } from '@/content/profile';
@@ -64,5 +64,51 @@ describe('Hero', () => {
 
     expect(await screen.findByText(/sistema distribuído ao vivo/)).toBeInTheDocument();
     expect(screen.getByText('7 online agora')).toBeInTheDocument();
+  });
+
+  it('exposes exactly two primary CTAs (projects + ask) at a >=44px touch target', async () => {
+    useMetricsMock.mockReturnValue({ data: { activeConnections: 7, totalVisits: 100 } });
+
+    await renderHero();
+
+    const primaryGroup = await screen.findByTestId('hero-cta-primary');
+    const controls = primaryGroup.querySelectorAll('a, button');
+    expect(controls).toHaveLength(2);
+    for (const control of controls) {
+      expect(control.className).toMatch(/min-h-11|h-11|min-h-\[44px\]/);
+    }
+
+    expect(within(primaryGroup).getByRole('link', { name: /see the projects/i })).toBeInTheDocument();
+    expect(within(primaryGroup).getByRole('button', { name: /ask the ai/i })).toBeInTheDocument();
+  });
+
+  it('demotes About/CV to a quieter secondary row, still at a >=44px touch target', async () => {
+    useMetricsMock.mockReturnValue({ data: { activeConnections: 7, totalVisits: 100 } });
+
+    await renderHero();
+
+    const secondaryGroup = await screen.findByTestId('hero-cta-secondary');
+    const controls = secondaryGroup.querySelectorAll('a, button');
+    expect(controls.length).toBeGreaterThanOrEqual(2);
+    for (const control of controls) {
+      expect(control.className).toMatch(/min-h-11|h-11|min-h-\[44px\]/);
+    }
+
+    expect(within(secondaryGroup).getByRole('link', { name: /about me/i })).toBeInTheDocument();
+    expect(within(secondaryGroup).getByRole('link', { name: /download cv/i })).toBeInTheDocument();
+  });
+
+  it('stacks the primary CTAs full-width on mobile and lets them size naturally from sm upward (no ragged wrap)', async () => {
+    useMetricsMock.mockReturnValue({ data: { activeConnections: 7, totalVisits: 100 } });
+
+    await renderHero();
+
+    const primaryGroup = await screen.findByTestId('hero-cta-primary');
+    expect(primaryGroup.className).toMatch(/flex-col/);
+
+    for (const control of primaryGroup.querySelectorAll('a, button')) {
+      expect(control.className).toMatch(/w-full/);
+      expect(control.className).toMatch(/sm:w-auto/);
+    }
   });
 });
