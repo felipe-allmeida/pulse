@@ -48,15 +48,20 @@ function Index() {
         compact, self-contained "live proof" slice: the map + 2 real stats +
         the event stream, pointing at /live for anyone who wants the rest.
         "Send a pulse" (the old docked Reactions widget's replacement) lives
-        in EngineeringShowcase above, next to the diagram it animates —
-        proving the pipeline is not this block's job.
+        in EngineeringShowcase above, next to the eyebrow above the diagram
+        it animates — proving the pipeline is not this block's job.
 
         This section now follows the site-wide theme like every other
         surface: `bg-background`/`text-foreground` resolve per theme, and the
         signal accent text below uses `text-signal-strong` (not the fixed
         bright `text-signal`) so it clears AA on a light surface too.
+
+        Mobile vertical rhythm (Task 3): `py-14` on mobile matches
+        EngineeringShowcase and the Ask chips section below — one consistent
+        section padding down the page instead of alternating py-12/py-16
+        "orphan" gaps, tightened from the previous py-16.
       */}
-      <section className="bg-background px-6 py-16 text-foreground sm:px-10 md:py-20">
+      <section className="bg-background px-6 py-14 text-foreground sm:px-10 md:py-20">
         <div className="mx-auto flex w-full max-w-5xl flex-col gap-6">
           <SectionEyebrow>{t('home:liveProof.eyebrow')}</SectionEyebrow>
 
@@ -94,7 +99,7 @@ function Index() {
         conversation. Kept as its own quiet section (not stacked inside
         live-proof); theme-driven like the rest of the page.
       */}
-      <section className="bg-background px-6 py-12 text-foreground sm:px-10">
+      <section className="bg-background px-6 py-14 text-foreground sm:px-10 md:py-20">
         <div className="mx-auto w-full max-w-5xl">
           <AskChips />
         </div>

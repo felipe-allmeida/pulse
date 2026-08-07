@@ -74,14 +74,20 @@ export function SendPulse({ onPulse }: SendPulseProps) {
   }
 
   return (
-    <div className="flex flex-col items-start gap-3">
+    <div className="flex w-full flex-col items-start gap-3 sm:w-auto">
+      {/*
+        Full-width on mobile — same left/right edges as its neighbors
+        (eyebrow, diagram) in the section's max-w-5xl container — instead
+        of the old fixed 176px (`min-w-44`) that read as misaligned.
+        Naturally sized from sm upward.
+      */}
       <Button
         type="button"
         size="lg"
         onClick={handleClick}
         disabled={pending}
         aria-busy={pending}
-        className="h-11 min-w-44 border-transparent bg-signal text-signal-foreground hover:bg-signal/90"
+        className="h-11 w-full justify-center border-transparent bg-signal text-signal-foreground hover:bg-signal/90 sm:w-auto sm:justify-start"
       >
         <Zap aria-hidden="true" />
         {pending ? t('home:sendPulse.sending') : t('home:sendPulse.button')}
