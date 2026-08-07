@@ -21,7 +21,8 @@ const NAV_LINKS = [
 ] as const;
 
 const DESKTOP_LINK_CLASS = 'text-sm font-medium text-muted-foreground transition-colors hover:text-foreground';
-const MOBILE_LINK_CLASS = 'text-base font-medium text-muted-foreground transition-colors hover:text-foreground';
+const MOBILE_LINK_CLASS =
+  'flex min-h-11 w-full items-center rounded-lg px-3 text-base font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground active:bg-accent';
 const ACTIVE_LINK_PROPS = { className: 'text-signal-strong', 'aria-current': 'page' as const };
 
 export function TopNav() {
@@ -57,12 +58,18 @@ export function TopNav() {
               <Menu />
             </Button>
           </SheetTrigger>
-          <SheetContent side="right" className="bg-background text-foreground">
-            <SheetHeader>
+          <SheetContent
+            side="bottom"
+            className="max-h-[85vh] gap-0 overflow-y-auto rounded-t-2xl border-t bg-background pb-[max(1.5rem,env(safe-area-inset-bottom))] text-foreground"
+          >
+            {/* Grab affordance — signals "this is a sheet, drag/swipe to dismiss"
+                even though the close control is the reliable path. */}
+            <div aria-hidden="true" className="mx-auto mt-3 h-1.5 w-10 shrink-0 rounded-full bg-muted-foreground/30" />
+            <SheetHeader className="pb-2 text-left">
               <SheetTitle>{t('nav:menu')}</SheetTitle>
               <SheetDescription className="sr-only">{t('nav:mobileNavDescription')}</SheetDescription>
             </SheetHeader>
-            <nav aria-label={t('nav:mobileNav')} className="flex flex-col gap-4 px-4">
+            <nav aria-label={t('nav:mobileNav')} className="flex flex-col gap-1 px-4 pb-2">
               {NAV_LINKS.map((link) => (
                 <SheetClose asChild key={link.to}>
                   <Link
@@ -81,7 +88,7 @@ export function TopNav() {
                 </Link>
               </SheetClose>
               <SheetClose asChild>
-                <CvButton className="w-full justify-center" />
+                <CvButton className="mt-2 h-11 w-full justify-center text-base" />
               </SheetClose>
             </nav>
           </SheetContent>
