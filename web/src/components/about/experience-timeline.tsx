@@ -14,7 +14,7 @@ export function ExperienceTimeline() {
         <li key={`${entry.org}-${L(entry.role)}`} className="relative">
           <span aria-hidden className="absolute top-1.5 -left-[1.8125rem] size-2.5 rounded-full bg-signal" />
           <p className="text-sm font-medium text-foreground">
-            {L(entry.role)} · <span className="font-semibold text-signal">{entry.org}</span>
+            {L(entry.role)} · <span className="font-semibold text-signal-strong">{entry.org}</span>
           </p>
           <p className="font-mono text-xs text-muted-foreground">{L(entry.period)}</p>
           <p className="mt-1.5 max-w-xl text-sm text-muted-foreground">{L(entry.summary)}</p>

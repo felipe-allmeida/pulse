@@ -27,14 +27,14 @@ export function ProjectDetail({ slug }: ProjectDetailProps) {
 
   if (!project) {
     return (
-      <div className="dark bg-background text-foreground">
+      <div className="bg-background text-foreground">
         <div className="mx-auto flex w-full max-w-3xl flex-col items-center gap-4 px-6 py-24 text-center sm:px-10">
           <SectionEyebrow>/projects</SectionEyebrow>
           <h1 className="text-3xl font-bold tracking-tight text-foreground">{t('projects:notFoundHeading')}</h1>
           <p className="max-w-md text-muted-foreground">{t('projects:notFoundBody')}</p>
           <Link
             to="/projects"
-            className="font-mono text-sm text-signal underline-offset-4 hover:underline"
+            className="font-mono text-sm text-signal-strong underline-offset-4 hover:underline"
           >
             ← {t('projects:backToProjects')}
           </Link>
@@ -44,14 +44,14 @@ export function ProjectDetail({ slug }: ProjectDetailProps) {
   }
 
   return (
-    <div className="dark bg-background text-foreground">
+    <div className="bg-background text-foreground">
       <div className="mx-auto flex w-full max-w-3xl flex-col gap-10 px-6 py-16 sm:px-10">
         <div className="flex flex-col gap-6">
           <div className="flex items-center justify-between gap-4">
             <SectionEyebrow>/projects/{project.slug}</SectionEyebrow>
             <Link
               to="/projects"
-              className="font-mono text-xs text-muted-foreground transition-colors hover:text-signal"
+              className="font-mono text-xs text-muted-foreground transition-colors hover:text-signal-strong"
             >
               ← {t('projects:backToProjects')}
             </Link>
@@ -81,7 +81,7 @@ export function ProjectDetail({ slug }: ProjectDetailProps) {
                   href={link.href}
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex items-center gap-1.5 rounded-full border border-signal/30 px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:border-signal/60 hover:text-signal"
+                  className="inline-flex items-center gap-1.5 rounded-full border border-signal/30 px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:border-signal/60 hover:text-signal-strong"
                 >
                   <ExternalLink aria-hidden className="size-3.5" />
                   {link.label}

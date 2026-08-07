@@ -11,7 +11,7 @@ export function AboutPage() {
   const { t } = useTranslation('about');
 
   return (
-    <div className="dark bg-background text-foreground">
+    <div className="bg-background text-foreground">
       <div className="mx-auto flex w-full max-w-3xl flex-col gap-16 px-6 py-16 sm:px-10">
         <section className="flex flex-col gap-8">
           <SectionEyebrow>/about</SectionEyebrow>

@@ -13,7 +13,7 @@ export function CvButton({ className }: { className?: string }) {
       aria-label={t('nav:downloadCv')}
       className={cn(
         buttonVariants({ variant: 'outline', size: 'sm' }),
-        'border-signal/40 font-mono text-signal hover:border-signal/60 hover:bg-signal/10 hover:text-signal',
+        'border-signal/40 font-mono text-signal-strong hover:border-signal/60 hover:bg-signal/10 hover:text-signal-strong',
         className,
       )}
     >

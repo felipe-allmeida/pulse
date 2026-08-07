@@ -90,7 +90,7 @@ export function SendPulse({ onPulse }: SendPulseProps) {
       {/* Persistent live region: the text inside changes rather than the
           element being conditionally mounted, so screen readers reliably
           announce each result. */}
-      <p role="status" aria-live="polite" className="min-h-5 font-mono text-sm text-signal">
+      <p role="status" aria-live="polite" className="min-h-5 font-mono text-sm text-signal-strong">
         {resultText}
       </p>
     </div>

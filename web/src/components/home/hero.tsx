@@ -33,7 +33,7 @@ export function Hero() {
   const openAskWidget = useAskWidgetStore((s) => s.open);
 
   return (
-    <section className="dark relative isolate flex flex-col justify-center overflow-hidden bg-background px-6 py-20 text-foreground sm:px-10 md:min-h-[85vh] md:py-28">
+    <section className="relative isolate flex flex-col justify-center overflow-hidden bg-background px-6 py-20 text-foreground sm:px-10 md:min-h-[85vh] md:py-28">
       <HeroMap className="z-0" />
 
       <div className="relative z-10 mx-auto flex w-full max-w-5xl flex-col gap-8">
@@ -58,7 +58,7 @@ export function Hero() {
             t={t}
             i18nKey="home:hero.hook"
             values={{ count: onlineCount }}
-            components={{ strong: <span className="font-semibold text-signal" /> }}
+            components={{ strong: <span className="font-semibold text-signal-strong" /> }}
           />
         </p>
 
@@ -82,7 +82,7 @@ export function Hero() {
             variant="ghost"
             size="lg"
             onClick={() => openAskWidget()}
-            className="border border-signal/30 text-signal hover:bg-signal/10 hover:text-signal"
+            className="border border-signal/30 text-signal-strong hover:bg-signal/10 hover:text-signal-strong"
           >
             <Sparkles />
             {t('home:cta.ask')}

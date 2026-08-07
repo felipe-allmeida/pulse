@@ -4,11 +4,9 @@ import { useVisits } from '@/lib/api';
 import { byNewest, EMPTY_POINTS } from '@/lib/points';
 import { world } from '@/lib/world';
 import { useReducedMotion } from '@/hooks/use-reduced-motion';
+import { useThemeStore } from '@/stores/theme-store';
 import { cn } from '@/lib/utils';
 import type { VisitPoint } from '@/types/pulse';
-
-/** Single aqua "signal" accent — matches `--color-signal` in styles.css. */
-const SIGNAL = '#3ae0c4';
 
 /** How many recent points to render as ambient glow dots. */
 const MAX_POINTS = 40;
@@ -26,11 +24,25 @@ type Props = {
 
 type SizedProjection = { width: number; height: number; projection: GeoProjection };
 
-function withAlpha(hex: string, alpha: number): string {
-  const r = parseInt(hex.slice(1, 3), 16);
-  const g = parseInt(hex.slice(3, 5), 16);
-  const b = parseInt(hex.slice(5, 7), 16);
-  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+/**
+ * The ambient map used to hardcode `#3ae0c4` (the fixed dark-mode
+ * `--color-signal`), which only reads at ~1.7:1 against a white surface —
+ * effectively invisible once the hero stopped pinning `dark`. Canvas
+ * `fillStyle`/`strokeStyle` can't take a live `var(--x)` reference the way
+ * an SVG/CSS property can (no cascade to resolve against), so instead this
+ * reads `--signal-strong`/`--foreground`'s *resolved* HSL triplet off
+ * `documentElement` at draw time and builds an `hsl(...)` string from it —
+ * re-read every frame, so it tracks the current theme automatically for the
+ * animated case, and (see the `theme` dependency on the effect below) also
+ * forces a redraw for the `prefers-reduced-motion` single-frame case.
+ */
+function readHslTriplet(varName: string): string {
+  const value = getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
+  return value || '170 73% 55%';
+}
+
+function withAlpha(hslTriplet: string, alpha: number): string {
+  return `hsl(${hslTriplet} / ${alpha})`;
 }
 
 function buildProjection(width: number, height: number): GeoProjection {
@@ -39,12 +51,21 @@ function buildProjection(width: number, height: number): GeoProjection {
   return projection;
 }
 
+/** The theme-resolved colors a frame draws with — read fresh per frame, see `readHslTriplet`. */
+type Palette = {
+  /** `--signal-strong`'s resolved HSL triplet: the accent used for points/arcs/halos. */
+  signal: string;
+  /** `--foreground`'s resolved HSL triplet: tints the graticule/landmass so they stay visible on either surface. */
+  foreground: string;
+};
+
 function drawGlowPoint(
   ctx: CanvasRenderingContext2D,
   projection: GeoProjection,
   point: VisitPoint,
   isOrigin: boolean,
   time: number,
+  palette: Palette,
 ) {
   const coords = projection([point.lon, point.lat]);
   if (!coords) return;
@@ -57,18 +78,18 @@ function drawGlowPoint(
     ctx.save();
     ctx.beginPath();
     ctx.arc(x, y, haloRadius, 0, Math.PI * 2);
-    ctx.strokeStyle = withAlpha(SIGNAL, haloOpacity);
+    ctx.strokeStyle = withAlpha(palette.signal, haloOpacity);
     ctx.lineWidth = 1.5;
     ctx.stroke();
     ctx.restore();
   }
 
   ctx.save();
-  ctx.shadowColor = SIGNAL;
+  ctx.shadowColor = withAlpha(palette.signal, 1);
   ctx.shadowBlur = isOrigin ? 12 : 5;
   ctx.beginPath();
   ctx.arc(x, y, isOrigin ? 3 : 1.6, 0, Math.PI * 2);
-  ctx.fillStyle = withAlpha(SIGNAL, isOrigin ? 0.9 : 0.5);
+  ctx.fillStyle = withAlpha(palette.signal, isOrigin ? 0.9 : 0.5);
   ctx.fill();
   ctx.restore();
 }
@@ -79,6 +100,7 @@ function drawArc(
   origin: VisitPoint,
   target: VisitPoint,
   time: number,
+  palette: Palette,
 ) {
   const interpolate = geoInterpolate([origin.lon, origin.lat], [target.lon, target.lat]);
   const STEPS = 40;
@@ -92,7 +114,7 @@ function drawArc(
     if (i === 0) ctx.moveTo(coords[0], coords[1]);
     else ctx.lineTo(coords[0], coords[1]);
   }
-  ctx.strokeStyle = withAlpha(SIGNAL, 0.12);
+  ctx.strokeStyle = withAlpha(palette.signal, 0.12);
   ctx.lineWidth = 1;
   ctx.stroke();
   ctx.restore();
@@ -102,11 +124,11 @@ function drawArc(
   const coords = projection([lon, lat]);
   if (!coords) return;
   ctx.save();
-  ctx.shadowColor = SIGNAL;
+  ctx.shadowColor = withAlpha(palette.signal, 1);
   ctx.shadowBlur = 6;
   ctx.beginPath();
   ctx.arc(coords[0], coords[1], 1.6, 0, Math.PI * 2);
-  ctx.fillStyle = withAlpha(SIGNAL, 0.8 * (1 - Math.abs(phase - 0.5) * 0.6));
+  ctx.fillStyle = withAlpha(palette.signal, 0.8 * (1 - Math.abs(phase - 0.5) * 0.6));
   ctx.fill();
   ctx.restore();
 }
@@ -118,11 +140,16 @@ function drawFrame(
   origin: VisitPoint | undefined,
   arcTargets: VisitPoint[],
   time: number,
+  palette: Palette,
 ) {
   const path = geoPath(projection, ctx);
 
+  // Graticule/landmass used to be a fixed white tint, drawn for a hero that
+  // always committed to dark — now tinted from `--foreground` so they stay a
+  // faint but visible line/fill on whichever surface the theme resolves to
+  // (near-white lines on the dark surface, near-black on the light one).
   ctx.save();
-  ctx.strokeStyle = 'rgba(255, 255, 255, 0.04)';
+  ctx.strokeStyle = withAlpha(palette.foreground, 0.08);
   ctx.lineWidth = 0.5;
   ctx.beginPath();
   path(geoGraticule10());
@@ -130,21 +157,21 @@ function drawFrame(
   ctx.restore();
 
   ctx.save();
-  ctx.fillStyle = 'rgba(255, 255, 255, 0.06)';
+  ctx.fillStyle = withAlpha(palette.foreground, 0.06);
   ctx.beginPath();
   path(world);
   ctx.fill();
   ctx.restore();
 
   if (origin) {
-    for (const target of arcTargets) drawArc(ctx, projection, origin, target, time);
+    for (const target of arcTargets) drawArc(ctx, projection, origin, target, time, palette);
   }
 
   for (const point of points) {
     if (point === origin) continue;
-    drawGlowPoint(ctx, projection, point, false, time);
+    drawGlowPoint(ctx, projection, point, false, time, palette);
   }
-  if (origin) drawGlowPoint(ctx, projection, origin, true, time);
+  if (origin) drawGlowPoint(ctx, projection, origin, true, time, palette);
 }
 
 /**
@@ -165,6 +192,12 @@ export function HeroMap({ className }: Props) {
   const { data } = useVisits();
   const points = data ?? EMPTY_POINTS;
   const reducedMotion = useReducedMotion();
+  // Not read directly — the effect below re-reads the CSS variables from
+  // `documentElement` itself (the source of truth for the resolved color).
+  // Subscribing here just makes `theme` a dependency, so the effect (and its
+  // single static frame) re-runs on toggle even when reduced-motion means
+  // there's no per-frame rAF loop that would otherwise pick up the change.
+  const theme = useThemeStore((s) => s.theme);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -208,7 +241,11 @@ export function HeroMap({ className }: Props) {
           : buildProjection(width, height);
       projectionRef.current = { width, height, projection };
 
-      drawFrame(ctx, projection, recentPoints, origin, arcTargets, time);
+      const palette: Palette = {
+        signal: readHslTriplet('--signal-strong'),
+        foreground: readHslTriplet('--foreground'),
+      };
+      drawFrame(ctx, projection, recentPoints, origin, arcTargets, time, palette);
     };
 
     render(0);
@@ -229,7 +266,7 @@ export function HeroMap({ className }: Props) {
       window.removeEventListener('resize', handleResize);
       if (frameId !== null) cancelAnimationFrame(frameId);
     };
-  }, [reducedMotion, recentPoints, origin, arcTargets]);
+  }, [reducedMotion, recentPoints, origin, arcTargets, theme]);
 
   return (
     <div

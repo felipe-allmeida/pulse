@@ -25,7 +25,7 @@ export function EngineeringShowcase() {
   const [traversalKey, setTraversalKey] = useState(0);
 
   return (
-    <section className="dark bg-background px-6 py-16 text-foreground sm:px-10 md:py-20">
+    <section className="bg-background px-6 py-16 text-foreground sm:px-10 md:py-20">
       <div className="mx-auto flex w-full max-w-5xl flex-col gap-8">
         <Pill>{t('home:showcase.eyebrow')}</Pill>
 

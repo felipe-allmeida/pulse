@@ -73,7 +73,7 @@ export function ProjectCard({ project, className }: ProjectCardProps) {
               href={link.href}
               target="_blank"
               rel="noreferrer"
-              className="inline-flex items-center gap-1.5 rounded-full border border-signal/30 px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:border-signal/60 hover:text-signal"
+              className="inline-flex items-center gap-1.5 rounded-full border border-signal/30 px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:border-signal/60 hover:text-signal-strong"
             >
               <ExternalLink aria-hidden className="size-3.5" />
               {link.label}
@@ -91,7 +91,7 @@ export function ProjectCard({ project, className }: ProjectCardProps) {
         to="/projects/$slug"
         params={{ slug: project.slug }}
         aria-label={t('projects:viewDetails', { name: project.name })}
-        className="absolute inset-0 z-0 rounded-2xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-signal"
+        className="absolute inset-0 z-0 rounded-2xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-signal-strong"
       />
     </article>
   );

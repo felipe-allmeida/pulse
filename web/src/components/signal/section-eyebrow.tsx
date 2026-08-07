@@ -13,6 +13,6 @@ export interface SectionEyebrowProps {
  */
 export function SectionEyebrow({ children, className }: SectionEyebrowProps) {
   return (
-    <p className={cn('font-mono text-xs tracking-[0.2em] text-signal uppercase', className)}>{children}</p>
+    <p className={cn('font-mono text-xs tracking-[0.2em] text-signal-strong uppercase', className)}>{children}</p>
   );
 }

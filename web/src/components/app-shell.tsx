@@ -22,14 +22,12 @@ export function AppShell({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-screen bg-background text-foreground">
       {/*
-        The header commits to the signal dark treatment unconditionally,
-        like every other redesigned surface (Hero, About, Projects) — it
-        sits directly above content that is itself always dark, so letting
-        it follow the site-wide theme toggle would reintroduce the exact
-        "looks left-behind" seam this redesign closes. `ThemeToggle` still
-        controls the rest of the (not-yet-redesigned) app.
+        The header now follows the site-wide theme toggle like every other
+        surface: `bg-background/85` + `text-foreground` resolve per theme via
+        their CSS variables, so it no longer pins the dark treatment
+        unconditionally.
       */}
-      <header className="dark sticky top-0 z-40 border-b border-signal/15 bg-background/85 text-foreground backdrop-blur supports-[backdrop-filter]:bg-background/70">
+      <header className="sticky top-0 z-40 border-b border-signal/15 bg-background/85 text-foreground backdrop-blur supports-[backdrop-filter]:bg-background/70">
         <div className="mx-auto flex max-w-7xl items-center gap-4 px-6 py-3 sm:px-10">
           <Link
             to="/"

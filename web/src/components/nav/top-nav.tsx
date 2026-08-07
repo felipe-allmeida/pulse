@@ -22,7 +22,7 @@ const NAV_LINKS = [
 
 const DESKTOP_LINK_CLASS = 'text-sm font-medium text-muted-foreground transition-colors hover:text-foreground';
 const MOBILE_LINK_CLASS = 'text-base font-medium text-muted-foreground transition-colors hover:text-foreground';
-const ACTIVE_LINK_PROPS = { className: 'text-signal', 'aria-current': 'page' as const };
+const ACTIVE_LINK_PROPS = { className: 'text-signal-strong', 'aria-current': 'page' as const };
 
 export function TopNav() {
   const { t } = useTranslation(['nav', 'contact']);
@@ -57,7 +57,7 @@ export function TopNav() {
               <Menu />
             </Button>
           </SheetTrigger>
-          <SheetContent side="right" className="dark bg-background text-foreground">
+          <SheetContent side="right" className="bg-background text-foreground">
             <SheetHeader>
               <SheetTitle>{t('nav:menu')}</SheetTitle>
               <SheetDescription className="sr-only">{t('nav:mobileNavDescription')}</SheetDescription>
