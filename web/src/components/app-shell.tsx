@@ -1,10 +1,9 @@
 import { Link } from '@tanstack/react-router';
 import { useEffect } from 'react';
 import type { ReactNode } from 'react';
-import { ConnectionStatus } from '@/components/connection-status';
 import { LanguageToggle } from '@/components/i18n/language-toggle';
+import { LiveIndicator } from '@/components/live-indicator';
 import { TopNav } from '@/components/nav/top-nav';
-import { PresenceBadge } from '@/components/presence-badge';
 import { ThemeToggle } from '@/components/theme-toggle';
 import i18n from '@/i18n';
 
@@ -44,9 +43,8 @@ export function AppShell({ children }: { children: ReactNode }) {
           </Link>
           <TopNav />
           <div className="ml-auto flex items-center gap-3">
-            <div className="hidden items-center gap-2 sm:flex">
-              <ConnectionStatus />
-              <PresenceBadge />
+            <div className="hidden sm:flex">
+              <LiveIndicator />
             </div>
             <div className="flex items-center gap-1 border-l border-border/60 pl-2">
               <LanguageToggle />

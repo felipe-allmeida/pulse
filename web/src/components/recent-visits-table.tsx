@@ -2,7 +2,8 @@ import { useMemo } from 'react';
 import { createColumnHelper, flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-table';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { SubsectionHeading } from '@/components/signal/subsection-heading';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useVisits } from '@/lib/api';
@@ -45,12 +46,12 @@ export function RecentVisitsTable({ now = new Date() }: RecentVisitsTableProps =
   });
 
   return (
-    <Card>
+    <Card className="border-signal/20 bg-signal-muted/10">
       <CardHeader>
-        <CardTitle>{t('dashboard:recentVisits.title')}</CardTitle>
+        <SubsectionHeading>{t('dashboard:recentVisits.title')}</SubsectionHeading>
       </CardHeader>
       <CardContent>
-        <Table>
+        <Table className="font-mono text-xs tabular-nums">
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>

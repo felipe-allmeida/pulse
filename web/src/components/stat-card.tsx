@@ -15,13 +15,15 @@ export function StatCard({ label, value, icon: Icon, series }: StatCardProps) {
   const formattedValue = new Intl.NumberFormat(i18n.language).format(value);
 
   return (
-    <Card>
+    <Card className="border-signal/20 bg-signal-muted/10">
       <CardHeader className="flex-row items-center justify-between gap-2 space-y-0 pb-2">
-        <CardTitle className="text-sm font-medium text-muted-foreground">{label}</CardTitle>
+        <CardTitle className="font-mono text-xs tracking-wide text-muted-foreground uppercase">
+          {label}
+        </CardTitle>
         <Icon className="size-4 text-muted-foreground" aria-hidden="true" />
       </CardHeader>
       <CardContent>
-        <div className="text-2xl font-bold text-foreground">{formattedValue}</div>
+        <div className="font-mono text-2xl font-bold tabular-nums text-foreground">{formattedValue}</div>
         {series && series.length > 0 && (
           <div className="mt-2 h-12 w-full">
             <ResponsiveContainer width="100%" height="100%">

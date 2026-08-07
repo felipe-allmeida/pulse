@@ -6,10 +6,9 @@ import {
   createRouter,
 } from '@tanstack/react-router';
 import { fireEvent, screen, within } from '@testing-library/react';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import type { Locale } from '@/content/types';
 import { renderWithI18n } from '@/test/render-with-i18n';
-import { useAskWidgetStore } from '@/stores/ask-widget-store';
 import { TopNav } from './top-nav';
 
 function renderTopNav(initialPath = '/', locale?: Locale) {
@@ -21,7 +20,8 @@ function renderTopNav(initialPath = '/', locale?: Locale) {
     path: '/projects',
     component: () => null,
   });
-  const routeTree = rootRoute.addChildren([indexRoute, aboutRoute, projectsRoute]);
+  const liveRoute = createRoute({ getParentRoute: () => rootRoute, path: '/live', component: () => null });
+  const routeTree = rootRoute.addChildren([indexRoute, aboutRoute, projectsRoute, liveRoute]);
   const router = createRouter({
     routeTree,
     history: createMemoryHistory({ initialEntries: [initialPath] }),
@@ -31,17 +31,21 @@ function renderTopNav(initialPath = '/', locale?: Locale) {
 }
 
 describe('TopNav', () => {
-  beforeEach(() => {
-    useAskWidgetStore.setState({ isOpen: false });
-  });
-
-  it('renders links to Home, About, Projects and Contact', async () => {
+  it('renders links to Home, About, Projects, Live and Contact', async () => {
     await renderTopNav();
 
     expect(await screen.findByRole('link', { name: /home/i })).toBeInTheDocument();
     expect(screen.getAllByRole('link', { name: /about/i }).length).toBeGreaterThan(0);
     expect(screen.getAllByRole('link', { name: /projects/i }).length).toBeGreaterThan(0);
+    expect(screen.getAllByRole('link', { name: /^live$/i }).length).toBeGreaterThan(0);
     expect(screen.getAllByRole('link', { name: /contact/i }).length).toBeGreaterThan(0);
+  });
+
+  it('points the Live link at /live', async () => {
+    await renderTopNav();
+
+    const liveLinks = await screen.findAllByRole('link', { name: /^live$/i });
+    expect(liveLinks[0]).toHaveAttribute('href', '/live');
   });
 
   it('points the Contact link at the About contact anchor', async () => {
@@ -51,15 +55,10 @@ describe('TopNav', () => {
     expect(contactLinks[0]).toHaveAttribute('href', '/about#contact');
   });
 
-  it('renders an Ask the AI trigger that opens the shared Ask widget store', async () => {
+  it('does not render an Ask the AI trigger in the header (the hero CTA and floating trigger cover it)', async () => {
     await renderTopNav();
 
-    const askButtons = await screen.findAllByRole('button', { name: /ask the ai/i });
-    expect(askButtons.length).toBeGreaterThan(0);
-
-    fireEvent.click(askButtons[0]);
-
-    expect(useAskWidgetStore.getState().isOpen).toBe(true);
+    expect(screen.queryAllByRole('button', { name: /ask the ai/i })).toHaveLength(0);
   });
 
   it('renders a Download CV control', async () => {
@@ -83,8 +82,10 @@ describe('TopNav', () => {
     expect(within(mobileNav).getByRole('link', { name: /home/i })).toBeInTheDocument();
     expect(within(mobileNav).getByRole('link', { name: /about/i })).toBeInTheDocument();
     expect(within(mobileNav).getByRole('link', { name: /projects/i })).toBeInTheDocument();
+    expect(within(mobileNav).getByRole('link', { name: /^live$/i })).toBeInTheDocument();
     expect(within(mobileNav).getByRole('link', { name: /contact/i })).toBeInTheDocument();
     expect(within(mobileNav).getByRole('link', { name: /download cv/i })).toBeInTheDocument();
+    expect(within(mobileNav).queryAllByRole('button', { name: /ask the ai/i })).toHaveLength(0);
   });
 
   it('highlights the active route link', async () => {
@@ -101,6 +102,7 @@ describe('TopNav', () => {
     expect(await screen.findByRole('link', { name: /início/i })).toBeInTheDocument();
     expect(screen.getAllByRole('link', { name: /sobre/i }).length).toBeGreaterThan(0);
     expect(screen.getAllByRole('link', { name: /projetos/i }).length).toBeGreaterThan(0);
+    expect(screen.getAllByRole('link', { name: /^ao vivo$/i }).length).toBeGreaterThan(0);
     expect(screen.getAllByRole('link', { name: /contato/i }).length).toBeGreaterThan(0);
     expect(screen.getAllByRole('link', { name: /baixar currículo/i }).length).toBeGreaterThan(0);
   });

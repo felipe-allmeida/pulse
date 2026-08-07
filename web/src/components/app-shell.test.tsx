@@ -36,22 +36,27 @@ function renderAppShell() {
 }
 
 describe('AppShell', () => {
-  it('renders the wordmark, status widgets, and children', async () => {
+  it('renders the wordmark, the merged live indicator, and children', async () => {
     renderAppShell();
 
     expect(await screen.findByText(/pulse/i)).toBeInTheDocument();
-    expect(screen.getByText(/connected/i)).toBeInTheDocument();
+    // Connection state now lives on the single live indicator's accessible
+    // name (dot color + aria-label/title), not a separate visible badge.
+    expect(screen.getByRole('status', { name: /connected.*4 online/i })).toBeInTheDocument();
     expect(screen.getByText('4 online')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /toggle theme/i })).toBeInTheDocument();
     expect(screen.getByText('page content')).toBeInTheDocument();
   });
 
-  it('renders the header inside a banner landmark with the nav links and the Ask trigger', async () => {
+  it('renders the header inside a banner landmark with the nav links, no Ask trigger there', async () => {
     renderAppShell();
 
     const banner = await screen.findByRole('banner');
     expect(within(banner).getByRole('link', { name: /home/i })).toBeInTheDocument();
     expect(within(banner).getAllByRole('link', { name: /contact/i }).length).toBeGreaterThan(0);
-    expect(within(banner).getAllByRole('button', { name: /ask the ai/i }).length).toBeGreaterThan(0);
+    // The header's own "Ask the AI" button was dropped — the hero CTA and
+    // the floating Ask trigger are the only two entry points left, both
+    // outside the header.
+    expect(within(banner).queryAllByRole('button', { name: /ask the ai/i })).toHaveLength(0);
   });
 });

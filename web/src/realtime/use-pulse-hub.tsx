@@ -12,7 +12,14 @@ type ConnectionStatus = 'connected' | 'reconnecting' | 'offline';
 type PulseHubContextValue = {
   count: number;
   connection: ConnectionStatus;
-  react: (emoji: string) => void;
+  /**
+   * Resolves once the server has handled the `React` invocation (SignalR's
+   * `invoke()` ack) — callers that need a genuine round-trip measurement
+   * (e.g. "send a pulse") time from just before calling this to the
+   * resolution. Rejects if the hub isn't connected or the invoke fails;
+   * callers that don't care about the outcome may ignore the rejection.
+   */
+  react: (emoji: string) => Promise<void>;
 };
 
 const PulseHubContext = createContext<PulseHubContextValue | null>(null);
@@ -82,8 +89,10 @@ export function PulseHubProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
-  const react = useCallback((emoji: string) => {
-    connectionRef.current?.invoke('React', emoji).catch(() => {});
+  const react = useCallback((emoji: string): Promise<void> => {
+    const hub = connectionRef.current;
+    if (!hub) return Promise.reject(new Error('not connected'));
+    return hub.invoke('React', emoji);
   }, []);
 
   const value = useMemo<PulseHubContextValue>(

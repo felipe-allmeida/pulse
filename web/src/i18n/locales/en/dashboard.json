@@ -27,11 +27,7 @@
     "title": "Live activity",
     "empty": "No events yet.",
     "visit": "Visit from {{city}}, {{country}}",
-    "reaction": "Reaction {{emoji}}"
-  },
-  "reactions": {
-    "title": "React",
-    "ariaLabel": "React with {{emoji}}"
+    "pulse": "Pulse {{emoji}}"
   },
   "connectionStatus": {
     "connected": "Connected",
@@ -41,5 +37,8 @@
   "presence": {
     "online_one": "{{formattedCount}} online",
     "online_other": "{{formattedCount}} online"
+  },
+  "liveIndicator": {
+    "ariaLabel": "{{status}} — {{count}}"
   }
 }

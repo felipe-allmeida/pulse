@@ -1,7 +1,7 @@
 {
   "pageTitle": "Projects",
   "pageEyebrow": "/projects",
-  "screenshotPlaceholder": "Screenshot coming",
+  "screenshotAlt": "{{name}} screenshot",
   "privateLabel": "Private",
   "viewDetails": "View {{name}} details",
   "backToProjects": "All projects",

@@ -1,5 +1,7 @@
-import { screen } from '@testing-library/react';
+import { act, screen } from '@testing-library/react';
+import { I18nextProvider } from 'react-i18next';
 import { describe, expect, it, vi } from 'vitest';
+import i18n from '@/i18n';
 import { renderWithI18n } from '@/test/render-with-i18n';
 
 function mockMatchMedia(matches: boolean) {
@@ -48,5 +50,51 @@ describe('ArchitectureDiagram', () => {
     const { container } = await renderWithI18n(<ArchitectureDiagram />);
 
     expect(container.querySelector('[data-motion="animated"]')).toBeInTheDocument();
+  });
+
+  it('does not play a traversal on mount, even with a traversalKey already set', async () => {
+    mockMatchMedia(false);
+
+    const { container } = await renderWithI18n(<ArchitectureDiagram traversalKey={0} />);
+
+    expect(container.querySelector('[data-traversal="playing"]')).not.toBeInTheDocument();
+  });
+
+  it('plays one traversal when traversalKey changes', async () => {
+    mockMatchMedia(false);
+
+    const { container, rerender } = await renderWithI18n(<ArchitectureDiagram traversalKey={0} />);
+    expect(container.querySelector('[data-traversal="playing"]')).not.toBeInTheDocument();
+
+    // `rerender` must be handed the same top-level element type it was
+    // first rendered with (the I18nextProvider wrapper renderWithI18n
+    // applies) — otherwise React tears down and remounts a fresh tree
+    // instead of updating props on the existing one, which would silently
+    // reset the "already mounted" guard this test is meant to exercise.
+    await act(async () => {
+      rerender(
+        <I18nextProvider i18n={i18n}>
+          <ArchitectureDiagram traversalKey={1} />
+        </I18nextProvider>,
+      );
+    });
+
+    expect(container.querySelector('[data-traversal="playing"]')).toBeInTheDocument();
+  });
+
+  it('does not play a traversal under prefers-reduced-motion', async () => {
+    mockMatchMedia(true);
+
+    const { container, rerender } = await renderWithI18n(<ArchitectureDiagram traversalKey={0} />);
+
+    await act(async () => {
+      rerender(
+        <I18nextProvider i18n={i18n}>
+          <ArchitectureDiagram traversalKey={1} />
+        </I18nextProvider>,
+      );
+    });
+
+    expect(container.querySelector('[data-traversal="playing"]')).not.toBeInTheDocument();
   });
 });

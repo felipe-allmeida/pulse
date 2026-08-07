@@ -51,9 +51,9 @@ async function renderIndexRoute(locale: Locale = 'en') {
       {/*
         AskWidget isn't part of the `/` route tree in production — it's
         mounted once in `__root.tsx`, alongside the route's <Outlet />. It's
-        rendered here too so the "separate corners" test below reflects the
-        real composed page, where both floating elements are on screen at
-        once.
+        rendered here too so the "doesn't overlap" test below reflects the
+        real composed page, where the Ask trigger and the "send a pulse"
+        button are both on screen at once.
       */}
       <RouterProvider router={router} />
       <AskWidget />
@@ -61,7 +61,7 @@ async function renderIndexRoute(locale: Locale = 'en') {
   );
 }
 
-describe('Index dashboard route', () => {
+describe('Index route (portfolio home)', () => {
   beforeEach(() => {
     useEventStore.setState({ events: [] });
     useMetricsMock.mockReturnValue({ data: undefined, isLoading: true });
@@ -69,19 +69,19 @@ describe('Index dashboard route', () => {
     usePulseHubMock.mockReturnValue({ count: 0, connection: 'connected', react: vi.fn() });
   });
 
-  it('renders the "React" reactions card title in en', async () => {
+  it('renders the "Send a pulse" button in en', async () => {
     await renderIndexRoute('en');
 
-    expect(screen.getByText('React')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /send a pulse/i })).toBeInTheDocument();
   });
 
-  it('renders the "Reagir" reactions card title in pt-BR', async () => {
+  it('renders the "Enviar um pulso" button in pt-BR', async () => {
     await renderIndexRoute('pt-BR');
 
-    expect(screen.getByText('Reagir')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /enviar um pulso/i })).toBeInTheDocument();
   });
 
-  it('composes the hero, engineering showcase, and the existing live dashboard with exactly one h1', async () => {
+  it('composes the hero, engineering showcase, and a compact live-proof block, with exactly one h1', async () => {
     useMetricsMock.mockReturnValue({ data: { activeConnections: 7, totalVisits: 120 }, isLoading: false });
     useVisitsMock.mockReturnValue({
       data: [{ lat: 38.7, lon: -9.1, city: 'Lisbon', country: 'Portugal', at: '2026-08-04T10:00:00Z' }],
@@ -97,61 +97,49 @@ describe('Index dashboard route', () => {
     // EngineeringShowcase
     expect(screen.getByText(/what you're looking at/i)).toBeInTheDocument();
 
-    // Existing dashboard, still present and mounted below
-    expect(screen.getByText('Live dashboard')).toBeInTheDocument();
+    // Compact live-proof block: map + real stats (KpiRow) + event stream + a
+    // link out to the full panel.
+    expect(screen.getByText('Watch it happen')).toBeInTheDocument();
     expect(screen.getByRole('img', { name: /world map of live visitor locations/i })).toBeInTheDocument();
+    expect(screen.getByText('Active connections')).toBeInTheDocument();
+    expect(screen.getByText('Live activity')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /see the full panel/i })).toHaveAttribute('href', '/live');
 
     // Exactly one h1 on the whole composed page
     expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
   });
 
-  it('keeps the floating Reactions card and the Ask widget trigger from overlapping, including on phone widths', async () => {
+  it('does NOT render the full widget stack that moved to /live', async () => {
+    useMetricsMock.mockReturnValue({ data: { activeConnections: 7, totalVisits: 120 }, isLoading: false });
+    useVisitsMock.mockReturnValue({ data: [], isLoading: false });
+
     await renderIndexRoute();
 
-    const reactionsCard = screen.getByText('React').closest('.fixed');
-    const askTrigger = screen.getByRole('button', { name: /ask about felipe/i });
-
-    expect(reactionsCard).not.toBeNull();
-
-    // jsdom does no real layout (getBoundingClientRect is stubbed to
-    // zeros), so a bounding-box check can't tell us anything — instead
-    // this asserts the specific classes that are what actually prevents
-    // the overlap, so a regression to any of them fails this test.
-    //
-    // A left/right corner-anchor check alone is NOT enough: on phone
-    // widths (320–414px) both elements are `fixed` at the same
-    // `bottom-6` row, the Reactions card has no width cap of its own
-    // (Card/CardHeader/CardContent are unconstrained, so its 8-icon row
-    // shrink-to-fits to ~344px), and the Ask trigger's own text is
-    // `whitespace-nowrap` — together those alone can already approach a
-    // 375px viewport's width, so `left-6`/`right-6` anchoring is not
-    // sufficient by itself to keep them apart. Below `md:` the Reactions
-    // card is moved off the bottom row entirely (`top-24`) instead of
-    // sharing it, and `max-w-[216px]` keeps it compact everywhere
-    // (including at `md:` and up, where it does share the bottom row
-    // with the trigger — see the space math in routes/index.tsx's
-    // comment and task-5-report.md's "Fix round 1" section).
-    expect(reactionsCard).toHaveClass('max-w-[216px]');
-    expect(reactionsCard).toHaveClass('top-24');
-    expect(reactionsCard).toHaveClass('md:top-auto');
-    expect(reactionsCard).toHaveClass('md:bottom-6');
-
-    // Still true, and still worth asserting: from `md:` up, where the
-    // card rejoins the bottom row, left/right anchoring is what keeps it
-    // on the opposite side from the trigger.
-    expect(reactionsCard).toHaveClass('left-6');
-    expect(reactionsCard).not.toHaveClass('right-6');
-    expect(askTrigger).toHaveClass('right-6');
-    expect(askTrigger).not.toHaveClass('left-6');
+    expect(screen.queryByText('Visits over time')).not.toBeInTheDocument();
+    expect(screen.queryByText('Recent visits')).not.toBeInTheDocument();
   });
 
-  it('shows pt-BR hero copy on the composed home', async () => {
+  it('renders "send a pulse" inline in the showcase, not as a viewport-fixed element overlapping the hero', async () => {
+    await renderIndexRoute();
+
+    const pulseButton = screen.getByRole('button', { name: /send a pulse/i }).closest('.fixed');
+    expect(pulseButton).toBeNull();
+
+    // The Ask widget's floating trigger stays the only fixed bottom-right element.
+    const askTrigger = screen.getByRole('button', { name: /ask about felipe/i });
+    expect(askTrigger).toHaveClass('fixed');
+    expect(askTrigger).toHaveClass('right-6');
+    expect(askTrigger).toHaveClass('bottom-6');
+  });
+
+  it('shows pt-BR hero and live-proof copy on the composed home', async () => {
     useMetricsMock.mockReturnValue({ data: { activeConnections: 7, totalVisits: 120 }, isLoading: false });
     useVisitsMock.mockReturnValue({ data: [], isLoading: false });
 
     await renderIndexRoute('pt-BR');
 
     expect(await screen.findByText(/sistema distribuído ao vivo/)).toBeInTheDocument();
-    expect(screen.getByText('Painel ao vivo')).toBeInTheDocument();
+    expect(screen.getByText('Veja acontecendo')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /ver o painel completo/i })).toHaveAttribute('href', '/live');
   });
 });

@@ -4,7 +4,7 @@
     "online_other": "{{count}} online agora"
   },
   "hero": {
-    "hook": "Você é uma de {{count}} pessoas aqui agora mesmo — e esta página é um sistema distribuído ao vivo, transmitindo presença, geolocalização e eventos em tempo real."
+    "hook": "Você é uma de <strong>{{count}}</strong> pessoas aqui agora mesmo — e esta página é um sistema distribuído ao vivo, transmitindo presença, geolocalização e eventos em tempo real."
   },
   "cta": {
     "projects": "Ver os projetos",
@@ -14,17 +14,16 @@
   "showcase": {
     "eyebrow": "o que você está vendo · ao vivo"
   },
-  "dashboard": {
-    "heading": "Painel ao vivo"
+  "liveProof": {
+    "eyebrow": "prova ao vivo",
+    "heading": "Veja acontecendo",
+    "description": "Uma fatia ao vivo do mesmo sistema por trás desta página: visitantes reais, localizações reais, chegando em tempo real.",
+    "cta": "Ver o painel completo"
   },
-  "stats": {
-    "online": "online agora",
-    "events": "visitas registradas",
-    "countries": "países (recentes)",
-    "cities": "cidades (recentes)"
-  },
-  "eventStream": {
-    "live": "ao vivo"
+  "livePanel": {
+    "eyebrow": "/live",
+    "heading": "Painel ao vivo",
+    "description": "Todas as métricas, o mapa ao vivo, as visitas recentes e o fluxo bruto de eventos — o painel completo por trás dos números da página inicial."
   },
   "arch": {
     "web": "Web",
@@ -34,5 +33,13 @@
     "worker": "Worker",
     "db": "Postgres",
     "caption": "O pipeline por trás desta página, ao vivo: seu navegador mantém uma conexão SignalR com a API, presença e geolocalização passam pelo Redis, eventos entram na fila do RabbitMQ para o worker, e tudo é gravado no Postgres."
+  },
+  "sendPulse": {
+    "button": "Enviar um pulso",
+    "sending": "Enviando…",
+    "result": "{{ms}} ms · cliente → API → volta",
+    "seenBy_one": "visto por {{count}} pessoa aqui",
+    "seenBy_other": "visto por {{count}} pessoas aqui",
+    "error": "Não foi possível alcançar o servidor — tente de novo"
   }
 }

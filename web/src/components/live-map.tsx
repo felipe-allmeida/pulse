@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useRef } from 'react';
 import { geoNaturalEarth1, geoPath } from 'd3-geo';
 import { useTranslation } from 'react-i18next';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { SubsectionHeading } from '@/components/signal/subsection-heading';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { countryCounts, matchCountryName } from '@/lib/geo';
 import { useVisits } from '@/lib/api';
 import { byNewest, EMPTY_POINTS } from '@/lib/points';
@@ -37,9 +38,9 @@ export function LiveMap() {
   }, [counts]);
 
   return (
-    <Card>
+    <Card className="border-signal/20 bg-signal-muted/10">
       <CardHeader>
-        <CardTitle>{t('dashboard:liveMap.title')}</CardTitle>
+        <SubsectionHeading>{t('dashboard:liveMap.title')}</SubsectionHeading>
       </CardHeader>
       <CardContent>
         <svg

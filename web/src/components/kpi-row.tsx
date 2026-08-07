@@ -8,7 +8,7 @@ import { useMetricHistory } from '@/hooks/use-metric-history';
 
 function StatCardSkeleton() {
   return (
-    <Card>
+    <Card className="border-signal/20 bg-signal-muted/10">
       <CardHeader className="flex-row items-center justify-between gap-2 space-y-0 pb-2">
         <Skeleton className="h-4 w-24" />
         <Skeleton className="size-4 rounded-full" />

@@ -1,14 +1,13 @@
-import { createFileRoute } from '@tanstack/react-router';
+import { Link, createFileRoute } from '@tanstack/react-router';
+import { ArrowRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { AskChips } from '@/components/ask/ask-chips';
 import { EngineeringShowcase } from '@/components/home/engineering-showcase';
 import { Hero } from '@/components/home/hero';
 import { EventFeed } from '@/components/event-feed';
 import { KpiRow } from '@/components/kpi-row';
 import { LiveMap } from '@/components/live-map';
-import { Reactions } from '@/components/reactions';
-import { RecentVisitsTable } from '@/components/recent-visits-table';
-import { VisitsChart } from '@/components/visits-chart';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { SectionEyebrow } from '@/components/signal/section-eyebrow';
 import { useVisitFeed } from '@/hooks/use-visit-feed';
 
 export const Route = createFileRoute('/')({
@@ -16,10 +15,11 @@ export const Route = createFileRoute('/')({
 });
 
 function Index() {
-  const { t } = useTranslation(['home', 'dashboard']);
+  const { t } = useTranslation('home');
   // Mounted once here: bridges polled visit data into the live event store
-  // that both the hero's engineering showcase and the dashboard's EventFeed
-  // read from.
+  // that both the hero's engineering showcase and this page's own EventFeed
+  // (below, in the live-proof block) read from. /live mounts its own
+  // instance for when that route is the one on screen instead.
   useVisitFeed();
 
   return (
@@ -40,11 +40,42 @@ function Index() {
         <EngineeringShowcase />
       </div>
 
-      <section className="px-6 py-16 sm:px-10 md:py-20">
+      {/*
+        Portfolio-first home (visual coherence Task 2): the full ops-console
+        widget stack (RecentVisitsTable, VisitsChart)
+        moved to /live — a 2126px dashboard was over half the page and read
+        as an ops console bolted onto a portfolio. What stays here is a
+        compact, self-contained "live proof" slice: the map + 2 real stats +
+        the event stream, pointing at /live for anyone who wants the rest.
+        "Send a pulse" (the old docked Reactions widget's replacement) lives
+        in EngineeringShowcase above, next to the diagram it animates —
+        proving the pipeline is not this block's job.
+
+        `dark` is pinned here like every other content surface (hero, showcase,
+        about, projects, /live) so these widgets never render light while the
+        sections above stay dark — that split is exactly the two-systems
+        problem this pass removed. It also keeps `text-signal` on a dark
+        ground, where it meets AA.
+      */}
+      <section className="dark bg-background px-6 py-16 text-foreground sm:px-10 md:py-20">
         <div className="mx-auto flex w-full max-w-5xl flex-col gap-6">
-          <h2 className="text-2xl font-semibold tracking-tight text-foreground">
-            {t('home:dashboard.heading')}
-          </h2>
+          <SectionEyebrow>{t('home:liveProof.eyebrow')}</SectionEyebrow>
+
+          <div className="flex flex-wrap items-end justify-between gap-4">
+            <div className="flex flex-col gap-2">
+              <h2 className="text-2xl font-semibold tracking-tight text-foreground">
+                {t('home:liveProof.heading')}
+              </h2>
+              <p className="max-w-prose text-sm text-muted-foreground">{t('home:liveProof.description')}</p>
+            </div>
+            <Link
+              to="/live"
+              className="inline-flex shrink-0 items-center gap-1.5 text-sm font-medium text-signal hover:underline"
+            >
+              {t('home:liveProof.cta')}
+              <ArrowRight className="size-4" aria-hidden="true" />
+            </Link>
+          </div>
 
           <KpiRow />
 
@@ -52,50 +83,24 @@ function Index() {
             <div className="lg:col-span-2">
               <LiveMap />
             </div>
-            <RecentVisitsTable />
-          </div>
-
-          <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-            <VisitsChart />
             <EventFeed />
           </div>
         </div>
       </section>
 
       {/*
-        Ask widget's floating trigger (ask-widget.tsx) is anchored
-        `fixed right-6 bottom-6`. Two things keep this card from colliding
-        with it, not just the opposite `left-6` anchor:
-
-        1. `max-w-[216px]` caps this card's width everywhere. Left
-           unconstrained, `Card`/`CardHeader`/`CardContent` have no width of
-           their own, so the 8-icon `Reactions` row (flex-wrap, ~344px of
-           unwrapped content) sizes the card up to its max-content width —
-           216px forces it to wrap to 4 icons/row instead, which also bounds
-           how far its right edge can reach on the shared bottom row above
-           `md:`.
-        2. Below `md:` (768px) it sits at `top-24 left-6` instead — off the
-           bottom row entirely, so on real phone widths (320–414px, where
-           the Ask trigger's own text can already approach the full
-           viewport width) there's no shared row to collide on in the first
-           place. `top-24` (96px) clears the sticky header (~60–64px tall)
-           with margin to spare. From `md:` up there's enough width for
-           both the capped card and the trigger on the same bottom row —
-           see the space math in task-5-report.md's "Fix round 1" section.
-
-        routes/index.test.tsx locks all of this: the left/right corner
-        classes, the width cap, and the mobile top-position classes.
+        Ask chips (visual coherence Task 2): right after the live-proof
+        block, the recruiter has just watched the system prove itself —
+        this is the highest-attention moment to offer the actual
+        conversation. Kept as its own quiet section (not stacked inside
+        live-proof) so it doesn't get lost as "just another stat"; `dark`
+        for the same reason as every other content surface on this page.
       */}
-      <div className="fixed top-24 left-6 z-50 max-w-[216px] md:top-auto md:bottom-6">
-        <Card className="border-signal/20 shadow-lg">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm">{t('dashboard:reactions.title')}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Reactions />
-          </CardContent>
-        </Card>
-      </div>
+      <section className="dark bg-background px-6 py-12 text-foreground sm:px-10">
+        <div className="mx-auto w-full max-w-5xl">
+          <AskChips />
+        </div>
+      </section>
     </div>
   );
 }

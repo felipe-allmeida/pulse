@@ -14,12 +14,18 @@ interface ProjectCardProps {
 }
 
 /**
- * The signal project card: screenshot slot, title + mono-aqua tagline,
- * description, tech chips, role/period line. The whole card is a stretched
- * link to its dedicated `/projects/$slug` page — the external links (only
- * for `visibility: 'public'`) sit above the overlay so they stay
- * independently clickable rather than nesting an `<a>` inside an `<a>`.
- * `pulse` renders with the ambient featured glow.
+ * The signal project card: a content-led layout — title + sans tagline,
+ * description, tech chips, role/period line carry the visual weight, not an
+ * empty media box. Tagline/description are prose (sans, not aqua — aqua
+ * stays an accent, used on the featured whisper and hover states, not as a
+ * body-text color); the tech chips and role/period line stay mono, they're
+ * data. When `project.screenshot` is set, the real image renders up top;
+ * otherwise a thin signal accent rule stands in for it — never a giant void.
+ * The whole card is a stretched link to its dedicated `/projects/$slug`
+ * page — the external links (only for `visibility: 'public'`) sit above the
+ * overlay so they stay independently clickable rather than nesting an `<a>`
+ * inside an `<a>`. `pulse` renders with a tamed featured accent (a
+ * border/shadow whisper, not a neon halo).
  */
 export function ProjectCard({ project, className }: ProjectCardProps) {
   const { t } = useTranslation('projects');
@@ -31,15 +37,19 @@ export function ProjectCard({ project, className }: ProjectCardProps) {
       data-featured={featured}
       className={cn(
         'group relative flex flex-col gap-5 overflow-hidden rounded-2xl border border-signal/20 bg-signal-muted/10 p-6 transition-colors hover:border-signal/40',
-        featured && 'shadow-[0_0_60px_-15px_var(--color-signal)]',
+        featured && 'border-signal/30 shadow-[0_0_20px_-14px_var(--color-signal)]',
         className,
       )}
     >
-      <ProjectScreenshot glow={featured} />
+      <ProjectScreenshot
+        src={project.screenshot}
+        alt={t('projects:screenshotAlt', { name: project.name })}
+        glow={featured}
+      />
 
       <div className="flex flex-col gap-1">
         <h3 className="text-lg font-semibold text-foreground">{project.name}</h3>
-        <p className="font-mono text-xs text-signal sm:text-sm">{L(project.tagline)}</p>
+        <p className="text-sm font-medium text-foreground/80">{L(project.tagline)}</p>
       </div>
 
       <p className="text-sm text-muted-foreground">{L(project.description)}</p>

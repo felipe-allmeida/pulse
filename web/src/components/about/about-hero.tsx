@@ -25,12 +25,19 @@ export function AboutHero() {
 
         <div className="flex flex-1 flex-col gap-2">
           <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl">{profile.name}</h1>
-          <p className="font-mono text-sm text-signal sm:text-base">{L(profile.title)}</p>
-          <p className="max-w-xl font-mono text-xs text-signal/70 sm:text-sm">{L(profile.tagline)}</p>
+          {/*
+            Role + tagline: sans prose, same muted-foreground treatment as
+            the home Hero's identical pair (profile.title / profile.tagline)
+            — one visual tier, not two more fonts/colors stacked on top of
+            the name. The page's one aqua emphasis lives in the StatusPill
+            above, so this block stays quiet.
+          */}
+          <p className="text-lg font-medium text-muted-foreground sm:text-xl">{L(profile.title)}</p>
+          <p className="max-w-[65ch] text-base text-muted-foreground">{L(profile.tagline)}</p>
         </div>
       </div>
 
-      <p className="max-w-2xl text-base leading-relaxed text-muted-foreground">{L(profile.bio)}</p>
+      <p className="max-w-[65ch] text-base leading-relaxed text-muted-foreground">{L(profile.bio)}</p>
 
       <div>
         <CvButton className="h-10 px-6" />
