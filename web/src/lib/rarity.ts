@@ -1,12 +1,13 @@
-import type { ClientSignals } from '@/lib/client-signals';
+import type { BrowserName, ClientSignals, OperatingSystem } from '@/lib/client-signals';
 import type { VisitorContext } from '@/types/pulse';
 
 /**
- * One dimension of "how unusual are you", with the provenance of its number
- * attached. `measured` values come from this site's own visit history;
- * `estimated` ones come from public browser-population figures and are
- * ballpark. The page labels them differently — a fabricated statistic
- * presented as fact would undercut the entire argument it is making.
+ * One row of the receipt, with the provenance of its number attached.
+ *
+ * `measured` comes from this site's own visit history. `published` comes from
+ * public web-population market share. The page labels them differently on
+ * purpose — presenting an estimate as a measurement would undercut the whole
+ * argument the page is making.
  */
 export type RarityDimension = {
   key: string;
@@ -14,7 +15,7 @@ export type RarityDimension = {
   value: string;
   /** Share of people expected to match, in (0, 1]. */
   share: number;
-  source: 'measured' | 'estimated';
+  source: 'measured' | 'published';
 };
 
 export type Rarity = {
@@ -28,138 +29,155 @@ export type Rarity = {
 };
 
 /**
- * Rough shares of the global browser population, used only where this site has
- * no measurement of its own.
+ * Rounded global web-population shares, in the ballpark of what StatCounter and
+ * similar trackers publish. Deliberately coarse: reporting "18.4%" would imply
+ * a precision this page has not earned, so everything here is rounded to
+ * something a reader can sanity-check.
  *
- * These are order-of-magnitude figures, not survey data, and the page says so.
- * They are also the honest weak point of every "you are 1 in N" widget on the
- * web: the multiplication assumes the dimensions are independent, which they
- * are not (language and timezone correlate heavily, for one). The result
- * overstates uniqueness — which the copy admits rather than hides.
+ * These describe the whole web, not this site's audience, and the page says so.
+ * The one figure that *is* measured — how many of this page's own visitors came
+ * from your city — is computed from the visit history instead.
  */
-const ESTIMATED_SHARES = {
-  /** A common desktop resolution vs. anything else. */
-  commonResolution: 0.08,
-  uncommonResolution: 0.01,
-  /** English-speaking browsers vs. any other single language. */
-  englishLanguage: 0.25,
-  otherLanguage: 0.04,
-  /** A major timezone vs. a minor one. */
-  timeZone: 0.03,
-  /** Touch-capable devices. */
-  touch: 0.55,
-  noTouch: 0.45,
-  /** Do Not Track is off for the overwhelming majority. */
-  dntOff: 0.9,
-  dntOn: 0.1,
-  /** Reported core counts cluster hard on 4/8. */
-  commonCores: 0.35,
-  unusualCores: 0.05,
-} as const;
+const OS_SHARES: Record<OperatingSystem, number> = {
+  Android: 0.44,
+  Windows: 0.24,
+  iOS: 0.18,
+  macOS: 0.06,
+  Linux: 0.02,
+  unknown: 0.06,
+};
 
-const COMMON_RESOLUTIONS = new Set(['1920x1080', '1366x768', '1536x864', '2560x1440', '1440x900']);
-const COMMON_CORE_COUNTS = new Set([4, 8]);
+const BROWSER_SHARES: Record<BrowserName, number> = {
+  Chrome: 0.65,
+  Safari: 0.18,
+  Edge: 0.05,
+  Firefox: 0.025,
+  'Samsung Internet': 0.02,
+  Opera: 0.02,
+  unknown: 0.045,
+};
+
+/** Rough share of web users whose browser is set to each language. */
+const LANGUAGE_SHARES: Record<string, number> = {
+  en: 0.25,
+  zh: 0.13,
+  es: 0.06,
+  hi: 0.05,
+  pt: 0.04,
+  ar: 0.04,
+  ru: 0.035,
+  ja: 0.03,
+  de: 0.03,
+  fr: 0.03,
+  id: 0.02,
+  it: 0.02,
+};
+/** Anything outside the list above is rarer than the least common entry in it. */
+const OTHER_LANGUAGE_SHARE = 0.01;
+
+/**
+ * Timezones are long-tailed: a handful hold most of the population. These are
+ * the crowded ones; everything else is treated as the tail.
+ */
+const CROWDED_TIME_ZONES: Record<string, number> = {
+  'Asia/Shanghai': 0.12,
+  'Asia/Kolkata': 0.1,
+  'America/New_York': 0.05,
+  'Europe/London': 0.03,
+  'Europe/Berlin': 0.025,
+  'America/Sao_Paulo': 0.025,
+  'America/Chicago': 0.025,
+  'Asia/Tokyo': 0.02,
+  'America/Los_Angeles': 0.02,
+  'Europe/Moscow': 0.02,
+  'Europe/Paris': 0.02,
+  'Asia/Jakarta': 0.02,
+};
+const OTHER_TIME_ZONE_SHARE = 0.005;
+
+/** The resolutions that actually cluster; everything else is long-tail. */
+const COMMON_RESOLUTIONS: Record<string, number> = {
+  '1920x1080': 0.09,
+  '1366x768': 0.05,
+  '1536x864': 0.03,
+  '390x844': 0.03,
+  '393x852': 0.025,
+  '1280x720': 0.02,
+  '2560x1440': 0.02,
+  '414x896': 0.02,
+  '1440x900': 0.02,
+  '360x800': 0.02,
+};
+const OTHER_RESOLUTION_SHARE = 0.005;
+
+const CORE_COUNT_SHARES: Record<number, number> = { 2: 0.1, 4: 0.3, 6: 0.1, 8: 0.3, 12: 0.05, 16: 0.03 };
+const OTHER_CORE_COUNT_SHARE = 0.02;
+
+const TOUCH_SHARE = 0.55;
+const NO_TOUCH_SHARE = 0.45;
+const DNT_ON_SHARE = 0.08;
+const DNT_OFF_SHARE = 0.92;
 
 function clampShare(share: number): number {
   // Never 0 (an infinite "1 in N") and never above 1 (a share, not a count).
-  return Math.min(1, Math.max(1e-9, share));
+  return Math.min(1, Math.max(1e-12, share));
 }
 
-/**
- * Builds the dimensions for a visitor, skipping any signal the browser withheld
- * rather than guessing a value for it.
- */
+/** Builds the receipt, skipping any signal the browser withheld rather than guessing at it. */
 export function rarityOf(signals: ClientSignals, visitor?: VisitorContext): Rarity {
   const dimensions: RarityDimension[] = [];
 
-  // Measured, not estimated: this is literally how many of this page's own
-  // visitors came from the same city.
-  if (visitor?.geo && visitor.totalVisits > 0) {
-    dimensions.push({
-      key: 'city',
-      value: visitor.geo.city,
-      // +1 counts the visitor themselves, so a first-ever city reads as
-      // 1-of-total instead of a divide-by-zero certainty.
-      share: clampShare((visitor.cityVisits + 1) / (visitor.totalVisits + 1)),
-      source: 'measured',
-    });
-  }
+  const push = (key: string, value: string, share: number, source: RarityDimension['source'] = 'published') =>
+    dimensions.push({ key, value, share: clampShare(share), source });
+
+  if (signals.os !== 'unknown') push('os', signals.os, OS_SHARES[signals.os]);
+  if (signals.browser !== 'unknown') push('browser', signals.browser, BROWSER_SHARES[signals.browser]);
 
   if (signals.language && signals.language !== 'unknown') {
-    dimensions.push({
-      key: 'language',
-      value: signals.language,
-      share: signals.language.toLowerCase().startsWith('en')
-        ? ESTIMATED_SHARES.englishLanguage
-        : ESTIMATED_SHARES.otherLanguage,
-      source: 'estimated',
-    });
+    const base = signals.language.split('-')[0].toLowerCase();
+    push('language', signals.language, LANGUAGE_SHARES[base] ?? OTHER_LANGUAGE_SHARE);
   }
 
   if (signals.timeZone) {
-    dimensions.push({
-      key: 'timeZone',
-      value: signals.timeZone,
-      share: ESTIMATED_SHARES.timeZone,
-      source: 'estimated',
-    });
+    push('timeZone', signals.timeZone, CROWDED_TIME_ZONES[signals.timeZone] ?? OTHER_TIME_ZONE_SHARE);
   }
 
   if (signals.screenWidth && signals.screenHeight) {
-    const resolution = `${signals.screenWidth}x${signals.screenHeight}`;
-    dimensions.push({
-      key: 'resolution',
-      value: resolution,
-      share: COMMON_RESOLUTIONS.has(resolution)
-        ? ESTIMATED_SHARES.commonResolution
-        : ESTIMATED_SHARES.uncommonResolution,
-      source: 'estimated',
-    });
+    const resolution = `${signals.screenWidth}×${signals.screenHeight}`;
+    const key = `${signals.screenWidth}x${signals.screenHeight}`;
+    push('resolution', resolution, COMMON_RESOLUTIONS[key] ?? OTHER_RESOLUTION_SHARE);
   }
 
   if (signals.cores !== null) {
-    dimensions.push({
-      key: 'cores',
-      value: String(signals.cores),
-      share: COMMON_CORE_COUNTS.has(signals.cores)
-        ? ESTIMATED_SHARES.commonCores
-        : ESTIMATED_SHARES.unusualCores,
-      source: 'estimated',
-    });
+    push('cores', String(signals.cores), CORE_COUNT_SHARES[signals.cores] ?? OTHER_CORE_COUNT_SHARE);
   }
 
   if (signals.touchPoints !== null) {
     const touch = signals.touchPoints > 0;
-    dimensions.push({
-      key: 'touch',
-      value: touch ? 'touch' : 'no-touch',
-      share: touch ? ESTIMATED_SHARES.touch : ESTIMATED_SHARES.noTouch,
-      source: 'estimated',
-    });
+    push('touch', touch ? 'touch' : 'no-touch', touch ? TOUCH_SHARE : NO_TOUCH_SHARE);
   }
 
   if (signals.doNotTrack !== null) {
-    dimensions.push({
-      key: 'doNotTrack',
-      value: signals.doNotTrack ? 'on' : 'off',
-      share: signals.doNotTrack ? ESTIMATED_SHARES.dntOn : ESTIMATED_SHARES.dntOff,
-      source: 'estimated',
-    });
+    push('doNotTrack', signals.doNotTrack ? 'on' : 'off', signals.doNotTrack ? DNT_ON_SHARE : DNT_OFF_SHARE);
+  }
+
+  // The only measured row on the receipt: how many of this page's own visitors
+  // came from the same city. Placed last so the table ends on the one number
+  // that is not an estimate.
+  if (visitor?.geo && visitor.totalVisits > 0) {
+    // +1 counts the visitor themselves, so a first-ever city reads as
+    // 1-of-total instead of a divide-by-zero certainty.
+    push('city', visitor.geo.city, (visitor.cityVisits + 1) / (visitor.totalVisits + 1), 'measured');
   }
 
   const share = clampShare(dimensions.reduce((acc, d) => acc * d.share, 1));
-  return {
-    dimensions,
-    share,
-    oneIn: Math.round(1 / share),
-    bits: Math.log2(1 / share),
-  };
+  return { dimensions, share, oneIn: Math.round(1 / share), bits: Math.log2(1 / share) };
 }
 
 /**
- * The running "1 in N" after each dimension is folded in — the page shows this
- * cumulatively, because watching common traits multiply into a unique one is
- * the argument, not the final number on its own.
+ * The running "1 in N" after each row is folded in. The page shows this
+ * cumulatively, because watching common traits compound into a unique one is
+ * the argument — the final number alone is just a big number.
  */
 export function cumulativeOneIn(dimensions: RarityDimension[]): number[] {
   const running: number[] = [];

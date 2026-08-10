@@ -118,14 +118,28 @@ The turn is the point. A reveal that stops at "look what I can see" is an
 argument about surveillance; ending on the record that *cannot* carry an IP
 makes it an argument about engineering.
 
+The receipt table multiplies out OS, browser, language, timezone, resolution,
+cores, touch and DNT into a running "1 in N", and closes on the one row that
+isn't an estimate — the share of this page's own visitors who came from the
+same city. Then the bid request: a real OpenRTB 2.6 message built from those
+same readings, with `user.data.segment` left as the placeholder a data broker
+fills with inferred intent ("in-market for a car", "new parent"). That field is
+the point of the section — it's the part that actually sells, and the only part
+the person it describes can't see.
+
 What it deliberately does not do, though all of it would work: no WebRTC
 public-IP discovery, no canvas/WebGL/audio hashing or font probing, no stored
-fingerprint, no persistence of any kind. The digest it displays is computed for
-the reader to look at and thrown away — there is no second-visit recognition,
-which is exactly what the copy claims. Only one rarity row (`city`) is real
-data, measured from this site's own history; the rest are labelled estimates,
-and the page states plainly that multiplying them overstates uniqueness because
-the dimensions aren't independent.
+fingerprint, no persistence of any kind. `device.ip` in the bid request is
+withheld rather than printed — a real exchange receives it, this page reads it
+once for the city lookup and drops it. The digest it displays is computed for
+the reader and thrown away, so there is no second-visit recognition, which is
+exactly what the copy claims.
+
+On the numbers: every share except `city` is a rounded slice of published
+web-population market share, labelled as such, and the page states plainly that
+multiplying them overstates uniqueness because the dimensions aren't
+independent. It then makes the sharper point — that overstating barely matters,
+since tracking needs to be consistent rather than accurate.
 
 ## Privacy by design
 
