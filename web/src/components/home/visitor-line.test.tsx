@@ -1,6 +1,14 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { screen } from '@testing-library/react';
+import {
+  RouterProvider,
+  createMemoryHistory,
+  createRootRoute,
+  createRoute,
+  createRouter,
+} from '@tanstack/react-router';
 import { renderWithI18n } from '@/test/render-with-i18n';
+import type { Locale } from '@/content/types';
 import type { VisitorContext } from '@/types/pulse';
 
 const useMetricsMock = vi.fn(() => ({ data: { activeConnections: 3, totalVisits: 1246 } }));
@@ -12,6 +20,24 @@ vi.mock('@/lib/api', () => ({
 }));
 
 const { VisitorLine } = await import('./visitor-line');
+
+/**
+ * VisitorLine links to /watched, so it needs a router in context. The tree is
+ * the minimum that resolves that link plus the route it renders on.
+ */
+async function renderVisitorLine(locale?: Locale) {
+  const rootRoute = createRootRoute({ component: () => <VisitorLine /> });
+  const indexRoute = createRoute({ getParentRoute: () => rootRoute, path: '/', component: () => null });
+  const watchedRoute = createRoute({ getParentRoute: () => rootRoute, path: '/watched', component: () => null });
+  const routeTree = rootRoute.addChildren([indexRoute, watchedRoute]);
+  const router = createRouter({ routeTree, history: createMemoryHistory({ initialEntries: ['/'] }) });
+
+  const result = await renderWithI18n(<RouterProvider router={router} />, { locale });
+  // The router resolves its route asynchronously, so settle here once and let
+  // every assertion below stay synchronous.
+  await screen.findByTestId('visitor-line');
+  return result;
+}
 
 function mockMatchMedia(matches: boolean) {
   window.matchMedia = vi.fn().mockImplementation((query: string) => ({
@@ -45,7 +71,7 @@ describe('VisitorLine', () => {
   });
 
   it('says nothing personal until the visitor context arrives', async () => {
-    await renderWithI18n(<VisitorLine />);
+    await renderVisitorLine();
 
     // The generic hook, not a half-built greeting — this is also what a crawler
     // or a JS-less client is left with.
@@ -56,7 +82,7 @@ describe('VisitorLine', () => {
   it('greets the visitor by city with their position once loaded', async () => {
     useVisitorMock.mockReturnValue({ data: visitor() });
 
-    await renderWithI18n(<VisitorLine />);
+    await renderVisitorLine();
 
     expect(screen.getByTestId('visitor-line')).toHaveAttribute('data-state', 'personal');
     // 1,246 stored visits + this one, formatted as an English ordinal.
@@ -67,7 +93,7 @@ describe('VisitorLine', () => {
   it('leads with the rarest true fact rather than the position', async () => {
     useVisitorMock.mockReturnValue({ data: visitor({ cityVisits: 0, lastCityVisitAt: null }) });
 
-    await renderWithI18n(<VisitorLine />);
+    await renderVisitorLine();
 
     expect(lineText()).toContain('first person from there');
     expect(lineText()).not.toContain('1,247th');
@@ -76,7 +102,7 @@ describe('VisitorLine', () => {
   it('claims the map dot only when the visitor is actually on the map', async () => {
     useVisitorMock.mockReturnValue({ data: visitor({ geo: null }) });
 
-    await renderWithI18n(<VisitorLine />);
+    await renderVisitorLine();
 
     // No geo means no origin point was drawn, so pointing at one would be a lie.
     expect(lineText()).not.toContain('dot behind this text');
@@ -86,7 +112,7 @@ describe('VisitorLine', () => {
   it('never names a city it could not resolve', async () => {
     useVisitorMock.mockReturnValue({ data: visitor({ geo: null }) });
 
-    await renderWithI18n(<VisitorLine />);
+    await renderVisitorLine();
 
     expect(lineText()).not.toContain('undefined');
     expect(lineText()).toContain("You're the");
@@ -96,7 +122,7 @@ describe('VisitorLine', () => {
     mockMatchMedia(true);
     useVisitorMock.mockReturnValue({ data: visitor() });
 
-    await renderWithI18n(<VisitorLine />);
+    await renderVisitorLine();
 
     // The map draws a single static frame under reduced motion, so nothing pulses.
     expect(lineText()).toContain('lit dot behind this text');
@@ -106,7 +132,7 @@ describe('VisitorLine', () => {
   it('translates the whole greeting, ordinal included', async () => {
     useVisitorMock.mockReturnValue({ data: visitor() });
 
-    await renderWithI18n(<VisitorLine />, { locale: 'pt-BR' });
+    await renderVisitorLine('pt-BR');
 
     expect(lineText()).toContain('1.247ª');
     expect(lineText()).toContain('Nenhum cookie');
@@ -119,7 +145,7 @@ describe('VisitorLine', () => {
       }),
     });
 
-    await renderWithI18n(<VisitorLine />);
+    await renderVisitorLine();
 
     expect(lineText()).toContain('Lisbon');
     expect(lineText()).toContain('3 hours ago');
@@ -133,11 +159,11 @@ describe('VisitorLine', () => {
     });
     useVisitorMock.mockReturnValue({ data });
 
-    const first = await renderWithI18n(<VisitorLine />);
+    const first = await renderVisitorLine();
     const firstText = lineText();
     first.unmount();
 
-    await renderWithI18n(<VisitorLine />);
+    await renderVisitorLine();
 
     expect(lineText()).not.toBe(firstText);
   });
@@ -148,7 +174,7 @@ describe('VisitorLine', () => {
     });
     useVisitorMock.mockReturnValue({ data: visitor() });
 
-    await renderWithI18n(<VisitorLine />);
+    await renderVisitorLine();
 
     expect(screen.getByTestId('visitor-line')).toHaveAttribute('data-state', 'personal');
     getItem.mockRestore();

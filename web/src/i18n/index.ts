@@ -9,6 +9,7 @@ import enDashboard from './locales/en/dashboard.json';
 import enHome from './locales/en/home.json';
 import enNav from './locales/en/nav.json';
 import enProjects from './locales/en/projects.json';
+import enWatched from './locales/en/watched.json';
 import ptAbout from './locales/pt-BR/about.json';
 import ptAsk from './locales/pt-BR/ask.json';
 import ptCommon from './locales/pt-BR/common.json';
@@ -17,6 +18,7 @@ import ptDashboard from './locales/pt-BR/dashboard.json';
 import ptHome from './locales/pt-BR/home.json';
 import ptNav from './locales/pt-BR/nav.json';
 import ptProjects from './locales/pt-BR/projects.json';
+import ptWatched from './locales/pt-BR/watched.json';
 
 export const resources = {
   en: {
@@ -28,6 +30,7 @@ export const resources = {
     ask: enAsk,
     home: enHome,
     contact: enContact,
+    watched: enWatched,
   },
   'pt-BR': {
     common: ptCommon,
@@ -38,6 +41,7 @@ export const resources = {
     ask: ptAsk,
     home: ptHome,
     contact: ptContact,
+    watched: ptWatched,
   },
 } as const;
 
@@ -50,7 +54,7 @@ i18n
     supportedLngs: ['en', 'pt-BR'],
     load: 'currentOnly',
     defaultNS: 'common',
-    ns: ['common', 'nav', 'about', 'projects', 'dashboard', 'ask', 'home', 'contact'],
+    ns: ['common', 'nav', 'about', 'projects', 'dashboard', 'ask', 'home', 'contact', 'watched'],
     interpolation: { escapeValue: false },
     detection: {
       order: ['localStorage', 'navigator'],

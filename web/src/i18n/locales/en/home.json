@@ -25,7 +25,8 @@
     },
     "dot": "That pulsing dot behind this text is you.",
     "dotStatic": "That lit dot behind this text is you.",
-    "noCookie": "No cookie, no permission, nothing stored."
+    "noCookie": "No cookie, no permission, nothing stored.",
+    "how": "How do I know that?"
   },
   "cta": {
     "projects": "See the projects",
