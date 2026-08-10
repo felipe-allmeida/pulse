@@ -36,7 +36,7 @@ const DAY_MS = 86_400_000;
  * high would make it win nearly every time and flatten the rotation that
  * `index` exists to drive.
  */
-function eligibleFacts(ctx: VisitorContext, now: number): VisitorFact[] {
+export function eligibleFacts(ctx: VisitorContext, now: number = Date.now()): VisitorFact[] {
   const facts: VisitorFact[] = [];
   // The stored counts stop at the visit before this one — see VisitorContext.
   const position = ctx.totalVisits + 1;

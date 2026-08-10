@@ -1,0 +1,74 @@
+{
+  "eyebrow": "/watched",
+  "heading": "What I already know about you",
+  "intro": "You clicked nothing. You accepted no banner, granted no permission, and no cookie was set. This page still opened knowing a few things. They're worth looking at — not because this site is creepy, but because the next one you open can do all of it too, and won't tell you.",
+
+  "history": {
+    "heading": "what I knew before you scrolled",
+    "lede": "None of this came from your browser. It came from this site's own visit history — the same history the home page greets you with. Every one of these is true right now:",
+    "empty": "I couldn't load this visit's history yet.",
+    "note": "The home page picks one of these at a time, the least likely one that happens to be true, and a reload moves to the next. Here they all are at once.",
+    "fact": {
+      "firstEver": "You're the <strong>first person</strong> ever to open this page.",
+      "firstFromCity": "You're the first person from <strong>{{city}}</strong> ever to open this page.",
+      "firstFromCityInDays": "You're the first person from <strong>{{city}}</strong> in <strong>{{days}} days</strong>.",
+      "milestone": "You're exactly the <strong>{{position}}</strong> person to open this page.",
+      "recent24h": "You're the <strong>{{position}}</strong> person here in the last 24 hours.",
+      "previous": "The last person before you arrived from <strong>{{previousCity}}</strong>, {{when}}.",
+      "position": "You're the <strong>{{position}}</strong> person to open this page."
+    }
+  },
+
+  "signals": {
+    "heading": "what your browser volunteered",
+    "lede": "These are straight reads of public properties. Not one of them triggers a permission prompt, which is exactly why no site has to mention it is reading them:",
+    "language": "Languages",
+    "timeZone": "Time zone",
+    "screen": "Screen",
+    "cores": "CPU cores (as reported)",
+    "memory": "Memory (approximate)",
+    "touch": "Touch",
+    "touchYes": "touchscreen ({{count}} points)",
+    "touchNo": "no touchscreen",
+    "platform": "Platform",
+    "theme": "System theme",
+    "theme_dark": "dark",
+    "theme_light": "light",
+    "doNotTrack": "Do Not Track",
+    "dntOn": "on",
+    "dntOff": "off",
+    "dntUnset": "not stated",
+    "note": "A private window would change none of this. Every reading above works exactly the same in one — that anonymity is from your own history, not from the site."
+  },
+
+  "rarity": {
+    "heading": "how rare that makes you",
+    "lede": "Each item on its own is common. Watch what happens as they multiply:",
+    "dimension": {
+      "city": "City",
+      "language": "Primary language",
+      "timeZone": "Time zone",
+      "resolution": "Screen resolution",
+      "cores": "CPU cores",
+      "touch": "Touch",
+      "doNotTrack": "Do Not Track"
+    },
+    "measured": "measured",
+    "oneIn": "1 in {{value}}",
+    "total": "Putting it together: roughly <strong>1 in {{value}}</strong> browsers look like yours — <strong>{{bits}} bits</strong> of entropy. None of it used a cookie.",
+    "fingerprint": "this visit's fingerprint: {{hash}}",
+    "caveat": "Being honest about the arithmetic: only the row marked \"measured\" comes from this site's real data (how many of its visitors came from your city). The rest are rough browser-population estimates, and the multiplication pretends the dimensions are independent — they aren't: language and time zone travel together, for one. So this number overstates you. The uncomfortable part is that overstating barely matters: tracking doesn't need to be accurate, it needs to be consistent. If your browser gets something wrong the same way every time, the mistake itself becomes part of your identity."
+  },
+
+  "kept": {
+    "heading": "and what I actually kept",
+    "lede": "Here's the turn. Everything above was to show what could be done. This is what this system does. When you opened the home page, a single event crossed every process boundary here — this one, copied from the source:",
+    "noIp": "Notice what <strong>isn't</strong> in that record: there is no IP field. That isn't a promise or a scrubbing step — it's the type. The IP is read once to find the city and dies as a local variable; there is nowhere for it to go afterwards, because no field exists to carry it.",
+    "presence": "Presence — who's online right now — lives only in a Redis set with an expiry. Close the tab and the entry expires on its own. There is no record of who was here, only the count.",
+    "thisPage": "And this page stored nothing at all. No cookie, no storage, no requests beyond the readings above. That fingerprint was computed for you to look at and thrown away — I didn't keep it, so I have no way to recognise you when you come back.",
+    "liveLink": "See what's left of you →",
+    "homeLink": "Back to the start"
+  },
+
+  "outro": "None of this is sophisticated. It's the floor of what any page can do, and most do — except they also store it, join it to third-party cookies, and sell the result in an auction that takes a tenth of a second. The part worth minding isn't that this much is knowable. It's that nobody is obliged to tell you."
+}

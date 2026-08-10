@@ -1,0 +1,74 @@
+{
+  "eyebrow": "/watched",
+  "heading": "O que eu já sei sobre você",
+  "intro": "Você não clicou em nada. Não aceitou nenhum banner, não deu nenhuma permissão, e nenhum cookie foi gravado. Mesmo assim, esta página abriu sabendo algumas coisas. Vale ver quais — não porque este site seja invasivo, mas porque o próximo que você abrir pode fazer exatamente o mesmo, e não vai te contar.",
+
+  "history": {
+    "heading": "o que eu sabia antes de você rolar a página",
+    "lede": "Nada aqui veio do seu navegador. Veio do histórico de visitas deste site — o mesmo que a página inicial usa para te dar bom dia. Cada uma destas frases é verdade agora:",
+    "empty": "Ainda não consegui carregar o histórico desta visita.",
+    "note": "A página inicial escolhe uma dessas por vez, a mais improvável que estiver valendo, e recarregar troca para a próxima. Aqui estão todas de uma vez.",
+    "fact": {
+      "firstEver": "Você é a <strong>primeira pessoa</strong> a abrir esta página.",
+      "firstFromCity": "Você é a primeira pessoa de <strong>{{city}}</strong> a abrir esta página.",
+      "firstFromCityInDays": "Você é a primeira pessoa de <strong>{{city}}</strong> em <strong>{{days}} dias</strong>.",
+      "milestone": "Você é exatamente a <strong>{{position}}</strong> pessoa a abrir esta página.",
+      "recent24h": "Você é a <strong>{{position}}</strong> pessoa aqui nas últimas 24 horas.",
+      "previous": "A última pessoa antes de você chegou de <strong>{{previousCity}}</strong>, {{when}}.",
+      "position": "Você é a <strong>{{position}}</strong> pessoa a abrir esta página."
+    }
+  },
+
+  "signals": {
+    "heading": "o que o seu navegador entregou sem eu pedir",
+    "lede": "Estas são leituras diretas de propriedades públicas. Nenhuma delas abre um pedido de permissão, e é por isso que nenhum site precisa avisar que está lendo:",
+    "language": "Idiomas",
+    "timeZone": "Fuso horário",
+    "screen": "Tela",
+    "cores": "Núcleos de CPU (declarados)",
+    "memory": "Memória (aproximada)",
+    "touch": "Toque",
+    "touchYes": "tela sensível ao toque ({{count}} pontos)",
+    "touchNo": "sem tela sensível ao toque",
+    "platform": "Plataforma",
+    "theme": "Tema do sistema",
+    "theme_dark": "escuro",
+    "theme_light": "claro",
+    "doNotTrack": "Do Not Track",
+    "dntOn": "ligado",
+    "dntOff": "desligado",
+    "dntUnset": "não informado",
+    "note": "Uma janela anônima não mudaria nada disso. Todas essas leituras funcionam igual lá dentro — o anonimato ali é em relação ao seu próprio histórico, não em relação ao site."
+  },
+
+  "rarity": {
+    "heading": "o quanto isso te torna raro",
+    "lede": "Cada item sozinho é comum. Repare no que acontece quando eles se multiplicam:",
+    "dimension": {
+      "city": "Cidade",
+      "language": "Idioma principal",
+      "timeZone": "Fuso horário",
+      "resolution": "Resolução de tela",
+      "cores": "Núcleos de CPU",
+      "touch": "Toque",
+      "doNotTrack": "Do Not Track"
+    },
+    "measured": "medido",
+    "oneIn": "1 em {{value}}",
+    "total": "Somando tudo: cerca de <strong>1 em {{value}}</strong> navegadores se parecem com o seu — <strong>{{bits}} bits</strong> de entropia. Sem nenhum cookie.",
+    "fingerprint": "impressão digital desta visita: {{hash}}",
+    "caveat": "Sendo honesto com a conta: só a linha marcada como \"medido\" sai de dados reais deste site (quantos visitantes daqui vieram da sua cidade). O resto são estimativas grosseiras da população de navegadores, e a multiplicação finge que as dimensões são independentes — não são: idioma e fuso caminham juntos, por exemplo. Ou seja, esse número exagera. O detalhe desconfortável é que exagerar não importa muito: rastreamento não precisa estar certo, precisa estar consistente. Se o seu navegador erra sempre da mesma forma, o erro em si vira parte da sua identificação."
+  },
+
+  "kept": {
+    "heading": "e o que eu realmente guardei",
+    "lede": "Aqui a página vira. Tudo acima foi para mostrar o que dava para fazer. Isto é o que este sistema faz. Quando você abriu a página inicial, um único evento atravessou todos os processos daqui — este, copiado do código:",
+    "noIp": "Repare no que <strong>não existe</strong> nesse registro: não há campo de IP. Não é uma promessa nem uma limpeza posterior — é o tipo. O IP é lido uma vez para descobrir a cidade e morre como variável local; não há para onde ele ir depois, porque não existe campo que o carregue.",
+    "presence": "A presença — quem está online agora — vive só num conjunto no Redis com tempo de expiração. Você fecha a aba, o registro expira sozinho. Não existe histórico de quem esteve aqui, só a contagem.",
+    "thisPage": "E esta página aqui não gravou nada. Nenhum cookie, nenhum storage, nenhuma requisição fora as leituras acima. Aquela impressão digital foi calculada para você ver e descartada — não guardei, então não tenho como reconhecer você quando voltar.",
+    "liveLink": "Ver o que sobrou de você →",
+    "homeLink": "Voltar para o início"
+  },
+
+  "outro": "Nada disso é sofisticado. É o mínimo que qualquer página consegue fazer, e a maioria faz — com a diferença de que também grava, cruza com cookies de terceiros e vende o resultado num leilão que dura um décimo de segundo. A parte que deveria incomodar não é que dê para saber tanto assim, é que ninguém é obrigado a te avisar."
+}

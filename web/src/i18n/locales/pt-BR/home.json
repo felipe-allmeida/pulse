@@ -25,7 +25,8 @@
     },
     "dot": "Aquele ponto pulsando atrás deste texto é você.",
     "dotStatic": "Aquele ponto aceso atrás deste texto é você.",
-    "noCookie": "Nenhum cookie, nenhuma permissão, nada guardado."
+    "noCookie": "Nenhum cookie, nenhuma permissão, nada guardado.",
+    "how": "Como eu sei disso?"
   },
   "cta": {
     "projects": "Ver os projetos",

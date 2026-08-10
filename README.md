@@ -104,6 +104,29 @@ Deliberate constraints, because this is a portfolio and not a party trick:
   same coarse geo the map already used; no fingerprinting, no extra signal
   collection, no client-side probing.
 
+### `/watched` — the long version
+
+A quiet "How do I know that?" link under the hero opens the full page, so the
+reveal is opt-in rather than an ambush. It escalates — the whole stack of true
+history facts, then the readings the browser volunteers with no prompt
+(language, timezone, screen, cores, touch, DNT), then those common traits
+multiplied into a "1 in N" — and then turns hard into what this system
+actually keeps: the `VisitStarted` record with no IP field, the Redis TTL that
+erases presence on its own, and a link to `/live`.
+
+The turn is the point. A reveal that stops at "look what I can see" is an
+argument about surveillance; ending on the record that *cannot* carry an IP
+makes it an argument about engineering.
+
+What it deliberately does not do, though all of it would work: no WebRTC
+public-IP discovery, no canvas/WebGL/audio hashing or font probing, no stored
+fingerprint, no persistence of any kind. The digest it displays is computed for
+the reader to look at and thrown away — there is no second-visit recognition,
+which is exactly what the copy claims. Only one rarity row (`city`) is real
+data, measured from this site's own history; the rest are labelled estimates,
+and the page states plainly that multiplying them overstates uniqueness because
+the dimensions aren't independent.
+
 ## Privacy by design
 
 Privacy is treated as a feature, not an afterthought — this system is built
