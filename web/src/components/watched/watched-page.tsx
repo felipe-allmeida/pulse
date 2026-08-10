@@ -218,7 +218,10 @@ export function WatchedPage() {
           </pre>
 
           <p className="text-base leading-relaxed text-muted-foreground">
-            <Trans t={t} i18nKey="watched:auction.segments" components={{ strong: emphasis }} />
+            <Trans t={t} i18nKey="watched:auction.segments" components={{ strong: emphasis, code: <code className="font-mono text-sm" /> }} />
+          </p>
+          <p className="text-base leading-relaxed text-muted-foreground">
+            <Trans t={t} i18nKey="watched:auction.brokerGap" components={{ strong: emphasis }} />
           </p>
           <p className="text-sm text-muted-foreground">{t('watched:auction.ip')}</p>
         </section>

@@ -69,8 +69,9 @@
   "auction": {
     "heading": "what you're worth, and what they're actually buying",
     "lede": "Every ad-supported page you open auctions you to dozens of bidders in about a tenth of a second. This is the message that describes you, assembled just now, from your real readings, in the real format (OpenRTB 2.6):",
-    "segments": "Everything there is real except <strong>user.data.segment</strong> — the field just above, where a data broker attaches what it <strong>infers you want</strong>. It's the part that actually sells, and the only part you can't see: filling it means paying a broker. The bidders can see it. You can't.",
+    "segments": "Notice that <strong>user.data</strong> carries two providers. I could fill the first one: those are interests this page <strong>worked out by itself</strong>, in milliseconds, with no history and no budget — where you came from, what kind of device this is, whether it's a weekday or a weekend. The <code>confidence</code> field marks which are readings and which are guesses; \"high-end device\", for one, came out of pixel density, and that is precisely the sort of guess the ad industry treats as fact.",
     "ip": "The device.ip field is blank on purpose. A real exchange receives yours; here the IP is read once to find the city and discarded, so there is nothing left to print — and handing someone their own IP back is precisely what this page is objecting to.",
-    "segmentPlaceholder": "in-market:… — your inferred interests attach here (\"in-market for a car\", \"new parent\", \"cardholder\"). We're not a paying buyer, so we can't show you yours."
+    "segmentPlaceholder": "in-market:… — your inferred interests attach here (\"in-market for a car\", \"new parent\", \"cardholder\"). We're not a paying buyer, so we can't show you yours.",
+    "brokerGap": "The second provider is the one that matters, and it's empty. That's where <strong>what you want to buy</strong> goes — inferred from your browsing across sites, your purchases, your apps, where you've been. It can't be worked out from a single visit, and it can't be looked up without paying a data broker. So there's the whole asymmetry on one screen: <strong>what any page gets for free is up top. What actually sells is just below it, and it's the only part you don't get to see.</strong>"
   }
 }

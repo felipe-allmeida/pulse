@@ -85,7 +85,7 @@ describe('WatchedPage', () => {
 
     // Filled from readings already taken — that it is unremarkable is the point.
     expect(pageText()).toContain('OpenRTB 2.6');
-    expect(pageText()).toContain('user.data.segment');
+    expect(pageText()).toContain('user.data');
     expect(pageText()).toContain('"bidfloor": 0.5');
   });
 
@@ -110,7 +110,26 @@ describe('WatchedPage', () => {
     expect(json).not.toContain('in-market for a car');
   });
 
-  it('leaves the segment visibly a placeholder rather than inventing one', async () => {
+  it('fills the first data provider with segments it actually derived', async () => {
+    await renderWatched();
+
+    const json = screen.getByText(/"bidfloor": 0.5/).textContent ?? '';
+    // A placeholder on its own read as a dead end; these are real inferences,
+    // and the gap to the empty broker slot below is the section's argument.
+    expect(json).toContain('traffic.source');
+    expect(json).toContain('context.daypart');
+    expect(json).toContain('"confidence"');
+  });
+
+  it('keeps both providers, so the gap between them is visible', async () => {
+    await renderWatched();
+
+    const json = screen.getByText(/"bidfloor": 0.5/).textContent ?? '';
+    expect(json).toContain('derived-on-this-page');
+    expect(json).toContain('a-data-broker.example');
+  });
+
+  it('leaves the broker segment visibly a placeholder rather than inventing one', async () => {
     await renderWatched();
 
     // Presenting made-up inferred interests as if they had been read would be

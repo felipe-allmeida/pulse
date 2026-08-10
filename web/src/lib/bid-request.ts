@@ -1,4 +1,5 @@
 import type { ClientSignals } from '@/lib/client-signals';
+import { deriveSegments } from '@/lib/derived-segments';
 import type { VisitorContext } from '@/types/pulse';
 
 /**
@@ -94,6 +95,18 @@ export function buildBidRequest(
       id: '<exchange-assigned ID from an ID-sync cookie>',
       buyeruid: '<buyer-specific ID>',
       data: [
+        // Two providers, and the gap between them is the argument. The first is
+        // filled for real, from readings this page already took. The second is
+        // the one that actually sells, and it stays empty.
+        {
+          id: 'derived-on-this-page',
+          name: window.location.hostname,
+          segment: deriveSegments(signals, visitor).map((s) => ({
+            id: s.id,
+            name: s.name,
+            ext: { confidence: s.confidence },
+          })),
+        },
         {
           id: '<data-provider>',
           name: 'a-data-broker.example',
