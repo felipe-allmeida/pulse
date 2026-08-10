@@ -89,6 +89,37 @@ describe('WatchedPage', () => {
     expect(pageText()).toContain('"bidfloor": 0.5');
   });
 
+  it('shows the inferred-interest examples inside the JSON, where the eye lands', async () => {
+    await renderWatched();
+
+    // These used to live only in the prose below the block, where readers
+    // scanning the JSON never found them.
+    const json = screen.getByText(/"bidfloor": 0.5/).textContent ?? '';
+    expect(json).toContain('in-market for a car');
+    expect(json).toContain('new parent');
+    expect(json).toContain('cardholder');
+  });
+
+  it('translates the placeholder inside the JSON along with the rest of the page', async () => {
+    await renderWatched('pt-BR');
+
+    // It is hand-written filler, not protocol, so leaving it in English left a
+    // block of English sitting in the middle of a Portuguese page.
+    const json = screen.getByText(/"bidfloor": 0.5/).textContent ?? '';
+    expect(json).toContain('pesquisando carro');
+    expect(json).not.toContain('in-market for a car');
+  });
+
+  it('leaves the segment visibly a placeholder rather than inventing one', async () => {
+    await renderWatched();
+
+    // Presenting made-up inferred interests as if they had been read would be
+    // the exact dishonesty this section is about.
+    const json = screen.getByText(/"bidfloor": 0.5/).textContent ?? '';
+    expect(json).toContain('PLACEHOLDER');
+    expect(json).toContain("can't show you yours");
+  });
+
   it('never prints the visitor an IP back at them', async () => {
     await renderWatched();
 

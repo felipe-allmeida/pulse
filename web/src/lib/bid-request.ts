@@ -16,11 +16,14 @@ import type { VisitorContext } from '@/types/pulse';
  *   server-side only for the city lookup and throws it away, so there is
  *   nothing to print — and printing someone's IP back at them is exactly the
  *   move this page argues against.
- * - `user.data.segment` is a placeholder. That slot is where a data broker
- *   attaches inferred *intent* — "in-market for a car", "new parent",
- *   "cardholder" — and it is the part that actually sells. It can't be filled
- *   here because filling it requires paying a broker, which is the whole
- *   asymmetry: the bidders can see it, the person it describes cannot.
+ * - `user.data.segment` is a placeholder, passed in by the caller so it can be
+ *   localised. That slot is where a data broker attaches inferred *intent* —
+ *   "in-market for a car", "new parent", "cardholder" — and it is the part that
+ *   actually sells. It stays visibly a placeholder rather than being filled
+ *   with plausible-looking segments: inventing someone's inferred interests and
+ *   presenting them as read is the exact dishonesty this page objects to. It
+ *   cannot be filled honestly, because filling it means paying a broker, which
+ *   is the asymmetry — the bidders can see it, the person it describes cannot.
  */
 export type BidRequest = Record<string, unknown>;
 
@@ -45,7 +48,12 @@ function deviceMake(signals: ClientSignals): string {
   }
 }
 
-export function buildBidRequest(signals: ClientSignals, visitor?: VisitorContext): BidRequest {
+export function buildBidRequest(
+  signals: ClientSignals,
+  visitor: VisitorContext | undefined,
+  /** Localised placeholder for `user.data.segment` — see the note above. */
+  segmentPlaceholder: string,
+): BidRequest {
   return {
     id: 'auction-xxxxxxxx',
     at: 2,
@@ -89,7 +97,7 @@ export function buildBidRequest(signals: ClientSignals, visitor?: VisitorContext
         {
           id: '<data-provider>',
           name: 'a-data-broker.example',
-          segment: [{ id: 'PLACEHOLDER', name: 'in-market:… (this is the part that sells, and the part you cannot see)' }],
+          segment: [{ id: 'PLACEHOLDER', name: segmentPlaceholder }],
         },
       ],
     },

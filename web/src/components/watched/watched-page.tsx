@@ -53,7 +53,12 @@ export function WatchedPage() {
   const rarity = useMemo(() => rarityOf(signals, visitor), [signals, visitor]);
   const running = useMemo(() => cumulativeOneIn(rarity.dimensions), [rarity.dimensions]);
   const facts = useMemo(() => (visitor ? eligibleFacts(visitor, openedAt) : []), [visitor, openedAt]);
-  const bidRequest = useMemo(() => buildBidRequest(signals, visitor), [signals, visitor]);
+  const bidRequest = useMemo(
+    // The placeholder is the one string inside the JSON a reader actually stops
+    // on, so it has to speak their language like the rest of the page.
+    () => buildBidRequest(signals, visitor, t('watched:auction.segmentPlaceholder')),
+    [signals, visitor, t],
+  );
 
   const numberFormat = useMemo(() => new Intl.NumberFormat(i18n.language), [i18n.language]);
   const percentFormat = useMemo(

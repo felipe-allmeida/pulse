@@ -69,7 +69,8 @@
   "auction": {
     "heading": "quanto você vale, e o que estão comprando de verdade",
     "lede": "Toda página com publicidade te leiloa para dezenas de compradores em cerca de um décimo de segundo. Esta é a mensagem que descreve você, montada agora, com as suas leituras reais, no formato real (OpenRTB 2.6):",
-    "segments": "Tudo aí é real, menos <strong>user.data.segment</strong>. É nesse campo que um data broker pendura o que ele <strong>infere que você quer</strong> — \"pesquisando carro\", \"pai ou mãe recente\", \"tem cartão de crédito\". É a parte que realmente vende, e é a única que você não consegue ver: para preencher, é preciso pagar um broker. Quem dá o lance vê. Você não.",
-    "ip": "O campo device.ip aparece vazio de propósito. Um exchange de verdade recebe o seu; aqui o IP é lido uma vez para descobrir a cidade e descartado, então não sobrou nada para imprimir — e devolver o IP de alguém na cara dela é exatamente o que esta página está criticando."
+    "segments": "Tudo aí é real, menos o <strong>user.data.segment</strong> — o campo logo acima, onde um data broker pendura o que ele <strong>infere que você quer</strong>. É a parte que realmente vende, e é a única que você não consegue ver: para preencher, é preciso pagar um broker. Quem dá o lance vê. Você não.",
+    "ip": "O campo device.ip aparece vazio de propósito. Um exchange de verdade recebe o seu; aqui o IP é lido uma vez para descobrir a cidade e descartado, então não sobrou nada para imprimir — e devolver o IP de alguém na cara dela é exatamente o que esta página está criticando.",
+    "segmentPlaceholder": "in-market:… — aqui entram os seus interesses inferidos (\"pesquisando carro\", \"pai ou mãe recente\", \"tem cartão de crédito\"). Não somos compradores, então não conseguimos mostrar os seus."
   }
 }
