@@ -17,6 +17,10 @@ function signals(overrides: Partial<ClientSignals> = {}): ClientSignals {
     doNotTrack: false,
     platform: 'macOS',
     colorScheme: 'dark',
+    os: 'macOS',
+    browser: 'Safari',
+    userAgent:
+      'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Safari/605.1.15',
     ...overrides,
   };
 }
@@ -107,9 +111,11 @@ describe('rarityOf', () => {
     expect(rarity.bits).toBeCloseTo(Math.log2(1 / rarity.share), 6);
   });
 
-  it('produces a usable result with no signals and no visitor at all', () => {
+  it('produces a usable result when the browser tells it nothing at all', () => {
     const rarity = rarityOf(
       signals({
+        os: 'unknown',
+        browser: 'unknown',
         language: 'unknown',
         timeZone: null,
         screenWidth: null,
@@ -124,14 +130,46 @@ describe('rarityOf', () => {
     expect(rarity.oneIn).toBe(1);
     expect(rarity.bits).toBe(0);
   });
+
+  it('puts operating system and browser on the receipt', () => {
+    const rarity = rarityOf(signals({ os: 'iOS', browser: 'Safari' }));
+    const keys = rarity.dimensions.map((d) => d.key);
+
+    // The two rows a non-technical reader actually recognises.
+    expect(keys).toContain('os');
+    expect(keys).toContain('browser');
+  });
+
+  it('omits a platform it could not identify rather than guessing', () => {
+    const rarity = rarityOf(signals({ os: 'unknown', browser: 'unknown' }));
+    const keys = rarity.dimensions.map((d) => d.key);
+
+    expect(keys).not.toContain('os');
+    expect(keys).not.toContain('browser');
+  });
+
+  it('treats a minority browser as rarer than the dominant one', () => {
+    const chrome = rarityOf(signals({ browser: 'Chrome' }));
+    const firefox = rarityOf(signals({ browser: 'Firefox' }));
+
+    expect(firefox.oneIn).toBeGreaterThan(chrome.oneIn);
+  });
+
+  it('ends the receipt on the one measured row', () => {
+    const rarity = rarityOf(signals(), visitor());
+
+    // The table closes on the only number that isn't an estimate.
+    expect(rarity.dimensions.at(-1)?.key).toBe('city');
+    expect(rarity.dimensions.at(-1)?.source).toBe('measured');
+  });
 });
 
 describe('cumulativeOneIn', () => {
   it('multiplies each dimension into the running total', () => {
     const running = cumulativeOneIn([
-      { key: 'a', value: 'a', share: 0.5, source: 'estimated' },
-      { key: 'b', value: 'b', share: 0.5, source: 'estimated' },
-      { key: 'c', value: 'c', share: 0.25, source: 'estimated' },
+      { key: 'a', value: 'a', share: 0.5, source: 'published' },
+      { key: 'b', value: 'b', share: 0.5, source: 'published' },
+      { key: 'c', value: 'c', share: 0.25, source: 'published' },
     ]);
 
     // 1 in 2, then 1 in 4, then 1 in 16 — the escalation the section exists for.

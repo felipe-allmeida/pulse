@@ -80,12 +80,31 @@ describe('WatchedPage', () => {
     expect(pageText()).toContain('1,247th');
   });
 
-  it('ends on what the system actually keeps, with the event that has no IP field', async () => {
+  it('builds the real bid request an exchange would broadcast', async () => {
     await renderWatched();
 
-    // The turn is the reason the page exists — the reveal above is only setup.
-    expect(pageText()).toContain('VisitStarted');
-    expect(pageText()).toContain('there is no IP field');
+    // Filled from readings already taken — that it is unremarkable is the point.
+    expect(pageText()).toContain('OpenRTB 2.6');
+    expect(pageText()).toContain('user.data.segment');
+    expect(pageText()).toContain('"bidfloor": 0.5');
+  });
+
+  it('never prints the visitor an IP back at them', async () => {
+    await renderWatched();
+
+    // The page argues against exactly this move, so the field stays withheld
+    // even though a real exchange would receive it.
+    expect(pageText()).toContain('withheld');
+    expect(pageText()).not.toMatch(/"ip": "\d+\.\d+\.\d+\.\d+"/);
+  });
+
+  it('closes by contrasting what survived, without a lecture', async () => {
+    await renderWatched();
+
+    expect(pageText()).toContain('no field for one');
+    // The old close was a whole section quoting the record and explaining
+    // itself; the bid request above now carries that contrast on its own.
+    expect(pageText()).not.toContain('public sealed record');
   });
 
   it('labels the one dimension that comes from real data', async () => {
@@ -93,7 +112,7 @@ describe('WatchedPage', () => {
 
     // Everything else is an estimate, and conflating the two would undercut
     // the honesty the whole page trades on.
-    expect(screen.getAllByText('measured').length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/measured here/).length).toBeGreaterThan(0);
   });
 
   it('keeps the caveat about the arithmetic overstating uniqueness', async () => {
@@ -131,7 +150,7 @@ describe('WatchedPage', () => {
     await renderWatched('pt-BR');
 
     expect(pageText()).toContain('O que eu já sei sobre você');
-    expect(pageText()).toContain('e o que eu realmente guardei');
+    expect(pageText()).toContain('quanto você vale');
     expect(pageText()).not.toContain('what your browser volunteered');
   });
 
@@ -140,7 +159,7 @@ describe('WatchedPage', () => {
 
     await renderWatched();
 
-    expect(screen.queryAllByText('measured')).toHaveLength(0);
+    expect(screen.queryAllByText(/measured here/)).toHaveLength(0);
     expect(pageText()).not.toContain('Porto Alegre');
   });
 });

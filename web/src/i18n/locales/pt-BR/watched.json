@@ -2,7 +2,6 @@
   "eyebrow": "/watched",
   "heading": "O que eu já sei sobre você",
   "intro": "Você não clicou em nada. Não aceitou nenhum banner, não deu nenhuma permissão, e nenhum cookie foi gravado. Mesmo assim, esta página abriu sabendo algumas coisas. Vale ver quais — não porque este site seja invasivo, mas porque o próximo que você abrir pode fazer exatamente o mesmo, e não vai te contar.",
-
   "history": {
     "heading": "o que eu sabia antes de você rolar a página",
     "lede": "Nada aqui veio do seu navegador. Veio do histórico de visitas deste site — o mesmo que a página inicial usa para te dar bom dia. Cada uma destas frases é verdade agora:",
@@ -18,7 +17,6 @@
       "position": "Você é a <strong>{{position}}</strong> pessoa a abrir esta página."
     }
   },
-
   "signals": {
     "heading": "o que o seu navegador entregou sem eu pedir",
     "lede": "Estas são leituras diretas de propriedades públicas. Nenhuma delas abre um pedido de permissão, e é por isso que nenhum site precisa avisar que está lendo:",
@@ -40,35 +38,38 @@
     "dntUnset": "não informado",
     "note": "Uma janela anônima não mudaria nada disso. Todas essas leituras funcionam igual lá dentro — o anonimato ali é em relação ao seu próprio histórico, não em relação ao site."
   },
-
   "rarity": {
     "heading": "o quanto isso te torna raro",
     "lede": "Cada item sozinho é comum. Repare no que acontece quando eles se multiplicam:",
     "dimension": {
-      "city": "Cidade",
+      "os": "Sistema operacional",
+      "browser": "Navegador",
       "language": "Idioma principal",
       "timeZone": "Fuso horário",
       "resolution": "Resolução de tela",
       "cores": "Núcleos de CPU",
       "touch": "Toque",
-      "doNotTrack": "Do Not Track"
+      "doNotTrack": "Do Not Track",
+      "city": "Cidade"
     },
-    "measured": "medido",
+    "measured": "· medido aqui",
+    "share": "{{value}} das pessoas",
     "oneIn": "1 em {{value}}",
-    "total": "Somando tudo: cerca de <strong>1 em {{value}}</strong> navegadores se parecem com o seu — <strong>{{bits}} bits</strong> de entropia. Sem nenhum cookie.",
+    "receipt": "o recibo",
+    "total": "No total: aproximadamente <strong>1 em {{value}}</strong> navegadores se parecem com o seu — <strong>{{bits}} bits</strong> de entropia. Nada disso usou cookie.",
     "fingerprint": "impressão digital desta visita: {{hash}}",
-    "caveat": "Sendo honesto com a conta: só a linha marcada como \"medido\" sai de dados reais deste site (quantos visitantes daqui vieram da sua cidade). O resto são estimativas grosseiras da população de navegadores, e a multiplicação finge que as dimensões são independentes — não são: idioma e fuso caminham juntos, por exemplo. Ou seja, esse número exagera. O detalhe desconfortável é que exagerar não importa muito: rastreamento não precisa estar certo, precisa estar consistente. Se o seu navegador erra sempre da mesma forma, o erro em si vira parte da sua identificação."
+    "caveat": "Sobre a conta: só a linha marcada como medida sai de dados reais deste site. O resto são fatias arredondadas de participação de mercado publicada, e a multiplicação assume que as dimensões são independentes — não são, idioma e fuso andam juntos. Ou seja, esse número exagera. O detalhe desconfortável é que exagerar quase não importa: rastreamento não precisa estar certo, precisa estar consistente. Se o seu navegador erra sempre da mesma forma, o erro vira parte da sua identificação."
   },
-
   "kept": {
-    "heading": "e o que eu realmente guardei",
-    "lede": "Aqui a página vira. Tudo acima foi para mostrar o que dava para fazer. Isto é o que este sistema faz. Quando você abriu a página inicial, um único evento atravessou todos os processos daqui — este, copiado do código:",
-    "noIp": "Repare no que <strong>não existe</strong> nesse registro: não há campo de IP. Não é uma promessa nem uma limpeza posterior — é o tipo. O IP é lido uma vez para descobrir a cidade e morre como variável local; não há para onde ele ir depois, porque não existe campo que o carregue.",
-    "presence": "A presença — quem está online agora — vive só num conjunto no Redis com tempo de expiração. Você fecha a aba, o registro expira sozinho. Não existe histórico de quem esteve aqui, só a contagem.",
-    "thisPage": "E esta página aqui não gravou nada. Nenhum cookie, nenhum storage, nenhuma requisição fora as leituras acima. Aquela impressão digital foi calculada para você ver e descartada — não guardei, então não tenho como reconhecer você quando voltar.",
+    "summary": "Para efeito de comparação: desta visita sobraram <strong>país, cidade, uma coordenada aproximada e o horário</strong>. Sem IP — não porque foi apagado, mas porque o evento que atravessa este sistema não tem campo para ele. Esta página aqui não gravou nada: nem cookie, nem storage, e aquela impressão digital foi calculada para você ver e jogada fora.",
     "liveLink": "Ver o que sobrou de você →",
     "homeLink": "Voltar para o início"
   },
-
-  "outro": "Nada disso é sofisticado. É o mínimo que qualquer página consegue fazer, e a maioria faz — com a diferença de que também grava, cruza com cookies de terceiros e vende o resultado num leilão que dura um décimo de segundo. A parte que deveria incomodar não é que dê para saber tanto assim, é que ninguém é obrigado a te avisar."
+  "outro": "Nada disso é sofisticado. É o mínimo que qualquer página consegue fazer, e a maioria faz — com a diferença de que também grava, cruza com cookies de terceiros e vende o resultado num leilão que dura um décimo de segundo. A parte que deveria incomodar não é que dê para saber tanto assim, é que ninguém é obrigado a te avisar.",
+  "auction": {
+    "heading": "quanto você vale, e o que estão comprando de verdade",
+    "lede": "Toda página com publicidade te leiloa para dezenas de compradores em cerca de um décimo de segundo. Esta é a mensagem que descreve você, montada agora, com as suas leituras reais, no formato real (OpenRTB 2.6):",
+    "segments": "Tudo aí é real, menos <strong>user.data.segment</strong>. É nesse campo que um data broker pendura o que ele <strong>infere que você quer</strong> — \"pesquisando carro\", \"pai ou mãe recente\", \"tem cartão de crédito\". É a parte que realmente vende, e é a única que você não consegue ver: para preencher, é preciso pagar um broker. Quem dá o lance vê. Você não.",
+    "ip": "O campo device.ip aparece vazio de propósito. Um exchange de verdade recebe o seu; aqui o IP é lido uma vez para descobrir a cidade e descartado, então não sobrou nada para imprimir — e devolver o IP de alguém na cara dela é exatamente o que esta página está criticando."
+  }
 }

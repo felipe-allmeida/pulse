@@ -19,6 +19,10 @@ function baseSignals(overrides: Partial<ClientSignals> = {}): ClientSignals {
     doNotTrack: false,
     platform: 'macOS',
     colorScheme: 'dark',
+    os: 'macOS',
+    browser: 'Safari',
+    userAgent:
+      'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Safari/605.1.15',
     ...overrides,
   };
 }
@@ -129,5 +133,93 @@ describe('fingerprintOf', () => {
     });
 
     expect(fingerprintOf(empty)).toMatch(/^[0-9a-f]{8}$/);
+  });
+});
+
+describe('user-agent detection', () => {
+  function detect(userAgent: string, maxTouchPoints = 0) {
+    stub('userAgent', userAgent);
+    stub('maxTouchPoints', maxTouchPoints);
+    const signals = readClientSignals();
+    return { os: signals.os, browser: signals.browser };
+  }
+
+  it('identifies the mainstream desktop combinations', () => {
+    expect(
+      detect(
+        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0 Safari/537.36',
+      ),
+    ).toEqual({ os: 'Windows', browser: 'Chrome' });
+
+    expect(
+      detect(
+        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Safari/605.1.15',
+      ),
+    ).toEqual({ os: 'macOS', browser: 'Safari' });
+
+    expect(detect('Mozilla/5.0 (X11; Linux x86_64; rv:133.0) Gecko/20100101 Firefox/133.0')).toEqual({
+      os: 'Linux',
+      browser: 'Firefox',
+    });
+  });
+
+  it('sees through the browsers that impersonate Chrome', () => {
+    // Edge and Opera both carry "Chrome/" in their UA; order of checks decides.
+    expect(
+      detect(
+        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0 Safari/537.36 Edg/131.0',
+      ).browser,
+    ).toBe('Edge');
+
+    expect(
+      detect(
+        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0 Safari/537.36 OPR/117.0',
+      ).browser,
+    ).toBe('Opera');
+
+    expect(
+      detect(
+        'Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 (KHTML, like Gecko) SamsungBrowser/27.0 Chrome/125.0 Mobile Safari/537.36',
+      ).browser,
+    ).toBe('Samsung Internet');
+  });
+
+  it('does not call Chrome "Safari" just because it says so', () => {
+    // Every Chromium UA ends in "Safari/537.36" for compatibility.
+    expect(
+      detect(
+        'Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0 Mobile Safari/537.36',
+      ),
+    ).toEqual({ os: 'Android', browser: 'Chrome' });
+  });
+
+  it('recognises the iOS browsers that are all WebKit underneath', () => {
+    expect(
+      detect(
+        'Mozilla/5.0 (iPhone; CPU iPhone OS 18_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/131.0 Mobile/15E148',
+        5,
+      ),
+    ).toEqual({ os: 'iOS', browser: 'Chrome' });
+
+    expect(
+      detect(
+        'Mozilla/5.0 (iPhone; CPU iPhone OS 18_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1',
+        5,
+      ),
+    ).toEqual({ os: 'iOS', browser: 'Safari' });
+  });
+
+  it('catches an iPad claiming to be a Mac', () => {
+    const iPadOS =
+      'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Safari/605.1.15';
+
+    // Identical UA to a desktop Mac — the touchscreen is the only tell, since
+    // no shipping Mac has one.
+    expect(detect(iPadOS, 5).os).toBe('iOS');
+    expect(detect(iPadOS, 0).os).toBe('macOS');
+  });
+
+  it('says unknown instead of guessing at an unrecognised agent', () => {
+    expect(detect('some-crawler/1.0')).toEqual({ os: 'unknown', browser: 'unknown' });
   });
 });

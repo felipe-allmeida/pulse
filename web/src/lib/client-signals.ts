@@ -28,7 +28,53 @@ export type ClientSignals = {
   doNotTrack: boolean | null;
   platform: string | null;
   colorScheme: 'dark' | 'light' | null;
+  os: OperatingSystem;
+  browser: BrowserName;
+  userAgent: string;
 };
+
+export type OperatingSystem = 'Android' | 'iOS' | 'Windows' | 'macOS' | 'Linux' | 'unknown';
+export type BrowserName = 'Chrome' | 'Safari' | 'Edge' | 'Firefox' | 'Samsung Internet' | 'Opera' | 'unknown';
+
+/**
+ * Order matters in both of these: the UA string is a pile of compatibility
+ * lies, so every check has to run after the ones that would otherwise swallow
+ * it. Edge claims to be Chrome, Chrome claims to be Safari, and iPadOS claims
+ * to be a Mac. Each entry below is placed to be tested before whatever it
+ * impersonates.
+ */
+const BROWSER_MATCHERS: [BrowserName, RegExp][] = [
+  ['Edge', /\bEdg(e|A|iOS)?\//],
+  ['Samsung Internet', /SamsungBrowser\//],
+  ['Opera', /\b(OPR|Opera)\//],
+  ['Firefox', /\b(Firefox|FxiOS)\//],
+  ['Chrome', /\b(Chrome|CriOS|Chromium)\//],
+  ['Safari', /\bSafari\//],
+];
+
+const OS_MATCHERS: [OperatingSystem, RegExp][] = [
+  ['Android', /\bAndroid\b/],
+  ['iOS', /\b(iPhone|iPad|iPod)\b/],
+  ['Windows', /\bWindows\b/],
+  ['macOS', /\bMac OS X\b|\bMacintosh\b/],
+  ['Linux', /\bLinux\b|\bX11\b/],
+];
+
+function detectBrowser(userAgent: string): BrowserName {
+  for (const [name, pattern] of BROWSER_MATCHERS) if (pattern.test(userAgent)) return name;
+  return 'unknown';
+}
+
+function detectOs(userAgent: string, touchPoints: number | null): OperatingSystem {
+  for (const [name, pattern] of OS_MATCHERS) {
+    if (!pattern.test(userAgent)) continue;
+    // iPadOS reports itself as a desktop Mac. A touchscreen is the practical
+    // tell, since no shipping Mac has one.
+    if (name === 'macOS' && (touchPoints ?? 0) > 1) return 'iOS';
+    return name;
+  }
+  return 'unknown';
+}
 
 function safe<T>(read: () => T): T | null {
   try {
@@ -52,7 +98,13 @@ function readPlatform(): string | null {
 }
 
 export function readClientSignals(): ClientSignals {
+  const userAgent = safe(() => navigator.userAgent) ?? '';
+  const touchPoints = safe(() => navigator.maxTouchPoints) ?? null;
+
   return {
+    userAgent,
+    os: detectOs(userAgent, touchPoints),
+    browser: detectBrowser(userAgent),
     language: safe(() => navigator.language) ?? 'unknown',
     languages: safe(() => [...(navigator.languages ?? [])]) ?? [],
     timeZone: safe(() => Intl.DateTimeFormat().resolvedOptions().timeZone) ?? null,
@@ -62,7 +114,7 @@ export function readClientSignals(): ClientSignals {
     cores: safe(() => navigator.hardwareConcurrency) ?? null,
     // Chromium-only, and bucketed by the browser rather than exact.
     memoryGb: safe(() => (navigator as Navigator & { deviceMemory?: number }).deviceMemory) ?? null,
-    touchPoints: safe(() => navigator.maxTouchPoints) ?? null,
+    touchPoints,
     doNotTrack: safe(() => {
       const raw = navigator.doNotTrack;
       return raw === null || raw === undefined || raw === 'unspecified' ? null : raw === '1';
@@ -91,6 +143,8 @@ export function readClientSignals(): ClientSignals {
  */
 export function fingerprintOf(signals: ClientSignals): string {
   const material = [
+    signals.os,
+    signals.browser,
     signals.language,
     signals.languages.join(','),
     signals.timeZone,
