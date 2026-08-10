@@ -12,10 +12,12 @@ import { useAskWidgetStore } from '@/stores/ask-widget-store';
 
 const useMetricsMock = vi.fn();
 const useVisitsMock = vi.fn(() => ({ data: undefined }));
+const useVisitorMock = vi.fn(() => ({ data: undefined }));
 
 vi.mock('@/lib/api', () => ({
   useMetrics: () => useMetricsMock(),
   useVisits: () => useVisitsMock(),
+  useVisitor: () => useVisitorMock(),
 }));
 
 vi.mock('@/lib/ask', () => ({ streamAsk: vi.fn(async () => {}) }));

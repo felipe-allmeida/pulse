@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { byNewest, EMPTY_POINTS } from './points';
+import { byNewest, EMPTY_POINTS, isSameSpot, selectArcTargets } from './points';
 import type { VisitPoint } from '@/types/pulse';
 
 const points: VisitPoint[] = [
@@ -31,5 +31,38 @@ describe('byNewest', () => {
 describe('EMPTY_POINTS', () => {
   it('is a stable empty array', () => {
     expect(EMPTY_POINTS).toEqual([]);
+  });
+});
+
+describe('isSameSpot', () => {
+  it('treats coordinates that only differ by float noise as one place', () => {
+    // City-level geo hands back the same lat/lon for everyone in a city; a JSON
+    // round trip is the only thing that perturbs it.
+    expect(isSameSpot({ lat: -30.03, lon: -51.23 }, { lat: -30.030000000001, lon: -51.23 })).toBe(true);
+  });
+
+  it('keeps genuinely different cities apart', () => {
+    expect(isSameSpot({ lat: -30.03, lon: -51.23 }, { lat: -23.55, lon: -46.63 })).toBe(false);
+  });
+});
+
+describe('selectArcTargets', () => {
+  it('never sweeps an arc from the origin back to itself', () => {
+    const origin = { lat: 38.7, lon: -9.1 };
+
+    const targets = selectArcTargets(points, origin, 3);
+
+    // Another visitor sharing the viewer's city sits at identical coordinates,
+    // so an arc to them would render as a smudge on top of the origin halo.
+    expect(targets.map((p) => p.city)).toEqual(['NYC', 'Tokyo']);
+  });
+
+  it('caps the number of arcs', () => {
+    expect(selectArcTargets(points, undefined, 2)).toHaveLength(2);
+  });
+
+  it('keeps every point when the origin is unknown', () => {
+    // No geo means no origin dot at all, so nothing needs excluding.
+    expect(selectArcTargets(points, undefined, 10)).toHaveLength(3);
   });
 });

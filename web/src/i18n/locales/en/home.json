@@ -6,6 +6,27 @@
   "hero": {
     "hook": "You're one of <strong>{{count}}</strong> people here right now — and this page is a live distributed system, streaming presence, geolocation, and events in real time."
   },
+  "visitor": {
+    "fact": {
+      "firstEver": "You're in <strong>{{city}}</strong> — and the first person ever to open this page.",
+      "firstFromCity": "You're in <strong>{{city}}</strong> — and the first person from there ever to open this page.",
+      "firstFromCityInDays": "You're in <strong>{{city}}</strong> — and the first person from there in <strong>{{days}} days</strong>.",
+      "milestone": "You're in <strong>{{city}}</strong>, and exactly the <strong>{{position}}</strong> person to open this page.",
+      "recent24h": "You're in <strong>{{city}}</strong>, and the <strong>{{position}}</strong> person here in the last 24 hours.",
+      "previous": "You're in <strong>{{city}}</strong>. The last person before you arrived from <strong>{{previousCity}}</strong>, {{when}}.",
+      "position": "You're in <strong>{{city}}</strong>, and the <strong>{{position}}</strong> person to open this page."
+    },
+    "factNoGeo": {
+      "firstEver": "You're the first person ever to open this page.",
+      "milestone": "You're exactly the <strong>{{position}}</strong> person to open this page.",
+      "recent24h": "You're the <strong>{{position}}</strong> person here in the last 24 hours.",
+      "previous": "The last person before you arrived from <strong>{{previousCity}}</strong>, {{when}}.",
+      "position": "You're the <strong>{{position}}</strong> person to open this page."
+    },
+    "dot": "That pulsing dot behind this text is you.",
+    "dotStatic": "That lit dot behind this text is you.",
+    "noCookie": "No cookie, no permission, nothing stored."
+  },
   "cta": {
     "projects": "See the projects",
     "about": "About me",
