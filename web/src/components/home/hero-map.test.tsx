@@ -2,9 +2,11 @@ import { render } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 const useVisitsMock = vi.fn();
+const useVisitorMock = vi.fn(() => ({ data: undefined }) as { data: { geo: { lat: number; lon: number } | null } | undefined });
 
 vi.mock('@/lib/api', () => ({
   useVisits: () => useVisitsMock(),
+  useVisitor: () => useVisitorMock(),
 }));
 
 function mockMatchMedia(matches: boolean) {

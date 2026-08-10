@@ -75,6 +75,35 @@ other directly; RabbitMQ is the only coupling.
 - **CI/CD:** GitHub Actions → GHCR → Portainer stack webhook
 - **Testing:** xUnit, Testcontainers (Postgres + Redis + RabbitMQ spun up per test run)
 
+## The visitor moment
+
+The hero opens by telling you something true about your own arrival — *"You're
+in Porto Alegre — and the first person from there ever to open this page. That
+pulsing dot behind this text is you."* No cookie, no permission prompt, no
+click.
+
+It runs on the visit history the Worker has been writing all along:
+`GET /api/visitor` returns the caller's coarse geo plus the counts around it,
+and the client picks the most striking fact that happens to be true right now —
+first ever from your city, first in N days, a round-numbered arrival, the nth
+person in the last 24 hours, or who came before you and from where. There is
+always a true fact left (`position`), so the line never comes up empty, and a
+reload steps to the next one down the list instead of repeating itself.
+
+Deliberate constraints, because this is a portfolio and not a party trick:
+
+- **It never guesses.** Without a resolved city, every city-based fact drops
+  out and the copy uses its city-less form. Nothing is invented to fill a slot.
+- **It never claims a dot that isn't drawn.** The "that's you" clause only
+  renders when the visitor actually has a point on the map.
+- **It says nothing personal to a crawler**, or before `/api/visitor` answers —
+  both get the generic hook.
+- **It stays in intervals, not calendar days** ("in the last 24 hours", "3
+  hours ago"), because the server can't see the visitor's timezone.
+- **It reads nothing new about you.** Everything on that line comes from the
+  same coarse geo the map already used; no fingerprinting, no extra signal
+  collection, no client-side probing.
+
 ## Privacy by design
 
 Privacy is treated as a feature, not an afterthought — this system is built
@@ -178,21 +207,23 @@ unset, the redeploy step logs and no-ops rather than failing the pipeline.
 
 ### Real visitor geolocation
 
-By default the production stack runs with **no geo database mounted** — the
-API's lazy `GeoLocator` factory falls back to a demo spread (or `"Unknown"`
-with `Geo__DemoFallback=false`), so the stack boots and serves traffic fine
-without it. To switch on real coarse geo (country/city/lat-lon from the
-visitor's IP):
+The production stack **expects a real geo database** and is wired for one in
+`deploy/compose.prod.yml` (`Geo__DbPath` + `Geo__DemoFallback: "false"`, with
+the `.mmdb` bind-mounted read-only). The demo city round-robin is deliberately
+*not* used in production: the home page greets visitors by their own city, and
+a synthetic spread would state a confidently wrong one.
 
 1. Download `dbip-city-lite.mmdb` — free, **no account required** — from
    [db-ip.com/db/download/ip-to-city-lite](https://db-ip.com/db/download/ip-to-city-lite).
-2. Place it on the Hetzner box, e.g. `/opt/pulse/geo/dbip-city-lite.mmdb`.
-3. In `deploy/compose.prod.yml`, uncomment the `volumes:` block under the
-   `api` service's "Real visitor geo (DB-IP Lite)" comment, and add
-   `Geo__DbPath: /geo/city.mmdb` and `Geo__DemoFallback: "false"` to that
-   service's `environment:`.
-4. Redeploy the stack (Portainer "Update the stack" with "Re-pull image", or
-   the stack webhook) so the container picks up the new mount + env.
+2. Place it on the Hetzner box at `/opt/pulse/geo/dbip-city-lite.mmdb` (or
+   anywhere else, and point `GEO_DB_HOST_PATH` at it in the repo-root `.env`).
+3. Redeploy the stack (Portainer "Update the stack" with "Re-pull image", or
+   the stack webhook) so the container picks up the mount.
+
+If the file is missing, the API still boots — the lazy `GeoLocator` factory
+falls through to `NullGeoLocator`, geo resolves to `"Unknown"`, and both the
+map and the home page's greeting degrade to their city-less form rather than
+inventing a location.
 
 The DB-IP CC-BY attribution link is already rendered under the live map in
 the UI (no further UI work needed once real geo is on). Monthly refresh is

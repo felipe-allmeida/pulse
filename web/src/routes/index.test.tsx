@@ -10,11 +10,13 @@ import type { Locale } from '@/content/types';
 
 const useMetricsMock = vi.fn();
 const useVisitsMock = vi.fn();
+const useVisitorMock = vi.fn(() => ({ data: undefined }));
 const usePulseHubMock = vi.fn();
 
 vi.mock('@/lib/api', () => ({
   useMetrics: () => useMetricsMock(),
   useVisits: () => useVisitsMock(),
+  useVisitor: () => useVisitorMock(),
 }));
 
 vi.mock('@/realtime/use-pulse-hub', () => ({

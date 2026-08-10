@@ -1,8 +1,9 @@
 import { ArrowRight, Sparkles } from 'lucide-react';
-import { Trans, useTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
 import { Link } from '@tanstack/react-router';
 import { CvButton } from '@/components/nav/cv-button';
 import { HeroMap } from '@/components/home/hero-map';
+import { VisitorLine } from '@/components/home/visitor-line';
 import { Chip } from '@/components/signal/chip';
 import { Pill } from '@/components/signal/pill';
 import { Button, buttonVariants } from '@/components/ui/button';
@@ -49,18 +50,15 @@ export function Hero() {
 
         {/*
           The main sales sentence — prose meant to be read, not data. Sans,
-          a readable ~65ch measure, normal leading. The live count is the
-          single aqua emphasis inside it; everything else is plain
+          a readable ~65ch measure, normal leading. Its emphasised values are
+          the single aqua accent inside it; everything else is plain
           muted-foreground so the accent doesn't compete with itself.
+
+          VisitorLine owns the copy: it greets the reader with something true
+          about their own arrival, and falls back to the generic hook whenever
+          that isn't available (still loading, geo unresolved, or a crawler).
         */}
-        <p className="max-w-[65ch] text-base leading-relaxed text-muted-foreground sm:text-lg">
-          <Trans
-            t={t}
-            i18nKey="home:hero.hook"
-            values={{ count: onlineCount }}
-            components={{ strong: <span className="font-semibold text-signal-strong" /> }}
-          />
-        </p>
+        <VisitorLine />
 
         <div className="flex flex-col gap-4">
           {/*

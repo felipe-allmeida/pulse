@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef } from 'react';
 import { geoGraticule10, geoInterpolate, geoNaturalEarth1, geoPath, type GeoProjection } from 'd3-geo';
-import { useVisits } from '@/lib/api';
-import { byNewest, EMPTY_POINTS } from '@/lib/points';
+import { useVisitor, useVisits } from '@/lib/api';
+import { byNewest, EMPTY_POINTS, isSameSpot, selectArcTargets, type Coordinates } from '@/lib/points';
 import { world } from '@/lib/world';
 import { useReducedMotion } from '@/hooks/use-reduced-motion';
 import { useThemeStore } from '@/stores/theme-store';
@@ -62,7 +62,7 @@ type Palette = {
 function drawGlowPoint(
   ctx: CanvasRenderingContext2D,
   projection: GeoProjection,
-  point: VisitPoint,
+  point: Coordinates,
   isOrigin: boolean,
   time: number,
   palette: Palette,
@@ -97,8 +97,8 @@ function drawGlowPoint(
 function drawArc(
   ctx: CanvasRenderingContext2D,
   projection: GeoProjection,
-  origin: VisitPoint,
-  target: VisitPoint,
+  origin: Coordinates,
+  target: Coordinates,
   time: number,
   palette: Palette,
 ) {
@@ -137,7 +137,7 @@ function drawFrame(
   ctx: CanvasRenderingContext2D,
   projection: GeoProjection,
   points: VisitPoint[],
-  origin: VisitPoint | undefined,
+  origin: Coordinates | undefined,
   arcTargets: VisitPoint[],
   time: number,
   palette: Palette,
@@ -168,7 +168,8 @@ function drawFrame(
   }
 
   for (const point of points) {
-    if (point === origin) continue;
+    // Anyone sharing the origin's city is already under the origin's own halo.
+    if (origin && isSameSpot(point, origin)) continue;
     drawGlowPoint(ctx, projection, point, false, time, palette);
   }
   if (origin) drawGlowPoint(ctx, projection, origin, true, time, palette);
@@ -178,10 +179,17 @@ function drawFrame(
  * Ambient, decorative live world-map background for the hero. Reuses the
  * same data source (`useVisits`) and projection approach (d3-geo
  * `geoNaturalEarth1` over the shared `world` topology) as `LiveMap` — dimmed
- * landmasses/graticule, glowing presence points, the most recent visit
+ * landmasses/graticule, glowing presence points, the viewer's own location
  * emphasized as the "you are here" origin with a pulsing halo, and a few
  * sweeping arcs from it to other recent points. A radial veil on top keeps
  * the overlay hero text at AA contrast.
+ *
+ * The origin comes from `/api/visitor` rather than from the newest point in
+ * `useVisits`. That older shortcut was almost never actually the viewer: a
+ * visit only reaches `/api/map` after the outbox -> RabbitMQ -> Worker ->
+ * Postgres round trip, and the query refetches on a 10s interval, so on first
+ * paint the highlighted dot was whoever came before. The hero copy points
+ * straight at this dot and calls it the reader, so it has to be them.
  *
  * Purely decorative: `aria-hidden` + `pointer-events-none`. Honors
  * `prefers-reduced-motion` by drawing a single static frame instead of
@@ -204,8 +212,18 @@ export function HeroMap({ className }: Props) {
   const projectionRef = useRef<SizedProjection | null>(null);
 
   const recentPoints = useMemo(() => byNewest(points, MAX_POINTS), [points]);
-  const origin = recentPoints[0];
-  const arcTargets = useMemo(() => recentPoints.slice(1, 1 + ARC_COUNT), [recentPoints]);
+
+  const { data: visitor } = useVisitor();
+  const geo = visitor?.geo;
+  // Undefined until geo resolves (or forever, if the deployment has no geo
+  // database) — the map then simply draws no origin, no halo, and no arcs,
+  // matching the hero line, which drops its "that dot is you" clause in
+  // exactly the same case.
+  const origin = useMemo<Coordinates | undefined>(
+    () => (geo ? { lat: geo.lat, lon: geo.lon } : undefined),
+    [geo],
+  );
+  const arcTargets = useMemo(() => selectArcTargets(recentPoints, origin, ARC_COUNT), [recentPoints, origin]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
