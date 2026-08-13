@@ -6,12 +6,23 @@
     "types": ["node"],
     "skipLibCheck": true,
 
-    /* Bundler mode */
-    "module": "nodenext",
+    /*
+      Bundler mode. Vite bundles vite.config.ts (and the plugin code it pulls
+      in) with esbuild, so resolution here is the bundler's, not Node's — and
+      it has to be: `plugins/aio.ts` imports the same extensionless modules
+      under `src/` that the app does, and node16 resolution would reject every
+      one of them.
+    */
+    "module": "esnext",
+    "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
     "verbatimModuleSyntax": true,
     "moduleDetection": "force",
     "noEmit": true,
+
+    /* Type safety — matches tsconfig.app.json so shared modules are checked
+       the same way in both programs. */
+    "strict": true,
 
     /* Linting */
     "noUnusedLocals": true,
@@ -19,5 +30,5 @@
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["vite.config.ts"]
+  "include": ["vite.config.ts", "plugins"]
 }

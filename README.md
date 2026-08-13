@@ -208,6 +208,37 @@ or in `appsettings.json` under `OpenAI` / `Ask`):
 No API key is committed anywhere in this repo — see [Deploy](#deploy) for
 how it's supplied in production.
 
+## Found by AI search (AIO)
+
+A client-rendered SPA is invisible to the crawlers that feed answer engines.
+GPTBot, OAI-SearchBot, ClaudeBot, PerplexityBot and CCBot fetch the HTML and
+never execute the bundle, so what they index is `<div id="root"></div>` — no
+title, no bio, nothing to cite. Google renders JavaScript, but nobody else in
+that list does.
+
+So the web build emits a real document per route. [`web/plugins/aio.ts`](web/plugins/aio.ts)
+takes the finished `index.html` and fans it out, filling the `<!--aio:head-->`
+and `<!--aio:body-->` markers from the same `src/content/*` data the React app
+renders from:
+
+| Emitted | What it carries |
+|---|---|
+| `index.html`, `about.html`, `projects.html`, `projects/<slug>.html`, `live.html`, `watched.html` | Per-route `<title>`, description, canonical, Open Graph, and a no-script mirror of the route's text |
+| Schema.org `@graph` in each document | `Person` (one `@id` across every page), `WebSite`, `ProfilePage` / `CollectionPage`, `SoftwareSourceCode` for public repos, `BreadcrumbList` |
+| `robots.txt` | Every answer-engine crawler explicitly allowed, plus the sitemap |
+| `sitemap.xml` | Every route |
+| `llms.txt`, `llms-full.txt` | The curated markdown map agents probe for, and the whole site in one fetch |
+| `<route>.md` | A markdown mirror of each route, linked from its `<head>` |
+
+Each generated document still boots the same SPA from the same asset graph, so
+browsers get exactly the app they got before — the static content lives in
+`<noscript>` and never paints. Caddy's `try_files {path}.html {path}` is what
+maps `/about` to `about.html` (see [`deploy/Caddyfile`](deploy/Caddyfile)).
+
+Canonical URLs default to `https://pulse.felipealmeida.tech`; build with
+`PULSE_SITE_URL=https://preview.example.com pnpm -C web build` to stamp a
+different origin.
+
 ## Run locally
 
 ```bash
