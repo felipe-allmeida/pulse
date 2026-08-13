@@ -25,6 +25,11 @@
     <PackageVersion Include="xunit.runner.visualstudio" Version="2.8.2" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
     <PackageVersion Include="coverlet.collector" Version="6.0.4" />
+    <!-- Transitive pin: fixes GHSA-q939-rpr3-3284 (High) in SSH.NET 2024.1.0, which
+         Testcontainers pulls in for its Docker-over-SSH transport. Test-only — SSH.NET
+         never reaches the Api/Worker images, so this closed a red CI gate rather than
+         an exposure in the deployed stack. -->
+    <PackageVersion Include="SSH.NET" Version="2026.0.0" />
     <PackageVersion Include="Testcontainers.PostgreSql" Version="4.1.0" />
     <PackageVersion Include="Testcontainers.Redis" Version="4.1.0" />
     <PackageVersion Include="Testcontainers.RabbitMq" Version="4.1.0" />
