@@ -53,7 +53,12 @@ export function WatchedPage() {
   const rarity = useMemo(() => rarityOf(signals, visitor), [signals, visitor]);
   const running = useMemo(() => cumulativeOneIn(rarity.dimensions), [rarity.dimensions]);
   const facts = useMemo(() => (visitor ? eligibleFacts(visitor, openedAt) : []), [visitor, openedAt]);
-  const bidRequest = useMemo(() => buildBidRequest(signals, visitor), [signals, visitor]);
+  const bidRequest = useMemo(
+    // The placeholder is the one string inside the JSON a reader actually stops
+    // on, so it has to speak their language like the rest of the page.
+    () => buildBidRequest(signals, visitor, t('watched:auction.segmentPlaceholder')),
+    [signals, visitor, t],
+  );
 
   const numberFormat = useMemo(() => new Intl.NumberFormat(i18n.language), [i18n.language]);
   const percentFormat = useMemo(
@@ -213,7 +218,10 @@ export function WatchedPage() {
           </pre>
 
           <p className="text-base leading-relaxed text-muted-foreground">
-            <Trans t={t} i18nKey="watched:auction.segments" components={{ strong: emphasis }} />
+            <Trans t={t} i18nKey="watched:auction.segments" components={{ strong: emphasis, code: <code className="font-mono text-sm" /> }} />
+          </p>
+          <p className="text-base leading-relaxed text-muted-foreground">
+            <Trans t={t} i18nKey="watched:auction.brokerGap" components={{ strong: emphasis }} />
           </p>
           <p className="text-sm text-muted-foreground">{t('watched:auction.ip')}</p>
         </section>

@@ -85,8 +85,58 @@ describe('WatchedPage', () => {
 
     // Filled from readings already taken — that it is unremarkable is the point.
     expect(pageText()).toContain('OpenRTB 2.6');
-    expect(pageText()).toContain('user.data.segment');
+    expect(pageText()).toContain('user.data');
     expect(pageText()).toContain('"bidfloor": 0.5');
+  });
+
+  it('shows the inferred-interest examples inside the JSON, where the eye lands', async () => {
+    await renderWatched();
+
+    // These used to live only in the prose below the block, where readers
+    // scanning the JSON never found them.
+    const json = screen.getByText(/"bidfloor": 0.5/).textContent ?? '';
+    expect(json).toContain('in-market for a car');
+    expect(json).toContain('new parent');
+    expect(json).toContain('cardholder');
+  });
+
+  it('translates the placeholder inside the JSON along with the rest of the page', async () => {
+    await renderWatched('pt-BR');
+
+    // It is hand-written filler, not protocol, so leaving it in English left a
+    // block of English sitting in the middle of a Portuguese page.
+    const json = screen.getByText(/"bidfloor": 0.5/).textContent ?? '';
+    expect(json).toContain('pesquisando carro');
+    expect(json).not.toContain('in-market for a car');
+  });
+
+  it('fills the first data provider with segments it actually derived', async () => {
+    await renderWatched();
+
+    const json = screen.getByText(/"bidfloor": 0.5/).textContent ?? '';
+    // A placeholder on its own read as a dead end; these are real inferences,
+    // and the gap to the empty broker slot below is the section's argument.
+    expect(json).toContain('traffic.source');
+    expect(json).toContain('context.daypart');
+    expect(json).toContain('"confidence"');
+  });
+
+  it('keeps both providers, so the gap between them is visible', async () => {
+    await renderWatched();
+
+    const json = screen.getByText(/"bidfloor": 0.5/).textContent ?? '';
+    expect(json).toContain('derived-on-this-page');
+    expect(json).toContain('a-data-broker.example');
+  });
+
+  it('leaves the broker segment visibly a placeholder rather than inventing one', async () => {
+    await renderWatched();
+
+    // Presenting made-up inferred interests as if they had been read would be
+    // the exact dishonesty this section is about.
+    const json = screen.getByText(/"bidfloor": 0.5/).textContent ?? '';
+    expect(json).toContain('PLACEHOLDER');
+    expect(json).toContain("can't show you yours");
   });
 
   it('never prints the visitor an IP back at them', async () => {
@@ -102,6 +152,9 @@ describe('WatchedPage', () => {
     await renderWatched();
 
     expect(pageText()).toContain('no field for one');
+    // The claim has to survive a reader opening devtools: i18n persists a
+    // language preference, so "stored nothing" flat out would be false.
+    expect(pageText()).toContain('only your language preference');
     // The old close was a whole section quoting the record and explaining
     // itself; the bid request above now carries that contrast on its own.
     expect(pageText()).not.toContain('public sealed record');

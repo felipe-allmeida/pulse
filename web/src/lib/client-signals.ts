@@ -31,6 +31,12 @@ export type ClientSignals = {
   os: OperatingSystem;
   browser: BrowserName;
   userAgent: string;
+  /** Hostname the visitor arrived from, or null when they came directly. */
+  referrer: string | null;
+  /** Local hour of day, 0-23, as the visitor's own clock reports it. */
+  localHour: number;
+  /** Day of week on the visitor's clock, 0 = Sunday. */
+  localDay: number;
 };
 
 export type OperatingSystem = 'Android' | 'iOS' | 'Windows' | 'macOS' | 'Linux' | 'unknown';
@@ -97,12 +103,37 @@ function readPlatform(): string | null {
   return legacy || null;
 }
 
+/**
+ * The site that linked here, if any.
+ *
+ * Not a new kind of reading — the browser sends this header to every site it
+ * visits, unasked. Same-origin arrivals are reported as null: a visitor
+ * clicking through from the home page came from nowhere in particular, and
+ * naming this site as the referrer would be noise. Note that a client-side
+ * route change does not reset `document.referrer`, so someone who landed on
+ * `/` from elsewhere and clicked through still carries their real source.
+ */
+function readReferrer(): string | null {
+  const raw = safe(() => document.referrer);
+  if (!raw) return null;
+  try {
+    const { hostname } = new URL(raw);
+    return hostname && hostname !== window.location.hostname ? hostname : null;
+  } catch {
+    return null;
+  }
+}
+
 export function readClientSignals(): ClientSignals {
   const userAgent = safe(() => navigator.userAgent) ?? '';
   const touchPoints = safe(() => navigator.maxTouchPoints) ?? null;
+  const now = new Date();
 
   return {
     userAgent,
+    referrer: readReferrer(),
+    localHour: now.getHours(),
+    localDay: now.getDay(),
     os: detectOs(userAgent, touchPoints),
     browser: detectBrowser(userAgent),
     language: safe(() => navigator.language) ?? 'unknown',
