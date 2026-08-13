@@ -61,7 +61,7 @@
     "caveat": "Sobre a conta: só a linha marcada como medida sai de dados reais deste site. O resto são fatias arredondadas de participação de mercado publicada, e a multiplicação assume que as dimensões são independentes — não são, idioma e fuso andam juntos. Ou seja, esse número exagera. O detalhe desconfortável é que exagerar quase não importa: rastreamento não precisa estar certo, precisa estar consistente. Se o seu navegador erra sempre da mesma forma, o erro vira parte da sua identificação."
   },
   "kept": {
-    "summary": "Para efeito de comparação: desta visita sobraram <strong>país, cidade, uma coordenada aproximada e o horário</strong>. Sem IP — não porque foi apagado, mas porque o evento que atravessa este sistema não tem campo para ele. Esta página aqui não gravou nada: nem cookie, nem storage, e aquela impressão digital foi calculada para você ver e jogada fora.",
+    "summary": "Para efeito de comparação: desta visita sobraram <strong>país, cidade, uma coordenada aproximada e o horário</strong>. Sem IP — não porque foi apagado, mas porque o evento que atravessa este sistema não tem campo para ele. E esta página não gravou nada <strong>sobre você</strong>: nenhum cookie, e no storage do navegador só a sua escolha de idioma. Aquela impressão digital foi calculada para você ver e jogada fora — pode conferir no devtools.",
     "liveLink": "Ver o que sobrou de você →",
     "homeLink": "Voltar para o início"
   },

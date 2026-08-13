@@ -61,7 +61,7 @@
     "caveat": "About the arithmetic: only the row marked as measured comes from this site's real data. The rest are rounded slices of published market share, and the multiplication assumes the dimensions are independent — they aren't, language and time zone travel together. So this number overstates you. The uncomfortable part is that overstating barely matters: tracking doesn't need to be accurate, it needs to be consistent. If your browser gets something wrong the same way every time, the mistake becomes part of your identity."
   },
   "kept": {
-    "summary": "For comparison: what's left of this visit is <strong>a country, a city, an approximate coordinate, and a timestamp</strong>. No IP — not because it was scrubbed, but because the event that crosses this system has no field for one. This page stored nothing at all: no cookie, no storage, and that fingerprint was computed for you to look at and thrown away.",
+    "summary": "For comparison: what's left of this visit is <strong>a country, a city, an approximate coordinate, and a timestamp</strong>. No IP — not because it was scrubbed, but because the event that crosses this system has no field for one. And this page stored nothing <strong>about you</strong>: no cookie, and in browser storage only your language preference. That fingerprint was computed for you to look at and thrown away — check in devtools.",
     "liveLink": "See what's left of you →",
     "homeLink": "Back to the start"
   },

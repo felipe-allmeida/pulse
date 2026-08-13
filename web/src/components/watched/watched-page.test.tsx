@@ -152,6 +152,9 @@ describe('WatchedPage', () => {
     await renderWatched();
 
     expect(pageText()).toContain('no field for one');
+    // The claim has to survive a reader opening devtools: i18n persists a
+    // language preference, so "stored nothing" flat out would be false.
+    expect(pageText()).toContain('only your language preference');
     // The old close was a whole section quoting the record and explaining
     // itself; the bid request above now carries that contrast on its own.
     expect(pageText()).not.toContain('public sealed record');
