@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { AboutHero } from '@/components/about/about-hero';
 import { AboutContact } from '@/components/about/social-links';
+import { FaqSection } from '@/components/about/faq-section';
 import { ExperienceTimeline } from '@/components/about/experience-timeline';
 import { SkillGroups } from '@/components/about/skill-groups';
 import { SectionEyebrow } from '@/components/signal/section-eyebrow';
@@ -27,6 +28,8 @@ export function AboutPage() {
           <SubsectionHeading>{t('about:skillsHeading')}</SubsectionHeading>
           <SkillGroups />
         </section>
+
+        <FaqSection />
 
         <section id="contact" className="scroll-mt-24">
           <AboutContact />

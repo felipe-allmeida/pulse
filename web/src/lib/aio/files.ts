@@ -112,6 +112,13 @@ export function renderPageMarkdown(page: AioPage, base: string): string {
     if (section.bullets?.length) lines.push('');
   }
 
+  if (page.faq?.length) {
+    lines.push(`## ${page.locale === 'pt-BR' ? 'Perguntas frequentes' : 'FAQ'}`, '');
+    for (const entry of page.faq) {
+      lines.push(`### ${entry.question}`, '', entry.answer, '');
+    }
+  }
+
   lines.push('---', '', `Source: ${absoluteUrl(base, page.path)}`, '');
   return lines.join('\n');
 }

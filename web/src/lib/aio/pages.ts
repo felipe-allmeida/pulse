@@ -14,6 +14,7 @@
  * (`/about`, `/pt/about`) served as its own document — a Portuguese URL whose
  * body is English would be worse than no Portuguese URL at all.
  */
+import { faq } from '../../content/faq';
 import { profile } from '../../content/profile';
 import { projects } from '../../content/projects';
 import type { Project } from '../../content/projects';
@@ -41,6 +42,12 @@ export interface AioPage {
   /** The single `<h1>` of the static shell. */
   heading: string;
   sections: AioSection[];
+  /**
+   * Question/answer pairs shown on the page itself. Kept apart from
+   * `sections` because they are also emitted as `FAQPage` JSON-LD, and that
+   * markup is only legitimate while it mirrors visible content.
+   */
+  faq?: { question: string; answer: string }[];
   /** Sitemap hint. */
   priority: number;
 }
@@ -53,6 +60,7 @@ const COPY = {
   skills: { en: 'Skills', 'pt-BR': 'Competências' },
   coreSkills: { en: 'Core skills', 'pt-BR': 'Principais competências' },
   contact: { en: 'Contact', 'pt-BR': 'Contato' },
+  faq: { en: 'FAQ', 'pt-BR': 'Perguntas frequentes' },
   overview: { en: 'Overview', 'pt-BR': 'Visão geral' },
   stack: { en: 'Stack', 'pt-BR': 'Stack' },
   highlights: { en: 'Highlights', 'pt-BR': 'Destaques' },
@@ -194,6 +202,7 @@ function aboutPage(locale: Locale): AioPage {
         ],
       },
     ],
+    faq: faq.map((entry) => ({ question: L(entry.question), answer: L(entry.answer) })),
     priority: 0.9,
   });
 }

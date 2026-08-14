@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { projects } from '../../content/projects';
+import { faq } from '../../content/faq';
 import { profile } from '../../content/profile';
 import type { Locale } from '../../content/types';
 import { buildAllPages, buildPages, pageForPath } from './pages';
@@ -287,4 +288,35 @@ it('index.html keeps the markers the aio plugin fills', () => {
   expect(html).toContain('<!--aio:body-->');
   // The plugin swaps this exact string per locale.
   expect(html).toContain('<html lang="en">');
+});
+
+describe('faq', () => {
+  it('carries the question/answer pairs on /about in both locales', () => {
+    expect(page('/about').faq).toHaveLength(faq.length);
+    expect(page('/about').faq?.[0].question).toBe(faq[0].question.en);
+    expect(page('/about', 'pt-BR').faq?.[0].question).toBe(faq[0].question['pt-BR']);
+    // Only /about has one — no other page renders the section.
+    expect(allPages.filter((p) => p.faq?.length)).toHaveLength(2);
+  });
+
+  it('emits FAQPage markup the About page actually shows', () => {
+    const [faqNode] = nodesOfType('/about', 'FAQPage');
+    const questions = faqNode.mainEntity as { name: string; acceptedAnswer: { text: string } }[];
+
+    expect(questions).toHaveLength(faq.length);
+    expect(questions[0].name).toBe(faq[0].question.en);
+    expect(questions[0].acceptedAnswer.text).toBe(faq[0].answer.en);
+
+    // Claimed by the page, but not confused with the ProfilePage's own
+    // mainEntity (the person).
+    expect(nodesOfType('/about', 'ProfilePage')[0].hasPart).toEqual({ '@id': `${BASE}/about#faq` });
+    expect(nodesOfType('/about', 'ProfilePage')[0].mainEntity).toEqual({ '@id': `${BASE}/#person` });
+    expect(nodesOfType('/projects', 'FAQPage')).toHaveLength(0);
+  });
+
+  it('renders the answers into the static shell and the markdown mirror', () => {
+    expect(renderStaticBody(page('/about'))).toContain(faq[0].answer.en);
+    expect(renderPageMarkdown(page('/about', 'pt-BR'), BASE)).toContain('## Perguntas frequentes');
+    expect(renderPageMarkdown(page('/about', 'pt-BR'), BASE)).toContain(faq[0].answer['pt-BR']);
+  });
 });

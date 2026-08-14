@@ -161,6 +161,33 @@ export function jsonLdForPage(page: AioPage, base: string, siteName: string): Js
     graph.push(projectNode(base, project, page.locale));
   }
 
+  /*
+    The FAQ is its own node rather than a second `@type` on the page: a
+    ProfilePage's `mainEntity` is the person, an FAQPage's is the question
+    list, and merging the two would leave both meanings ambiguous. The page
+    claims it via `hasPart`.
+
+    It is emitted only from `page.faq`, which is the same array the About page
+    renders — structured data describing answers a visitor cannot find on the
+    page is the one kind of markup search engines actively penalise.
+  */
+  if (page.faq?.length) {
+    const faqId = `${url}#faq`;
+    pageNode.hasPart = { '@id': faqId };
+    graph.push({
+      '@type': 'FAQPage',
+      '@id': faqId,
+      url,
+      inLanguage: page.locale,
+      about: { '@id': personId(base) },
+      mainEntity: page.faq.map((entry) => ({
+        '@type': 'Question',
+        name: entry.question,
+        acceptedAnswer: { '@type': 'Answer', text: entry.answer },
+      })),
+    });
+  }
+
   graph.push(pageNode);
 
   const breadcrumb = breadcrumbNode(base, page);

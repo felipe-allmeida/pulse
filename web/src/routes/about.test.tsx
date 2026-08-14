@@ -16,8 +16,10 @@ describe('AboutPage', () => {
   it('renders the status pill availability text and positioning detail', async () => {
     await renderWithI18n(<AboutPage />);
 
-    expect(screen.getByText(/available now/i)).toBeInTheDocument();
-    expect(screen.getByText(/open to staff \/ principal/i)).toBeInTheDocument();
+    // Scoped to the pill's own span: the FAQ below also says he is available
+    // now, in prose, so an unscoped text query matches twice.
+    expect(screen.getByText(/available now/i, { selector: 'span' })).toBeInTheDocument();
+    expect(screen.getByText(/open to staff \/ principal/i, { selector: 'span' })).toBeInTheDocument();
   });
 
   it('renders the initials-avatar placeholder as first + last name initials', async () => {

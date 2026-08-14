@@ -19,6 +19,8 @@ import { jsonLdForPage } from './json-ld';
 /** Open Graph wants underscored territory codes, not BCP-47 tags. */
 const OG_LOCALE: Record<Locale, string> = { en: 'en_US', 'pt-BR': 'pt_BR' };
 
+const FAQ_HEADING: Record<Locale, string> = { en: 'FAQ', 'pt-BR': 'Perguntas frequentes' };
+
 export function escapeHtml(value: string): string {
   return value
     .replace(/&/g, '&amp;')
@@ -112,6 +114,15 @@ export function renderStaticBody(page: AioPage): string {
     if (section.bullets?.length) {
       parts.push(`<ul>${section.bullets.map((b) => `<li>${escapeHtml(b)}</li>`).join('')}</ul>`);
     }
+  }
+
+  if (page.faq?.length) {
+    parts.push(`<h2>${escapeHtml(FAQ_HEADING[page.locale])}</h2>`);
+    parts.push(
+      `<dl>${page.faq
+        .map((entry) => `<dt>${escapeHtml(entry.question)}</dt><dd>${escapeHtml(entry.answer)}</dd>`)
+        .join('')}</dl>`,
+    );
   }
 
   return `<noscript>\n      <article>\n        ${parts.join('\n        ')}\n      </article>\n    </noscript>`;
