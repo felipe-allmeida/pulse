@@ -2,6 +2,7 @@
 **/obj/
 **/node_modules/
 web/dist/
+web/dist-prerender/
 .git/
 .superpowers/
 docs/

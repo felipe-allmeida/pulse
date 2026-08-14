@@ -4,10 +4,23 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Pulse — live presence</title>
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff" />
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0a0a0a" />
+    <!--
+      Filled per route by the `pulse-aio` plugin (web/plugins/aio.ts): title,
+      description, canonical, Open Graph, and the Schema.org @graph. Removing
+      this marker fails the build.
+    -->
+    <!--aio:head-->
   </head>
   <body>
-    <div id="root"></div>
+    <!--
+      Filled with this route's markup, rendered at build time from the real
+      component tree (web/src/entry-prerender.tsx), so the crawlers that never
+      run the bundle receive the page instead of an empty div. The client
+      mounts over it with createRoot.
+    -->
+    <div id="root"><!--aio:app--></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

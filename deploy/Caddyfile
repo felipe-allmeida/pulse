@@ -44,10 +44,39 @@
 		}
 	}
 
+	# The documents now carry each route's prerendered markup (see
+	# web/plugins/aio.ts), so they are tens of kilobytes of highly repetitive
+	# HTML rather than a one-line shell — and nothing here was compressing
+	# them. Text compression is the single cheapest win available on this
+	# stack; zstd first, gzip for clients that do not speak it.
+	encode zstd gzip
+
+	# Markdown mirrors (/about.md, /llms.txt …) are plain text for agents, not
+	# downloads. The caddy:alpine image ships no /etc/mime.types, so Go's mime
+	# package has no mapping for .md and would serve it as octet-stream —
+	# which makes a browser download the file instead of showing it.
+	@markdown path *.md
+	header @markdown Content-Type "text/markdown; charset=utf-8"
+
 	# Everything else: the built SPA, with client-side-router fallback.
+	#
+	# The `{path}.html` step is what serves the AIO documents the web build
+	# generates (see web/plugins/aio.ts): /about resolves to /srv/about.html,
+	# /projects/pulse to /srv/projects/pulse.html — each one a complete
+	# document with that route's title, description, JSON-LD, and a no-script
+	# copy of its text, for the AI crawlers that never run the bundle. Every
+	# one of them still boots the same SPA, so browsers are unaffected. Routes
+	# without a generated document (and anything unknown) fall through to the
+	# SPA shell exactly as before.
+	#
+	# `{path}.html` is tried FIRST, before the literal path, because try_files
+	# matches directories too: /projects would otherwise resolve to the
+	# /srv/projects/ directory (which holds the per-project documents and has
+	# no index.html of its own) and 404 instead of serving projects.html. The
+	# extra stat per asset request is not worth reordering for.
 	handle {
 		root * /srv
-		try_files {path} /index.html
+		try_files {path}.html {path} /index.html
 		file_server
 	}
 }

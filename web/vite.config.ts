@@ -4,6 +4,7 @@ import react from '@vitejs/plugin-react'
 import { TanStackRouterVite } from '@tanstack/router-plugin/vite'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { aio } from './plugins/aio'
 
 const dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -12,7 +13,9 @@ const apiDevOrigin = 'http://localhost:5059'
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [TanStackRouterVite({ target: 'react', autoCodeSplitting: true }), react()],
+  // `aio` last: it reads the finished index.html off disk in writeBundle and
+  // fans it out into one crawlable document per route.
+  plugins: [TanStackRouterVite({ target: 'react', autoCodeSplitting: true }), react(), aio()],
   resolve: { alias: { '@': path.resolve(dirname, './src') } },
   server: {
     port: 5173,
