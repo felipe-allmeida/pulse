@@ -12,9 +12,12 @@ a production-grade engineering reference, not a toy demo.
 
 ## Live demo
 
-`https://pulse.<domain>` — **coming soon.** The URL is assigned once the owner
-provisions DNS for the deployed Hetzner box (see [Deploy](#deploy) below); no
-placeholder or fake domain is linked here yet.
+**https://pulse.felipealmeida.tech**
+
+The same hostname the deployment already targets — NPM proxies it to
+`pulse-web` (see [`deploy/compose.prod.yml`](deploy/compose.prod.yml)) and it is
+what the build stamps into every canonical URL, `hreflang`, and sitemap entry
+(see [Found by AI search](#found-by-ai-search-aio)).
 
 ## Architecture
 
