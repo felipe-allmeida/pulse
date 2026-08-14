@@ -1,14 +1,12 @@
 /**
- * Renders an `AioPage` into the two chunks the build step splices into the
- * built `index.html`: the `<head>` block and the static body fallback.
+ * Renders an `AioPage` into the `<head>` block the build step splices into
+ * every emitted document.
  *
- * The body fallback lives in `<noscript>`. That is a deliberate trade: a
- * crawler fetching the raw HTML gets the full text of the route, while a real
- * browser — which runs the SPA — never paints it, so there is no flash of
- * duplicate content and nothing is hidden from users that is shown to
- * crawlers. The markdown mirrors (`/about.md`, linked from `<head>` and from
- * `llms.txt`) cover the extraction pipelines that strip `<noscript>` before
- * chunking.
+ * The body no longer comes from here: each document carries the route's real
+ * markup, rendered from the component tree by `src/entry-prerender.tsx`. This
+ * file owns the part a crawler reads before it reads anything else — title,
+ * description, canonical, the `hreflang` set, the social card, and the
+ * Schema.org graph.
  */
 import type { Locale } from '../../content/types';
 import { DEFAULT_LOCALE } from '../../i18n/locale-url';
@@ -18,8 +16,6 @@ import { jsonLdForPage } from './json-ld';
 
 /** Open Graph wants underscored territory codes, not BCP-47 tags. */
 const OG_LOCALE: Record<Locale, string> = { en: 'en_US', 'pt-BR': 'pt_BR' };
-
-const FAQ_HEADING: Record<Locale, string> = { en: 'FAQ', 'pt-BR': 'Perguntas frequentes' };
 
 export function escapeHtml(value: string): string {
   return value
@@ -100,30 +96,4 @@ export function renderHead(page: AioPage, base: string, siteName: string, author
   ];
 
   return tags.join('\n    ');
-}
-
-/** The `<noscript>` mirror of the route's content. */
-export function renderStaticBody(page: AioPage): string {
-  const parts: string[] = [`<h1>${escapeHtml(page.heading)}</h1>`, `<p>${escapeHtml(page.description)}</p>`];
-
-  for (const section of page.sections) {
-    parts.push(`<h2>${escapeHtml(section.heading)}</h2>`);
-    for (const paragraph of section.paragraphs ?? []) {
-      parts.push(`<p>${escapeHtml(paragraph)}</p>`);
-    }
-    if (section.bullets?.length) {
-      parts.push(`<ul>${section.bullets.map((b) => `<li>${escapeHtml(b)}</li>`).join('')}</ul>`);
-    }
-  }
-
-  if (page.faq?.length) {
-    parts.push(`<h2>${escapeHtml(FAQ_HEADING[page.locale])}</h2>`);
-    parts.push(
-      `<dl>${page.faq
-        .map((entry) => `<dt>${escapeHtml(entry.question)}</dt><dd>${escapeHtml(entry.answer)}</dd>`)
-        .join('')}</dl>`,
-    );
-  }
-
-  return `<noscript>\n      <article>\n        ${parts.join('\n        ')}\n      </article>\n    </noscript>`;
 }

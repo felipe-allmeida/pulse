@@ -44,6 +44,13 @@
 		}
 	}
 
+	# The documents now carry each route's prerendered markup (see
+	# web/plugins/aio.ts), so they are tens of kilobytes of highly repetitive
+	# HTML rather than a one-line shell — and nothing here was compressing
+	# them. Text compression is the single cheapest win available on this
+	# stack; zstd first, gzip for clients that do not speak it.
+	encode zstd gzip
+
 	# Markdown mirrors (/about.md, /llms.txt …) are plain text for agents, not
 	# downloads. The caddy:alpine image ships no /etc/mime.types, so Go's mime
 	# package has no mapping for .md and would serve it as octet-stream —

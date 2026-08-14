@@ -50,15 +50,24 @@ export function LiveMap() {
           aria-label={t('dashboard:liveMap.ariaLabel')}
         >
           <g>
-            {world.features.map((geo) => {
+            {/*
+              Skipped in the build-time render (see src/entry-prerender.tsx).
+              The country outlines are ~200 KB of path data per document and
+              carry no information a crawler can use — the map is decoration
+              around the numbers, and the numbers are live anyway. The client
+              draws it a moment later, from the same data already in the
+              bundle. Everything else on the page prerenders normally.
+            */}
+            {(import.meta.env.SSR ? [] : world.features).map((geo) => {
               const count = counts.get(matchCountryName(geo.properties.name)) ?? 0;
               const ratio = maxCount > 0 ? count / maxCount : 0;
               const fill = `color-mix(in oklch, var(--color-chart-1) ${Math.round(ratio * 100)}%, var(--color-muted))`;
               return (
                 <path key={geo.id ?? geo.properties.name} d={path(geo) ?? undefined} fill={fill} stroke="var(--color-background)" strokeWidth={0.5}>
-                  <title>
-                    {geo.properties.name} — {t('dashboard:liveMap.visitCount', { count })}
-                  </title>
+                  {/* One interpolated string, not text + value siblings: React
+                      cannot collapse an array of children into a <title>, and
+                      warns about it on every build-time render. */}
+                  <title>{`${geo.properties.name} — ${t('dashboard:liveMap.visitCount', { count })}`}</title>
                 </path>
               );
             })}
@@ -71,14 +80,10 @@ export function LiveMap() {
               return (
                 <g key={`${p.at}-${p.city}-${i}`} transform={`translate(${x}, ${y})`}>
                   <circle className="live-map-ping-ring" r={3} fill="none" stroke="var(--color-chart-1)" strokeWidth={1.5}>
-                    <title>
-                      {p.city}, {p.country}
-                    </title>
+                    <title>{`${p.city}, ${p.country}`}</title>
                   </circle>
                   <circle r={2} fill="var(--color-chart-1)">
-                    <title>
-                      {p.city}, {p.country}
-                    </title>
+                    <title>{`${p.city}, ${p.country}`}</title>
                   </circle>
                 </g>
               );

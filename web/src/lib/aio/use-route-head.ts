@@ -1,6 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useRouterState } from '@tanstack/react-router';
-import { localeFromPathname, pathForLocale, routePathFromPathname } from '../../i18n/locale-url';
+import {
+  DEFAULT_LOCALE,
+  localeFromPathname,
+  pathForLocale,
+  routePathFromPathname,
+} from '../../i18n/locale-url';
 import { pageForPath } from './pages';
 
 /**
@@ -32,7 +37,11 @@ export function useRouteHead(): void {
   // effect instead would race — the router updates its state before it pushes
   // to history, so the effect would look up the *previous* URL and retitle the
   // page to the route it just left.
-  const [locale] = useState(() => localeFromPathname(window.location.pathname));
+  const [locale] = useState(() =>
+    // The build-time render has no address bar; the effect that uses this
+    // never runs there, so the default is only ever a placeholder.
+    typeof window === 'undefined' ? DEFAULT_LOCALE : localeFromPathname(window.location.pathname),
+  );
 
   useEffect(() => {
     const page = pageForPath(pathForLocale(routePathFromPathname(routerPath), locale));

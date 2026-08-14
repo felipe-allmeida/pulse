@@ -217,23 +217,47 @@ title, no bio, nothing to cite. Google renders JavaScript, but nobody else in
 that list does.
 
 So the web build emits a real document per route. [`web/plugins/aio.ts`](web/plugins/aio.ts)
-takes the finished `index.html` and fans it out, filling the `<!--aio:head-->`
-and `<!--aio:body-->` markers from the same `src/content/*` data the React app
-renders from:
+takes the finished `index.html` and fans it out, filling `<!--aio:head-->` from
+the same `src/content/*` data the React app renders from, and `<!--aio:app-->`
+with that route's markup — rendered from the real component tree at build time
+by [`web/src/entry-prerender.tsx`](web/src/entry-prerender.tsx):
 
 | Emitted | What it carries |
 |---|---|
-| `index.html`, `about.html`, `projects.html`, `projects/<slug>.html`, `live.html`, `watched.html`, and the same set again under `pt/` | Per-route `<title>`, description, canonical, `hreflang` alternates, Open Graph, and a no-script mirror of the route's text |
+| `index.html`, `about.html`, `projects.html`, `projects/<slug>.html`, `live.html`, `watched.html`, and the same set again under `pt/` | Per-route `<title>`, description, canonical, `hreflang` alternates, Open Graph, and the route's real rendered markup inside `#root` |
 | Schema.org `@graph` in each document | `Person` (one `@id` across every page), `WebSite`, `ProfilePage` / `CollectionPage`, `SoftwareSourceCode` for public repos, `BreadcrumbList` |
 | `robots.txt` | Every answer-engine crawler explicitly allowed, plus the sitemap |
 | `sitemap.xml` | Every route |
 | `llms.txt`, `llms-full.txt` | The curated markdown map agents probe for, and the whole site in one fetch |
 | `<route>.md` | A markdown mirror of each route, linked from its `<head>` |
 
-Each generated document still boots the same SPA from the same asset graph, so
-browsers get exactly the app they got before — the static content lives in
-`<noscript>` and never paints. Caddy's `try_files {path}.html {path}` is what
-maps `/about` to `about.html` (see [`deploy/Caddyfile`](deploy/Caddyfile)).
+Each generated document still boots the same SPA from the same asset graph.
+Caddy's `try_files {path}.html {path}` is what maps `/about` to `about.html`
+(see [`deploy/Caddyfile`](deploy/Caddyfile)).
+
+### Prerendered, not server-rendered
+
+There is no Node process in production — Caddy serves static files. So
+`pnpm build` runs twice: once with `--ssr` to produce the render entry, then
+the client build, whose plugin calls that entry for every route × locale and
+splices the markup into each document.
+
+The client mounts with `createRoot`, **not** `hydrateRoot`. This app's first
+paint is full of live values — presence counts, the visitor's own city, event
+feeds — that cannot match markup rendered at build time, and hydration
+mismatches on that kind of content produce subtle, drifting bugs. Re-rendering
+costs one paint over markup that is already correct and already styled.
+
+What prerendering does impose is a constraint: everything reachable from the
+render entry has to survive a render with no `window`, `document` or
+`navigator`. [`web/src/entry-prerender.test.ts`](web/src/entry-prerender.test.ts)
+runs in a **Node** environment (not jsdom) precisely so that a regression fails
+the suite instead of silently shipping empty `#root`s.
+
+The world map is the one deliberate omission: its country outlines are ~200 KB
+of path data per document and carry nothing a crawler can use, so they are
+skipped under `import.meta.env.SSR` and drawn on the client. That alone took
+the home document from 220 KB to 36 KB.
 
 ### One URL per language
 

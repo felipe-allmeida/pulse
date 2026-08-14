@@ -7,7 +7,7 @@ import { profile } from '../../content/profile';
 import type { Locale } from '../../content/types';
 import { buildAllPages, buildPages, pageForPath } from './pages';
 import { jsonLdForPage } from './json-ld';
-import { renderHead, renderStaticBody, serialiseJsonLd } from './render';
+import { renderHead, serialiseJsonLd } from './render';
 import {
   AI_USER_AGENTS,
   renderLlmsFullTxt,
@@ -207,25 +207,6 @@ describe('json-ld', () => {
   });
 });
 
-describe('static body', () => {
-  const body = renderStaticBody(page('/about'));
-
-  it('mirrors the route text inside <noscript> with exactly one h1', () => {
-    expect(body).toMatch(/^<noscript>/);
-    expect(body.match(/<h1>/g)).toHaveLength(1);
-    expect(body).toContain(profile.experience[0].org);
-  });
-
-  it('escapes content rather than trusting it as markup', () => {
-    const escaped = renderStaticBody({
-      ...page('/about'),
-      heading: '<script>alert(1)</script>',
-    });
-    expect(escaped).not.toContain('<script>alert(1)</script>');
-    expect(escaped).toContain('&lt;script&gt;');
-  });
-});
-
 describe('crawler files', () => {
   it('allows every answer-engine crawler and advertises the sitemap', () => {
     const robots = renderRobotsTxt(BASE);
@@ -285,7 +266,7 @@ describe('crawler files', () => {
 it('index.html keeps the markers the aio plugin fills', () => {
   const html = readFileSync(join(__dirname, '../../../index.html'), 'utf8');
   expect(html).toContain('<!--aio:head-->');
-  expect(html).toContain('<!--aio:body-->');
+  expect(html).toContain('<!--aio:app-->');
   // The plugin swaps this exact string per locale.
   expect(html).toContain('<html lang="en">');
 });
@@ -314,8 +295,7 @@ describe('faq', () => {
     expect(nodesOfType('/projects', 'FAQPage')).toHaveLength(0);
   });
 
-  it('renders the answers into the static shell and the markdown mirror', () => {
-    expect(renderStaticBody(page('/about'))).toContain(faq[0].answer.en);
+  it('renders the answers into the markdown mirror', () => {
     expect(renderPageMarkdown(page('/about', 'pt-BR'), BASE)).toContain('## Perguntas frequentes');
     expect(renderPageMarkdown(page('/about', 'pt-BR'), BASE)).toContain(faq[0].answer['pt-BR']);
   });

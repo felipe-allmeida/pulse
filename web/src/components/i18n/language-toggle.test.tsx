@@ -1,23 +1,40 @@
+import {
+  RouterProvider,
+  createMemoryHistory,
+  createRootRoute,
+  createRoute,
+  createRouter,
+} from '@tanstack/react-router';
 import { fireEvent, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it } from 'vitest';
+import { basepathForLocale } from '@/i18n/locale-url';
 import { renderWithI18n } from '@/test/render-with-i18n';
 import { LanguageToggle } from './language-toggle';
 
-/** Puts jsdom on a given path so the toggle can mirror it into the other locale. */
-function visit(pathname: string) {
-  window.history.replaceState({}, '', pathname);
-}
+/**
+ * The toggle reads the current route from the router, so the test mounts it in
+ * one — at the same basepath the app uses for that locale.
+ */
+async function openMenu(pathname = '/', locale: 'en' | 'pt-BR' = 'en') {
+  const rootRoute = createRootRoute({ component: LanguageToggle });
+  const routes = ['/', '/about', '/projects', '/projects/$slug'].map((path) =>
+    createRoute({ getParentRoute: () => rootRoute, path, component: () => null }),
+  );
+  const router = createRouter({
+    routeTree: rootRoute.addChildren(routes),
+    basepath: basepathForLocale(locale),
+    history: createMemoryHistory({ initialEntries: [pathname] }),
+  });
 
-async function openMenu(locale: 'en' | 'pt-BR' = 'en') {
-  await renderWithI18n(<LanguageToggle />, { locale });
-  fireEvent.keyDown(screen.getByRole('button', { name: /language|idioma/i }), { key: 'Enter' });
+  await renderWithI18n(<RouterProvider router={router as never} />, { locale });
+  // RouterProvider paints nothing until the router has loaded its first match.
+  fireEvent.keyDown(await screen.findByRole('button', { name: /language|idioma/i }), { key: 'Enter' });
 }
 
 describe('LanguageToggle', () => {
   beforeEach(() => {
     window.localStorage.clear();
     document.documentElement.lang = '';
-    visit('/');
   });
 
   it('offers both PT and EN controls in the menu', async () => {
@@ -28,8 +45,7 @@ describe('LanguageToggle', () => {
   });
 
   it('links each language to its own URL for the route being viewed', async () => {
-    visit('/projects/pulse');
-    await openMenu();
+    await openMenu('/projects/pulse');
 
     // Same route, other locale — switching language never dumps the visitor
     // back on the home page.
@@ -41,8 +57,7 @@ describe('LanguageToggle', () => {
   });
 
   it('mirrors a prefixed path back to the unprefixed one', async () => {
-    visit('/pt/about');
-    await openMenu('pt-BR');
+    await openMenu('/pt/about', 'pt-BR');
 
     expect(await screen.findByRole('menuitem', { name: /english/i })).toHaveAttribute('href', '/about');
     expect(screen.getByRole('menuitem', { name: /português/i })).toHaveAttribute('href', '/pt/about');

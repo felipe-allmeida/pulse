@@ -1,4 +1,5 @@
 import { Check, Languages } from 'lucide-react';
+import { useRouterState } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import {
@@ -8,7 +9,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import type { Locale } from '@/content/types';
-import { LOCALE_STORAGE_KEY, switchLocalePath } from '@/i18n/locale-url';
+import { LOCALE_STORAGE_KEY, pathForLocale, routePathFromPathname } from '@/i18n/locale-url';
 
 // Each language is named in its own endonym ("English" / "Português") —
 // the standard pattern for a language switcher — so the keys hold the same
@@ -29,13 +30,22 @@ const LANGUAGE_OPTIONS: { locale: Locale; labelKey: 'languageEn' | 'languagePt' 
  * contradict every one of those. The full reload is the price, paid once per
  * switch.
  *
- * They are real anchors, so the options open in a new tab, survive a
- * right-click, and — usefully — give crawlers the link between the two
- * language versions.
+ * They are real anchors, so the options open in a new tab and survive a
+ * right-click. They are not how crawlers find the other language, though —
+ * the menu only mounts once opened, so it is absent from the served HTML.
+ * Reciprocal `hreflang` in the document head does that job.
  */
 export function LanguageToggle() {
   const { t, i18n } = useTranslation();
   const activeLocale = (i18n.resolvedLanguage ?? i18n.language) as Locale;
+
+  // The route being viewed, from the router rather than `window.location`, so
+  // the links are already correct in the build-time render — a document whose
+  // language links all point at the home page is a worse map of the site than
+  // one whose links point at the same route in the other language.
+  const routePath = routePathFromPathname(
+    useRouterState({ select: (state) => state.location.pathname }),
+  );
 
   return (
     <DropdownMenu>
@@ -53,7 +63,7 @@ export function LanguageToggle() {
           return (
             <DropdownMenuItem key={option.locale} asChild aria-current={isActive}>
               <a
-                href={switchLocalePath(window.location.pathname, option.locale)}
+                href={pathForLocale(routePath, option.locale)}
                 hrefLang={option.locale}
                 // Remembered so a later visit to the bare root lands in the
                 // language this visitor actually picked.

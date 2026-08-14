@@ -14,12 +14,13 @@
     <!--aio:head-->
   </head>
   <body>
-    <div id="root"></div>
     <!--
-      A no-script mirror of this route's content, for the AI crawlers that
-      fetch the HTML and never run it. Also filled by `pulse-aio`.
+      Filled with this route's markup, rendered at build time from the real
+      component tree (web/src/entry-prerender.tsx), so the crawlers that never
+      run the bundle receive the page instead of an empty div. The client
+      mounts over it with createRoot.
     -->
-    <!--aio:body-->
+    <div id="root"><!--aio:app--></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
