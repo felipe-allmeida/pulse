@@ -70,6 +70,13 @@ describe('head', () => {
     expect(head).toContain('max-snippet:-1');
   });
 
+  it('points the social card at an absolute image URL', () => {
+    // A relative og:image is the most common reason a link preview renders blank.
+    expect(head).toContain(`<meta property="og:image" content="${BASE}/og.png" />`);
+    expect(head).toContain('<meta name="twitter:card" content="summary_large_image" />');
+    expect(head).toContain(`<meta name="twitter:image" content="${BASE}/og.png" />`);
+  });
+
   it('points at the markdown mirror of the same route', () => {
     expect(head).toContain('<link rel="alternate" type="text/markdown" href="/about.md"');
     expect(renderHead(page('/'), BASE, SITE_NAME, profile.name)).toContain('href="/index.md"');

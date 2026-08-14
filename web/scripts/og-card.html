@@ -1,0 +1,144 @@
+<!doctype html>
+<!--
+  Source for web/public/og.png — the 1200×630 social/AI-preview card.
+
+  Rendered to PNG by scripts/generate-og.mjs, which is run by hand and its
+  output committed. It is deliberately NOT part of `pnpm build`: rasterising
+  needs a headless browser, and CI has no business installing Chromium to
+  redraw a card that changes once a year.
+
+  Colours are copied from src/styles.css rather than imported: this file is
+  opened as a bare file:// URL with no build step, so it cannot resolve the
+  Tailwind theme. --color-signal (#3ae0c4) and the dark --background
+  (0 0% 3.9% → #0a0a0a) are the two that matter; keep them in step by hand.
+-->
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        width: 1200px;
+        height: 630px;
+        background: #0a0a0a;
+        color: #fafafa;
+        font-family: 'Liberation Sans', 'DejaVu Sans', sans-serif;
+        overflow: hidden;
+      }
+
+      /* The aqua bloom behind the mark — the same "live signal" cue the site's
+         hero uses, dimmed so the type stays the brightest thing on the card. */
+      .glow {
+        position: absolute;
+        top: -180px;
+        right: -120px;
+        width: 620px;
+        height: 620px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(58, 224, 196, 0.22) 0%, rgba(58, 224, 196, 0) 68%);
+      }
+
+      .grid {
+        position: absolute;
+        inset: 0;
+        background-image:
+          linear-gradient(rgba(58, 224, 196, 0.05) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(58, 224, 196, 0.05) 1px, transparent 1px);
+        background-size: 60px 60px;
+        mask-image: linear-gradient(to bottom right, #000 0%, transparent 70%);
+      }
+
+      .card {
+        position: relative;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        padding: 72px 80px;
+      }
+
+      .mark {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        font-family: 'DejaVu Sans Mono', 'Liberation Mono', monospace;
+        font-size: 30px;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+      }
+
+      .dot {
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        background: #3ae0c4;
+        box-shadow: 0 0 18px #3ae0c4;
+      }
+
+      h1 {
+        font-size: 86px;
+        font-weight: 700;
+        letter-spacing: -0.035em;
+        line-height: 1;
+      }
+
+      .role {
+        margin-top: 26px;
+        font-size: 35px;
+        font-weight: 400;
+        color: #a1a1aa;
+        letter-spacing: -0.01em;
+      }
+
+      .tagline {
+        margin-top: 18px;
+        font-size: 28px;
+        color: #71717a;
+        max-width: 900px;
+      }
+
+      .stack {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+
+      .chip {
+        font-family: 'DejaVu Sans Mono', 'Liberation Mono', monospace;
+        font-size: 21px;
+        color: #3ae0c4;
+        border: 1px solid rgba(58, 224, 196, 0.35);
+        border-radius: 999px;
+        padding: 9px 20px;
+        background: rgba(58, 224, 196, 0.07);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="glow"></div>
+    <div class="grid"></div>
+    <div class="card">
+      <div class="mark"><span class="dot"></span>pulse</div>
+
+      <div>
+        <h1>Felipe de Almeida</h1>
+        <div class="role">Software Engineer &amp; Architect</div>
+        <div class="tagline">Distributed systems, developer platforms, and cloud infrastructure.</div>
+      </div>
+
+      <div class="stack">
+        <span class="chip">.NET</span>
+        <span class="chip">React</span>
+        <span class="chip">SignalR</span>
+        <span class="chip">RabbitMQ</span>
+        <span class="chip">Postgres</span>
+        <span class="chip">Terraform</span>
+      </div>
+    </div>
+  </body>
+</html>

@@ -59,9 +59,17 @@ export function renderHead(page: AioPage, base: string, siteName: string, author
     property('og:description', page.description),
     property('og:url', url),
     property('og:locale', 'en'),
-    meta('twitter:card', 'summary'),
+    // One site-wide card rather than one per route: the image says who this is,
+    // which is the same answer on every page. Absolute URL — relative og:image
+    // is the single most common reason a preview renders blank.
+    property('og:image', `${base}/og.png`),
+    property('og:image:width', '1200'),
+    property('og:image:height', '630'),
+    property('og:image:alt', `${author} — ${siteName}`),
+    meta('twitter:card', 'summary_large_image'),
     meta('twitter:title', page.title),
     meta('twitter:description', page.description),
+    meta('twitter:image', `${base}/og.png`),
     `<script type="application/ld+json">${serialiseJsonLd(jsonLdForPage(page, base, siteName))}</script>`,
   ];
 
