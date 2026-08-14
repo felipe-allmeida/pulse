@@ -5,7 +5,6 @@ import {
   pathForLocale,
   rootRedirectPath,
   routePathFromPathname,
-  switchLocalePath,
 } from './locale-url';
 
 describe('localeFromPathname', () => {
@@ -40,10 +39,10 @@ describe('path translation', () => {
   });
 
   it('round-trips a path between locales', () => {
-    expect(switchLocalePath('/projects/pulse', 'pt-BR')).toBe('/pt/projects/pulse');
-    expect(switchLocalePath('/pt/projects/pulse', 'en')).toBe('/projects/pulse');
-    expect(switchLocalePath('/pt', 'en')).toBe('/');
-    expect(switchLocalePath('/', 'pt-BR')).toBe('/pt');
+    // What the language switcher does: strip the prefix, add the other one.
+    expect(pathForLocale(routePathFromPathname('/pt/projects/pulse'), 'en')).toBe('/projects/pulse');
+    expect(pathForLocale(routePathFromPathname('/projects/pulse'), 'pt-BR')).toBe('/pt/projects/pulse');
+    expect(pathForLocale(routePathFromPathname('/pt'), 'en')).toBe('/');
   });
 
   it('gives the router a basepath it accepts', () => {

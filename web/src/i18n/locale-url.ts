@@ -57,11 +57,6 @@ export function basepathForLocale(locale: Locale): string {
   return LOCALE_PREFIX[locale] || '/';
 }
 
-/** Translates a live pathname into its equivalent in another locale. */
-export function switchLocalePath(pathname: string, target: Locale): string {
-  return pathForLocale(routePathFromPathname(pathname), target);
-}
-
 function isLocale(value: string | null): value is Locale {
   return value !== null && (LOCALES as string[]).includes(value);
 }
