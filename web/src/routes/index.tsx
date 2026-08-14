@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { AskChips } from '@/components/ask/ask-chips';
 import { EngineeringShowcase } from '@/components/home/engineering-showcase';
 import { Hero } from '@/components/home/hero';
+import { VisitHistory } from '@/components/home/visit-history';
 import { EventFeed } from '@/components/event-feed';
 import { KpiRow } from '@/components/kpi-row';
 import { LiveMap } from '@/components/live-map';
@@ -91,6 +92,21 @@ function Index() {
           </div>
         </div>
       </section>
+
+      {/*
+        The full stack of true history facts, the long form of the hero's
+        one-line greeting. It used to be a separate /watched page that escalated
+        into browser fingerprinting and a "1 in N" rarity receipt; that section
+        overclaimed (the shares were published estimates multiplied as if
+        independent) and the page was a detour off the portfolio. What survives
+        is the part that is actually measured — this site's own visit history —
+        placed here, after the live-proof block has shown the system running, so
+        the facts read as output of that system rather than a party trick.
+
+        Renders nothing until /api/visitor answers, so the page simply does not
+        have this section for a crawler.
+      */}
+      <VisitHistory />
 
       {/*
         Ask chips (visual coherence Task 2): right after the live-proof

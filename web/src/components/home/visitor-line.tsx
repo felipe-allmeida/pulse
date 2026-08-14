@@ -1,6 +1,5 @@
 import { useMemo, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
-import { Link } from '@tanstack/react-router';
 import { useReducedMotion } from '@/hooks/use-reduced-motion';
 import { useMetrics, useVisitor } from '@/lib/api';
 import { formatOrdinal, formatTimeAgo, pickVisitorFact } from '@/lib/visitor-fact';
@@ -80,24 +79,11 @@ export function VisitorLine({ className }: { className?: string }) {
   }
 
   return (
-    <div className="flex flex-col gap-2">
-      <p className={paragraph} data-testid="visitor-line" data-state="personal">
-        <Trans t={t} i18nKey={phrasing.key} values={phrasing.values} components={{ strong: emphasis }} />{' '}
-        {/* Only claim the dot when there is one — without geo the visitor is not on the map. */}
-        {visitor?.geo ? <>{t(reducedMotion ? 'visitor.dotStatic' : 'visitor.dot')} </> : null}
-        {t('visitor.noCookie')}
-      </p>
-      {/*
-        The way into the long version. Deliberately quiet and opt-in: the line
-        above is the whole moment for most readers, and the full reveal is for
-        the ones who want to know how it was done.
-      */}
-      <Link
-        to="/watched"
-        className="inline-flex min-h-11 w-fit items-center text-sm font-medium text-signal-strong underline-offset-4 hover:underline"
-      >
-        {t('visitor.how')}
-      </Link>
-    </div>
+    <p className={paragraph} data-testid="visitor-line" data-state="personal">
+      <Trans t={t} i18nKey={phrasing.key} values={phrasing.values} components={{ strong: emphasis }} />{' '}
+      {/* Only claim the dot when there is one — without geo the visitor is not on the map. */}
+      {visitor?.geo ? <>{t(reducedMotion ? 'visitor.dotStatic' : 'visitor.dot')} </> : null}
+      {t('visitor.noCookie')}
+    </p>
   );
 }

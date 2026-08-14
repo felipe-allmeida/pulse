@@ -104,42 +104,25 @@ Deliberate constraints, because this is a portfolio and not a party trick:
   same coarse geo the map already used; no fingerprinting, no extra signal
   collection, no client-side probing.
 
-### `/watched` — the long version
+### The full list, further down the page
 
-A quiet "How do I know that?" link under the hero opens the full page, so the
-reveal is opt-in rather than an ambush. It escalates — the whole stack of true
-history facts, then the readings the browser volunteers with no prompt
-(language, timezone, screen, cores, touch, DNT), then those common traits
-multiplied into a "1 in N" — and then turns hard into what this system
-actually keeps: the `VisitStarted` record with no IP field, the Redis TTL that
-erases presence on its own, and a link to `/live`.
+The hero shows one fact at a time. Further down the home page — after the
+live-proof block, once the system has been seen running — the same history is
+laid out in full: every fact that is true of this arrival at once, with a note
+on exactly what the visit left behind (a country, a city, an approximate
+coordinate and a timestamp; no IP, because `VisitStarted` has no field for one).
 
-The turn is the point. A reveal that stops at "look what I can see" is an
-argument about surveillance; ending on the record that *cannot* carry an IP
-makes it an argument about engineering.
+Same source, same constraints as the hero line: no fingerprinting, no
+client-side probing, nothing read from the browser at all. The section simply
+does not render until `/api/visitor` answers, so a crawler never sees a heading
+with an empty list under it.
 
-The receipt table multiplies out OS, browser, language, timezone, resolution,
-cores, touch and DNT into a running "1 in N", and closes on the one row that
-isn't an estimate — the share of this page's own visitors who came from the
-same city. Then the bid request: a real OpenRTB 2.6 message built from those
-same readings, with `user.data.segment` left as the placeholder a data broker
-fills with inferred intent ("in-market for a car", "new parent"). That field is
-the point of the section — it's the part that actually sells, and the only part
-the person it describes can't see.
-
-What it deliberately does not do, though all of it would work: no WebRTC
-public-IP discovery, no canvas/WebGL/audio hashing or font probing, no stored
-fingerprint, no persistence of any kind. `device.ip` in the bid request is
-withheld rather than printed — a real exchange receives it, this page reads it
-once for the city lookup and drops it. The digest it displays is computed for
-the reader and thrown away, so there is no second-visit recognition, which is
-exactly what the copy claims.
-
-On the numbers: every share except `city` is a rounded slice of published
-web-population market share, labelled as such, and the page states plainly that
-multiplying them overstates uniqueness because the dimensions aren't
-independent. It then makes the sharper point — that overstating barely matters,
-since tracking needs to be consistent rather than accurate.
+This block used to be a separate `/watched` page that escalated into browser
+readings (language, timezone, screen, cores, DNT), a "1 in N" rarity receipt and
+an OpenRTB bid request. The receipt was the weak part — the shares were rounded
+market-share estimates multiplied as if the dimensions were independent, which
+overstates uniqueness — and the whole thing was a detour off a portfolio. What
+survived is the part that is actually measured: this site's own visit history.
 
 ## Privacy by design
 

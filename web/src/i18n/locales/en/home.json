@@ -25,8 +25,22 @@
     },
     "dot": "That pulsing dot behind this text is you.",
     "dotStatic": "That lit dot behind this text is you.",
-    "noCookie": "No cookie, no permission, nothing stored.",
-    "how": "How do I know that?"
+    "noCookie": "No cookie, no permission, nothing stored."
+  },
+  "visitHistory": {
+    "eyebrow": "no cookie · no permission",
+    "heading": "What I already knew when you opened this",
+    "lede": "None of this came from your browser — it came from this site's own visit history. You clicked nothing, accepted no banner, and nothing was written to your machine. Every one of these is true right now:",
+    "fact": {
+      "firstEver": "You're the <strong>first person</strong> ever to open this page.",
+      "firstFromCity": "You're the first person from <strong>{{city}}</strong> ever to open this page.",
+      "firstFromCityInDays": "You're the first person from <strong>{{city}}</strong> in <strong>{{days}} days</strong>.",
+      "milestone": "You're exactly the <strong>{{position}}</strong> person to open this page.",
+      "recent24h": "You're the <strong>{{position}}</strong> person here in the last 24 hours.",
+      "previous": "The last person before you arrived from <strong>{{previousCity}}</strong>, {{when}}.",
+      "position": "You're the <strong>{{position}}</strong> person to open this page."
+    },
+    "note": "The line at the top of this page picks one of these at a time, and a reload moves to the next. What's kept from your visit is a country, a city, an approximate coordinate and a timestamp — no IP, not because it was scrubbed but because the event that crosses this system has no field for one."
   },
   "cta": {
     "projects": "See the projects",

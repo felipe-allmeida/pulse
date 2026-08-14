@@ -1,12 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { screen } from '@testing-library/react';
-import {
-  RouterProvider,
-  createMemoryHistory,
-  createRootRoute,
-  createRoute,
-  createRouter,
-} from '@tanstack/react-router';
 import { renderWithI18n } from '@/test/render-with-i18n';
 import type { Locale } from '@/content/types';
 import type { VisitorContext } from '@/types/pulse';
@@ -21,20 +14,9 @@ vi.mock('@/lib/api', () => ({
 
 const { VisitorLine } = await import('./visitor-line');
 
-/**
- * VisitorLine links to /watched, so it needs a router in context. The tree is
- * the minimum that resolves that link plus the route it renders on.
- */
+/** The line is pure prose with no links left in it, so no router is needed. */
 async function renderVisitorLine(locale?: Locale) {
-  const rootRoute = createRootRoute({ component: () => <VisitorLine /> });
-  const indexRoute = createRoute({ getParentRoute: () => rootRoute, path: '/', component: () => null });
-  const watchedRoute = createRoute({ getParentRoute: () => rootRoute, path: '/watched', component: () => null });
-  const routeTree = rootRoute.addChildren([indexRoute, watchedRoute]);
-  const router = createRouter({ routeTree, history: createMemoryHistory({ initialEntries: ['/'] }) });
-
-  const result = await renderWithI18n(<RouterProvider router={router} />, { locale });
-  // The router resolves its route asynchronously, so settle here once and let
-  // every assertion below stay synchronous.
+  const result = await renderWithI18n(<VisitorLine />, { locale });
   await screen.findByTestId('visitor-line');
   return result;
 }

@@ -25,8 +25,22 @@
     },
     "dot": "Aquele ponto pulsando atrás deste texto é você.",
     "dotStatic": "Aquele ponto aceso atrás deste texto é você.",
-    "noCookie": "Nenhum cookie, nenhuma permissão, nada guardado.",
-    "how": "Como eu sei disso?"
+    "noCookie": "Nenhum cookie, nenhuma permissão, nada guardado."
+  },
+  "visitHistory": {
+    "eyebrow": "sem cookie · sem permissão",
+    "heading": "O que eu já sabia quando você abriu isto",
+    "lede": "Nada aqui veio do seu navegador — veio do histórico de visitas deste site. Você não clicou em nada, não aceitou nenhum banner e nada foi gravado na sua máquina. Cada uma destas frases é verdade agora:",
+    "fact": {
+      "firstEver": "Você é a <strong>primeira pessoa</strong> a abrir esta página.",
+      "firstFromCity": "Você é a primeira pessoa de <strong>{{city}}</strong> a abrir esta página.",
+      "firstFromCityInDays": "Você é a primeira pessoa de <strong>{{city}}</strong> em <strong>{{days}} dias</strong>.",
+      "milestone": "Você é exatamente a <strong>{{position}}</strong> pessoa a abrir esta página.",
+      "recent24h": "Você é a <strong>{{position}}</strong> pessoa aqui nas últimas 24 horas.",
+      "previous": "A última pessoa antes de você chegou de <strong>{{previousCity}}</strong>, {{when}}.",
+      "position": "Você é a <strong>{{position}}</strong> pessoa a abrir esta página."
+    },
+    "note": "A frase lá no topo desta página escolhe uma dessas por vez, e recarregar troca para a próxima. Da sua visita ficam guardados país, cidade, uma coordenada aproximada e o horário — sem IP, não porque foi apagado, mas porque o evento que atravessa este sistema não tem campo para ele."
   },
   "cta": {
     "projects": "Ver os projetos",

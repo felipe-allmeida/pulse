@@ -13,7 +13,6 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as LiveRouteImport } from './routes/live'
 import { Route as ProjectsRouteImport } from './routes/projects'
-import { Route as WatchedRouteImport } from './routes/watched'
 import { Route as ProjectsSlugRouteImport } from './routes/projects_.$slug'
 
 const IndexRoute = IndexRouteImport.update({
@@ -36,11 +35,6 @@ const ProjectsRoute = ProjectsRouteImport.update({
   path: '/projects',
   getParentRoute: () => rootRouteImport,
 } as any)
-const WatchedRoute = WatchedRouteImport.update({
-  id: '/watched',
-  path: '/watched',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ProjectsSlugRoute = ProjectsSlugRouteImport.update({
   id: '/projects_/$slug',
   path: '/projects/$slug',
@@ -52,7 +46,6 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/live': typeof LiveRoute
   '/projects': typeof ProjectsRoute
-  '/watched': typeof WatchedRoute
   '/projects/$slug': typeof ProjectsSlugRoute
 }
 export interface FileRoutesByTo {
@@ -60,7 +53,6 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/live': typeof LiveRoute
   '/projects': typeof ProjectsRoute
-  '/watched': typeof WatchedRoute
   '/projects/$slug': typeof ProjectsSlugRoute
 }
 export interface FileRoutesById {
@@ -69,23 +61,14 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/live': typeof LiveRoute
   '/projects': typeof ProjectsRoute
-  '/watched': typeof WatchedRoute
   '/projects_/$slug': typeof ProjectsSlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths:
-    '/' | '/about' | '/live' | '/projects' | '/watched' | '/projects/$slug'
+  fullPaths: '/' | '/about' | '/live' | '/projects' | '/projects/$slug'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/live' | '/projects' | '/watched' | '/projects/$slug'
-  id:
-    | '__root__'
-    | '/'
-    | '/about'
-    | '/live'
-    | '/projects'
-    | '/watched'
-    | '/projects_/$slug'
+  to: '/' | '/about' | '/live' | '/projects' | '/projects/$slug'
+  id: '__root__' | '/' | '/about' | '/live' | '/projects' | '/projects_/$slug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -93,7 +76,6 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   LiveRoute: typeof LiveRoute
   ProjectsRoute: typeof ProjectsRoute
-  WatchedRoute: typeof WatchedRoute
   ProjectsSlugRoute: typeof ProjectsSlugRoute
 }
 
@@ -127,13 +109,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProjectsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/watched': {
-      id: '/watched'
-      path: '/watched'
-      fullPath: '/watched'
-      preLoaderRoute: typeof WatchedRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/projects_/$slug': {
       id: '/projects_/$slug'
       path: '/projects/$slug'
@@ -149,7 +124,6 @@ const rootRouteChildren: RootRouteChildren = {
   AboutRoute: AboutRoute,
   LiveRoute: LiveRoute,
   ProjectsRoute: ProjectsRoute,
-  WatchedRoute: WatchedRoute,
   ProjectsSlugRoute: ProjectsSlugRoute,
 }
 export const routeTree = rootRouteImport
