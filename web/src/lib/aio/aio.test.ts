@@ -3,7 +3,8 @@ import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { projects } from '../../content/projects';
 import { profile } from '../../content/profile';
-import { buildPages, pageForPath } from './pages';
+import type { Locale } from '../../content/types';
+import { buildAllPages, buildPages, pageForPath } from './pages';
 import { jsonLdForPage } from './json-ld';
 import { renderHead, renderStaticBody, serialiseJsonLd } from './render';
 import {
@@ -17,27 +18,34 @@ import {
 
 const BASE = 'https://example.test';
 const SITE_NAME = 'Test Site';
-const pages = buildPages();
-const page = (path: string) => {
-  const found = pages.find((p) => p.path === path);
-  if (!found) throw new Error(`no AIO page for ${path}`);
+const allPages = buildAllPages();
+
+const page = (routePath: string, locale: Locale = 'en') => {
+  const found = buildPages(locale).find((p) => p.routePath === routePath);
+  if (!found) throw new Error(`no AIO page for ${routePath} in ${locale}`);
   return found;
 };
 
 /** The `@graph` nodes of a page, by `@type`. */
-function nodesOfType(path: string, type: string): Record<string, unknown>[] {
-  const graph = jsonLdForPage(page(path), BASE, SITE_NAME)['@graph'] as Record<string, unknown>[];
+function nodesOfType(routePath: string, type: string, locale: Locale = 'en'): Record<string, unknown>[] {
+  const graph = jsonLdForPage(page(routePath, locale), BASE, SITE_NAME)['@graph'] as Record<string, unknown>[];
   return graph.filter((n) => n['@type'] === type);
 }
 
 describe('pages', () => {
   it('covers every public route, each with a title and description', () => {
-    const paths = pages.map((p) => p.path);
-    expect(paths).toEqual(
-      expect.arrayContaining(['/', '/about', '/projects', '/live', '/watched', ...projects.map((p) => `/projects/${p.slug}`)]),
+    const routes = buildPages('en').map((p) => p.routePath);
+    expect(routes).toEqual(
+      expect.arrayContaining([
+        '/',
+        '/about',
+        '/projects',
+        '/live',
+        '/watched',
+        ...projects.map((p) => `/projects/${p.slug}`),
+      ]),
     );
-    expect(new Set(paths).size).toBe(paths.length);
-    for (const p of pages) {
+    for (const p of allPages) {
       expect(p.title.length).toBeGreaterThan(10);
       // Long enough to be a real answer, short enough that Google does not
       // truncate it in a snippet.
@@ -46,15 +54,36 @@ describe('pages', () => {
     }
   });
 
-  it('emits nested project routes into a matching file path', () => {
-    expect(page('/projects/pulse').file).toBe('projects/pulse.html');
-    expect(page('/').file).toBe('index.html');
+  it('emits one document per route per locale, at distinct paths', () => {
+    const paths = allPages.map((p) => p.path);
+    expect(new Set(paths).size).toBe(paths.length);
+    expect(allPages).toHaveLength(buildPages('en').length * 2);
   });
 
-  it('resolves a live pathname, trailing slash and all, and nothing for unknown routes', () => {
-    expect(pageForPath('/about')?.path).toBe('/about');
-    expect(pageForPath('/about/')?.path).toBe('/about');
-    expect(pageForPath('/')?.path).toBe('/');
+  it('prefixes only the Portuguese paths and files', () => {
+    expect(page('/projects/pulse').file).toBe('projects/pulse.html');
+    expect(page('/').file).toBe('index.html');
+    expect(page('/projects/pulse', 'pt-BR').path).toBe('/pt/projects/pulse');
+    expect(page('/projects/pulse', 'pt-BR').file).toBe('pt/projects/pulse.html');
+    expect(page('/', 'pt-BR').path).toBe('/pt');
+    expect(page('/', 'pt-BR').file).toBe('pt.html');
+  });
+
+  it('actually translates the body, not just the URL', () => {
+    const ptAbout = page('/about', 'pt-BR');
+    expect(ptAbout.heading).toBe(`Sobre ${profile.name}`);
+    expect(ptAbout.description).toBe(profile.bio['pt-BR']);
+    expect(ptAbout.sections.map((s) => s.heading)).toEqual(['Biografia', 'Experiência', 'Competências', 'Contato']);
+    // No English section heading survives into the Portuguese document.
+    expect(page('/live', 'pt-BR').title).toContain('Métricas do sistema ao vivo');
+  });
+
+  it('resolves a live pathname to the page for that locale', () => {
+    expect(pageForPath('/about')?.locale).toBe('en');
+    expect(pageForPath('/pt/about')?.locale).toBe('pt-BR');
+    expect(pageForPath('/pt/about')?.routePath).toBe('/about');
+    expect(pageForPath('/about/')?.routePath).toBe('/about');
+    expect(pageForPath('/pt')?.routePath).toBe('/');
     expect(pageForPath('/nope')).toBeUndefined();
   });
 });
@@ -70,16 +99,39 @@ describe('head', () => {
     expect(head).toContain('max-snippet:-1');
   });
 
-  it('points the social card at an absolute image URL', () => {
-    // A relative og:image is the most common reason a link preview renders blank.
-    expect(head).toContain(`<meta property="og:image" content="${BASE}/og.png" />`);
-    expect(head).toContain('<meta name="twitter:card" content="summary_large_image" />');
-    expect(head).toContain(`<meta name="twitter:image" content="${BASE}/og.png" />`);
+  it('declares every locale of the route, with x-default on the English URL', () => {
+    expect(head).toContain(`<link rel="alternate" hreflang="en" href="${BASE}/about" />`);
+    expect(head).toContain(`<link rel="alternate" hreflang="pt-BR" href="${BASE}/pt/about" />`);
+    expect(head).toContain(`<link rel="alternate" hreflang="x-default" href="${BASE}/about" />`);
+
+    // The Portuguese document points at the same set — hreflang has to be
+    // reciprocal or Google discards it.
+    const ptHead = renderHead(page('/about', 'pt-BR'), BASE, SITE_NAME, profile.name);
+    expect(ptHead).toContain(`<link rel="canonical" href="${BASE}/pt/about" />`);
+    expect(ptHead).toContain(`<link rel="alternate" hreflang="en" href="${BASE}/about" />`);
+    expect(ptHead).toContain(`<link rel="alternate" hreflang="pt-BR" href="${BASE}/pt/about" />`);
+    expect(ptHead).toContain(`<link rel="alternate" hreflang="x-default" href="${BASE}/about" />`);
+  });
+
+  it('uses Open Graph territory codes and names the other locale', () => {
+    expect(head).toContain('<meta property="og:locale" content="en_US" />');
+    expect(head).toContain('<meta property="og:locale:alternate" content="pt_BR" />');
+    const ptHead = renderHead(page('/about', 'pt-BR'), BASE, SITE_NAME, profile.name);
+    expect(ptHead).toContain('<meta property="og:locale" content="pt_BR" />');
+    expect(ptHead).toContain('<meta property="og:locale:alternate" content="en_US" />');
   });
 
   it('points at the markdown mirror of the same route', () => {
     expect(head).toContain('<link rel="alternate" type="text/markdown" href="/about.md"');
     expect(renderHead(page('/'), BASE, SITE_NAME, profile.name)).toContain('href="/index.md"');
+    expect(renderHead(page('/about', 'pt-BR'), BASE, SITE_NAME, profile.name)).toContain('href="/pt/about.md"');
+  });
+
+  it('points the social card at an absolute image URL', () => {
+    // A relative og:image is the most common reason a link preview renders blank.
+    expect(head).toContain(`<meta property="og:image" content="${BASE}/og.png" />`);
+    expect(head).toContain('<meta name="twitter:card" content="summary_large_image" />');
+    expect(head).toContain(`<meta name="twitter:image" content="${BASE}/og.png" />`);
   });
 
   it('escapes JSON-LD so content can never close the script tag', () => {
@@ -95,19 +147,31 @@ describe('head', () => {
 });
 
 describe('json-ld', () => {
-  it('describes the person identically on every page, under one @id', () => {
-    for (const p of pages) {
-      const [person] = nodesOfType(p.path, 'Person');
+  it('describes one person under one @id, in both languages', () => {
+    for (const p of allPages) {
+      const [person] = (jsonLdForPage(p, BASE, SITE_NAME)['@graph'] as Record<string, unknown>[]).filter(
+        (n) => n['@type'] === 'Person',
+      );
+      // Same identity on every page of every locale — one entity, not a dozen
+      // lookalikes.
       expect(person['@id']).toBe(`${BASE}/#person`);
+      expect(person.url).toBe(`${BASE}/about`);
       expect(person.name).toBe(profile.name);
       expect(person.sameAs).toContain('https://github.com/felipe-allmeida');
       expect(person.knowsAbout).toContain('.NET / ASP.NET Core');
     }
+    // ...but the prose is the page's own language.
+    expect(nodesOfType('/about', 'Person', 'pt-BR')[0].description).toBe(profile.bio['pt-BR']);
+  });
+
+  it('tags each page with the language it is actually written in', () => {
+    expect(nodesOfType('/about', 'ProfilePage')[0].inLanguage).toBe('en');
+    expect(nodesOfType('/about', 'ProfilePage', 'pt-BR')[0].inLanguage).toBe('pt-BR');
+    expect(nodesOfType('/about', 'ProfilePage', 'pt-BR')[0]['@id']).toBe(`${BASE}/pt/about#page`);
   });
 
   it('marks /about as a ProfilePage whose main entity is that person', () => {
-    const [profilePage] = nodesOfType('/about', 'ProfilePage');
-    expect(profilePage.mainEntity).toEqual({ '@id': `${BASE}/#person` });
+    expect(nodesOfType('/about', 'ProfilePage')[0].mainEntity).toEqual({ '@id': `${BASE}/#person` });
   });
 
   it('types public work as source code with a repo, private work as CreativeWork', () => {
@@ -119,17 +183,25 @@ describe('json-ld', () => {
     expect(ulbra.codeRepository).toBeUndefined();
   });
 
-  it('lists every project on the projects index', () => {
-    const [collection] = nodesOfType('/projects', 'CollectionPage');
+  it('lists every project on the projects index, in-locale', () => {
+    const [collection] = nodesOfType('/projects', 'CollectionPage', 'pt-BR');
     const list = collection.mainEntity as { itemListElement: { url: string }[] };
-    expect(list.itemListElement.map((i) => i.url)).toEqual(projects.map((p) => `${BASE}/projects/${p.slug}`));
+    expect(list.itemListElement.map((i) => i.url)).toEqual(
+      projects.map((p) => `${BASE}/pt/projects/${p.slug}`),
+    );
   });
 
-  it('gives nested routes a breadcrumb trail and the home page none', () => {
+  it('gives nested routes a localized breadcrumb trail and the home page none', () => {
     const [crumbs] = nodesOfType('/projects/pulse', 'BreadcrumbList');
     const trail = crumbs.itemListElement as { name: string; item: string }[];
     expect(trail.map((c) => c.name)).toEqual(['Home', 'Projects', 'Pulse']);
     expect(trail.at(-1)!.item).toBe(`${BASE}/projects/pulse`);
+
+    const [ptCrumbs] = nodesOfType('/projects/pulse', 'BreadcrumbList', 'pt-BR');
+    const ptTrail = ptCrumbs.itemListElement as { name: string; item: string }[];
+    expect(ptTrail.map((c) => c.name)).toEqual(['Início', 'Projetos', 'Pulse']);
+    expect(ptTrail.at(-1)!.item).toBe(`${BASE}/pt/projects/pulse`);
+
     expect(nodesOfType('/', 'BreadcrumbList')).toHaveLength(0);
   });
 });
@@ -164,31 +236,37 @@ describe('crawler files', () => {
     expect(robots).not.toMatch(/^Disallow: \//m);
   });
 
-  it('lists every page in the sitemap under the sitemaps.org namespace', () => {
-    const xml = renderSitemap(pages, BASE, '2026-08-13');
+  it('lists every page of every locale, each carrying its hreflang set', () => {
+    const xml = renderSitemap(allPages, BASE, '2026-08-13');
     expect(xml).toContain('xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"');
-    for (const p of pages) {
+    expect(xml).toContain('xmlns:xhtml="http://www.w3.org/1999/xhtml"');
+    for (const p of allPages) {
       expect(xml).toContain(`<loc>${BASE}${p.path === '/' ? '/' : p.path}</loc>`);
     }
-    expect(xml.match(/<url>/g)).toHaveLength(pages.length);
+    expect(xml.match(/<url>/g)).toHaveLength(allPages.length);
+    expect(xml).toContain(`<xhtml:link rel="alternate" hreflang="pt-BR" href="${BASE}/pt/about" />`);
+    expect(xml).toContain(`<xhtml:link rel="alternate" hreflang="x-default" href="${BASE}/about" />`);
   });
 
-  it('gives llms.txt a summary, every project, and the contact facts', () => {
-    const llms = renderLlmsTxt(pages, BASE);
+  it('gives llms.txt a summary, every project, the contact facts and the pt index', () => {
+    const llms = renderLlmsTxt(allPages, BASE);
     expect(llms).toMatch(/^# Felipe de Almeida\n\n> /);
     for (const p of projects) {
       expect(llms).toContain(`${BASE}/projects/${p.slug}.md`);
     }
     expect(llms).toContain(profile.contact.email);
     expect(llms).toContain(`${BASE}/llms-full.txt`);
+    expect(llms).toContain('## Português');
+    expect(llms).toContain(`${BASE}/pt/about.md`);
   });
 
-  it('inlines every page into llms-full.txt, including the pt-BR summary', () => {
-    const full = renderLlmsFullTxt(pages, BASE);
-    for (const p of pages) {
+  it('inlines every page of both languages into llms-full.txt', () => {
+    const full = renderLlmsFullTxt(allPages, BASE);
+    for (const p of allPages) {
       expect(full).toContain(`# ${p.heading}`);
     }
-    expect(full).toContain(profile.bio['pt-BR']);
+    expect(full).toContain('# English');
+    expect(full).toContain('# Português');
   });
 
   it('renders a route to markdown with its heading, summary and source link', () => {
@@ -196,6 +274,10 @@ describe('crawler files', () => {
     expect(md.startsWith('# Pulse — ')).toBe(true);
     expect(md).toContain('## Highlights');
     expect(md).toContain(`Source: ${BASE}/projects/pulse`);
+
+    const ptMd = renderPageMarkdown(page('/projects/pulse', 'pt-BR'), BASE);
+    expect(ptMd).toContain('## Destaques');
+    expect(ptMd).toContain(`Source: ${BASE}/pt/projects/pulse`);
   });
 });
 
@@ -203,4 +285,6 @@ it('index.html keeps the markers the aio plugin fills', () => {
   const html = readFileSync(join(__dirname, '../../../index.html'), 'utf8');
   expect(html).toContain('<!--aio:head-->');
   expect(html).toContain('<!--aio:body-->');
+  // The plugin swaps this exact string per locale.
+  expect(html).toContain('<html lang="en">');
 });

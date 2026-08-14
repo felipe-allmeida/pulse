@@ -1,5 +1,6 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouterState } from '@tanstack/react-router';
+import { localeFromPathname, pathForLocale, routePathFromPathname } from '../../i18n/locale-url';
 import { pageForPath } from './pages';
 
 /**
@@ -21,10 +22,20 @@ function setAttribute(selector: string, attribute: string, value: string): void 
 }
 
 export function useRouteHead(): void {
-  const pathname = useRouterState({ select: (state) => state.location.pathname });
+  // The router reports paths in its own space, with the locale basepath
+  // stripped: on /pt/about it says `/about`.
+  const routerPath = useRouterState({ select: (state) => state.location.pathname });
+
+  // Read once at mount, and only from the address bar: the locale is fixed for
+  // the life of the document (switching language is a real navigation), and
+  // the router state does not carry it. Reading `window.location` inside the
+  // effect instead would race — the router updates its state before it pushes
+  // to history, so the effect would look up the *previous* URL and retitle the
+  // page to the route it just left.
+  const [locale] = useState(() => localeFromPathname(window.location.pathname));
 
   useEffect(() => {
-    const page = pageForPath(pathname);
+    const page = pageForPath(pathForLocale(routePathFromPathname(routerPath), locale));
     if (!page) return;
 
     document.title = page.title;
@@ -33,5 +44,5 @@ export function useRouteHead(): void {
     setAttribute('meta[property="og:description"]', 'content', page.description);
     // Canonical is deliberately left alone: it is stamped at build time with
     // the deploy's real origin, which the browser cannot know here.
-  }, [pathname]);
+  }, [routerPath, locale]);
 }

@@ -22,7 +22,8 @@ import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import type { Plugin } from 'vite';
 import { resolveSiteUrl, site } from '../src/content/site';
-import { buildPages } from '../src/lib/aio/pages';
+import { buildAllPages, buildPages, basenameForPath } from '../src/lib/aio/pages';
+import { DEFAULT_LOCALE } from '../src/i18n/locale-url';
 import { renderHead, renderStaticBody } from '../src/lib/aio/render';
 import {
   renderLlmsFullTxt,
@@ -44,11 +45,6 @@ export interface AioOptions {
   lastmod?: string;
 }
 
-/** `/projects/pulse` → `projects/pulse`; `/` → `index`. */
-function basenameForPath(path: string): string {
-  return path === '/' ? 'index' : path.replace(/^\//, '');
-}
-
 function write(outDir: string, relativePath: string, contents: string): void {
   const target = join(outDir, relativePath);
   mkdirSync(dirname(target), { recursive: true });
@@ -68,7 +64,7 @@ export function aio(options: AioOptions = {}): Plugin {
      */
     transformIndexHtml(html, ctx) {
       if (!ctx.server) return html;
-      const home = buildPages()[0];
+      const home = buildPages(DEFAULT_LOCALE)[0];
       return html
         .replace(HEAD_MARKER, renderHead(home, base, site.name, profile.name))
         .replace(BODY_MARKER, renderStaticBody(home));
@@ -89,15 +85,28 @@ export function aio(options: AioOptions = {}): Plugin {
         );
       }
 
-      const pages = buildPages();
+      const pages = buildAllPages();
       const lastmod = options.lastmod ?? new Date().toISOString().slice(0, 10);
 
       for (const page of pages) {
         const html = template
+          // The template is built from `<html lang="en">`; the Portuguese
+          // documents have to say so, or every one of them announces the
+          // wrong language to crawlers and screen readers alike.
+          .replace('<html lang="en">', `<html lang="${page.locale}">`)
           .replace(HEAD_MARKER, renderHead(page, base, site.name, profile.name))
           .replace(BODY_MARKER, renderStaticBody(page));
         write(outDir, page.file, html);
         write(outDir, `${basenameForPath(page.path)}.md`, renderPageMarkdown(page, base));
+
+        // A locale root needs both spellings. The router, given basepath
+        // `/pt`, renders its home link as `/pt/` — and `/pt/` would otherwise
+        // hit the directory holding that locale's other documents, find no
+        // index, and fall through to the English SPA shell. Both files carry
+        // the same canonical (`/pt`), which is exactly what canonical is for.
+        if (page.routePath === '/' && page.path !== '/') {
+          write(outDir, `${basenameForPath(page.path)}/index.html`, html);
+        }
       }
 
       write(outDir, 'robots.txt', renderRobotsTxt(base));

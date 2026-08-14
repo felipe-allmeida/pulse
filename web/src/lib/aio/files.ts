@@ -8,8 +8,12 @@
  * content expanded so a model can answer from one fetch.
  */
 import { profile } from '../../content/profile';
+import type { Locale } from '../../content/types';
+import { LOCALES } from '../../content/types';
+import { DEFAULT_LOCALE } from '../../i18n/locale-url';
 import type { AioPage } from './pages';
-import { absoluteUrl } from './render';
+import { alternatesFor } from './pages';
+import { absoluteUrl, markdownPathFor } from './render';
 
 const en = <T extends { en: string }>(v: T): string => v.en;
 
@@ -60,19 +64,37 @@ export function renderRobotsTxt(base: string): string {
   return blocks.join('\n');
 }
 
+/**
+ * A sitemap with the `hreflang` set inline on every entry — the form Google
+ * documents for multilingual sites, and the one that stops the two locales
+ * being read as duplicates of each other.
+ */
 export function renderSitemap(pages: AioPage[], base: string, lastmod: string): string {
   const urls = pages
-    .map((page) =>
-      [
+    .map((page) => {
+      const alternates = alternatesFor(page.routePath);
+      const links = [
+        ...alternates.map(
+          (alternate) =>
+            `    <xhtml:link rel="alternate" hreflang="${alternate.locale}" href="${absoluteUrl(base, alternate.path)}" />`,
+        ),
+        `    <xhtml:link rel="alternate" hreflang="x-default" href="${absoluteUrl(
+          base,
+          alternates.find((a) => a.locale === DEFAULT_LOCALE)!.path,
+        )}" />`,
+      ];
+      return [
         '  <url>',
         `    <loc>${absoluteUrl(base, page.path)}</loc>`,
         `    <lastmod>${lastmod}</lastmod>`,
         `    <priority>${page.priority.toFixed(1)}</priority>`,
+        ...links,
         '  </url>',
-      ].join('\n'),
-    )
+      ].join('\n');
+    })
     .join('\n');
-  return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>\n`;
+
+  return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">\n${urls}\n</urlset>\n`;
 }
 
 /** Markdown body of one route — the content of `/about.md` and friends. */
@@ -94,10 +116,19 @@ export function renderPageMarkdown(page: AioPage, base: string): string {
   return lines.join('\n');
 }
 
+const LOCALE_LABEL: Record<Locale, string> = { en: 'English', 'pt-BR': 'Português' };
+
+function pageLinks(pages: AioPage[], base: string, locale: Locale): string[] {
+  return pages
+    .filter((page) => page.locale === locale)
+    .map((page) => `- [${page.heading}](${base}${markdownPathFor(page.path)}): ${page.description}`);
+}
+
 /** The curated index — short by design, one hop from every real answer. */
 export function renderLlmsTxt(pages: AioPage[], base: string): string {
-  const byPath = Object.fromEntries(pages.map((p) => [p.path, p]));
-  const projectPages = pages.filter((p) => p.path.startsWith('/projects/'));
+  const english = pages.filter((page) => page.locale === DEFAULT_LOCALE);
+  const content = english.filter((page) => !page.routePath.startsWith('/projects/'));
+  const projectPages = english.filter((page) => page.routePath.startsWith('/projects/'));
 
   const lines: string[] = [
     `# ${profile.name}`,
@@ -107,19 +138,15 @@ export function renderLlmsTxt(pages: AioPage[], base: string): string {
     'This is the personal site and engineering portfolio of ' +
       `${profile.name}. The site itself ("Pulse") is a working distributed system — live presence over SignalR, a visitor world map, and public metrics served by a .NET event-driven backend — so the portfolio and the demo are the same artifact.`,
     '',
+    `Every page exists in English (unprefixed) and Portuguese (under /pt).`,
+    '',
     '## Pages',
     '',
-    ...['/', '/about', '/projects', '/live', '/watched']
-      .filter((path) => byPath[path])
-      .map((path) => {
-        const page = byPath[path];
-        const md = path === '/' ? '/index.md' : `${path}.md`;
-        return `- [${page.heading}](${base}${md}): ${page.description}`;
-      }),
+    ...content.map((page) => `- [${page.heading}](${base}${markdownPathFor(page.path)}): ${page.description}`),
     '',
     '## Projects',
     '',
-    ...projectPages.map((page) => `- [${page.heading}](${base}${page.path}.md): ${page.description}`),
+    ...projectPages.map((page) => `- [${page.heading}](${base}${markdownPathFor(page.path)}): ${page.description}`),
     '',
     '## Facts',
     '',
@@ -131,6 +158,10 @@ export function renderLlmsTxt(pages: AioPage[], base: string): string {
     `- LinkedIn: ${profile.contact.linkedin}`,
     '- GitHub: https://github.com/felipe-allmeida',
     '',
+    '## Português',
+    '',
+    ...pageLinks(pages, base, 'pt-BR'),
+    '',
     '## Optional',
     '',
     `- [Full site content in one file](${base}/llms-full.txt)`,
@@ -141,20 +172,22 @@ export function renderLlmsTxt(pages: AioPage[], base: string): string {
   return lines.join('\n');
 }
 
-/** Everything, in one fetch, in reading order. */
+/** Everything, in one fetch, in reading order, grouped by language. */
 export function renderLlmsFullTxt(pages: AioPage[], base: string): string {
   const header = [
     `# ${profile.name} — complete site content`,
     '',
     `> ${en(profile.title)}. Every page of ${base} as markdown, in one file.`,
     '',
-    '## Português',
-    '',
-    `${en(profile.title)} — ${profile.bio['pt-BR']}`,
-    '',
-    '---',
-    '',
   ].join('\n');
 
-  return header + pages.map((page) => renderPageMarkdown(page, base)).join('\n');
+  const sections = LOCALES.map((locale) => {
+    const body = pages
+      .filter((page) => page.locale === locale)
+      .map((page) => renderPageMarkdown(page, base))
+      .join('\n');
+    return `\n# ${LOCALE_LABEL[locale]}\n\n${body}`;
+  }).join('\n');
+
+  return header + sections;
 }

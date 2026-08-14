@@ -223,7 +223,7 @@ renders from:
 
 | Emitted | What it carries |
 |---|---|
-| `index.html`, `about.html`, `projects.html`, `projects/<slug>.html`, `live.html`, `watched.html` | Per-route `<title>`, description, canonical, Open Graph, and a no-script mirror of the route's text |
+| `index.html`, `about.html`, `projects.html`, `projects/<slug>.html`, `live.html`, `watched.html`, and the same set again under `pt/` | Per-route `<title>`, description, canonical, `hreflang` alternates, Open Graph, and a no-script mirror of the route's text |
 | Schema.org `@graph` in each document | `Person` (one `@id` across every page), `WebSite`, `ProfilePage` / `CollectionPage`, `SoftwareSourceCode` for public repos, `BreadcrumbList` |
 | `robots.txt` | Every answer-engine crawler explicitly allowed, plus the sitemap |
 | `sitemap.xml` | Every route |
@@ -234,6 +234,30 @@ Each generated document still boots the same SPA from the same asset graph, so
 browsers get exactly the app they got before — the static content lives in
 `<noscript>` and never paints. Caddy's `try_files {path}.html {path}` is what
 maps `/about` to `about.html` (see [`deploy/Caddyfile`](deploy/Caddyfile)).
+
+### One URL per language
+
+The language used to be picked in the browser from `navigator`/localStorage,
+which meant one URL per route and no Portuguese page for a crawler to index —
+half the site's content was unreachable to search.
+
+Now the locale is in the path: `/about` is English, `/pt/about` is Portuguese,
+each served as its own document with its own `<html lang>`, canonical, and
+reciprocal `hreflang` set (`x-default` points at the English URL). The URL is
+authoritative — nothing re-reads `navigator` after load, because a page whose
+body disagrees with its own canonical is worse than a monolingual one.
+
+Two consequences worth knowing:
+
+- The router gets `basepath` (`/pt`), so every `<Link to="/about">` stays in
+  the current locale without any call site knowing about prefixes.
+- The language switcher is a set of real `<a>` links to the other locale's URL,
+  not an in-place string swap. It costs a page load and buys a correct document
+  every time — and gives crawlers the link between the two versions.
+
+Only the bare root ever redirects: a first-time visitor whose browser prefers
+Portuguese is sent from `/` to `/pt` before anything renders. A deep link is a
+language choice and is never rewritten.
 
 Canonical URLs default to `https://pulse.felipealmeida.tech`; build with
 `PULSE_SITE_URL=https://preview.example.com pnpm -C web build` to stamp a
