@@ -2,8 +2,11 @@ import { Link } from '@tanstack/react-router';
 import { ExternalLink, Lock } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { CaseStudyArchitecture } from '@/components/projects/case-study-architecture';
+import { CaseStudyComparison } from '@/components/projects/case-study-comparison';
 import { CaseStudyDecisions } from '@/components/projects/case-study-decisions';
 import { CaseStudyMetrics } from '@/components/projects/case-study-metrics';
+import { CaseStudyScript } from '@/components/projects/case-study-script';
+import { CaseStudyTable } from '@/components/projects/case-study-table';
 import { FEATURED_PROJECT_SLUG } from '@/components/projects/featured';
 import { ProjectScreenshot } from '@/components/projects/project-screenshot';
 import { Chip } from '@/components/signal/chip';
@@ -133,6 +136,28 @@ export function ProjectDetail({ slug }: ProjectDetailProps) {
               summary={project.detail.architecture.summary}
               nodes={project.detail.architecture.nodes}
             />
+          </section>
+        ) : null}
+
+        {project.detail?.script && project.detail.script.lines.length > 0 ? (
+          <section className="flex flex-col gap-3">
+            <SubsectionHeading>{L(project.detail.script.caption)}</SubsectionHeading>
+            <CaseStudyScript script={project.detail.script} />
+          </section>
+        ) : null}
+
+        {project.detail?.comparison &&
+        Math.max(project.detail.comparison.before.weight, project.detail.comparison.after.weight) > 0 ? (
+          <section className="flex flex-col gap-3">
+            <SubsectionHeading>{L(project.detail.comparison.caption)}</SubsectionHeading>
+            <CaseStudyComparison comparison={project.detail.comparison} />
+          </section>
+        ) : null}
+
+        {project.detail?.table && project.detail.table.rows.length > 0 ? (
+          <section className="flex flex-col gap-3">
+            <SubsectionHeading>{L(project.detail.table.caption)}</SubsectionHeading>
+            <CaseStudyTable table={project.detail.table} />
           </section>
         ) : null}
 

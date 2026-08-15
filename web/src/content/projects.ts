@@ -23,6 +23,45 @@ export interface CaseStudySection {
   body: LocalizedString;
 }
 
+/** A short, real script or config sample, rendered as a code block. */
+export interface CaseStudyScript {
+  /** Short label above the block — doubles as the section heading. */
+  caption: LocalizedString;
+  /** Lines of the sample, verbatim. Not localized: it is code. */
+  lines: string[];
+  /** Optional note under the block. */
+  note?: LocalizedString;
+}
+
+/** One side of a before/after comparison. */
+export interface CaseStudyComparisonSide {
+  label: LocalizedString;
+  value: LocalizedString;
+  /** Relative magnitude, any unit — drives bar length so the figure cannot
+   *  draw a proportion the numbers do not claim. */
+  weight: number;
+}
+
+/** A two-sided before/after figure, drawn to scale. */
+export interface CaseStudyComparison {
+  /** Doubles as the section heading. */
+  caption: LocalizedString;
+  before: CaseStudyComparisonSide;
+  after: CaseStudyComparisonSide;
+  /** Where the numbers come from — rendered as a footnote. */
+  source?: LocalizedString;
+}
+
+/** A small illustrative table of the system's output. */
+export interface CaseStudyTable {
+  /** Doubles as the section heading. */
+  caption: LocalizedString;
+  columns: LocalizedString[];
+  /** Row cells, already formatted. Illustrative values, real structure. */
+  rows: string[][];
+  note?: LocalizedString;
+}
+
 export interface ProjectDetailContent {
   /** A longer, dedicated-page overview — 1-3 sentences. */
   overview?: LocalizedString;
@@ -38,6 +77,12 @@ export interface ProjectDetailContent {
     summary: LocalizedString;
     nodes: CaseStudyArchitectureNode[];
   };
+  /** A real script or config sample. */
+  script?: CaseStudyScript;
+  /** A before/after figure drawn to scale. */
+  comparison?: CaseStudyComparison;
+  /** An illustrative table of the system's output. */
+  table?: CaseStudyTable;
   /** 3-5 engineering decisions with their rationale. */
   decisions?: CaseStudySection[];
 }
@@ -500,6 +545,237 @@ export const projects: Project[] = [
         {
           en: 'A modern React + Tailwind front end replacing older internal tools.',
           'pt-BR': 'Front-end moderno em React + Tailwind substituindo ferramentas internas antigas.',
+        },
+      ],
+    },
+  },
+  {
+    slug: 'dell-automated-caller',
+    name: 'Dell Automated Caller',
+    tagline: {
+      en: 'Automated end-to-end testing for a phone system.',
+      'pt-BR': 'Teste end-to-end automatizado de um sistema de telefonia.',
+    },
+    description: {
+      en: 'An internal tool that tests an interactive voice system by actually calling it: a script drives a real phone call, the spoken responses are transcribed and checked against what the script expected, and the outcome is reported back into the test-management tool.',
+      'pt-BR':
+        'Uma ferramenta interna que testa uma URA ligando de verdade para ela: um roteiro conduz uma chamada real, as respostas faladas são transcritas e conferidas contra o que o roteiro esperava, e o resultado volta para a ferramenta de gestão de testes.',
+    },
+    tech: ['.NET Core', 'RabbitMQ', 'Entity Framework', 'Twilio', 'xUnit'],
+    role: {
+      en: 'Conception, architecture and implementation — later mentoring the junior engineer who joined the project.',
+      'pt-BR':
+        'Concepção, arquitetura e implementação — e depois mentoria do engenheiro júnior que entrou no projeto.',
+    },
+    period: { en: '2020', 'pt-BR': '2020' },
+    visibility: 'private',
+    links: [],
+    detail: {
+      overview: {
+        en: "An internal tool that tests an interactive voice system by actually calling it — the test suite dials the phone menu, listens to what it says, and checks it against what was expected, then files the result alongside the rest of the suite.",
+        'pt-BR':
+          'Uma ferramenta interna que testa uma URA ligando de verdade para ela — a suíte disca o menu telefônico, ouve o que ele diz, confere contra o esperado e registra o resultado junto com o resto da suíte.',
+      },
+      problem: {
+        en: 'Testing a phone menu meant someone dialling it, pressing the keys, listening to what the system said, and writing down whether it was right — once per scenario, per language, per route. A full cycle was over twenty thousand calls placed by hand across the team, which in practice meant the full cycle almost never ran. Automating it brought the cycle down to about three hours.',
+        'pt-BR':
+          'Testar um menu telefônico significava alguém discar, apertar as teclas, ouvir o que o sistema dizia e anotar se estava certo — uma vez por cenário, por idioma, por rota. Um ciclo completo eram mais de vinte mil ligações feitas à mão pelo time, o que na prática significava que o ciclo completo quase nunca rodava. Automatizar reduziu o ciclo para cerca de três horas.',
+      },
+      metricsNote: {
+        en: 'Call volume and cycle time as recalled from the project; the command count is verifiable in source.',
+        'pt-BR':
+          'Volume de ligações e tempo de ciclo conforme lembrados do projeto; a contagem de comandos é verificável no código.',
+      },
+      metrics: [
+        {
+          value: { en: '20k+', 'pt-BR': '20 mil+' },
+          label: { en: 'calls per test cycle', 'pt-BR': 'ligações por ciclo de teste' },
+          note: {
+            en: 'previously placed one at a time, by hand across the team',
+            'pt-BR': 'antes, uma a uma, à mão, pelo time',
+          },
+        },
+        {
+          value: { en: '~3h', 'pt-BR': '~3h' },
+          label: { en: 'to run the full cycle', 'pt-BR': 'para rodar o ciclo inteiro' },
+          note: { en: 'it had taken about a month', 'pt-BR': 'antes levava cerca de um mês' },
+        },
+        {
+          value: { en: '9', 'pt-BR': '9' },
+          label: { en: 'commands in the test DSL', 'pt-BR': 'comandos na DSL de teste' },
+          note: {
+            en: 'the script is validated before anything is dialled',
+            'pt-BR': 'o roteiro é validado antes de qualquer discagem',
+          },
+        },
+      ],
+      architecture: {
+        summary: {
+          en: 'A .NET Core service in DDD layers. The API accepts a script; a validator rejects a malformed one before a call is placed; the run is dispatched over a RabbitMQ publish/subscribe queue; a telephony provider places the call and posts each transcribed response back by webhook; the response is scored against what the script expected; and the outcome is written back to the test-management tool against its plan, suite and work-item identifiers.',
+          'pt-BR':
+            'Um serviço .NET Core em camadas DDD. A API recebe um roteiro; um validador rejeita roteiro malformado antes de gastar uma ligação; a execução é despachada por uma fila publish/subscribe no RabbitMQ; um provedor de telefonia faz a chamada e devolve cada resposta transcrita por webhook; a resposta é pontuada contra o que o roteiro esperava; e o resultado volta para a ferramenta de gestão de testes, amarrado aos identificadores de plano, suíte e item de trabalho.',
+        },
+        nodes: [
+          {
+            label: 'Test script',
+            detail: {
+              en: 'An ordered list of commands describing one call.',
+              'pt-BR': 'Uma lista ordenada de comandos descrevendo uma ligação.',
+            },
+          },
+          {
+            label: 'Validator',
+            detail: {
+              en: 'Rejects a malformed script before anything is dialled.',
+              'pt-BR': 'Rejeita roteiro malformado antes de qualquer discagem.',
+            },
+          },
+          {
+            label: 'Queue',
+            detail: {
+              en: 'Publish/subscribe, so a slow call never blocks the request.',
+              'pt-BR': 'Publish/subscribe, então uma ligação lenta não trava a requisição.',
+            },
+          },
+          {
+            label: 'Telephony provider',
+            detail: {
+              en: 'Places the call and posts each transcribed response back.',
+              'pt-BR': 'Faz a chamada e devolve cada resposta transcrita.',
+            },
+          },
+          {
+            label: 'Test management',
+            detail: {
+              en: 'Receives the outcome against its plan, suite and work item.',
+              'pt-BR': 'Recebe o resultado amarrado ao plano, à suíte e ao item de trabalho.',
+            },
+          },
+        ],
+      },
+      script: {
+        caption: { en: 'A test script', 'pt-BR': 'Um roteiro de teste' },
+        lines: [
+          'Setup Language="en-US"',
+          'Dial +1 (000) 000 0000',
+          'Wait 3',
+          'Hear [Confidence=85%] thank you for calling, please say or enter your service tag',
+          'Enter (serialnumber) 1234567#',
+          'Hear [WaitBefore=2] one moment while I look that up',
+          'Hang',
+        ],
+        note: {
+          en: 'The grammar is checked before the call: a missing Dial or Hang, a repeated step where only one is allowed, or a step out of order fails the script rather than the phone bill. Validation steps run after the call ends. The number above is a documentation placeholder.',
+          'pt-BR':
+            'A gramática é conferida antes da ligação: um Dial ou Hang ausente, um passo repetido onde só cabe um, ou um passo fora de ordem reprovam o roteiro em vez da conta de telefone. Os passos de validação rodam depois que a chamada termina. O número acima é um placeholder de documentação.',
+        },
+      },
+      comparison: {
+        caption: { en: 'One test cycle', 'pt-BR': 'Um ciclo de teste' },
+        before: {
+          label: { en: 'By hand', 'pt-BR': 'À mão' },
+          value: { en: '~1 month', 'pt-BR': '~1 mês' },
+          weight: 160,
+        },
+        after: {
+          label: { en: 'Automated', 'pt-BR': 'Automatizado' },
+          value: { en: '~3 hours', 'pt-BR': '~3 horas' },
+          weight: 3,
+        },
+        source: {
+          en: 'Durations as recalled from the project; the repository does not record them.',
+          'pt-BR': 'Durações conforme lembradas do projeto; o repositório não as registra.',
+        },
+      },
+      table: {
+        caption: { en: 'What a step records', 'pt-BR': 'O que um passo registra' },
+        columns: [
+          { en: 'Expected', 'pt-BR': 'Esperado' },
+          { en: 'Heard', 'pt-BR': 'Ouvido' },
+          { en: 'Similarity', 'pt-BR': 'Similaridade' },
+        ],
+        rows: [
+          ['please enter your service tag', 'please enter your service tag', '100%'],
+          ['one moment while I look that up', 'one moment while i look that up', '97%'],
+          ['transferring you to support', 'transferring you to sales', '78%'],
+        ],
+        note: {
+          en: 'Structure from the real model — every spoken response is stored with what was expected, what was transcribed, and how closely the two matched. Values here are illustrative.',
+          'pt-BR':
+            'Estrutura do modelo real — toda resposta falada é guardada com o que se esperava, o que foi transcrito e o quanto os dois bateram. Os valores aqui são ilustrativos.',
+        },
+      },
+      highlights: [
+        {
+          en: 'A test script is a short list of ordered commands: dial, wait, enter digits, listen, validate, hang up.',
+          'pt-BR':
+            'Um roteiro de teste é uma lista curta de comandos ordenados: discar, esperar, digitar, ouvir, validar, desligar.',
+        },
+        {
+          en: 'Placeholders in the script are substituted at run time, so one script covers many data sets.',
+          'pt-BR':
+            'Placeholders no roteiro são substituídos em tempo de execução, então um roteiro cobre muitos conjuntos de dados.',
+        },
+        {
+          en: 'Every spoken response is stored with what was expected, what was heard, and how closely they matched.',
+          'pt-BR':
+            'Toda resposta falada é guardada com o que se esperava, o que foi ouvido e o quanto os dois bateram.',
+        },
+        {
+          en: 'Results are written back to the test-management tool against the plan, suite and work item they belong to.',
+          'pt-BR':
+            'Os resultados voltam para a ferramenta de gestão de testes amarrados ao plano, à suíte e ao item de trabalho a que pertencem.',
+        },
+        {
+          en: 'A malformed script is rejected with a readable list of errors before any call is placed.',
+          'pt-BR':
+            'Um roteiro malformado é rejeitado com uma lista legível de erros antes de qualquer ligação.',
+        },
+      ],
+      decisions: [
+        {
+          heading: {
+            en: 'Assert on similarity, with the threshold declared per step',
+            'pt-BR': 'Asserção por similaridade, com o limiar declarado em cada passo',
+          },
+          body: {
+            en: 'Speech transcription is never character-exact, so comparing for equality fails good tests. Each assertion carries its own tolerance in the script, because how close a transcription lands depends on what was said — a stock prompt transcribes reliably, a product name does not.',
+            'pt-BR':
+              'Transcrição de fala nunca é exata caractere a caractere, então comparar por igualdade reprova bons testes. Cada asserção carrega sua própria tolerância no roteiro, porque o quão perto a transcrição chega depende do que foi dito — um prompt padrão transcreve de forma confiável, um nome de produto não.',
+          },
+        },
+        {
+          heading: {
+            en: 'The script is a small language, validated before anything is dialled',
+            'pt-BR': 'O roteiro é uma linguagem pequena, validada antes de qualquer discagem',
+          },
+          body: {
+            en: 'A real call costs time and money and cannot be undone. The validator checks that the required commands are present, that single-use commands appear once, that the order is legal, and that each line matches its grammar — reporting every error in plain language before the first digit is dialled.',
+            'pt-BR':
+              'Uma ligação real custa tempo e dinheiro e não dá para desfazer. O validador confere que os comandos obrigatórios estão presentes, que os de uso único aparecem uma vez, que a ordem é válida e que cada linha bate com sua gramática — reportando cada erro em linguagem clara antes do primeiro dígito discado.',
+          },
+        },
+        {
+          heading: {
+            en: 'A queue between the request and the call',
+            'pt-BR': 'Uma fila entre a requisição e a ligação',
+          },
+          body: {
+            en: 'A phone call takes minutes and fails for reasons outside the caller’s control. Publish/subscribe decouples whoever asked for the run from whatever executes it, so a slow or failed call never blocks the request that started it.',
+            'pt-BR':
+              'Uma ligação telefônica leva minutos e falha por motivos fora do controle de quem chamou. Publish/subscribe desacopla quem pediu a execução de quem a executa, então uma ligação lenta ou falha nunca trava a requisição que a iniciou.',
+          },
+        },
+        {
+          heading: {
+            en: 'Checking more than the audio',
+            'pt-BR': 'Conferir mais que o áudio',
+          },
+          body: {
+            en: 'Hearing the right words does not prove the call was routed correctly. Separate validation steps check the voice menu, the telephony routing, and the records both left behind — which is what makes it an end-to-end test rather than an audio assertion.',
+            'pt-BR':
+              'Ouvir as palavras certas não prova que a ligação foi roteada corretamente. Passos de validação separados conferem o menu de voz, o roteamento telefônico e os registros que os dois deixaram — e é isso que faz dele um teste end-to-end em vez de uma asserção sobre áudio.',
+          },
         },
       ],
     },

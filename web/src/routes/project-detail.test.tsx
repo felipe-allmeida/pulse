@@ -178,4 +178,67 @@ describe('ProjectDetail', () => {
       'Decisões de engenharia',
     ]);
   });
+
+  it('renders the Dell case study with its three figures, in section order', async () => {
+    await renderDetail('dell-automated-caller');
+
+    const h1 = await screen.findAllByRole('heading', { level: 1 });
+    expect(h1).toHaveLength(1);
+    expect(h1[0]).toHaveTextContent('Dell Automated Caller');
+
+    expect(screen.getByText(/pressing the keys/i)).toBeInTheDocument();
+    expect(screen.getByText('Validator')).toBeInTheDocument();
+    expect(screen.getByText('~1 month')).toBeInTheDocument();
+    expect(screen.getAllByRole('columnheader')).toHaveLength(3);
+
+    const headings = screen.getAllByRole('heading', { level: 2 }).map((h) => h.textContent);
+    expect(headings).toEqual([
+      'Overview',
+      'The problem',
+      'By the numbers',
+      'Architecture',
+      'A test script',
+      'One test cycle',
+      'What a step records',
+      'What it does',
+      'Engineering decisions',
+    ]);
+
+    expect(screen.getByText('Private')).toBeInTheDocument();
+    const externalLinks = screen.queryAllByRole('link').filter((l) => l.getAttribute('target') === '_blank');
+    expect(externalLinks).toHaveLength(0);
+  });
+
+  it('renders the Dell figure headings in pt-BR', async () => {
+    await renderDetail('dell-automated-caller', 'pt-BR');
+
+    await screen.findAllByRole('heading', { level: 1 });
+
+    const headings = screen.getAllByRole('heading', { level: 2 }).map((h) => h.textContent);
+    expect(headings).toEqual([
+      'Visão geral',
+      'O problema',
+      'Em números',
+      'Arquitetura',
+      'Um roteiro de teste',
+      'Um ciclo de teste',
+      'O que um passo registra',
+      'O que faz',
+      'Decisões de engenharia',
+    ]);
+  });
+
+  it('renders no section heading above a figure that renders nothing', async () => {
+    await renderDetail('dell-automated-caller');
+    await screen.findAllByRole('heading', { level: 1 });
+
+    for (const heading of screen.getAllByRole('heading', { level: 2 })) {
+      const section = heading.closest('section');
+      expect(section, `${heading.textContent} is not inside a section`).not.toBeNull();
+      expect(
+        section!.children.length,
+        `section "${heading.textContent}" has a heading and nothing else`,
+      ).toBeGreaterThan(1);
+    }
+  });
 });

@@ -118,3 +118,60 @@ it('refers to insurers by count', () => {
   expect(serialized).toContain('insurer');
   expect(serialized).toMatch(/nine insurers|nove seguradoras/);
 });
+
+it('dell-automated-caller has a case study with all three figures, localized', () => {
+  const project = projects.find((p) => p.slug === 'dell-automated-caller');
+  expect(project).toBeDefined();
+  expect(project!.visibility).toBe('private');
+  expect(project!.links).toHaveLength(0);
+
+  const detail = project!.detail!;
+  expectBothLocales(detail.problem!, 'problem');
+  expect(detail.metrics).toHaveLength(3);
+
+  const script = detail.script!;
+  expectBothLocales(script.caption, 'script.caption');
+  expect(script.lines.length).toBeGreaterThan(0);
+  for (const line of script.lines) expect(line.trim()).not.toBe('');
+
+  const comparison = detail.comparison!;
+  expectBothLocales(comparison.caption, 'comparison.caption');
+  for (const side of [comparison.before, comparison.after]) {
+    expectBothLocales(side.label, 'comparison.side.label');
+    expectBothLocales(side.value, 'comparison.side.value');
+    expect(side.weight).toBeGreaterThan(0);
+  }
+  expectBothLocales(comparison.source!, 'comparison.source');
+
+  const table = detail.table!;
+  expectBothLocales(table.caption, 'table.caption');
+  expect(table.columns.length).toBeGreaterThan(0);
+  for (const column of table.columns) expectBothLocales(column, 'table.column');
+  for (const row of table.rows) {
+    expect(row, 'every row has one cell per column').toHaveLength(table.columns.length);
+  }
+  expectBothLocales(table.note!, 'table.note');
+});
+
+it('dell-automated-caller is last — it is the oldest work', () => {
+  expect(projects[projects.length - 1].slug).toBe('dell-automated-caller');
+});
+
+it('publishes no hostname, URL or credential in any project narrative', () => {
+  // Deliberately pattern-based rather than a list of the specific internal
+  // hosts to keep out: this repository is public, so a guard naming them would
+  // publish exactly what it exists to protect — the same trap a name-list guard
+  // fell into on an earlier project. `links` is excluded because a public repo
+  // link is the one URL that belongs in content.
+  for (const project of projects) {
+    if (!project.detail) continue;
+    const narrative = JSON.stringify(project.detail);
+    expect(narrative, `${project.slug} detail contains a URL`).not.toMatch(/https?:\/\//);
+    expect(narrative, `${project.slug} detail contains a hostname`).not.toMatch(
+      /\b[a-z0-9-]+\.(com|io|net|dev|internal)\b/i,
+    );
+    expect(narrative, `${project.slug} detail contains a token-like string`).not.toMatch(
+      /\b[a-f0-9]{32,}\b/i,
+    );
+  }
+});
