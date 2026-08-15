@@ -166,6 +166,33 @@ function png(size, rgba) {
   ]);
 }
 
+/**
+ * ICO container: a 6-byte header, one 16-byte directory entry per image, then
+ * the image payloads. The payloads here are PNGs, which every browser that
+ * still reads .ico at all accepts.
+ */
+function ico(images) {
+  const header = Buffer.alloc(6);
+  header.writeUInt16LE(0, 0);
+  header.writeUInt16LE(1, 2);
+  header.writeUInt16LE(images.length, 4);
+  const dir = Buffer.alloc(16 * images.length);
+  let offset = header.length + dir.length;
+  images.forEach(({ size, data }, i) => {
+    const o = i * 16;
+    // 0 means 256 in this field; none of our sizes hit it, but the encoding
+    // is the reason the field is a single byte.
+    dir[o] = size >= 256 ? 0 : size;
+    dir[o + 1] = size >= 256 ? 0 : size;
+    dir.writeUInt16LE(1, o + 4);
+    dir.writeUInt16LE(32, o + 6);
+    dir.writeUInt32LE(data.length, o + 8);
+    dir.writeUInt32LE(offset, o + 12);
+    offset += data.length;
+  });
+  return Buffer.concat([header, dir, ...images.map((image) => image.data)]);
+}
+
 function svg() {
   const r = RADIUS;
   const span = GRID - 2 * r;
@@ -182,6 +209,12 @@ function svg() {
 const here = dirname(fileURLToPath(import.meta.url));
 const publicDir = join(here, '..', 'public');
 
+const ICO_SIZES = [16, 32, 48];
+
 writeFileSync(join(publicDir, 'favicon.svg'), svg());
+writeFileSync(
+  join(publicDir, 'favicon.ico'),
+  ico(ICO_SIZES.map((size) => ({ size, data: png(size, render(size, (RADIUS * size) / GRID)) }))),
+);
 writeFileSync(join(publicDir, 'apple-touch-icon.png'), png(180, render(180, 0)));
-console.log('wrote public/favicon.svg, public/apple-touch-icon.png');
+console.log('wrote public/favicon.svg, public/favicon.ico, public/apple-touch-icon.png');
