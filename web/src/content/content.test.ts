@@ -248,3 +248,74 @@ it('pulse points at both its source and the running site', () => {
   expect(pulse.links.some((l) => /github\.com/.test(l.href))).toBe(true);
   expect(pulse.links.some((l) => l.href === 'https://pulse.felipealmeida.tech')).toBe(true);
 });
+
+it('dietbox has a case study, localized in every locale', () => {
+  const project = projects.find((p) => p.slug === 'dietbox');
+  expect(project).toBeDefined();
+
+  expectBothLocales(project!.tagline, 'tagline');
+  expectBothLocales(project!.description, 'description');
+  expectBothLocales(project!.role, 'role');
+
+  const detail = project!.detail;
+  expect(detail).toBeDefined();
+
+  expectBothLocales(detail!.overview!, 'overview');
+  expectBothLocales(detail!.problem!, 'problem');
+  expectBothLocales(detail!.metricsNote!, 'metricsNote');
+
+  expect(detail!.metrics).toHaveLength(4);
+  for (const metric of detail!.metrics!) {
+    expectBothLocales(metric.value, 'metric.value');
+    expectBothLocales(metric.label, 'metric.label');
+    if (metric.note) expectBothLocales(metric.note, 'metric.note');
+  }
+
+  expectBothLocales(detail!.architecture!.summary!, 'architecture.summary');
+  expect(detail!.architecture!.steps).toHaveLength(5);
+  for (const step of detail!.architecture!.steps) {
+    expect(step.label.trim()).not.toBe('');
+    expectBothLocales(step.detail, 'architecture.step.detail');
+  }
+
+  expect(detail!.highlights).toHaveLength(4);
+  for (const highlight of detail!.highlights!) {
+    expectBothLocales(highlight, 'highlight');
+  }
+
+  expect(detail!.decisions).toHaveLength(4);
+  for (const decision of detail!.decisions!) {
+    expectBothLocales(decision.heading, 'decision.heading');
+    expectBothLocales(decision.body, 'decision.body');
+  }
+});
+
+it('dietbox names the shared work — its largest codebase was a team effort', () => {
+  const boundary = projects.find((p) => p.slug === 'dietbox')!.detail!.contribution!.boundary;
+  expect(boundary, 'the boundary must exist').toBeDefined();
+  expectBothLocales(boundary!, 'dietbox contribution.boundary');
+});
+
+it('dietbox sits between kota-embed and the ulbra projects', () => {
+  const slugs = projects.map((p) => p.slug);
+  expect(slugs.indexOf('dietbox')).toBeGreaterThan(slugs.indexOf('kota-embed'));
+  expect(slugs.indexOf('dietbox')).toBeLessThan(slugs.indexOf('ulbra-atende'));
+});
+
+it('dietbox links to its product, not its source', () => {
+  const dietbox = projects.find((p) => p.slug === 'dietbox')!;
+  expect(dietbox.visibility).toBe('private');
+  expect(dietbox.links).toEqual([{ label: 'Website', href: 'https://dietbox.me' }]);
+});
+
+it('dietbox is the only project with a leadership section, localized and non-empty', () => {
+  const withLeadership = projects.filter((p) => p.detail?.leadership);
+  expect(withLeadership.map((p) => p.slug)).toEqual(['dietbox']);
+
+  const leadership = withLeadership[0]!.detail!.leadership!;
+  expect(leadership).toHaveLength(4);
+  for (const section of leadership) {
+    expectBothLocales(section.heading, 'dietbox leadership heading');
+    expectBothLocales(section.body, 'dietbox leadership body');
+  }
+});
