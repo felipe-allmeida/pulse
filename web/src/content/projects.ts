@@ -546,6 +546,7 @@ export const projects: Project[] = [
     },
     period: { en: '2020–2024', 'pt-BR': '2020–2024' },
     visibility: 'private',
+    screenshot: '/screenshots/dietbox.png',
     links: [{ label: 'Website', href: 'https://dietbox.me' }],
     detail: {
       overview: {
@@ -1026,6 +1027,7 @@ export const projects: Project[] = [
     role: { en: 'Software engineer', 'pt-BR': 'Engenheiro de software' },
     period: { en: 'Professional work', 'pt-BR': 'Trabalho profissional' },
     visibility: 'private',
+    screenshot: '/screenshots/ulbra-one.png',
     links: [],
     detail: {
       overview: {
