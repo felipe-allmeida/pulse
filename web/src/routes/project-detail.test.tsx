@@ -139,7 +139,7 @@ describe('ProjectDetail', () => {
     expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
   });
 
-  it('renders the Kota Embed case study in section order, with no external link', async () => {
+  it('renders the Kota Embed case study in section order, with its website link', async () => {
     await renderDetail('kota-embed');
 
     const h1 = await screen.findAllByRole('heading', { level: 1 });
@@ -167,7 +167,8 @@ describe('ProjectDetail', () => {
 
     expect(screen.getByText('Private')).toBeInTheDocument();
     const externalLinks = screen.queryAllByRole('link').filter((l) => l.getAttribute('target') === '_blank');
-    expect(externalLinks).toHaveLength(0);
+    expect(externalLinks).toHaveLength(1);
+    expect(externalLinks[0]).toHaveAttribute('href', 'https://kota.io');
   });
 
   it('renders the Kota Embed case study in pt-BR', async () => {
@@ -270,5 +271,61 @@ describe('ProjectDetail', () => {
 
     const headings = screen.getAllByRole('heading', { level: 2 }).map((h) => h.textContent);
     expect(headings).toEqual(['Overview', 'What it does']);
+  });
+
+  it('renders the live-site link and the repository link for pulse', async () => {
+    await renderDetail('pulse');
+    await screen.findAllByRole('heading', { level: 1 });
+
+    expect(screen.getByRole('link', { name: /github/i })).toHaveAttribute(
+      'href',
+      'https://github.com/felipe-allmeida/pulse',
+    );
+    expect(screen.getByRole('link', { name: /live site/i })).toHaveAttribute(
+      'href',
+      'https://pulse.felipealmeida.tech',
+    );
+  });
+
+  it('renders kota-embed’s website link beside its Private indicator', async () => {
+    await renderDetail('kota-embed');
+    await screen.findAllByRole('heading', { level: 1 });
+
+    expect(screen.getByRole('link', { name: /website/i })).toHaveAttribute('href', 'https://kota.io');
+    expect(screen.getByText('Private')).toBeInTheDocument();
+  });
+
+  it('renders the full Pulse case study in section order', async () => {
+    await renderDetail('pulse');
+    await screen.findAllByRole('heading', { level: 1 });
+
+    expect(screen.getByText(/watch a system work/i)).toBeInTheDocument();
+    expect(screen.getByText('Outbox')).toBeInTheDocument();
+    expect(screen.getByText(/A transactional outbox behind a visit counter/i)).toBeInTheDocument();
+
+    const headings = screen.getAllByRole('heading', { level: 2 }).map((h) => h.textContent);
+    expect(headings).toEqual([
+      'Overview',
+      'What I did',
+      'The problem',
+      'Architecture',
+      'What it does',
+      'Engineering decisions',
+    ]);
+  });
+
+  it('renders the Pulse case study in pt-BR', async () => {
+    await renderDetail('pulse', 'pt-BR');
+    await screen.findAllByRole('heading', { level: 1 });
+
+    const headings = screen.getAllByRole('heading', { level: 2 }).map((h) => h.textContent);
+    expect(headings).toEqual([
+      'Visão geral',
+      'O que eu fiz',
+      'O problema',
+      'Arquitetura',
+      'O que faz',
+      'Decisões de engenharia',
+    ]);
   });
 });

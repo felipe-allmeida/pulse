@@ -23,9 +23,11 @@ interface ProjectCardProps {
  * data. When `project.screenshot` is set, the real image renders up top;
  * otherwise a thin signal accent rule stands in for it — never a giant void.
  * The whole card is a stretched link to its dedicated `/projects/$slug`
- * page — the external links (only for `visibility: 'public'`) sit above the
- * overlay so they stay independently clickable rather than nesting an `<a>`
- * inside an `<a>`. `pulse` renders with a tamed featured accent (a
+ * page — a project's own links render whatever its visibility —
+ * `visibility` describes the source, not the product, so a private project
+ * may still point at a public product site — and sit above the overlay so
+ * they stay independently clickable rather than nesting an `<a>` inside an
+ * `<a>`. `pulse` renders with a tamed featured accent (a
  * border/shadow whisper, not a neon halo).
  */
 export function ProjectCard({ project, className }: ProjectCardProps) {
@@ -71,25 +73,24 @@ export function ProjectCard({ project, className }: ProjectCardProps) {
       </p>
 
       <div className="relative z-10 flex flex-wrap items-center gap-3 pt-1">
-        {project.visibility === 'public' ? (
-          project.links.map((link) => (
-            <a
-              key={link.href}
-              href={link.href}
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex items-center gap-1.5 rounded-full border border-signal/30 px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:border-signal/60 hover:text-signal-strong"
-            >
-              <ExternalLink aria-hidden className="size-3.5" />
-              {link.label}
-            </a>
-          ))
-        ) : (
+        {project.links.map((link) => (
+          <a
+            key={link.href}
+            href={link.href}
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center gap-1.5 rounded-full border border-signal/30 px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:border-signal/60 hover:text-signal-strong"
+          >
+            <ExternalLink aria-hidden className="size-3.5" />
+            {link.label}
+          </a>
+        ))}
+        {project.visibility === 'private' ? (
           <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
             <Lock aria-hidden className="size-3.5" />
             {t('projects:privateLabel')}
           </span>
-        )}
+        ) : null}
       </div>
 
       <Link

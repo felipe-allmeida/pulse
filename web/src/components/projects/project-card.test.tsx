@@ -135,4 +135,32 @@ describe('ProjectCard', () => {
     expect(screen.queryByRole('link', { name: /github|repo/i })).not.toBeInTheDocument();
     expect(screen.getByText('Privado')).toBeInTheDocument();
   });
+
+  it('renders a private project’s product link beside the lock, not instead of it', async () => {
+    await renderCard({
+      ...privateProject,
+      links: [{ label: 'Website', href: 'https://example.com' }],
+    });
+
+    const link = await screen.findByRole('link', { name: /website/i });
+    expect(link).toHaveAttribute('href', 'https://example.com');
+    expect(link).toHaveAttribute('target', '_blank');
+    expect(link).toHaveAttribute('rel', expect.stringContaining('noreferrer'));
+    expect(screen.getByText('Private')).toBeInTheDocument();
+  });
+
+  it('renders only the lock for a private project with no links', async () => {
+    await renderCard({ ...privateProject, links: [] });
+
+    expect(await screen.findByText('Private')).toBeInTheDocument();
+    const external = screen.queryAllByRole('link').filter((l) => l.getAttribute('target') === '_blank');
+    expect(external).toHaveLength(0);
+  });
+
+  it('renders no lock for a public project', async () => {
+    await renderCard(publicProject);
+    await screen.findByRole('link', { name: /github/i });
+
+    expect(screen.queryByText('Private')).not.toBeInTheDocument();
+  });
 });

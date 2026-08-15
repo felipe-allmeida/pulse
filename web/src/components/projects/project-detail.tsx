@@ -23,9 +23,11 @@ export interface ProjectDetailProps {
 /**
  * The dedicated signal page for a single project, looked up by `slug` from
  * `projects`. Unknown slugs render a localized not-found state instead of
- * crashing. External links (GitHub/live) render only for
- * `visibility: 'public'` — the same confidentiality invariant enforced on
- * the card holds here too, in both locales. Exactly one `<h1>`.
+ * crashing. A project's own links (GitHub/live) render whatever its
+ * visibility — `visibility` describes the source, not the product, so a
+ * private project may still point at a public product site; the same
+ * repository-secrecy invariant enforced on the card holds here too, in both
+ * locales. Exactly one `<h1>`.
  */
 export function ProjectDetail({ slug }: ProjectDetailProps) {
   const { t } = useTranslation('projects');
@@ -80,27 +82,26 @@ export function ProjectDetail({ slug }: ProjectDetailProps) {
             ))}
           </div>
 
-          {project.visibility === 'public' ? (
-            <div className="flex flex-wrap gap-3">
-              {project.links.map((link) => (
-                <a
-                  key={link.href}
-                  href={link.href}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex items-center gap-1.5 rounded-full border border-signal/30 px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:border-signal/60 hover:text-signal-strong"
-                >
-                  <ExternalLink aria-hidden className="size-3.5" />
-                  {link.label}
-                </a>
-              ))}
-            </div>
-          ) : (
-            <span className="inline-flex w-fit items-center gap-1.5 text-xs text-muted-foreground">
-              <Lock aria-hidden className="size-3.5" />
-              {t('projects:privateLabel')}
-            </span>
-          )}
+          <div className="flex flex-wrap items-center gap-3">
+            {project.links.map((link) => (
+              <a
+                key={link.href}
+                href={link.href}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-1.5 rounded-full border border-signal/30 px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:border-signal/60 hover:text-signal-strong"
+              >
+                <ExternalLink aria-hidden className="size-3.5" />
+                {link.label}
+              </a>
+            ))}
+            {project.visibility === 'private' ? (
+              <span className="inline-flex w-fit items-center gap-1.5 text-xs text-muted-foreground">
+                <Lock aria-hidden className="size-3.5" />
+                {t('projects:privateLabel')}
+              </span>
+            ) : null}
+          </div>
         </div>
 
         <ProjectScreenshot

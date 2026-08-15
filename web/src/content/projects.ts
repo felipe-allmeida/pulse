@@ -140,7 +140,10 @@ export const projects: Project[] = [
     tech: ['.NET 10', 'SignalR', 'RabbitMQ', 'Redis', 'Postgres', 'React 19', 'Docker', 'Terraform'],
     role: { en: 'Design & implementation', 'pt-BR': 'Design & implementação' },
     visibility: 'public',
-    links: [{ label: 'GitHub', href: 'https://github.com/felipe-allmeida/pulse' }],
+    links: [
+      { label: 'Live site', href: 'https://pulse.felipealmeida.tech' },
+      { label: 'GitHub', href: 'https://github.com/felipe-allmeida/pulse' },
+    ],
     detail: {
       overview: {
         en: 'A self-hosted portfolio that doubles as a live systems demo: presence, visits, and metrics travel through a real event-driven backend in real time, not canned data.',
@@ -149,9 +152,9 @@ export const projects: Project[] = [
       },
       contribution: {
         summary: {
-          en: 'Sole author — the design, the event-driven backend, the front end, and the infrastructure it runs on.',
+          en: 'Solo project — the design, the event-driven backend, the front end, and the infrastructure it runs on.',
           'pt-BR':
-            'Autor único — o design, o backend orientado a eventos, o front-end e a infraestrutura em que roda.',
+            'Projeto solo — o design, o backend orientado a eventos, o front-end e a infraestrutura em que roda.',
         },
         areas: [
           { en: 'The realtime presence pipeline and its world map.', 'pt-BR': 'O pipeline de presença em tempo real e seu mapa-múndi.' },
@@ -159,6 +162,58 @@ export const projects: Project[] = [
           { en: 'The public ops dashboard and the metrics it exposes.', 'pt-BR': 'O dashboard de operações público e as métricas que ele expõe.' },
           { en: 'The AI assistant and the profile that grounds it.', 'pt-BR': 'O assistente de IA e o perfil que o fundamenta.' },
           { en: 'Deployment, from container build to the machine it lands on.', 'pt-BR': 'O deploy, do build do container à máquina onde ele roda.' },
+        ],
+      },
+      problem: {
+        en: 'A CV asserts seniority and a repository demands that someone read it; neither lets a stranger watch a system work. Pulse closes that gap by being both the portfolio and the thing being demonstrated. The constraint it was built against was not a user need but an evidentiary one — make the claim checkable in the thirty seconds someone actually spends.',
+        'pt-BR':
+          'Um currículo afirma senioridade e um repositório exige que alguém o leia; nenhum dos dois deixa um estranho ver um sistema funcionando. O Pulse fecha essa lacuna sendo ao mesmo tempo o portfólio e a coisa demonstrada. O que guiou sua construção não foi uma necessidade de usuário, e sim de evidência — tornar a afirmação conferível nos trinta segundos que alguém de fato gasta.',
+      },
+      architecture: {
+        summary: {
+          en: 'A .NET backend behind a React client. A new connection resolves the visitor’s rough location and publishes a visit event through a transactional outbox, flushed in the same save as the write. A worker drains that outbox over RabbitMQ and appends the audit trail in Postgres. SignalR carries live presence — the connection count, and reactions — while the world map reads the accumulated visits by polling, so the map draws on its own schedule instead of blocking on that round trip. Tracing runs through OpenTelemetry, and the whole thing ships as containers behind Caddy.',
+          'pt-BR':
+            'Um backend .NET por trás de um cliente React. Uma conexão nova resolve a localização aproximada do visitante e publica um evento de visita por um outbox transacional, descarregado no mesmo save da escrita. Um worker drena esse outbox via RabbitMQ e acrescenta a trilha de auditoria no Postgres. O SignalR carrega a presença ao vivo — a contagem de conexões e as reações — enquanto o mapa-múndi lê as visitas acumuladas por polling, então o mapa desenha no próprio ritmo em vez de travar esperando esse round trip. O tracing passa por OpenTelemetry, e tudo sobe como containers atrás do Caddy.',
+        },
+        steps: [
+          {
+            label: 'Browser',
+            detail: {
+              en: 'A React client holding a SignalR connection open.',
+              'pt-BR': 'Um cliente React mantendo uma conexão SignalR aberta.',
+            },
+          },
+          {
+            label: 'API',
+            detail: {
+              en: 'Resolves the visitor’s rough location, publishes the visit, and broadcasts the new presence count to everyone.',
+              'pt-BR':
+                'Resolve a localização aproximada do visitante, publica a visita e transmite a nova contagem de presença para todos.',
+            },
+          },
+          {
+            label: 'Outbox',
+            detail: {
+              en: 'The event is buffered and flushed in the same save as the write, so it cannot be published for something that did not commit.',
+              'pt-BR':
+                'O evento é bufferizado e descarregado no mesmo save da escrita, então não pode ser publicado para algo que não commitou.',
+            },
+          },
+          {
+            label: 'Worker',
+            detail: {
+              en: 'Drains the outbox over RabbitMQ and appends the visit to the audit trail.',
+              'pt-BR': 'Drena o outbox via RabbitMQ e acrescenta a visita à trilha de auditoria.',
+            },
+          },
+          {
+            label: 'World map',
+            detail: {
+              en: 'Polls the accumulated visits on its own schedule, so the map never blocks on the round trip that fills it.',
+              'pt-BR':
+                'Consulta as visitas acumuladas no próprio ritmo, então o mapa nunca trava esperando o round trip que o alimenta.',
+            },
+          },
         ],
       },
       highlights: [
@@ -172,8 +227,9 @@ export const projects: Project[] = [
             'Backend .NET orientado a eventos com outbox transacional via RabbitMQ, Postgres e tracing com OpenTelemetry.',
         },
         {
-          en: 'A public ops dashboard exposing real metrics — connections, event throughput, latency.',
-          'pt-BR': 'Um dashboard de operações público expondo métricas reais — conexões, throughput de eventos, latência.',
+          en: 'A public ops dashboard exposing real metrics — live connections, visits over time, and the event feed as it happens.',
+          'pt-BR':
+            'Um dashboard de operações público expondo métricas reais — conexões ao vivo, visitas ao longo do tempo e o feed de eventos conforme acontece.',
         },
         {
           en: 'An AI assistant grounded in a maintained profile, streaming answers about the author.',
@@ -182,6 +238,52 @@ export const projects: Project[] = [
         {
           en: 'Deployed with Docker Compose + Caddy behind Terraform-managed infrastructure.',
           'pt-BR': 'Deploy com Docker Compose + Caddy sobre infraestrutura gerenciada com Terraform.',
+        },
+      ],
+      decisions: [
+        {
+          heading: {
+            en: 'A transactional outbox behind a visit counter',
+            'pt-BR': 'Um outbox transacional atrás de um contador de visitas',
+          },
+          body: {
+            en: 'Nothing about counting visits requires one. The point is not the counter — it is that the pattern is here, wired end to end, in something a reader can watch rather than a diagram they have to trust. On a product this would be over-engineering; on a demonstration it is the deliverable.',
+            'pt-BR':
+              'Nada em contar visitas exige um. O ponto não é o contador — é que o padrão está aqui, ligado de ponta a ponta, em algo que o leitor pode ver funcionando em vez de um diagrama em que precisa acreditar. Num produto isso seria over-engineering; numa demonstração é a entrega.',
+          },
+        },
+        {
+          heading: {
+            en: 'Real telemetry, published',
+            'pt-BR': 'Telemetria real, publicada',
+          },
+          body: {
+            en: 'The ops dashboard exposes the system’s actual numbers, which means a reader can catch the site lying about itself. Most portfolios make claims that cannot be checked; this one chose the version that can be.',
+            'pt-BR':
+              'O dashboard de operações expõe os números reais do sistema, o que significa que um leitor pode flagrar o site mentindo sobre si mesmo. A maioria dos portfólios faz afirmações que não dá para conferir; este escolheu a versão que dá.',
+          },
+        },
+        {
+          heading: {
+            en: 'Prerendered pages over a client-only app',
+            'pt-BR': 'Páginas pré-renderizadas em vez de app só no cliente',
+          },
+          body: {
+            en: 'The site renders its content into HTML at build time, so a first visit does not wait on JavaScript and a crawler sees the same page a person does — and, usefully, a deploy can be verified with a single request rather than a browser.',
+            'pt-BR':
+              'O site renderiza seu conteúdo em HTML no build, então a primeira visita não espera JavaScript e um crawler vê a mesma página que uma pessoa — e, de quebra, um deploy pode ser verificado com uma única requisição em vez de um navegador.',
+          },
+        },
+        {
+          heading: {
+            en: 'An assistant grounded in a maintained profile',
+            'pt-BR': 'Um assistente fundamentado num perfil mantido',
+          },
+          body: {
+            en: 'The assistant answers from a file the author keeps current, and says it does not know rather than inventing. Ungrounded, it would be a demonstration of exactly the wrong thing.',
+            'pt-BR':
+              'O assistente responde a partir de um arquivo que o autor mantém atualizado, e diz que não sabe em vez de inventar. Sem fundamento, ele seria a demonstração exatamente do oposto.',
+          },
         },
       ],
     },
@@ -205,7 +307,7 @@ export const projects: Project[] = [
     },
     period: { en: 'Professional work', 'pt-BR': 'Trabalho profissional' },
     visibility: 'private',
-    links: [],
+    links: [{ label: 'Website', href: 'https://kota.io' }],
     detail: {
       overview: {
         en: 'Kota Embed lets employers offer health insurance to their employees without leaving the software they already use — the enrollment flow runs embedded in a third-party platform, backed by a multi-tenant .NET service that integrates directly with insurers.',

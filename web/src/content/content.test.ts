@@ -82,7 +82,8 @@ it('kota-embed has a case study, localized in every locale', () => {
   const project = projects.find((p) => p.slug === 'kota-embed');
   expect(project).toBeDefined();
   expect(project!.visibility).toBe('private');
-  expect(project!.links).toHaveLength(0);
+  expect(project!.links).toHaveLength(1);
+  expect(project!.links.some((l) => /github\.com|repo/i.test(l.href))).toBe(false);
 
   const detail = project!.detail;
   expectBothLocales(detail!.problem!, 'problem');
@@ -219,4 +220,31 @@ it('the state-machine figures are localized and non-empty', () => {
       expectBothLocales(step.detail, `${slug} states.step.detail`);
     }
   }
+});
+
+it('every project link is absolute and https', () => {
+  for (const project of projects) {
+    for (const link of project.links) {
+      expect(link.href, `${project.slug}: ${link.href}`).toMatch(/^https:\/\//);
+      expect(link.label.trim(), `${project.slug} has an unlabelled link`).not.toBe('');
+    }
+  }
+});
+
+it('no private project links to a repository', () => {
+  // `visibility` describes the source, not the product: a private project may
+  // point at its public product site, but never at the code.
+  for (const project of projects.filter((p) => p.visibility === 'private')) {
+    for (const link of project.links) {
+      expect(link.href, `${project.slug} links to a repository`).not.toMatch(
+        /github\.com|gitlab\.|bitbucket\.|codeberg\.|sr\.ht|dev\.azure\.com|\/_git\/|\bgit\.[a-z0-9-]+\.[a-z]{2,}|\/repo/i,
+      );
+    }
+  }
+});
+
+it('pulse points at both its source and the running site', () => {
+  const pulse = projects.find((p) => p.slug === 'pulse')!;
+  expect(pulse.links.some((l) => /github\.com/.test(l.href))).toBe(true);
+  expect(pulse.links.some((l) => l.href === 'https://pulse.felipealmeida.tech')).toBe(true);
 });
