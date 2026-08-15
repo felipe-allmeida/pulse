@@ -1,6 +1,9 @@
 import { Link } from '@tanstack/react-router';
 import { ExternalLink, Lock } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { CaseStudyArchitecture } from '@/components/projects/case-study-architecture';
+import { CaseStudyDecisions } from '@/components/projects/case-study-decisions';
+import { CaseStudyMetrics } from '@/components/projects/case-study-metrics';
 import { FEATURED_PROJECT_SLUG } from '@/components/projects/featured';
 import { ProjectScreenshot } from '@/components/projects/project-screenshot';
 import { Chip } from '@/components/signal/chip';
@@ -109,6 +112,30 @@ export function ProjectDetail({ slug }: ProjectDetailProps) {
           </section>
         ) : null}
 
+        {project.detail?.problem ? (
+          <section className="flex flex-col gap-3">
+            <SubsectionHeading>{t('projects:problemHeading')}</SubsectionHeading>
+            <p className="max-w-2xl text-base leading-relaxed text-muted-foreground">{L(project.detail.problem)}</p>
+          </section>
+        ) : null}
+
+        {project.detail?.metrics && project.detail.metrics.length > 0 ? (
+          <section className="flex flex-col gap-3">
+            <SubsectionHeading>{t('projects:metricsHeading')}</SubsectionHeading>
+            <CaseStudyMetrics metrics={project.detail.metrics} note={project.detail.metricsNote} />
+          </section>
+        ) : null}
+
+        {project.detail?.architecture && project.detail.architecture.nodes.length > 0 ? (
+          <section className="flex flex-col gap-3">
+            <SubsectionHeading>{t('projects:architectureHeading')}</SubsectionHeading>
+            <CaseStudyArchitecture
+              summary={project.detail.architecture.summary}
+              nodes={project.detail.architecture.nodes}
+            />
+          </section>
+        ) : null}
+
         {project.detail?.highlights && project.detail.highlights.length > 0 ? (
           <section className="flex flex-col gap-3">
             <SubsectionHeading>{t('projects:highlightsHeading')}</SubsectionHeading>
@@ -120,6 +147,13 @@ export function ProjectDetail({ slug }: ProjectDetailProps) {
                 </li>
               ))}
             </ul>
+          </section>
+        ) : null}
+
+        {project.detail?.decisions && project.detail.decisions.length > 0 ? (
+          <section className="flex flex-col gap-3">
+            <SubsectionHeading>{t('projects:decisionsHeading')}</SubsectionHeading>
+            <CaseStudyDecisions decisions={project.detail.decisions} />
           </section>
         ) : null}
       </div>
