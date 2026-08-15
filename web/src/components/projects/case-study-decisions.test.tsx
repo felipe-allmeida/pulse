@@ -17,7 +17,7 @@ const decisions: CaseStudySection[] = [
 
 describe('CaseStudyDecisions', () => {
   it('renders every heading and body in English', async () => {
-    await renderWithI18n(<CaseStudyDecisions decisions={decisions} />);
+    await renderWithI18n(<CaseStudyDecisions sections={decisions} />);
 
     expect(screen.getByText('A modular monolith')).toBeInTheDocument();
     expect(screen.getByText('One team, one deploy.')).toBeInTheDocument();
@@ -26,19 +26,19 @@ describe('CaseStudyDecisions', () => {
   });
 
   it('renders in pt-BR', async () => {
-    await renderWithI18n(<CaseStudyDecisions decisions={decisions} />, { locale: 'pt-BR' });
+    await renderWithI18n(<CaseStudyDecisions sections={decisions} />, { locale: 'pt-BR' });
 
     expect(screen.getByText('Monólito modular')).toBeInTheDocument();
     expect(screen.getByText('O evento commita com a escrita.')).toBeInTheDocument();
   });
 
   it('renders nothing for an empty list', async () => {
-    const { container } = await renderWithI18n(<CaseStudyDecisions decisions={[]} />);
+    const { container } = await renderWithI18n(<CaseStudyDecisions sections={[]} />);
     expect(container).toBeEmptyDOMElement();
   });
 
   it('renders decision headings as h3, below the page h2 sections', async () => {
-    await renderWithI18n(<CaseStudyDecisions decisions={decisions} />);
+    await renderWithI18n(<CaseStudyDecisions sections={decisions} />);
     expect(screen.getAllByRole('heading', { level: 3 })).toHaveLength(2);
   });
 });

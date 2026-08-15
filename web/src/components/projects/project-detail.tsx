@@ -195,7 +195,14 @@ export function ProjectDetail({ slug }: ProjectDetailProps) {
         {project.detail?.decisions && project.detail.decisions.length > 0 ? (
           <section className="flex flex-col gap-3">
             <SubsectionHeading>{t('projects:decisionsHeading')}</SubsectionHeading>
-            <CaseStudyDecisions decisions={project.detail.decisions} />
+            <CaseStudyDecisions sections={project.detail.decisions} />
+          </section>
+        ) : null}
+
+        {project.detail?.leadership && project.detail.leadership.length > 0 ? (
+          <section className="flex flex-col gap-3">
+            <SubsectionHeading>{t('projects:leadershipHeading')}</SubsectionHeading>
+            <CaseStudyDecisions sections={project.detail.leadership} />
           </section>
         ) : null}
       </div>

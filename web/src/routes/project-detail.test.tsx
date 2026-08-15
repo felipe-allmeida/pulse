@@ -328,4 +328,59 @@ describe('ProjectDetail', () => {
       'Decisões de engenharia',
     ]);
   });
+
+  it('renders the Dietbox case study in section order, with leadership last', async () => {
+    await renderDetail('dietbox');
+
+    await screen.findAllByRole('heading', { level: 1 });
+    expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
+    expect(screen.getByText(/lives in the tool all day/i)).toBeInTheDocument();
+    expect(screen.getByText('~1.7k')).toBeInTheDocument();
+    expect(screen.getByText(/its own sign-up, sign-in and password flow/i)).toBeInTheDocument();
+    expect(screen.getByText(/Revenue never paused/i)).toBeInTheDocument();
+    expect(screen.getByText(/the kind of change whose measure of success/i)).toBeInTheDocument();
+
+    const websiteLink = screen.getByRole('link', { name: /website/i });
+    expect(websiteLink).toHaveAttribute('href', 'https://dietbox.me');
+    expect(screen.getByText('Private')).toBeInTheDocument();
+
+    const headings = screen.getAllByRole('heading', { level: 2 }).map((h) => h.textContent);
+    expect(headings).toEqual([
+      'Overview',
+      'What I did',
+      'The problem',
+      'By the numbers',
+      'Architecture',
+      'What it does',
+      'Engineering decisions',
+      'What changed under my direction',
+    ]);
+  });
+
+  it('renders the Dietbox case study in pt-BR', async () => {
+    await renderDetail('dietbox', 'pt-BR');
+
+    await screen.findAllByRole('heading', { level: 1 });
+    expect(screen.getByText('Privado')).toBeInTheDocument();
+
+    const headings = screen.getAllByRole('heading', { level: 2 }).map((h) => h.textContent);
+    expect(headings).toEqual([
+      'Visão geral',
+      'O que eu fiz',
+      'O problema',
+      'Em números',
+      'Arquitetura',
+      'O que faz',
+      'Decisões de engenharia',
+      'O que mudou sob minha direção',
+    ]);
+  });
+
+  it('renders no leadership section for a project that has none', async () => {
+    await renderDetail('ulbra-atende');
+
+    await screen.findAllByRole('heading', { level: 1 });
+    const headings = screen.getAllByRole('heading', { level: 2 }).map((h) => h.textContent);
+    expect(headings).not.toContain('What changed under my direction');
+  });
 });
