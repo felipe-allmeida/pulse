@@ -1074,6 +1074,7 @@ export const projects: Project[] = [
     },
     period: { en: '2020', 'pt-BR': '2020' },
     visibility: 'private',
+    screenshot: '/screenshots/dell-automated-caller.png',
     links: [],
     detail: {
       overview: {
