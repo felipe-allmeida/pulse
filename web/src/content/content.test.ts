@@ -43,11 +43,11 @@ it('ulbra-atende has a full case study, localized in every locale', () => {
     if (metric.note) expectBothLocales(metric.note, 'metric.note');
   }
 
-  expectBothLocales(detail!.architecture!.summary, 'architecture.summary');
-  expect(detail!.architecture!.nodes.length).toBeGreaterThanOrEqual(3);
-  for (const node of detail!.architecture!.nodes) {
-    expect(node.label.trim()).not.toBe('');
-    expectBothLocales(node.detail, 'architecture.node.detail');
+  expectBothLocales(detail!.architecture!.summary!, 'architecture.summary');
+  expect(detail!.architecture!.steps.length).toBeGreaterThanOrEqual(3);
+  for (const step of detail!.architecture!.steps) {
+    expect(step.label.trim()).not.toBe('');
+    expectBothLocales(step.detail, 'architecture.step.detail');
   }
 
   expect(detail!.decisions!.length).toBeGreaterThanOrEqual(3);
@@ -64,10 +64,16 @@ it('no case-study section is present but empty on any project', () => {
     if (detail.metrics) expect(detail.metrics.length, `${project.slug} metrics`).toBeGreaterThan(0);
     if (detail.decisions) expect(detail.decisions.length, `${project.slug} decisions`).toBeGreaterThan(0);
     if (detail.architecture) {
-      expect(detail.architecture.nodes.length, `${project.slug} architecture nodes`).toBeGreaterThan(0);
+      expect(detail.architecture.steps.length, `${project.slug} architecture steps`).toBeGreaterThan(0);
     }
     if (detail.metricsNote) {
       expect(detail.metrics?.length ?? 0, `${project.slug} metricsNote without metrics`).toBeGreaterThan(0);
+    }
+    if (detail.states) {
+      expect(detail.states.steps.length, `${project.slug} states steps`).toBeGreaterThan(0);
+    }
+    if (detail.contribution?.areas) {
+      expect(detail.contribution.areas.length, `${project.slug} contribution areas`).toBeGreaterThan(0);
     }
   }
 });
@@ -88,11 +94,11 @@ it('kota-embed has a case study, localized in every locale', () => {
     if (metric.note) expectBothLocales(metric.note, 'metric.note');
   }
 
-  expectBothLocales(detail!.architecture!.summary, 'architecture.summary');
-  expect(detail!.architecture!.nodes).toHaveLength(5);
-  for (const node of detail!.architecture!.nodes) {
-    expect(node.label.trim()).not.toBe('');
-    expectBothLocales(node.detail, 'architecture.node.detail');
+  expectBothLocales(detail!.architecture!.summary!, 'architecture.summary');
+  expect(detail!.architecture!.steps).toHaveLength(5);
+  for (const step of detail!.architecture!.steps) {
+    expect(step.label.trim()).not.toBe('');
+    expectBothLocales(step.detail, 'architecture.step.detail');
   }
 
   expect(detail!.decisions).toHaveLength(4);
@@ -173,5 +179,44 @@ it('publishes no hostname, URL or credential in any project narrative', () => {
     expect(narrative, `${project.slug} detail contains a token-like string`).not.toMatch(
       /\b[a-f0-9]{32,}\b/i,
     );
+  }
+});
+
+it('every project except ulbra-one states what the author did', () => {
+  for (const project of projects) {
+    const contribution = project.detail?.contribution;
+    if (project.slug === 'ulbra-one') {
+      expect(contribution, 'ulbra-one is out of scope for now').toBeUndefined();
+      continue;
+    }
+    expect(contribution, `${project.slug} has no contribution`).toBeDefined();
+    expectBothLocales(contribution!.summary, `${project.slug} contribution.summary`);
+    for (const area of contribution!.areas ?? []) {
+      expectBothLocales(area, `${project.slug} contribution.area`);
+    }
+    if (contribution!.boundary) {
+      expectBothLocales(contribution!.boundary, `${project.slug} contribution.boundary`);
+    }
+  }
+});
+
+it('kota-embed names the front end as someone else’s work', () => {
+  const boundary = projects.find((p) => p.slug === 'kota-embed')!.detail!.contribution!.boundary!;
+  expect(boundary.en, 'the boundary must name what was not the author’s').toMatch(/front end/i);
+  expect(boundary.en).toMatch(/others|someone else/i);
+  expect(boundary['pt-BR']).toMatch(/front-end/i);
+  expect(boundary['pt-BR']).toMatch(/outros|outra pessoa/i);
+});
+
+it('the state-machine figures are localized and non-empty', () => {
+  for (const slug of ['kota-embed', 'ulbra-atende']) {
+    const states = projects.find((p) => p.slug === slug)!.detail!.states!;
+    expectBothLocales(states.caption!, `${slug} states.caption`);
+    expectBothLocales(states.summary!, `${slug} states.summary`);
+    expect(states.steps.length).toBeGreaterThanOrEqual(4);
+    for (const step of states.steps) {
+      expect(step.label.trim()).not.toBe('');
+      expectBothLocales(step.detail, `${slug} states.step.detail`);
+    }
   }
 });

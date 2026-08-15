@@ -10,11 +10,21 @@ export interface CaseStudyMetric {
   note?: LocalizedString;
 }
 
-/** One node in a project's architecture diagram. */
-export interface CaseStudyArchitectureNode {
-  /** Short technical label — a product name, so not localized. */
+/** One step in a flow — a topology node or a lifecycle state. */
+export interface CaseStudyFlowStep {
+  /** Short label: a product name or a state name, so not localized. */
   label: string;
   detail: LocalizedString;
+}
+
+/** A named sequence of steps: what calls what, or what happens next. */
+export interface CaseStudyFlow {
+  /** Doubles as the section heading. Optional only for `architecture`, which
+   *  falls back to the shared "Architecture" heading; a `states` flow without
+   *  one does not render, because "Architecture" would be the wrong title. */
+  caption?: LocalizedString;
+  summary?: LocalizedString;
+  steps: CaseStudyFlowStep[];
 }
 
 /** A titled prose block — used for "why X and not Y" decisions. */
@@ -62,9 +72,21 @@ export interface CaseStudyTable {
   note?: LocalizedString;
 }
 
+/** What the author actually did on a project. */
+export interface ProjectContribution {
+  /** One or two sentences naming the contribution. */
+  summary: LocalizedString;
+  /** The specific areas owned — 2-5 items. */
+  areas?: LocalizedString[];
+  /** What was explicitly someone else's. Omit when the author built it all. */
+  boundary?: LocalizedString;
+}
+
 export interface ProjectDetailContent {
   /** A longer, dedicated-page overview — 1-3 sentences. */
   overview?: LocalizedString;
+  /** What the author actually did — rendered as its own section. */
+  contribution?: ProjectContribution;
   /** What the system does, as 2-8 bullet points. */
   highlights?: LocalizedString[];
   /** The situation before the project existed. 2-4 sentences. */
@@ -73,10 +95,10 @@ export interface ProjectDetailContent {
   metrics?: CaseStudyMetric[];
   /** One qualifier rendered under the metrics heading, covering the whole grid. */
   metricsNote?: LocalizedString;
-  architecture?: {
-    summary: LocalizedString;
-    nodes: CaseStudyArchitectureNode[];
-  };
+  /** How the system is put together — what calls what. */
+  architecture?: CaseStudyFlow;
+  /** How one unit of work moves through the system, state by state. */
+  states?: CaseStudyFlow;
   /** A real script or config sample. */
   script?: CaseStudyScript;
   /** A before/after figure drawn to scale. */
@@ -125,6 +147,20 @@ export const projects: Project[] = [
         'pt-BR':
           'Um portfólio auto-hospedado que também funciona como demo de sistemas ao vivo: presença, visitas e métricas passam por um backend real orientado a eventos em tempo real, não dados simulados.',
       },
+      contribution: {
+        summary: {
+          en: 'Sole author — the design, the event-driven backend, the front end, and the infrastructure it runs on.',
+          'pt-BR':
+            'Autor único — o design, o backend orientado a eventos, o front-end e a infraestrutura em que roda.',
+        },
+        areas: [
+          { en: 'The realtime presence pipeline and its world map.', 'pt-BR': 'O pipeline de presença em tempo real e seu mapa-múndi.' },
+          { en: 'The transactional outbox and the event-driven backend behind it.', 'pt-BR': 'O outbox transacional e o backend orientado a eventos por trás dele.' },
+          { en: 'The public ops dashboard and the metrics it exposes.', 'pt-BR': 'O dashboard de operações público e as métricas que ele expõe.' },
+          { en: 'The AI assistant and the profile that grounds it.', 'pt-BR': 'O assistente de IA e o perfil que o fundamenta.' },
+          { en: 'Deployment, from container build to the machine it lands on.', 'pt-BR': 'O deploy, do build do container à máquina onde ele roda.' },
+        ],
+      },
       highlights: [
         {
           en: 'Live presence via SignalR — see who else is on the site right now, on a world map.',
@@ -164,9 +200,8 @@ export const projects: Project[] = [
     },
     tech: ['.NET', 'PostgreSQL', 'EF Core', 'AWS', 'OpenTelemetry', 'Multi-tenant', 'Webhooks'],
     role: {
-      en: 'Senior Product Engineer, platform team — the multi-tenant core, its intent workflows, the public API contract, and integration testing. Front end by others.',
-      'pt-BR':
-        'Senior Product Engineer, time de plataforma — o núcleo multi-tenant, seus fluxos de intent, o contrato da API pública e os testes de integração. Front-end por outros.',
+      en: 'Senior Product Engineer, platform team',
+      'pt-BR': 'Senior Product Engineer, time de plataforma',
     },
     period: { en: 'Professional work', 'pt-BR': 'Trabalho profissional' },
     visibility: 'private',
@@ -176,6 +211,25 @@ export const projects: Project[] = [
         en: 'Kota Embed lets employers offer health insurance to their employees without leaving the software they already use — the enrollment flow runs embedded in a third-party platform, backed by a multi-tenant .NET service that integrates directly with insurers.',
         'pt-BR':
           'O Kota Embed permite que empregadores ofereçam plano de saúde aos funcionários sem sair do software que já usam — o fluxo de adesão roda embutido numa plataforma de terceiro, apoiado por um serviço .NET multi-tenant que integra direto com as seguradoras.',
+      },
+      contribution: {
+        summary: {
+          en: 'I owned the multi-tenant core — the part that turns an enrollment request into a policy across nine insurers that each behave differently.',
+          'pt-BR':
+            'O núcleo multi-tenant foi meu — a parte que transforma um pedido de adesão numa apólice, através de nove seguradoras que se comportam de formas diferentes.',
+        },
+        areas: [
+          { en: 'The intent state machines behind enrollment, quoting, amendment and renewal.', 'pt-BR': 'As máquinas de estado de intent por trás de adesão, cotação, alteração e renovação.' },
+          { en: 'Adaptive requirements: asking a service what a case must collect instead of hardcoding a form per insurer.', 'pt-BR': 'Requisitos adaptativos: perguntar a um serviço o que um caso precisa coletar, em vez de codificar um formulário por seguradora.' },
+          { en: 'The versioned public API contract and its webhooks.', 'pt-BR': 'O contrato versionado da API pública e seus webhooks.' },
+          { en: 'Provider contracts introduced behind feature flags and migrated without stopping the product.', 'pt-BR': 'Contratos de provedor introduzidos atrás de feature flags e migrados sem parar o produto.' },
+          { en: 'Idempotency and duplicate suppression, and the integration suite that covers them.', 'pt-BR': 'Idempotência e supressão de duplicatas, e a suíte de integração que cobre as duas.' },
+        ],
+        boundary: {
+          en: 'The front end — the embedded flow and its SDK — was built by others; I have no commits in it.',
+          'pt-BR':
+            'O front-end — o fluxo embutido e seu SDK — foi feito por outros; não tenho commits nele.',
+        },
       },
       problem: {
         en: 'Enrolling someone in health insurance looks like a form. It is not. Each insurer wants different data in a different shape on its own schedule; some answer over HTTP, others by exchanging files over SFTP. Regulatory disclosure obligations differ by region. And all of it happens inside an iframe hosted on another company’s platform, where the user expects it to feel immediate. A form hardcoded per insurer does not survive the second insurer.',
@@ -205,7 +259,7 @@ export const projects: Project[] = [
           'pt-BR':
             'Um monólito modular em .NET dividido por contexto delimitado: o núcleo multi-tenant da plataforma, um módulo por seguradora, mais compliance, webhooks e relatório financeiro. O núcleo nunca chama uma seguradora direto — toda chamada a provedor passa por uma adapter factory, então o código que roda uma adesão não sabe com qual seguradora está falando. Trabalho de longa duração é modelado como intent: uma máquina de estados persistida, e não uma requisição mantida aberta.',
         },
-        nodes: [
+        steps: [
           {
             label: 'Third-party platform',
             detail: {
@@ -239,6 +293,51 @@ export const projects: Project[] = [
             detail: {
               en: 'One module per insurer, over HTTP or scheduled SFTP file exchange.',
               'pt-BR': 'Um módulo por seguradora, por HTTP ou troca agendada de arquivos via SFTP.',
+            },
+          },
+        ],
+      },
+      states: {
+        caption: { en: 'The life of an enrollment', 'pt-BR': 'A vida de uma adesão' },
+        summary: {
+          en: 'These are the statuses an enrollment actually moves through. It can also end ineligible, or not undertaken at all — the happy path below is not the only way out.',
+          'pt-BR':
+            'Estes são os status pelos quais uma adesão realmente passa. Ela também pode terminar inelegível, ou nem ser realizada — o caminho feliz abaixo não é a única saída.',
+        },
+        steps: [
+          {
+            label: 'Processing',
+            detail: {
+              en: 'The request is recorded against its idempotency key and validated, before anything external is called.',
+              'pt-BR': 'O pedido é registrado sob sua chave de idempotência e validado, antes de qualquer chamada externa.',
+            },
+          },
+          {
+            label: 'ActionRequired',
+            detail: {
+              en: 'Something is missing that only a person can supply. The intent says so and waits, instead of failing.',
+              'pt-BR': 'Falta algo que só uma pessoa pode fornecer. O intent declara isso e espera, em vez de falhar.',
+            },
+          },
+          {
+            label: 'PendingConfirmation',
+            detail: {
+              en: 'Everything the insurer and the region require is gathered; the requester confirms before it is sent.',
+              'pt-BR': 'Tudo o que a seguradora e a região exigem está reunido; quem pediu confirma antes do envio.',
+            },
+          },
+          {
+            label: 'Enrolling',
+            detail: {
+              en: 'Handed to the insurer through its adapter, which answers on its own schedule.',
+              'pt-BR': 'Entregue à seguradora pelo adapter dela, que responde no tempo dela.',
+            },
+          },
+          {
+            label: 'Enrolled',
+            detail: {
+              en: 'The policy exists. The platform reports it back to whoever asked.',
+              'pt-BR': 'A apólice existe. A plataforma reporta de volta a quem pediu.',
             },
           },
         ],
@@ -351,6 +450,20 @@ export const projects: Project[] = [
         'pt-BR':
           'O service desk de TI da ULBRA — um monólito modular em .NET 10 que substituiu o GLPI como canal único de entrada da TI da universidade, levando um pedido do chamado ao SLA à pesquisa de satisfação.',
       },
+      contribution: {
+        summary: {
+          en: 'Principal author, from scratch — the architecture, the backend, the front end, and the deployment.',
+          'pt-BR':
+            'Autor principal, do zero — a arquitetura, o backend, o front-end e o deploy.',
+        },
+        areas: [
+          { en: 'The modular monolith and the boundaries between its contexts.', 'pt-BR': 'O monólito modular e as fronteiras entre seus contextos.' },
+          { en: 'The SLA engine, including pauses that record who stopped the clock and why.', 'pt-BR': 'O motor de SLA, incluindo pausas que registram quem interrompeu a contagem e por quê.' },
+          { en: 'The transactional outbox and the notification fan-out it feeds.', 'pt-BR': 'O outbox transacional e o fan-out de notificação que ele alimenta.' },
+          { en: 'The OAuth authorization server and the MCP server behind its consent screen.', 'pt-BR': 'O servidor de autorização OAuth e o servidor MCP atrás da sua tela de consentimento.' },
+          { en: 'The React front end and the Docker Swarm deployment.', 'pt-BR': 'O front-end em React e o deploy em Docker Swarm.' },
+        ],
+      },
       problem: {
         en: "ULBRA's IT department took requests through GLPI, e-mail, and direct messages at the same time. There was no SLA per team, no audit trail on approvals, and no way to tell whether anyone was satisfied with the outcome. Ulbra Atende replaces GLPI as the single intake channel and makes each of those measurable — three months in, the median ticket closes in about an hour and a half.",
         'pt-BR':
@@ -388,7 +501,7 @@ export const projects: Project[] = [
           'pt-BR':
             'Um monólito modular em .NET 10: um único deploy, contextos delimitados separados — Core, Identity, Notifications e MCP — cada um em camadas Domain → Application → Infrastructure com seu próprio schema no Postgres. Eventos de integração passam pelo RabbitMQ através de um outbox transacional do EF. Anexos ficam em S3/MinIO, cache em Redis, tracing por OpenTelemetry; os testes de integração rodam contra Postgres, RabbitMQ e MinIO reais via Testcontainers.',
         },
-        nodes: [
+        steps: [
           {
             label: 'React 19 SPA',
             detail: {
@@ -422,6 +535,44 @@ export const projects: Project[] = [
             detail: {
               en: 'Notification fan-out consuming those events.',
               'pt-BR': 'Fan-out de notificação consumindo esses eventos.',
+            },
+          },
+        ],
+      },
+      states: {
+        caption: { en: 'The life of a ticket', 'pt-BR': 'A vida de um chamado' },
+        summary: {
+          en: 'The SLA clock is the thread running through it. It starts on the receiving team’s policy, stops when the ticket is waiting on someone outside the team, and is what the response and resolution targets are measured against. A ticket can also end cancelled, and work needing sign-off waits on an approval before it starts.',
+          'pt-BR':
+            'O relógio do SLA é o fio que atravessa tudo. Ele começa pela política do time que recebe, para quando o chamado depende de alguém fora do time, e é contra ele que as metas de resposta e resolução são medidas. Um chamado também pode terminar cancelado, e trabalho que exige aval espera uma aprovação antes de começar.',
+        },
+        steps: [
+          {
+            label: 'Open',
+            detail: {
+              en: 'The clock starts against the receiving team’s SLA policy, and triage routes it to a team and a category.',
+              'pt-BR': 'O relógio começa contra a política de SLA do time que recebe, e a triagem faz o roteamento para um time e uma categoria.',
+            },
+          },
+          {
+            label: 'InProgress',
+            detail: {
+              en: 'An assignee owns it. First response is already measured by this point.',
+              'pt-BR': 'Alguém assume. A primeira resposta já foi medida a esta altura.',
+            },
+          },
+          {
+            label: 'Paused',
+            detail: {
+              en: 'Waiting on the requester or a third party. The clock stops, and who paused it and why is recorded as its own entry.',
+              'pt-BR': 'Esperando quem abriu ou um terceiro. O relógio para, e quem pausou e por quê fica registrado como uma entrada própria.',
+            },
+          },
+          {
+            label: 'Completed',
+            detail: {
+              en: 'The work is done and the requester is asked to rate it — which is where the satisfaction score comes from.',
+              'pt-BR': 'O trabalho acabou e quem abriu é convidado a avaliar — que é de onde vem a nota de satisfação.',
             },
           },
         ],
@@ -563,9 +714,8 @@ export const projects: Project[] = [
     },
     tech: ['.NET Core', 'RabbitMQ', 'Entity Framework', 'Twilio', 'xUnit'],
     role: {
-      en: 'Conception, architecture and implementation — later mentoring the junior engineer who joined the project.',
-      'pt-BR':
-        'Concepção, arquitetura e implementação — e depois mentoria do engenheiro júnior que entrou no projeto.',
+      en: 'Conception, architecture and implementation',
+      'pt-BR': 'Concepção, arquitetura e implementação',
     },
     period: { en: '2020', 'pt-BR': '2020' },
     visibility: 'private',
@@ -575,6 +725,20 @@ export const projects: Project[] = [
         en: "An internal tool that tests an interactive voice system by actually calling it — the test suite dials the phone menu, listens to what it says, and checks it against what was expected, then files the result alongside the rest of the suite.",
         'pt-BR':
           'Uma ferramenta interna que testa uma URA ligando de verdade para ela — a suíte disca o menu telefônico, ouve o que ele diz, confere contra o esperado e registra o resultado junto com o resto da suíte.',
+      },
+      contribution: {
+        summary: {
+          en: 'I conceived the tool and built it, and later mentored the junior engineer who joined the project.',
+          'pt-BR':
+            'Concebi a ferramenta e a construí, e depois fui mentor do engenheiro júnior que entrou no projeto.',
+        },
+        areas: [
+          { en: 'The test scripting language and the validator that rejects a bad script before it costs a call.', 'pt-BR': 'A linguagem de roteiro de teste e o validador que rejeita roteiro ruim antes de custar uma ligação.' },
+          { en: 'Similarity-based assertion, with the threshold declared per step.', 'pt-BR': 'Asserção por similaridade, com o limiar declarado em cada passo.' },
+          { en: 'The queue between the request and the call.', 'pt-BR': 'A fila entre a requisição e a ligação.' },
+          { en: 'The telephony integration and the webhook that carries each transcribed response back.', 'pt-BR': 'A integração de telefonia e o webhook que traz cada resposta transcrita de volta.' },
+          { en: 'Reporting results back into the test-management tool.', 'pt-BR': 'O reporte dos resultados de volta para a ferramenta de gestão de testes.' },
+        ],
       },
       problem: {
         en: 'Testing a phone menu meant someone dialling it, pressing the keys, listening to what the system said, and writing down whether it was right — once per scenario, per language, per route. A full cycle was over twenty thousand calls placed by hand across the team, which in practice meant the full cycle almost never ran. Automating it brought the cycle down to about three hours.',
@@ -615,7 +779,7 @@ export const projects: Project[] = [
           'pt-BR':
             'Um serviço .NET Core em camadas DDD. A API recebe um roteiro; um validador rejeita roteiro malformado antes de gastar uma ligação; a execução é despachada por uma fila publish/subscribe no RabbitMQ; um provedor de telefonia faz a chamada e devolve cada resposta transcrita por webhook; a resposta é pontuada contra o que o roteiro esperava; e o resultado volta para a ferramenta de gestão de testes, amarrado aos identificadores de plano, suíte e item de trabalho.',
         },
-        nodes: [
+        steps: [
           {
             label: 'Test script',
             detail: {

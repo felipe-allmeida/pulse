@@ -1,13 +1,14 @@
 import { Link } from '@tanstack/react-router';
 import { ExternalLink, Lock } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { CaseStudyArchitecture } from '@/components/projects/case-study-architecture';
 import { CaseStudyComparison } from '@/components/projects/case-study-comparison';
 import { CaseStudyDecisions } from '@/components/projects/case-study-decisions';
+import { CaseStudyFlow } from '@/components/projects/case-study-flow';
 import { CaseStudyMetrics } from '@/components/projects/case-study-metrics';
 import { CaseStudyScript } from '@/components/projects/case-study-script';
 import { CaseStudyTable } from '@/components/projects/case-study-table';
 import { FEATURED_PROJECT_SLUG } from '@/components/projects/featured';
+import { ProjectContribution } from '@/components/projects/project-contribution';
 import { ProjectScreenshot } from '@/components/projects/project-screenshot';
 import { Chip } from '@/components/signal/chip';
 import { SectionEyebrow } from '@/components/signal/section-eyebrow';
@@ -115,6 +116,13 @@ export function ProjectDetail({ slug }: ProjectDetailProps) {
           </section>
         ) : null}
 
+        {project.detail?.contribution ? (
+          <section className="flex flex-col gap-3">
+            <SubsectionHeading>{t('projects:contributionHeading')}</SubsectionHeading>
+            <ProjectContribution contribution={project.detail.contribution} />
+          </section>
+        ) : null}
+
         {project.detail?.problem ? (
           <section className="flex flex-col gap-3">
             <SubsectionHeading>{t('projects:problemHeading')}</SubsectionHeading>
@@ -129,13 +137,21 @@ export function ProjectDetail({ slug }: ProjectDetailProps) {
           </section>
         ) : null}
 
-        {project.detail?.architecture && project.detail.architecture.nodes.length > 0 ? (
+        {project.detail?.architecture && project.detail.architecture.steps.length > 0 ? (
           <section className="flex flex-col gap-3">
-            <SubsectionHeading>{t('projects:architectureHeading')}</SubsectionHeading>
-            <CaseStudyArchitecture
-              summary={project.detail.architecture.summary}
-              nodes={project.detail.architecture.nodes}
-            />
+            <SubsectionHeading>
+              {project.detail.architecture.caption
+                ? L(project.detail.architecture.caption)
+                : t('projects:architectureHeading')}
+            </SubsectionHeading>
+            <CaseStudyFlow flow={project.detail.architecture} />
+          </section>
+        ) : null}
+
+        {project.detail?.states?.caption && project.detail.states.steps.length > 0 ? (
+          <section className="flex flex-col gap-3">
+            <SubsectionHeading>{L(project.detail.states.caption)}</SubsectionHeading>
+            <CaseStudyFlow flow={project.detail.states} />
           </section>
         ) : null}
 

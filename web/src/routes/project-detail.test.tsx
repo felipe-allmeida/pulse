@@ -99,9 +99,11 @@ describe('ProjectDetail', () => {
     const headings = screen.getAllByRole('heading', { level: 2 }).map((h) => h.textContent);
     expect(headings).toEqual([
       'Overview',
+      'What I did',
       'The problem',
       'By the numbers',
       'Architecture',
+      'The life of a ticket',
       'What it does',
       'Engineering decisions',
     ]);
@@ -118,9 +120,11 @@ describe('ProjectDetail', () => {
     const headings = screen.getAllByRole('heading', { level: 2 }).map((h) => h.textContent);
     expect(headings).toEqual([
       'Visão geral',
+      'O que eu fiz',
       'O problema',
       'Em números',
       'Arquitetura',
+      'A vida de um chamado',
       'O que faz',
       'Decisões de engenharia',
     ]);
@@ -145,13 +149,18 @@ describe('ProjectDetail', () => {
     expect(screen.getByText(/looks like a form/i)).toBeInTheDocument();
     expect(screen.getByText('Adapter factory')).toBeInTheDocument();
     expect(screen.getByText(/Intents instead of request\/response/i)).toBeInTheDocument();
+    expect(screen.getByText(/I owned the multi-tenant core/i)).toBeInTheDocument();
+    expect(screen.getByText(/no commits in it/i)).toBeInTheDocument();
+    expect(screen.getByText('PendingConfirmation')).toBeInTheDocument();
 
     const headings = screen.getAllByRole('heading', { level: 2 }).map((h) => h.textContent);
     expect(headings).toEqual([
       'Overview',
+      'What I did',
       'The problem',
       'By the numbers',
       'Architecture',
+      'The life of an enrollment',
       'What it does',
       'Engineering decisions',
     ]);
@@ -171,9 +180,11 @@ describe('ProjectDetail', () => {
     const headings = screen.getAllByRole('heading', { level: 2 }).map((h) => h.textContent);
     expect(headings).toEqual([
       'Visão geral',
+      'O que eu fiz',
       'O problema',
       'Em números',
       'Arquitetura',
+      'A vida de uma adesão',
       'O que faz',
       'Decisões de engenharia',
     ]);
@@ -194,6 +205,7 @@ describe('ProjectDetail', () => {
     const headings = screen.getAllByRole('heading', { level: 2 }).map((h) => h.textContent);
     expect(headings).toEqual([
       'Overview',
+      'What I did',
       'The problem',
       'By the numbers',
       'Architecture',
@@ -217,6 +229,7 @@ describe('ProjectDetail', () => {
     const headings = screen.getAllByRole('heading', { level: 2 }).map((h) => h.textContent);
     expect(headings).toEqual([
       'Visão geral',
+      'O que eu fiz',
       'O problema',
       'Em números',
       'Arquitetura',
@@ -240,5 +253,22 @@ describe('ProjectDetail', () => {
         `section "${heading.textContent}" has a heading and nothing else`,
       ).toBeGreaterThan(1);
     }
+  });
+
+  it('renders the contribution heading in pt-BR', async () => {
+    await renderDetail('kota-embed', 'pt-BR');
+    await screen.findAllByRole('heading', { level: 1 });
+
+    const headings = screen.getAllByRole('heading', { level: 2 }).map((h) => h.textContent);
+    expect(headings[1]).toBe('O que eu fiz');
+    expect(headings[5]).toBe('A vida de uma adesão');
+  });
+
+  it('renders no contribution section for a project without one', async () => {
+    await renderDetail('ulbra-one');
+    await screen.findAllByRole('heading', { level: 1 });
+
+    const headings = screen.getAllByRole('heading', { level: 2 }).map((h) => h.textContent);
+    expect(headings).toEqual(['Overview', 'What it does']);
   });
 });
