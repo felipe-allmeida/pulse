@@ -71,3 +71,50 @@ it('no case-study section is present but empty on any project', () => {
     }
   }
 });
+
+it('kota-embed has a case study, localized in every locale', () => {
+  const project = projects.find((p) => p.slug === 'kota-embed');
+  expect(project).toBeDefined();
+  expect(project!.visibility).toBe('private');
+  expect(project!.links).toHaveLength(0);
+
+  const detail = project!.detail;
+  expectBothLocales(detail!.problem!, 'problem');
+
+  expect(detail!.metrics).toHaveLength(3);
+  for (const metric of detail!.metrics!) {
+    expectBothLocales(metric.value, 'metric.value');
+    expectBothLocales(metric.label, 'metric.label');
+    if (metric.note) expectBothLocales(metric.note, 'metric.note');
+  }
+
+  expectBothLocales(detail!.architecture!.summary, 'architecture.summary');
+  expect(detail!.architecture!.nodes).toHaveLength(5);
+  for (const node of detail!.architecture!.nodes) {
+    expect(node.label.trim()).not.toBe('');
+    expectBothLocales(node.detail, 'architecture.node.detail');
+  }
+
+  expect(detail!.decisions).toHaveLength(4);
+  for (const decision of detail!.decisions!) {
+    expectBothLocales(decision.heading, 'decision.heading');
+    expectBothLocales(decision.body, 'decision.body');
+  }
+});
+
+it('kota-embed sits between pulse and the ulbra projects', () => {
+  const slugs = projects.map((p) => p.slug);
+  expect(slugs.indexOf('kota-embed')).toBe(1);
+  expect(slugs.indexOf('kota-embed')).toBeLessThan(slugs.indexOf('ulbra-atende'));
+});
+
+it('describes insurers by count, never by name', () => {
+  // Deliberately NOT a list of the partner names to grep for: this repository
+  // is public, so a guard spelling them out would publish exactly what it
+  // exists to keep out. The rule is enforced by review and by the Global
+  // Constraints; what is testable here is the shape the copy uses instead.
+  const kota = projects.find((p) => p.slug === 'kota-embed');
+  const serialized = JSON.stringify(kota);
+  expect(serialized).toContain('insurer');
+  expect(serialized).toMatch(/nine insurers|nove seguradoras/);
+});

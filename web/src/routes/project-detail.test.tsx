@@ -134,4 +134,48 @@ describe('ProjectDetail', () => {
     expect(headings).toEqual(['Overview', 'What it does']);
     expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
   });
+
+  it('renders the Kota Embed case study in section order, with no external link', async () => {
+    await renderDetail('kota-embed');
+
+    const h1 = await screen.findAllByRole('heading', { level: 1 });
+    expect(h1).toHaveLength(1);
+    expect(h1[0]).toHaveTextContent('Kota Embed');
+
+    expect(screen.getByText(/looks like a form/i)).toBeInTheDocument();
+    expect(screen.getByText('Adapter factory')).toBeInTheDocument();
+    expect(screen.getByText(/Intents instead of request\/response/i)).toBeInTheDocument();
+
+    const headings = screen.getAllByRole('heading', { level: 2 }).map((h) => h.textContent);
+    expect(headings).toEqual([
+      'Overview',
+      'The problem',
+      'By the numbers',
+      'Architecture',
+      'What it does',
+      'Engineering decisions',
+    ]);
+
+    expect(screen.getByText('Private')).toBeInTheDocument();
+    const externalLinks = screen.queryAllByRole('link').filter((l) => l.getAttribute('target') === '_blank');
+    expect(externalLinks).toHaveLength(0);
+  });
+
+  it('renders the Kota Embed case study in pt-BR', async () => {
+    await renderDetail('kota-embed', 'pt-BR');
+
+    await screen.findAllByRole('heading', { level: 1 });
+    expect(screen.getByText(/parece um formulário/i)).toBeInTheDocument();
+    expect(screen.getByText('Privado')).toBeInTheDocument();
+
+    const headings = screen.getAllByRole('heading', { level: 2 }).map((h) => h.textContent);
+    expect(headings).toEqual([
+      'Visão geral',
+      'O problema',
+      'Em números',
+      'Arquitetura',
+      'O que faz',
+      'Decisões de engenharia',
+    ]);
+  });
 });

@@ -106,6 +106,174 @@ export const projects: Project[] = [
     },
   },
   {
+    slug: 'kota-embed',
+    name: 'Kota Embed',
+    tagline: {
+      en: "Health insurance enrollment, embedded inside other companies' platforms.",
+      'pt-BR': 'Adesão a plano de saúde, embutida dentro das plataformas de outras empresas.',
+    },
+    description: {
+      en: 'A multi-tenant .NET service behind an embedded enrollment flow: employers offer health insurance to their employees without leaving the software they already use, while the backend integrates with nine insurers across three regulatory regions.',
+      'pt-BR':
+        'Um serviço .NET multi-tenant por trás de um fluxo de adesão embutido: empregadores oferecem plano de saúde aos funcionários sem sair do software que já usam, enquanto o backend integra com nove seguradoras em três regiões regulatórias.',
+    },
+    tech: ['.NET', 'PostgreSQL', 'EF Core', 'AWS', 'OpenTelemetry', 'Multi-tenant', 'Webhooks'],
+    role: {
+      en: 'Backend engineer, platform team — the multi-tenant core, its intent workflows, the public API contract, and integration testing. Front end by others.',
+      'pt-BR':
+        'Engenheiro backend, time de plataforma — o núcleo multi-tenant, seus fluxos de intent, o contrato da API pública e os testes de integração. Front-end por outros.',
+    },
+    period: { en: 'Professional work', 'pt-BR': 'Trabalho profissional' },
+    visibility: 'private',
+    links: [],
+    detail: {
+      overview: {
+        en: 'Kota Embed lets employers offer health insurance to their employees without leaving the software they already use — the enrollment flow runs embedded in a third-party platform, backed by a multi-tenant .NET service that integrates directly with insurers.',
+        'pt-BR':
+          'O Kota Embed permite que empregadores ofereçam plano de saúde aos funcionários sem sair do software que já usam — o fluxo de adesão roda embutido numa plataforma de terceiro, apoiado por um serviço .NET multi-tenant que integra direto com as seguradoras.',
+      },
+      problem: {
+        en: 'Enrolling someone in health insurance looks like a form. It is not. Each insurer wants different data in a different shape on its own schedule; some answer over HTTP, others by exchanging files over SFTP. Regulatory disclosure obligations differ by region. And all of it happens inside an iframe hosted on another company’s platform, where the user expects it to feel immediate. A form hardcoded per insurer does not survive the second insurer.',
+        'pt-BR':
+          'Inscrever alguém num plano de saúde parece um formulário. Não é. Cada seguradora quer dados diferentes, em formato diferente, no tempo dela; umas respondem por HTTP, outras trocando arquivos por SFTP. As obrigações regulatórias de disclosure mudam conforme a região. E tudo isso acontece dentro de um iframe hospedado na plataforma de outra empresa, onde o usuário espera que seja imediato. Um formulário hardcoded por seguradora não sobrevive à segunda seguradora.',
+      },
+      metrics: [
+        {
+          value: { en: '9', 'pt-BR': '9' },
+          label: { en: 'insurer integrations', 'pt-BR': 'integrações de seguradora' },
+          note: { en: 'HTTP APIs and SFTP file exchange', 'pt-BR': 'APIs HTTP e troca de arquivos por SFTP' },
+        },
+        {
+          value: { en: '3', 'pt-BR': '3' },
+          label: { en: 'regulatory regions', 'pt-BR': 'regiões regulatórias' },
+          note: { en: 'disclosure rules differ per region', 'pt-BR': 'as regras de disclosure mudam por região' },
+        },
+        {
+          value: { en: '7', 'pt-BR': '7' },
+          label: { en: 'intent workflow types', 'pt-BR': 'tipos de fluxo de intent' },
+          note: { en: 'enrollment, quote, amendment, renewal', 'pt-BR': 'adesão, cotação, alteração, renovação' },
+        },
+      ],
+      architecture: {
+        summary: {
+          en: 'A .NET modular monolith split by bounded context: the multi-tenant platform core, one module per insurer, plus compliance, webhooks, and financial reporting. The core never calls an insurer directly — every provider call goes through an adapter factory, so the code that runs an enrollment does not know which insurer it is talking to. Long-running work is modeled as an intent: a persisted state machine rather than a request held open.',
+          'pt-BR':
+            'Um monólito modular em .NET dividido por contexto delimitado: o núcleo multi-tenant da plataforma, um módulo por seguradora, mais compliance, webhooks e relatório financeiro. O núcleo nunca chama uma seguradora direto — toda chamada a provedor passa por uma adapter factory, então o código que roda uma adesão não sabe com qual seguradora está falando. Trabalho de longa duração é modelado como intent: uma máquina de estados persistida, e não uma requisição mantida aberta.',
+        },
+        nodes: [
+          {
+            label: 'Third-party platform',
+            detail: {
+              en: 'The host application, embedding the enrollment flow in an iframe.',
+              'pt-BR': 'A aplicação hospedeira, embutindo o fluxo de adesão num iframe.',
+            },
+          },
+          {
+            label: 'Public API',
+            detail: {
+              en: 'Versioned contract and signed webhooks for the platforms doing the embedding.',
+              'pt-BR': 'Contrato versionado e webhooks assinados para as plataformas que embutem o fluxo.',
+            },
+          },
+          {
+            label: 'Platform core',
+            detail: {
+              en: 'Employers, employees, eligibility, and the intent state machines.',
+              'pt-BR': 'Empregadores, funcionários, elegibilidade e as máquinas de estado dos intents.',
+            },
+          },
+          {
+            label: 'Adapter factory',
+            detail: {
+              en: 'The single door to every insurer, keeping the core provider-agnostic.',
+              'pt-BR': 'A única porta para cada seguradora, mantendo o núcleo agnóstico de provedor.',
+            },
+          },
+          {
+            label: 'Insurer integrations',
+            detail: {
+              en: 'One module per insurer, over HTTP or scheduled SFTP file exchange.',
+              'pt-BR': 'Um módulo por seguradora, por HTTP ou troca agendada de arquivos via SFTP.',
+            },
+          },
+        ],
+      },
+      highlights: [
+        {
+          en: 'Multi-tenant by construction: platform → employer → employee → group, isolated per tenant.',
+          'pt-BR': 'Multi-tenant por construção: plataforma → empregador → funcionário → grupo, isolados por tenant.',
+        },
+        {
+          en: 'Enrollment, quoting, amendment, renewal, policy import, and dependant management, each as its own workflow.',
+          'pt-BR':
+            'Adesão, cotação, alteração, renovação, importação de apólice e gestão de dependentes, cada uma como seu próprio fluxo.',
+        },
+        {
+          en: 'Eligibility computed from provider rules rather than stored as a flag.',
+          'pt-BR': 'Elegibilidade calculada a partir das regras do provedor, em vez de guardada como flag.',
+        },
+        {
+          en: 'Policy and plan data aggregated across insurers into a single response.',
+          'pt-BR': 'Dados de apólice e plano agregados entre seguradoras numa resposta única.',
+        },
+        {
+          en: 'A versioned public API and signed webhooks for the platforms doing the embedding.',
+          'pt-BR': 'Uma API pública versionada e webhooks assinados para as plataformas que embutem o fluxo.',
+        },
+        {
+          en: 'Insurer integrations over both HTTP APIs and scheduled SFTP file exchange.',
+          'pt-BR': 'Integrações de seguradora tanto por API HTTP quanto por troca agendada de arquivos via SFTP.',
+        },
+      ],
+      decisions: [
+        {
+          heading: {
+            en: 'Intents instead of request/response',
+            'pt-BR': 'Intent em vez de request/response',
+          },
+          body: {
+            en: 'An enrollment cannot finish inside one call — an insurer may take minutes or days. Modeling it as a persisted state machine with its own status makes the in-between state something the system can query, resume, and report on, instead of a transaction held open and hoped for.',
+            'pt-BR':
+              'Uma adesão não termina dentro de uma chamada — uma seguradora pode levar minutos ou dias. Modelar isso como máquina de estados persistida, com status próprio, transforma o estado intermediário em algo que o sistema consulta, retoma e reporta, em vez de uma transação mantida aberta na esperança.',
+          },
+        },
+        {
+          heading: {
+            en: 'Adaptive requirements instead of a form per insurer',
+            'pt-BR': 'Requisitos adaptativos em vez de um formulário por seguradora',
+          },
+          body: {
+            en: 'What a given case must collect depends on the insurer and the regulatory region at once. Rather than encoding nine forms, the platform asks a requirements service what this case needs and renders that. Adding an insurer stops being a front-end change.',
+            'pt-BR':
+              'O que um caso precisa coletar depende da seguradora e da região regulatória ao mesmo tempo. Em vez de codificar nove formulários, a plataforma pergunta a um serviço de requisitos o que aquele caso exige e renderiza isso. Adicionar uma seguradora deixa de ser mudança de front-end.',
+          },
+        },
+        {
+          heading: {
+            en: 'An adapter factory as the only door to a provider',
+            'pt-BR': 'Uma adapter factory como única porta para o provedor',
+          },
+          body: {
+            en: 'The platform core resolves an adapter and talks to that. It never learns which insurer it is serving, which is what keeps a ninth integration from touching enrollment logic — and what let provider contracts be introduced behind feature flags and migrated without stopping the product.',
+            'pt-BR':
+              'O núcleo da plataforma resolve um adapter e fala com ele. Nunca fica sabendo qual seguradora está atendendo, e é isso que impede uma nona integração de tocar na lógica de adesão — e o que permitiu introduzir contratos de provedor atrás de feature flags e migrar sem parar o produto.',
+          },
+        },
+        {
+          heading: {
+            en: 'Idempotency and duplicate suppression as a requirement, not a repair',
+            'pt-BR': 'Idempotência e supressão de duplicata como requisito, não conserto',
+          },
+          body: {
+            en: 'Retries happen, webhooks arrive twice, and consumers run concurrently against the same rows. Intent creation takes an idempotency key, auto-enrollment suppresses the duplicate intent-and-webhook pair, and the screening consumer handles serialization conflicts rather than assuming they cannot happen.',
+            'pt-BR':
+              'Retry acontece, webhook chega duas vezes e consumidores rodam concorrentes sobre as mesmas linhas. A criação de intent aceita chave de idempotência, a adesão automática suprime o par intent-e-webhook duplicado, e o consumer de screening trata conflito de serialização em vez de assumir que ele não ocorre.',
+          },
+        },
+      ],
+    },
+  },
+  {
     slug: 'ulbra-atende',
     name: 'Ulbra Atende',
     tagline: {
