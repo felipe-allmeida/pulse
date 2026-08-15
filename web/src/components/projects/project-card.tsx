@@ -2,6 +2,7 @@ import { Link } from '@tanstack/react-router';
 import { ExternalLink, Lock } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { FEATURED_PROJECT_SLUG } from '@/components/projects/featured';
+import { ProjectCover } from '@/components/projects/project-cover';
 import { ProjectScreenshot } from '@/components/projects/project-screenshot';
 import { Chip } from '@/components/signal/chip';
 import type { Project } from '@/content/projects';
@@ -41,11 +42,15 @@ export function ProjectCard({ project, className }: ProjectCardProps) {
         className,
       )}
     >
-      <ProjectScreenshot
-        src={project.screenshot}
-        alt={t('projects:screenshotAlt', { name: project.name })}
-        glow={featured}
-      />
+      {project.screenshot ? (
+        <ProjectScreenshot
+          src={project.screenshot}
+          alt={t('projects:screenshotAlt', { name: project.name })}
+          glow={featured}
+        />
+      ) : (
+        <ProjectCover project={project} glow={featured} />
+      )}
 
       <div className="flex flex-col gap-1">
         <h3 className="text-lg font-semibold text-foreground">{project.name}</h3>
