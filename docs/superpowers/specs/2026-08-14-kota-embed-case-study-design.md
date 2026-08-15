@@ -139,9 +139,14 @@ held open.
 **Tech chips.** `.NET`, `PostgreSQL`, `EF Core`, `AWS`, `OpenTelemetry`,
 `Multi-tenant`, `Webhooks`.
 
-**Role.** Backend engineer on the platform team — the multi-tenant core, its
+**Role.** Senior Product Engineer, platform team — the multi-tenant core, its
 intent workflows, the public API contract, and integration testing. Front end
 by others.
+
+The title matches the one the About page already carries for this employer;
+an earlier draft said "Backend engineer", which understated the role and
+contradicted `/about` one click away. Honesty about *scope* is what "front end
+by others" is for — it does not require understating seniority.
 
 ---
 
