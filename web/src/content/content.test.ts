@@ -108,7 +108,7 @@ it('kota-embed sits between pulse and the ulbra projects', () => {
   expect(slugs.indexOf('kota-embed')).toBeLessThan(slugs.indexOf('ulbra-atende'));
 });
 
-it('describes insurers by count, never by name', () => {
+it('refers to insurers by count', () => {
   // Deliberately NOT a list of the partner names to grep for: this repository
   // is public, so a guard spelling them out would publish exactly what it
   // exists to keep out. The rule is enforced by review and by the Global

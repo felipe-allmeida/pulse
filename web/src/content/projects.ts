@@ -119,9 +119,9 @@ export const projects: Project[] = [
     },
     tech: ['.NET', 'PostgreSQL', 'EF Core', 'AWS', 'OpenTelemetry', 'Multi-tenant', 'Webhooks'],
     role: {
-      en: 'Backend engineer, platform team — the multi-tenant core, its intent workflows, the public API contract, and integration testing. Front end by others.',
+      en: 'Senior Product Engineer, platform team — the multi-tenant core, its intent workflows, the public API contract, and integration testing. Front end by others.',
       'pt-BR':
-        'Engenheiro backend, time de plataforma — o núcleo multi-tenant, seus fluxos de intent, o contrato da API pública e os testes de integração. Front-end por outros.',
+        'Senior Product Engineer, time de plataforma — o núcleo multi-tenant, seus fluxos de intent, o contrato da API pública e os testes de integração. Front-end por outros.',
     },
     period: { en: 'Professional work', 'pt-BR': 'Trabalho profissional' },
     visibility: 'private',
@@ -151,7 +151,7 @@ export const projects: Project[] = [
         {
           value: { en: '7', 'pt-BR': '7' },
           label: { en: 'intent workflow types', 'pt-BR': 'tipos de fluxo de intent' },
-          note: { en: 'enrollment, quote, amendment, renewal', 'pt-BR': 'adesão, cotação, alteração, renovação' },
+          note: { en: 'enrollment, quote, amendment, renewal…', 'pt-BR': 'adesão, cotação, alteração, renovação…' },
         },
       ],
       architecture: {
@@ -204,9 +204,9 @@ export const projects: Project[] = [
           'pt-BR': 'Multi-tenant por construção: plataforma → empregador → funcionário → grupo, isolados por tenant.',
         },
         {
-          en: 'Enrollment, quoting, amendment, renewal, policy import, and dependant management, each as its own workflow.',
+          en: 'Group setup, enrollment, quoting, amendment, renewal, policy import, and dependant management, each as its own workflow.',
           'pt-BR':
-            'Adesão, cotação, alteração, renovação, importação de apólice e gestão de dependentes, cada uma como seu próprio fluxo.',
+            'Configuração de grupo, adesão, cotação, alteração, renovação, importação de apólice e gestão de dependentes, cada uma como seu próprio fluxo.',
         },
         {
           en: 'Eligibility computed from provider rules rather than stored as a flag.',
@@ -243,9 +243,9 @@ export const projects: Project[] = [
             'pt-BR': 'Requisitos adaptativos em vez de um formulário por seguradora',
           },
           body: {
-            en: 'What a given case must collect depends on the insurer and the regulatory region at once. Rather than encoding nine forms, the platform asks a requirements service what this case needs and renders that. Adding an insurer stops being a front-end change.',
+            en: 'What a given case must collect depends on the insurer and the regulatory region at once. Rather than encoding nine forms, the platform asks a requirements service what this case needs and renders that. Adding an insurer stops being a front-end change. The lookup happens behind the same adapter boundary, so the core still never handles a provider identity itself.',
             'pt-BR':
-              'O que um caso precisa coletar depende da seguradora e da região regulatória ao mesmo tempo. Em vez de codificar nove formulários, a plataforma pergunta a um serviço de requisitos o que aquele caso exige e renderiza isso. Adicionar uma seguradora deixa de ser mudança de front-end.',
+              'O que um caso precisa coletar depende da seguradora e da região regulatória ao mesmo tempo. Em vez de codificar nove formulários, a plataforma pergunta a um serviço de requisitos o que aquele caso exige e renderiza isso. Adicionar uma seguradora deixa de ser mudança de front-end. A consulta acontece atrás da mesma fronteira de adapter, então o núcleo continua sem manipular a identidade de nenhum provedor.',
           },
         },
         {
@@ -254,9 +254,9 @@ export const projects: Project[] = [
             'pt-BR': 'Uma adapter factory como única porta para o provedor',
           },
           body: {
-            en: 'The platform core resolves an adapter and talks to that. It never learns which insurer it is serving, which is what keeps a ninth integration from touching enrollment logic — and what let provider contracts be introduced behind feature flags and migrated without stopping the product.',
+            en: 'The platform core resolves an adapter and talks to that. It never learns which insurer it is serving, which is what keeps a tenth integration from touching enrollment logic — and what let provider contracts be introduced behind feature flags and migrated without stopping the product.',
             'pt-BR':
-              'O núcleo da plataforma resolve um adapter e fala com ele. Nunca fica sabendo qual seguradora está atendendo, e é isso que impede uma nona integração de tocar na lógica de adesão — e o que permitiu introduzir contratos de provedor atrás de feature flags e migrar sem parar o produto.',
+              'O núcleo da plataforma resolve um adapter e fala com ele. Nunca fica sabendo qual seguradora está atendendo, e é isso que impede uma décima integração de tocar na lógica de adesão — e o que permitiu introduzir contratos de provedor atrás de feature flags e migrar sem parar o produto.',
           },
         },
         {
@@ -265,9 +265,9 @@ export const projects: Project[] = [
             'pt-BR': 'Idempotência e supressão de duplicata como requisito, não conserto',
           },
           body: {
-            en: 'Retries happen, webhooks arrive twice, and consumers run concurrently against the same rows. Intent creation takes an idempotency key, auto-enrollment suppresses the duplicate intent-and-webhook pair, and the screening consumer handles serialization conflicts rather than assuming they cannot happen.',
+            en: 'Retries happen, webhooks arrive twice, and consumers run concurrently against the same rows. Intent creation takes an idempotency key, auto-enrollment suppresses the duplicate intent-and-webhook pair, and the eligibility-screening consumer handles serialization conflicts rather than assuming they cannot happen.',
             'pt-BR':
-              'Retry acontece, webhook chega duas vezes e consumidores rodam concorrentes sobre as mesmas linhas. A criação de intent aceita chave de idempotência, a adesão automática suprime o par intent-e-webhook duplicado, e o consumer de screening trata conflito de serialização em vez de assumir que ele não ocorre.',
+              'Retry acontece, webhook chega duas vezes e consumidores rodam concorrentes sobre as mesmas linhas. A criação de intent aceita chave de idempotência, a adesão automática suprime o par intent-e-webhook duplicado, e o consumer de triagem de elegibilidade trata conflito de serialização em vez de assumir que ele não ocorre.',
           },
         },
       ],

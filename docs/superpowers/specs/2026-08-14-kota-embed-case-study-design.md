@@ -28,7 +28,7 @@ embedded inside other companies' applications.
   they are the employer's commercial partners, not the author's to publicize.
 - **Scope is honest about authorship.** The author contributed to the backend,
   concentrated in the multi-tenant platform core, its public contract, and its
-  integration tests. He has no commits in the front-end repository. The page
+  integration tests. The front end was built by others. The page
   therefore describes the product in one paragraph as context, and spends the
   case study on the platform core. The `role` field states this plainly rather
   than leaving the reader to assume he built the whole thing.
