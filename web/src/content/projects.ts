@@ -140,6 +140,7 @@ export const projects: Project[] = [
     tech: ['.NET 10', 'SignalR', 'RabbitMQ', 'Redis', 'Postgres', 'React 19', 'Docker', 'Terraform'],
     role: { en: 'Design & implementation', 'pt-BR': 'Design & implementação' },
     visibility: 'public',
+    screenshot: '/screenshots/pulse.png',
     links: [
       { label: 'Live site', href: 'https://pulse.felipealmeida.tech' },
       { label: 'GitHub', href: 'https://github.com/felipe-allmeida/pulse' },
@@ -307,6 +308,7 @@ export const projects: Project[] = [
     },
     period: { en: 'Professional work', 'pt-BR': 'Trabalho profissional' },
     visibility: 'private',
+    screenshot: '/screenshots/kota.png',
     links: [{ label: 'Website', href: 'https://kota.io' }],
     detail: {
       overview: {
