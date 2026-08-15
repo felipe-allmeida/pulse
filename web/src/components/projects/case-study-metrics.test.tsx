@@ -52,4 +52,31 @@ describe('CaseStudyMetrics', () => {
     await renderWithI18n(<CaseStudyMetrics metrics={metrics} />);
     expect(screen.queryByText(/months of production/i)).not.toBeInTheDocument();
   });
+
+  it('lays out three metrics in three columns, not four', async () => {
+    const three: CaseStudyMetric[] = [
+      { value: { en: '9', 'pt-BR': '9' }, label: { en: 'insurers', 'pt-BR': 'seguradoras' } },
+      { value: { en: '3', 'pt-BR': '3' }, label: { en: 'regions', 'pt-BR': 'regiões' } },
+      { value: { en: '7', 'pt-BR': '7' }, label: { en: 'workflows', 'pt-BR': 'fluxos' } },
+    ];
+    const { container } = await renderWithI18n(<CaseStudyMetrics metrics={three} />);
+
+    const grid = container.querySelector('[class*="grid-cols"]');
+    expect(grid).not.toBeNull();
+    expect(grid!.className).toContain('sm:grid-cols-3');
+    expect(grid!.className).not.toContain('sm:grid-cols-4');
+  });
+
+  it('keeps four columns for four metrics', async () => {
+    const four: CaseStudyMetric[] = [
+      { value: { en: '1', 'pt-BR': '1' }, label: { en: 'a', 'pt-BR': 'a' } },
+      { value: { en: '2', 'pt-BR': '2' }, label: { en: 'b', 'pt-BR': 'b' } },
+      { value: { en: '3', 'pt-BR': '3' }, label: { en: 'c', 'pt-BR': 'c' } },
+      { value: { en: '4', 'pt-BR': '4' }, label: { en: 'd', 'pt-BR': 'd' } },
+    ];
+    const { container } = await renderWithI18n(<CaseStudyMetrics metrics={four} />);
+
+    const grid = container.querySelector('[class*="grid-cols"]');
+    expect(grid!.className).toContain('sm:grid-cols-4');
+  });
 });
