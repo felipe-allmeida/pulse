@@ -1,10 +1,45 @@
 import type { LocalizedString } from './types';
 
+/** One headline number on a case-study page. Pre-rounded and pre-formatted. */
+export interface CaseStudyMetric {
+  /** Display value, already formatted per locale — "~2.4k" / "~2,4 mil". */
+  value: LocalizedString;
+  /** What the number counts. */
+  label: LocalizedString;
+  /** Optional qualifier specific to this tile. */
+  note?: LocalizedString;
+}
+
+/** One node in a project's architecture diagram. */
+export interface CaseStudyArchitectureNode {
+  /** Short technical label — a product name, so not localized. */
+  label: string;
+  detail: LocalizedString;
+}
+
+/** A titled prose block — used for "why X and not Y" decisions. */
+export interface CaseStudySection {
+  heading: LocalizedString;
+  body: LocalizedString;
+}
+
 export interface ProjectDetailContent {
   /** A longer, dedicated-page overview — 1-3 sentences. */
   overview?: LocalizedString;
-  /** 2-5 bullet points for the dedicated page. */
+  /** What the system does, as 2-8 bullet points. */
   highlights?: LocalizedString[];
+  /** The situation before the project existed. 2-4 sentences. */
+  problem?: LocalizedString;
+  /** 3-4 headline numbers. Rounded — never exact production counts. */
+  metrics?: CaseStudyMetric[];
+  /** One qualifier rendered under the metrics heading, covering the whole grid. */
+  metricsNote?: LocalizedString;
+  architecture?: {
+    summary: LocalizedString;
+    nodes: CaseStudyArchitectureNode[];
+  };
+  /** 3-5 engineering decisions with their rationale. */
+  decisions?: CaseStudySection[];
 }
 
 export interface Project {
@@ -74,37 +109,186 @@ export const projects: Project[] = [
     slug: 'ulbra-atende',
     name: 'Ulbra Atende',
     tagline: {
-      en: 'Support & ticketing platform.',
-      'pt-BR': 'Plataforma de suporte e chamados.',
+      en: 'IT service desk for a university, replacing GLPI.',
+      'pt-BR': 'Service desk de TI de uma universidade, no lugar do GLPI.',
     },
     description: {
-      en: 'An internal support and ticketing platform built with .NET and React — role-based access and configurable ticket workflows for internal teams.',
+      en: "The IT service desk for a university, replacing GLPI as the single intake channel: SLA per team, approval flows, multi-stage templates, and an MCP server that lets staff work tickets from Claude or ChatGPT under their own permissions.",
       'pt-BR':
-        'Uma plataforma interna de suporte e chamados construída com .NET e React — acesso baseado em papéis e fluxos de chamados configuráveis para times internos.',
+        'O service desk de TI de uma universidade, substituindo o GLPI como canal único de entrada: SLA por time, fluxos de aprovação, templates multi-etapa e um servidor MCP que deixa a equipe trabalhar chamados pelo Claude ou ChatGPT com as próprias permissões.',
     },
-    tech: ['.NET 10', 'PostgreSQL', 'RabbitMQ', 'React', 'SignalR'],
-    role: { en: 'Software engineer', 'pt-BR': 'Engenheiro de software' },
+    tech: [
+      '.NET 10',
+      'PostgreSQL 17',
+      'RabbitMQ',
+      'React 19',
+      'OpenIddict',
+      'MCP',
+      'OpenTelemetry',
+      'Docker Swarm',
+    ],
+    role: { en: 'Design & implementation', 'pt-BR': 'Design & implementação' },
     period: { en: 'Professional work', 'pt-BR': 'Trabalho profissional' },
     visibility: 'private',
     links: [],
+    screenshot: '/screenshots/ulbra-atende.png',
     detail: {
       overview: {
-        en: 'An internal support and ticketing platform — a .NET modular monolith with role-based access and configurable ticket workflows for internal support staff.',
+        en: "The IT service desk for ULBRA — a .NET 10 modular monolith that replaced GLPI as the single intake channel for the university's IT department, carrying a request from ticket to SLA to satisfaction survey.",
         'pt-BR':
-          'Uma plataforma interna de suporte e chamados — um monólito modular em .NET com acesso baseado em papéis e fluxos de chamados configuráveis para as equipes de suporte.',
+          'O service desk de TI da ULBRA — um monólito modular em .NET 10 que substituiu o GLPI como canal único de entrada da TI da universidade, levando um pedido do chamado ao SLA à pesquisa de satisfação.',
+      },
+      problem: {
+        en: "ULBRA's IT department took requests through GLPI, e-mail, and direct messages at the same time. There was no SLA per team, no audit trail on approvals, and no way to tell whether anyone was satisfied with the outcome. Ulbra Atende replaces GLPI as the single intake channel and makes each of those measurable — three months in, the median ticket closes in about an hour and a half.",
+        'pt-BR':
+          'A TI da ULBRA recebia demanda por GLPI, e-mail e mensagem direta ao mesmo tempo. Não havia SLA por time, nem rastro de aprovação, nem como saber se alguém ficou satisfeito com o resultado. O Ulbra Atende substitui o GLPI como canal único de entrada e torna cada uma dessas coisas mensurável — três meses depois, a mediana de fechamento é de cerca de uma hora e meia.',
+      },
+      metricsNote: {
+        en: 'in ~3 months of production',
+        'pt-BR': 'em ~3 meses de produção',
+      },
+      metrics: [
+        {
+          value: { en: '~2.4k', 'pt-BR': '~2,4 mil' },
+          label: { en: 'tickets handled', 'pt-BR': 'chamados atendidos' },
+          note: { en: '85% closed', 'pt-BR': '85% concluídos' },
+        },
+        {
+          value: { en: '200+', 'pt-BR': '200+' },
+          label: { en: 'users', 'pt-BR': 'usuários' },
+          note: { en: 'across ~30 teams', 'pt-BR': 'em ~30 times' },
+        },
+        {
+          value: { en: '~6 min', 'pt-BR': '~6 min' },
+          label: { en: 'median first response', 'pt-BR': 'mediana da 1ª resposta' },
+          note: { en: 'SLA tracked per team', 'pt-BR': 'SLA medido por time' },
+        },
+        {
+          value: { en: '~5.0', 'pt-BR': '~5,0' },
+          label: { en: 'satisfaction score', 'pt-BR': 'nota de satisfação' },
+          note: { en: '400+ responses, 1-5 scale', 'pt-BR': '400+ respostas, escala 1-5' },
+        },
+      ],
+      architecture: {
+        summary: {
+          en: 'A .NET 10 modular monolith: one deployable, separate bounded contexts — Core, Identity, Notifications and MCP — each layered Domain → Application → Infrastructure with its own Postgres schema. Integration events travel over RabbitMQ through an EF transactional outbox. Attachments live in S3/MinIO, caching in Redis, tracing via OpenTelemetry; integration tests run against real Postgres, RabbitMQ and MinIO through Testcontainers.',
+          'pt-BR':
+            'Um monólito modular em .NET 10: um único deploy, contextos delimitados separados — Core, Identity, Notifications e MCP — cada um em camadas Domain → Application → Infrastructure com seu próprio schema no Postgres. Eventos de integração passam pelo RabbitMQ através de um outbox transacional do EF. Anexos ficam em S3/MinIO, cache em Redis, tracing por OpenTelemetry; os testes de integração rodam contra Postgres, RabbitMQ e MinIO reais via Testcontainers.',
+        },
+        nodes: [
+          {
+            label: 'React 19 SPA',
+            detail: {
+              en: 'TanStack Router and Query over a Tailwind design system.',
+              'pt-BR': 'TanStack Router e Query sobre um design system em Tailwind.',
+            },
+          },
+          {
+            label: '.NET 10 API',
+            detail: {
+              en: 'Modular monolith — four bounded contexts in one deployable.',
+              'pt-BR': 'Monólito modular — quatro contextos delimitados num único deploy.',
+            },
+          },
+          {
+            label: 'PostgreSQL 17',
+            detail: {
+              en: 'One schema per module; EF Core migrations applied on startup.',
+              'pt-BR': 'Um schema por módulo; migrations do EF Core aplicadas no startup.',
+            },
+          },
+          {
+            label: 'RabbitMQ',
+            detail: {
+              en: 'Integration events published through an EF transactional outbox.',
+              'pt-BR': 'Eventos de integração publicados por um outbox transacional do EF.',
+            },
+          },
+          {
+            label: 'Slack · Google Chat · e-mail',
+            detail: {
+              en: 'Notification fan-out consuming those events.',
+              'pt-BR': 'Fan-out de notificação consumindo esses eventos.',
+            },
+          },
+        ],
       },
       highlights: [
         {
-          en: 'Role-based access for internal teams.',
-          'pt-BR': 'Acesso baseado em papéis para times internos.',
+          en: 'SLA per team, with pauses that record who paused the clock and why.',
+          'pt-BR': 'SLA por time, com pausas que registram quem parou o relógio e por quê.',
         },
         {
-          en: 'Configurable ticket workflows and role-based routing across support teams.',
-          'pt-BR': 'Fluxos de chamados configuráveis e roteamento baseado em papéis entre times de suporte.',
+          en: 'Multi-stage ticket templates, so a recurring request arrives already broken into steps.',
+          'pt-BR':
+            'Templates de chamado multi-etapa, então um pedido recorrente já chega dividido em passos.',
         },
         {
-          en: 'Real-time ticket notifications over SignalR.',
-          'pt-BR': 'Notificações de chamados em tempo real via SignalR.',
+          en: 'Approval flow — work that needs a sign-off cannot start without one.',
+          'pt-BR': 'Fluxo de aprovação — trabalho que exige aval não começa sem ele.',
+        },
+        {
+          en: 'Parent/child tickets and explicit dependencies between them.',
+          'pt-BR': 'Chamados pai/filho e dependências explícitas entre eles.',
+        },
+        {
+          en: 'Notifications fan out to Slack, Google Chat and e-mail, per user preference.',
+          'pt-BR':
+            'Notificações se espalham por Slack, Google Chat e e-mail, conforme a preferência de cada usuário.',
+        },
+        {
+          en: 'A dashboard whose cards drill down into the exact listing they summarize.',
+          'pt-BR': 'Um dashboard cujos cards abrem exatamente a listagem que resumem.',
+        },
+        {
+          en: 'A satisfaction survey on every closed ticket.',
+          'pt-BR': 'Pesquisa de satisfação em todo chamado concluído.',
+        },
+      ],
+      decisions: [
+        {
+          heading: {
+            en: 'A modular monolith, not microservices',
+            'pt-BR': 'Monólito modular, não microsserviços',
+          },
+          body: {
+            en: 'One team, one deploy. The boundary that matters is the module — enforced by project references and a schema per context — not the network. Distributing it would have bought deployment independence nobody needed and paid for it in latency, partial failures, and debugging.',
+            'pt-BR':
+              'Um time, um deploy. A fronteira que importa é o módulo — garantida por referências de projeto e um schema por contexto — não a rede. Distribuir teria comprado uma independência de deploy que ninguém precisava, pagando em latência, falha parcial e dificuldade de depurar.',
+          },
+        },
+        {
+          heading: {
+            en: 'A transactional outbox for every integration event',
+            'pt-BR': 'Outbox transacional para todo evento de integração',
+          },
+          body: {
+            en: 'The event row is written in the same transaction as the business change. A notification can never fire for a ticket that failed to commit, and never disappears because the broker happened to be down at that moment — the relay delivers it once the transaction lands.',
+            'pt-BR':
+              'A linha do evento é escrita na mesma transação da mudança de negócio. Uma notificação nunca dispara para um chamado que não commitou, e nunca some porque o broker estava fora naquele instante — o relay entrega assim que a transação fecha.',
+          },
+        },
+        {
+          heading: {
+            en: 'Strongly-typed IDs from a source generator',
+            'pt-BR': 'IDs fortemente tipados por source generator',
+          },
+          body: {
+            en: 'Every entity has its own ID struct, rendered as ti_…, tm_…, us_…. Passing a team ID where a ticket ID belongs stops compiling. A whole class of bug moves from runtime to build time, and IDs say what they are in logs and URLs.',
+            'pt-BR':
+              'Cada entidade tem seu próprio struct de ID, escrito como ti_…, tm_…, us_…. Passar um ID de time onde se espera um de chamado para de compilar. Uma classe inteira de bug sai do runtime e vai para o build, e o ID diz o que é em log e em URL.',
+          },
+        },
+        {
+          heading: {
+            en: 'Its own OAuth server, and an MCP server behind it',
+            'pt-BR': 'Servidor OAuth próprio, e um servidor MCP atrás dele',
+          },
+          body: {
+            en: 'OpenIddict issues the tokens; the MCP server exposes ticket read/write and lookup tools. Someone connects Claude or ChatGPT to their own account through a consent screen and works tickets in natural language — under exactly the permissions they already have in the UI, with the same scope check on every tool call.',
+            'pt-BR':
+              'O OpenIddict emite os tokens; o servidor MCP expõe ferramentas de leitura, escrita e consulta de chamados. A pessoa conecta o Claude ou o ChatGPT à própria conta por uma tela de consentimento e trabalha os chamados em linguagem natural — com exatamente as permissões que já tem na interface, e a mesma checagem de escopo em cada chamada de ferramenta.',
+          },
         },
       ],
     },

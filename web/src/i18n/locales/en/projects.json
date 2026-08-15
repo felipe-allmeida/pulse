@@ -6,7 +6,11 @@
   "viewDetails": "View {{name}} details",
   "backToProjects": "All projects",
   "overviewHeading": "Overview",
-  "highlightsHeading": "Highlights",
+  "problemHeading": "The problem",
+  "metricsHeading": "By the numbers",
+  "architectureHeading": "Architecture",
+  "highlightsHeading": "What it does",
+  "decisionsHeading": "Engineering decisions",
   "notFoundHeading": "Project not found",
   "notFoundBody": "We couldn't find a project at that address."
 }

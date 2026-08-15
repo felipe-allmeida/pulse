@@ -53,7 +53,7 @@ describe('ProjectDetail', () => {
     expect(headings).toHaveLength(1);
     expect(headings[0]).toHaveTextContent('Ulbra Atende');
 
-    expect(screen.getByText(/role-based routing across support teams/i)).toBeInTheDocument();
+    expect(screen.getByText(/pauses that record who paused the clock/i)).toBeInTheDocument();
     expect(screen.getByText('Private')).toBeInTheDocument();
     expect(screen.queryByRole('link', { name: /github|repo/i })).not.toBeInTheDocument();
     // No external/repo link should exist at all on a private project's detail page.
@@ -68,7 +68,7 @@ describe('ProjectDetail', () => {
     expect(headings).toHaveLength(1);
     expect(headings[0]).toHaveTextContent('Ulbra Atende');
 
-    expect(screen.getByText(/roteamento baseado em papéis entre times de suporte/i)).toBeInTheDocument();
+    expect(screen.getByText(/pausas que registram quem parou o relógio/i)).toBeInTheDocument();
     expect(screen.getByText('Privado')).toBeInTheDocument();
     const externalLikeLinks = screen.queryAllByRole('link').filter((link) => link.getAttribute('target') === '_blank');
     expect(externalLikeLinks).toHaveLength(0);
@@ -83,5 +83,55 @@ describe('ProjectDetail', () => {
 
     const backLink = screen.getByRole('link', { name: /all projects/i });
     expect(backLink).toHaveAttribute('href', '/projects');
+  });
+
+  it('renders the full case study for ulbra-atende, in section order', async () => {
+    await renderDetail('ulbra-atende');
+
+    await screen.findAllByRole('heading', { level: 1 });
+    expect(screen.getByText(/took requests through GLPI/i)).toBeInTheDocument();
+    expect(screen.getByText('~2.4k')).toBeInTheDocument();
+    expect(screen.getByText('in ~3 months of production')).toBeInTheDocument();
+    expect(screen.getByText(/Core, Identity, Notifications and MCP/i)).toBeInTheDocument();
+    expect(screen.getByText('Slack · Google Chat · e-mail')).toBeInTheDocument();
+    expect(screen.getByText(/its own OAuth server/i)).toBeInTheDocument();
+
+    const headings = screen.getAllByRole('heading', { level: 2 }).map((h) => h.textContent);
+    expect(headings).toEqual([
+      'Overview',
+      'The problem',
+      'By the numbers',
+      'Architecture',
+      'What it does',
+      'Engineering decisions',
+    ]);
+  });
+
+  it('renders the case study in pt-BR', async () => {
+    await renderDetail('ulbra-atende', 'pt-BR');
+
+    await screen.findAllByRole('heading', { level: 1 });
+    expect(screen.getByText(/recebia demanda por GLPI/i)).toBeInTheDocument();
+    expect(screen.getByText('~2,4 mil')).toBeInTheDocument();
+    expect(screen.getByText('em ~3 meses de produção')).toBeInTheDocument();
+
+    const headings = screen.getAllByRole('heading', { level: 2 }).map((h) => h.textContent);
+    expect(headings).toEqual([
+      'Visão geral',
+      'O problema',
+      'Em números',
+      'Arquitetura',
+      'O que faz',
+      'Decisões de engenharia',
+    ]);
+  });
+
+  it('omits every case-study section for a project that has none', async () => {
+    await renderDetail('ulbra-one');
+
+    await screen.findAllByRole('heading', { level: 1 });
+    const headings = screen.getAllByRole('heading', { level: 2 }).map((h) => h.textContent);
+    expect(headings).toEqual(['Overview', 'What it does']);
+    expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
   });
 });
