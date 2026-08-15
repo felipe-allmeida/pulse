@@ -1,3 +1,6 @@
+import { readFileSync } from 'node:fs';
+import { dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import { CaseStudyMetrics } from '@/components/projects/case-study-metrics';
@@ -78,5 +81,17 @@ describe('CaseStudyMetrics', () => {
 
     const grid = container.querySelector('[class*="grid-cols"]');
     expect(grid!.className).toContain('sm:grid-cols-4');
+  });
+
+  // jsdom renders an interpolated class name identically to a literal one, so no
+  // DOM assertion can catch this. Tailwind only generates classes it finds spelled
+  // out in source, so the rule has to be checked against the source itself.
+  it('spells its grid classes out, never building them by interpolation', () => {
+    const __dirname = dirname(fileURLToPath(import.meta.url));
+    const source = readFileSync(`${__dirname}/case-study-metrics.tsx`, 'utf8');
+
+    expect(source).not.toMatch(/grid-cols-\$\{/);
+    expect(source).toContain('sm:grid-cols-3');
+    expect(source).toContain('sm:grid-cols-4');
   });
 });
