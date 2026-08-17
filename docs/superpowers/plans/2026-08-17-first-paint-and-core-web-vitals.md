@@ -1278,6 +1278,141 @@ answers from — before anyone asked anything."
 
 ---
 
+## Task 7b: Stop the whole content corpus loading for a title
+
+Found during Task 7's review, and it is the larger half of what that task was
+supposed to remove. Task 7's brief wrongly attributed `projects-*` (58 KB),
+`profile-*` (15 KB) and `faq-*` (9.5 KB) to `AskWidget`. They come from
+`useRouteHead()`, called unconditionally in `web/src/routes/__root.tsx`, which
+reaches `pageForPath()` in `web/src/lib/aio/pages.ts` — a module that statically
+imports `faq`, `profile` and `projects` and whose `buildPages()` constructs the
+full `AioPage` model for **every route in both locales**.
+
+All of that, on every page, to retitle the document. And the served document
+already carries its own correct `<title>` from the AIO build step, so none of it
+is needed on first load — only on a client-side navigation, which by definition
+happens after the visitor is already looking at a rendered page.
+
+**Files:**
+- Modify: `web/src/lib/aio/use-route-head.ts`
+- Modify: `web/src/lib/aio/use-route-head.test.tsx`
+
+**Interfaces:**
+- Consumes: `pageForPath` from `web/src/lib/aio/pages.ts`
+- Produces: nothing other tasks read
+
+- [ ] **Step 1: Establish what the hook actually guarantees**
+
+```bash
+cat web/src/lib/aio/use-route-head.ts && cat web/src/lib/aio/use-route-head.test.tsx
+```
+
+Read both fully before changing anything. Note in your report: what the hook sets
+(title, description, canonical, anything else), whether it runs on first mount or
+only on pathname change, and what its tests currently pin. The rest of this task
+depends on the answer to one question — **is the first-mount write redundant with
+what the served document already contains?** State your finding explicitly.
+
+- [ ] **Step 2: Write the failing test**
+
+Add to `web/src/lib/aio/use-route-head.test.tsx`:
+
+```tsx
+  it('does not pull the page model into the initial render', async () => {
+    // The served document already carries this route's title from the AIO
+    // build step, so nothing about the first paint needs the page model —
+    // and reaching for it statically drags faq, profile and projects (~82 KB)
+    // onto every page in the site.
+    const modules = await import('./use-route-head');
+    const source = readFileSync(
+      join(dirname(fileURLToPath(import.meta.url)), 'use-route-head.ts'),
+      'utf-8',
+    );
+
+    expect(modules).toBeDefined();
+    expect(source).not.toMatch(/^import .*\bfrom '\.\/pages'/m);
+    expect(source).toMatch(/await import\('\.\/pages'\)/);
+  });
+```
+
+Add the Node imports this needs at the top of the file, following the pattern in
+`web/src/favicon.test.ts`:
+
+```ts
+/// <reference types="node" />
+import { readFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+```
+
+- [ ] **Step 3: Run it to verify it fails**
+
+```bash
+pnpm -C web test src/lib/aio/use-route-head.test.tsx
+```
+
+Expected: FAIL — `pages` is currently a static import.
+
+- [ ] **Step 4: Make the page model load on demand**
+
+Convert the static `import { pageForPath } from './pages'` into a dynamic
+`await import('./pages')` inside the hook's effect. The effect is already
+asynchronous in nature (it writes to `document` after render), so this does not
+change when the title lands in any way a visitor can perceive — the document
+already shows the right title before the hook runs at all.
+
+Guard against the usual async-effect hazard: if the pathname changes again while
+the import is in flight, the late resolution must not write a stale title. Use a
+`cancelled` flag in the effect's cleanup, the same shape as
+`web/src/hooks/use-world.ts`.
+
+- [ ] **Step 5: Run the tests to verify they pass**
+
+```bash
+pnpm -C web test src/lib/aio/use-route-head.test.tsx
+```
+
+Expected: PASS, including every pre-existing test in that file. If a pre-existing
+test now fails because the title write became asynchronous, wrap its assertion in
+`waitFor` rather than weakening it — and say so explicitly in your report.
+
+- [ ] **Step 6: Confirm the content modules left the home graph**
+
+```bash
+pnpm -C web test && pnpm -C web build && grep -o 'href="/assets/[^"]*"' web/dist/index.html
+```
+
+Expected: `projects-*`, `profile-*` and `faq-*` are gone from the home document's
+preload list. Report the entry chunk's size before and after.
+
+- [ ] **Step 7: Confirm the served titles are untouched**
+
+```bash
+grep -o '<title>[^<]*</title>' web/dist/index.html web/dist/pt.html web/dist/about.html
+```
+
+Expected: each document still carries its own correct, localized title. This task
+must not change what the AIO build step emits — only what the client loads to
+maintain it afterwards.
+
+- [ ] **Step 8: Commit**
+
+```bash
+git add web/src/lib/aio/use-route-head.ts web/src/lib/aio/use-route-head.test.tsx
+git commit -m "perf(web): load the page model only when retitling needs it
+
+useRouteHead() runs on every page and reached pageForPath() through a
+static import, so pages.ts built the AioPage model for every route in
+both locales — dragging faq, profile and projects onto every page in the
+site, ~82 KB, to set a title.
+
+The served document already carries its own title from the AIO build
+step. Only a client-side navigation needs this, and that happens with a
+rendered page already on screen."
+```
+
+---
+
 ## Task 8: Inline the stylesheet
 
 56 KB raw / 9.9 KB gzip of render-blocking CSS costing 450ms, which on slow 4G is a round trip rather than parse time. The documents are already assembled at build time and already served `no-cache`, so inlining costs no cacheability.
