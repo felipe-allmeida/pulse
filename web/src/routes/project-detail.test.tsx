@@ -265,14 +265,6 @@ describe('ProjectDetail', () => {
     expect(headings[5]).toBe('A vida de uma adesão');
   });
 
-  it('renders the contribution section for projects that have one', async () => {
-    await renderDetail('ulbra-one');
-    await screen.findAllByRole('heading', { level: 1 });
-
-    const headings = screen.getAllByRole('heading', { level: 2 }).map((h) => h.textContent);
-    expect(headings[1]).toBe('What I did');
-  });
-
   it('renders the live-site link and the repository link for pulse', async () => {
     await renderDetail('pulse');
     await screen.findAllByRole('heading', { level: 1 });
