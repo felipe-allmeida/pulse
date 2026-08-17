@@ -3,7 +3,6 @@ import { render, screen } from '@testing-library/react';
 import { I18nextProvider } from 'react-i18next';
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 import i18n from '@/i18n';
-import { AskWidget } from '@/components/ask/ask-widget';
 import { profile } from '@/content/profile';
 import { useEventStore } from '@/stores/event-store';
 import type { Locale } from '@/content/types';
@@ -45,14 +44,7 @@ async function renderIndexRoute(locale: Locale = 'en') {
 
   return render(
     <I18nextProvider i18n={i18n}>
-      {/*
-        AskWidget isn't part of the `/` route tree in production — it's
-        mounted once in `__root.tsx`, alongside the route's <Outlet />. It's
-        rendered here too so the composed page matches production, with the
-        Ask trigger on screen alongside everything else.
-      */}
       <RouterProvider router={router} />
-      <AskWidget />
     </I18nextProvider>,
   );
 }
@@ -67,15 +59,45 @@ describe('Index route (portfolio home)', () => {
   it('renders the "How can I help you?" section in en', async () => {
     await renderIndexRoute('en');
 
-    expect(screen.getByRole('heading', { name: 'How can I help you?' })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: 'How can I help you?' })).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /send a pulse/i })).not.toBeInTheDocument();
   });
 
   it('renders the "Como eu posso te ajudar?" section in pt-BR', async () => {
     await renderIndexRoute('pt-BR');
 
-    expect(screen.getByRole('heading', { name: 'Como eu posso te ajudar?' })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: 'Como eu posso te ajudar?' })).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /enviar um pulso/i })).not.toBeInTheDocument();
+  });
+
+  it('places the help section between the hero and the engineering showcase in DOM order', async () => {
+    await renderIndexRoute();
+
+    // The router is code-split, so wait for whatever resolves first — same
+    // reasoning as the composed test below. Once that settles, the rest of
+    // the tree (including EngineeringShowcase, in the same chunk) is present
+    // too, so the remaining queries can be synchronous.
+    const heroHeading = await screen.findByRole('heading', { level: 1, name: profile.name });
+    const helpHeading = screen.getByRole('heading', { name: 'How can I help you?' });
+
+    // Hero's own tech-stack chips also say "RabbitMQ" (the stack list), so
+    // there are two matches on the composed page: Hero's chip (always
+    // before the help heading) and the architecture diagram's node label.
+    // Anchoring on "whichever RabbitMQ comes after the help heading" isolates
+    // the diagram's copy without depending on markup only the diagram has —
+    // the same node the deleted engineering-showcase.test.tsx test anchored
+    // on when EngineeringShowcase was rendered in isolation.
+    const rabbitNodes = screen.getAllByText('RabbitMQ');
+    const diagramNode = rabbitNodes.find(
+      // eslint-disable-next-line no-bitwise
+      (node) => helpHeading.compareDocumentPosition(node) & Node.DOCUMENT_POSITION_FOLLOWING,
+    );
+    expect(diagramNode, 'expected one "RabbitMQ" node — the diagram\'s — after the help heading').toBeDefined();
+
+    // DOCUMENT_POSITION_FOLLOWING means the second node comes after the
+    // first in DOM order.
+    // eslint-disable-next-line no-bitwise
+    expect(heroHeading.compareDocumentPosition(helpHeading) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
 
   it('composes the hero, engineering showcase, and a compact live-proof block, with exactly one h1', async () => {
