@@ -42,7 +42,7 @@ export function HelpCard({ variant, featured = false }: { variant: HelpCardKey; 
       data-featured={featured ? 'true' : undefined}
       className={cn(
         'flex h-full flex-col gap-4 rounded-lg bg-signal-muted/10',
-        featured ? 'border-2 border-signal/50 p-6' : 'border border-signal/20 p-5',
+        featured ? 'border-2 border-signal-strong/60 p-6' : 'border border-signal/20 p-5',
       )}
     >
       <h3

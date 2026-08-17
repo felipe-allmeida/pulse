@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { resources } from '@/i18n';
-
-const CARD_KEYS = ['repetitive', 'spreadsheet', 'ai', 'idea'] as const;
+import { HELP_CARD_KEYS as CARD_KEYS } from '@/components/home/help/help-cards';
 
 type HelpBlock = {
   eyebrow: string;

@@ -31,9 +31,12 @@ describe('HowIHelp', () => {
     const ask = screen.getByRole('link', { name: /tell me your case/i });
     const href = ask.getAttribute('href') ?? '';
 
-    expect(href.startsWith(`${profile.contact.whatsapp}?text=`), href).toBe(true);
-    expect(decodeURIComponent(href.split('?text=')[1] ?? '')).toBe(
-      "Hi Felipe, I came from your site. What's stuck here today is ",
+    // Asserted against the literal encoded href, not round-tripped through
+    // decodeURIComponent: the English message contains only spaces and a
+    // comma, so encoding and decoding it is a no-op that would pass whether
+    // or not the component actually calls encodeURIComponent.
+    expect(href).toBe(
+      `${profile.contact.whatsapp}?text=Hi%20Felipe%2C%20I%20came%20from%20your%20site.%20What's%20stuck%20here%20today%20is%20`,
     );
     expect(ask).toHaveAttribute('target', '_blank');
     expect(ask).toHaveAttribute('rel', 'noreferrer');
