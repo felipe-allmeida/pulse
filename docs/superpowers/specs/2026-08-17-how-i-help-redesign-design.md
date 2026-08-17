@@ -111,7 +111,7 @@ The primary CTA becomes an anchor to `profile.contact.whatsapp` with a
 prefilled message:
 
 ```
-https://wa.me/5551983468863?text=<encoded>
+https://wa.me/<the number in profile.contact.whatsapp>?text=<encoded>
 ```
 
 The message is deliberately an unfinished sentence, so the founder completes it

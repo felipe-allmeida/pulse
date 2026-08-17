@@ -27,7 +27,7 @@ import { cn } from '@/lib/utils';
  * than the longer line does. Do not reintroduce a per-paragraph `max-w-*`
  * here without changing the column with it.
  *
- * The home page's own sections (Hero, EngineeringShowcase, VisitHistory,
+ * The home page's own sections (Hero, HowIHelp, VisitHistory,
  * routes/index.tsx) keep their inline `px-6 sm:px-10` + inner `max-w-5xl`
  * because each carries its own full-bleed background band; they follow the
  * same two rules by hand.

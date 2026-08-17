@@ -73,7 +73,7 @@ export const profile: Profile = {
     calendly: 'https://calendly.com/pampa-devs/bate-papo-sobre-seu-projeto',
     email: 'contato@pampadevs.com',
     linkedin: 'https://www.linkedin.com/in/felipe-allmeida',
-    whatsapp: 'https://wa.me/5551983468863',
+    whatsapp: 'https://wa.me/5551991635191',
   },
   skills: [
     { group: { en: 'Languages', 'pt-BR': 'Linguagens' }, items: ['C#', 'TypeScript', 'JavaScript', 'SQL', 'Python'] },

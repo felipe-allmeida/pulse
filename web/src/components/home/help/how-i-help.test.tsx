@@ -95,4 +95,10 @@ describe('HowIHelp', () => {
     expect(row?.className).toMatch(/md:grid-cols-3/);
     expect(row?.querySelectorAll('h3')).toHaveLength(3);
   });
+
+  it('exposes the id the hero scroll cue scrolls to', async () => {
+    const { container } = await renderWithI18n(<HowIHelp />);
+
+    expect(container.querySelector('#how-i-help')).toBeInTheDocument();
+  });
 });

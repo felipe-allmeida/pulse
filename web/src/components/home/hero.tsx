@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Link } from '@tanstack/react-router';
 import { CvButton } from '@/components/nav/cv-button';
 import { HeroMap } from '@/components/home/hero-map';
+import { ScrollCue } from '@/components/home/scroll-cue';
 import { VisitorLine } from '@/components/home/visitor-line';
 import { Chip } from '@/components/signal/chip';
 import { Pill } from '@/components/signal/pill';
@@ -34,7 +35,7 @@ export function Hero() {
   const openAskWidget = useAskWidgetStore((s) => s.open);
 
   return (
-    <section className="relative isolate flex flex-col justify-center overflow-hidden bg-background px-6 py-20 text-foreground sm:px-10 md:min-h-[85vh] md:py-28">
+    <section className="relative isolate flex flex-col justify-center overflow-hidden bg-background px-6 py-20 text-foreground sm:px-10 md:min-h-[85vh] md:pt-28 md:pb-40">
       <HeroMap className="z-0" />
 
       <div className="relative z-10 mx-auto flex w-full max-w-5xl flex-col gap-8">
@@ -110,6 +111,14 @@ export function Hero() {
           ))}
         </ul>
       </div>
+
+      {/*
+        Anchored to the section's own box (which is already `relative
+        isolate`), not to the content column — the cue belongs to the band and
+        centres on the viewport. It sits below the content in source order so
+        it also comes last in the tab order.
+      */}
+      <ScrollCue />
     </section>
   );
 }

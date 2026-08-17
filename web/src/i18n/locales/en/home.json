@@ -45,10 +45,8 @@
   "cta": {
     "projects": "See the projects",
     "about": "About me",
-    "ask": "Ask the AI about me"
-  },
-  "showcase": {
-    "eyebrow": "what you're looking at · live"
+    "ask": "Ask the AI about me",
+    "scroll": "Scroll"
   },
   "help": {
     "eyebrow": "what i solve",
@@ -120,14 +118,5 @@
     "eyebrow": "/live",
     "heading": "Live dashboard",
     "description": "Every metric, the live map, recent visits, and the raw event stream — the full panel behind the numbers on the home page."
-  },
-  "arch": {
-    "web": "Web",
-    "api": "API",
-    "apiDetail": "SignalR · Redis",
-    "queue": "RabbitMQ",
-    "worker": "Worker",
-    "db": "Postgres",
-    "caption": "The request pipeline behind this page, live: your browser holds a SignalR connection through the API, presence and geolocation flow through Redis, events queue on RabbitMQ for the worker, and everything lands in Postgres."
   }
 }

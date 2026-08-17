@@ -2,7 +2,6 @@ import { Link, createFileRoute } from '@tanstack/react-router';
 import { ArrowRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { AskChips } from '@/components/ask/ask-chips';
-import { EngineeringShowcase } from '@/components/home/engineering-showcase';
 import { HowIHelp } from '@/components/home/help/how-i-help';
 import { Hero } from '@/components/home/hero';
 import { VisitHistory } from '@/components/home/visit-history';
@@ -19,9 +18,9 @@ export const Route = createFileRoute('/')({
 function Index() {
   const { t } = useTranslation('home');
   // Mounted once here: bridges polled visit data into the live event store
-  // that both the hero's engineering showcase and this page's own EventFeed
-  // (below, in the live-proof block) read from. /live mounts its own
-  // instance for when that route is the one on screen instead.
+  // that this page's EventFeed (below, in the live-proof block) reads from.
+  // /live mounts its own instance for when that route is the one on screen
+  // instead.
   useVisitFeed();
 
   return (
@@ -47,12 +46,6 @@ function Index() {
       */}
       <HowIHelp />
 
-      {/* Same breakout as the hero, minus the `-mt-6` — that cancels
-          <main>'s top padding and only the first block needs it. */}
-      <div className="ml-[calc(50%-50vw)] mr-[calc(50%-50vw)] w-screen">
-        <EngineeringShowcase />
-      </div>
-
       {/*
         Portfolio-first home (visual coherence Task 2): the full ops-console
         widget stack (RecentVisitsTable, VisitsChart)
@@ -66,10 +59,10 @@ function Index() {
         signal accent text below uses `text-signal-strong` (not the fixed
         bright `text-signal`) so it clears AA on a light surface too.
 
-        Mobile vertical rhythm (Task 3): `py-14` on mobile matches
-        EngineeringShowcase and the Ask chips section below — one consistent
-        section padding down the page instead of alternating py-12/py-16
-        "orphan" gaps, tightened from the previous py-16.
+        Mobile vertical rhythm (Task 3): `py-14` on mobile matches HowIHelp
+        above and the Ask chips section below — one consistent section
+        padding down the page instead of alternating py-12/py-16 "orphan"
+        gaps, tightened from the previous py-16.
       */}
       <section className="bg-background px-6 py-14 text-foreground sm:px-10 md:py-20">
         <div className="mx-auto flex w-full max-w-5xl flex-col gap-6">
