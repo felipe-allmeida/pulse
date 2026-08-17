@@ -157,13 +157,22 @@ system Felipe worked on; the "What Felipe did" line is the authoritative stateme
 
 - **Role:** Head of Technology (Jun 2026 – Current)
 - **Source:** closed — professional work described without the code
-- **Stack:** .NET 10, PostgreSQL, EF Core, React, Tailwind
-- **What it is:** An internal ERP replacing legacy systems — a modular .NET platform on PostgreSQL with a React front end, covering core internal business operations.
+- **Stack:** .NET 10, PostgreSQL 17, EF Core, React, Tailwind, shadcn/ui
+- **What it is:** An internal ERP built to take the university off its legacy systems — a modular .NET 10 monolith on PostgreSQL 17 with a React front end, covering core internal business operations. It is in testing, ahead of launch, so this describes what has been built rather than what is running.
+- **What Felipe did:** Set the architecture and the conventions, and built alongside one engineer who carries the day-to-day of this codebase.
+  - The module boundaries, and the conventions carried over from the service desk.
+  - The PostgreSQL schema and the code-first migration path.
+  - Review of every change into the codebase.
+  - NOT his work: One engineer owns this codebase day to day; much of the implementation is theirs.
+- **Problem it solved:** The university runs its internal operations on licensed legacy systems that neither its data nor its processes fit well. Ulbra One is the platform meant to replace them, built in-house so that the business rules live somewhere the team can change.
 - **What it does:**
-  - A modular architecture organized by business domain.
-  - Migrates core operations off legacy systems onto a unified platform.
-  - PostgreSQL persistence via EF Core.
-  - A modern React + Tailwind front end replacing older internal tools.
+  - A modular monolith organized by business domain rather than by technical layer.
+  - PostgreSQL via EF Core, code-first, with snake_case naming applied by convention rather than by attribute.
+  - A React and Tailwind front end sharing the design tokens of the service desk.
+  - Migrations run on startup, so an environment is never a manual step behind the code.
+- **Engineering decisions:**
+  - **The same conventions as the service desk, deliberately** — Endpoint shape, result type and migration strategy are copied from Ulbra Atende rather than reconsidered. With three engineers across six systems, an engineer moving between two codebases should not be learning a second set of rules — the consistency is worth more than any local improvement either codebase might have made alone.
+  - **A modular monolith, not services** — An ERP is a set of tightly related domains that transact together. Splitting it into services would buy independent deployment at the cost of distributed transactions across modules that genuinely need consistency — and there is no team here to operate that. Modules give the boundaries; the single process keeps the transactions.
 
 ### Dell Automated Caller — Automated end-to-end testing for a phone system.
 

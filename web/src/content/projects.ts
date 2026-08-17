@@ -1026,11 +1026,11 @@ export const projects: Project[] = [
       'pt-BR': 'ERP interno substituindo sistemas legados.',
     },
     description: {
-      en: 'An internal ERP built to replace legacy systems — a modular .NET platform on PostgreSQL with a React front end, covering core internal business operations.',
+      en: `An internal ERP replacing the university's legacy systems — a modular .NET monolith on PostgreSQL with a React front end. In testing, ahead of launch.`,
       'pt-BR':
-        'Um ERP interno construído para substituir sistemas legados — uma plataforma .NET modular sobre PostgreSQL com front-end em React, cobrindo as operações internas centrais do negócio.',
+        'Um ERP interno substituindo os sistemas legados da universidade — um monólito modular em .NET sobre PostgreSQL com front-end em React. Em teste, antes do lançamento.',
     },
-    tech: ['.NET 10', 'PostgreSQL', 'EF Core', 'React', 'Tailwind'],
+    tech: ['.NET 10', 'PostgreSQL 17', 'EF Core', 'React', 'Tailwind', 'shadcn/ui'],
     role: { en: 'Head of Technology', 'pt-BR': 'Head de Tecnologia' },
     period: { en: 'Jun 2026 – Current', 'pt-BR': 'Jun 2026 – Atual' },
     venture: 'ulbra',
@@ -1039,26 +1039,83 @@ export const projects: Project[] = [
     links: [],
     detail: {
       overview: {
-        en: 'An internal ERP replacing legacy systems — a modular .NET platform on PostgreSQL with a React front end, covering core internal business operations.',
+        en: 'An internal ERP built to take the university off its legacy systems — a modular .NET 10 monolith on PostgreSQL 17 with a React front end, covering core internal business operations. It is in testing, ahead of launch, so this describes what has been built rather than what is running.',
         'pt-BR':
-          'Um ERP interno substituindo sistemas legados — uma plataforma .NET modular sobre PostgreSQL com front-end em React, cobrindo as operações internas centrais do negócio.',
+          'Um ERP interno construído para tirar a universidade dos sistemas legados — um monólito modular em .NET 10 sobre PostgreSQL 17 com front-end em React, cobrindo as operações internas centrais. Está em teste, antes do lançamento, então o que segue descreve o que foi construído, não o que está em produção.',
+      },
+      contribution: {
+        summary: {
+          en: 'Set the architecture and the conventions, and built alongside one engineer who carries the day-to-day of this codebase.',
+          'pt-BR':
+            'Definiu a arquitetura e as convenções e construiu junto com um engenheiro que toca o dia a dia deste código.',
+        },
+        areas: [
+          {
+            en: 'The module boundaries, and the conventions carried over from the service desk.',
+            'pt-BR': 'As fronteiras entre módulos e as convenções trazidas do service desk.',
+          },
+          {
+            en: 'The PostgreSQL schema and the code-first migration path.',
+            'pt-BR': 'O schema PostgreSQL e o caminho de migrations code-first.',
+          },
+          {
+            en: 'Review of every change into the codebase.',
+            'pt-BR': 'Revisão de toda mudança que entra no código.',
+          },
+        ],
+        boundary: {
+          en: 'One engineer owns this codebase day to day; much of the implementation is theirs.',
+          'pt-BR':
+            'Um engenheiro cuida deste código no dia a dia; boa parte da implementação é dele.',
+        },
+      },
+      problem: {
+        en: 'The university runs its internal operations on licensed legacy systems that neither its data nor its processes fit well. Ulbra One is the platform meant to replace them, built in-house so that the business rules live somewhere the team can change.',
+        'pt-BR':
+          'A universidade opera seus processos internos sobre sistemas legados licenciados em que nem os dados nem os processos se encaixam bem. O Ulbra One é a plataforma que deve substituí-los, construída em casa para que as regras de negócio fiquem onde o time pode mudá-las.',
       },
       highlights: [
         {
-          en: 'A modular architecture organized by business domain.',
-          'pt-BR': 'Arquitetura modular organizada por domínio de negócio.',
+          en: 'A modular monolith organized by business domain rather than by technical layer.',
+          'pt-BR': 'Um monólito modular organizado por domínio de negócio, não por camada técnica.',
         },
         {
-          en: 'Migrates core operations off legacy systems onto a unified platform.',
-          'pt-BR': 'Migra operações centrais de sistemas legados para uma plataforma unificada.',
+          en: 'PostgreSQL via EF Core, code-first, with snake_case naming applied by convention rather than by attribute.',
+          'pt-BR':
+            'PostgreSQL via EF Core, code-first, com nomenclatura snake_case aplicada por convenção e não por atributo.',
         },
         {
-          en: 'PostgreSQL persistence via EF Core.',
-          'pt-BR': 'Persistência em PostgreSQL via EF Core.',
+          en: 'A React and Tailwind front end sharing the design tokens of the service desk.',
+          'pt-BR': 'Front-end React e Tailwind compartilhando os design tokens do service desk.',
         },
         {
-          en: 'A modern React + Tailwind front end replacing older internal tools.',
-          'pt-BR': 'Front-end moderno em React + Tailwind substituindo ferramentas internas antigas.',
+          en: 'Migrations run on startup, so an environment is never a manual step behind the code.',
+          'pt-BR':
+            'As migrations rodam na inicialização, então nenhum ambiente fica um passo manual atrás do código.',
+        },
+      ],
+      decisions: [
+        {
+          heading: {
+            en: 'The same conventions as the service desk, deliberately',
+            'pt-BR': 'As mesmas convenções do service desk, de propósito',
+          },
+          body: {
+            en: 'Endpoint shape, result type and migration strategy are copied from Ulbra Atende rather than reconsidered. With three engineers across six systems, an engineer moving between two codebases should not be learning a second set of rules — the consistency is worth more than any local improvement either codebase might have made alone.',
+            'pt-BR':
+              'Formato de endpoint, tipo de retorno e estratégia de migration são copiados do Ulbra Atende em vez de repensados. Com três engenheiros para seis sistemas, quem troca de código não deveria estar aprendendo um segundo conjunto de regras — a consistência vale mais do que qualquer melhoria local que um dos dois pudesse ter feito sozinho.',
+          },
+        },
+        {
+          heading: {
+            en: 'A modular monolith, not services',
+            'pt-BR': 'Um monólito modular, não serviços',
+          },
+          body: {
+            en: 'An ERP is a set of tightly related domains that transact together. Splitting it into services would buy independent deployment at the cost of distributed transactions across modules that genuinely need consistency — and there is no team here to operate that. Modules give the boundaries; the single process keeps the transactions.',
+            'pt-BR':
+              'Um ERP é um conjunto de domínios fortemente relacionados que transacionam juntos. Quebrá-lo em serviços compraria deploy independente ao custo de transações distribuídas entre módulos que realmente precisam de consistência — e não há time aqui para operar isso. Os módulos dão as fronteiras; o processo único mantém as transações.',
+          },
         },
       ],
     },

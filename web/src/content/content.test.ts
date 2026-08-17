@@ -313,13 +313,9 @@ it('publishes no hostname, URL or credential in any project narrative', () => {
   }
 });
 
-it('every project except ulbra-one states what the author did', () => {
+it('every project states what the author did', () => {
   for (const project of projects) {
     const contribution = project.detail?.contribution;
-    if (project.slug === 'ulbra-one') {
-      expect(contribution, 'ulbra-one is out of scope for now').toBeUndefined();
-      continue;
-    }
     expect(contribution, `${project.slug} has no contribution`).toBeDefined();
     expectBothLocales(contribution!.summary, `${project.slug} contribution.summary`);
     for (const area of contribution!.areas ?? []) {
@@ -329,6 +325,12 @@ it('every project except ulbra-one states what the author did', () => {
       expectBothLocales(contribution!.boundary, `${project.slug} contribution.boundary`);
     }
   }
+});
+
+it('ulbra-one is described as pre-launch, not as delivered', () => {
+  const one = projects.find((p) => p.slug === 'ulbra-one')!;
+  expect(one.detail!.overview!.en).toMatch(/testing|pre-launch|not yet/i);
+  expect(one.detail!.metrics, 'no production metrics before production').toBeUndefined();
 });
 
 it('kota-embed names the front end as someone else’s work', () => {
