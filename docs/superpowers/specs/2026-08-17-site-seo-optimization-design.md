@@ -182,13 +182,32 @@ browser since 2020, and keeping both formats would mean shipping a
 already does the rest correctly (`loading="lazy"`, `decoding="async"`,
 `aspect-video` reserving the box, so no CLS).
 
+### 1.9 Microsoft Clarity (landing in parallel)
+
+Clarity is being added in a separate session, which introduces this site's
+first external origin and invalidates the original reason for skipping
+resource hints. Two things follow, both to be applied once that work lands:
+
+- `<link rel="preconnect" href="https://www.clarity.ms" crossorigin />` plus a
+  `dns-prefetch` fallback in `web/index.html`.
+- The tag loads deferred, on `window`'s `load` event behind a `setTimeout`,
+  following `pampadevs-client/index.html`. A synchronous third-party tag in
+  `<head>` would undo section 1.5 outright: it competes with the route chunk
+  that section 1.1 now makes the swap wait on.
+
+Two coordination notes. First, both changes touch `web/index.html`, which
+sections 1.2 and 1.7 also modify — expect to reconcile. Second, and more
+important for measurement: **Clarity must be held constant across the
+before/after Lighthouse runs.** Otherwise a third-party script landing
+mid-flight gets attributed to this work, in either direction, and the TBT
+criterion below becomes meaningless.
+
 ### Not adopted from pampadevs
 
-- `preconnect` / `dns-prefetch` — this site has no external origins. No web
-  fonts, no analytics; `/api` and `/hub` are same-origin.
 - The `initial-loader` element — real prerendered content is strictly better
   than a spinner.
 - `<meta name="keywords">` — ignored by Google since 2009.
+- Forced stable chunk filenames — see 1.7.
 
 ---
 
@@ -249,7 +268,8 @@ Acceptance criteria:
 
 - **LCP < 2.5s** (expected ~1.3s once the prerendered markup is the LCP
   element)
-- **TBT does not regress** from the current 100ms
+- **TBT does not regress** from the current 100ms, measured with Clarity held
+  constant across both runs (see 1.9)
 - **CLS < 0.1** (currently 0.003 — the screenshot work must not disturb it)
 - **Zero blank frames in the filmstrip**
 - Phase 2 and 3 rules land as passing tests, so the audit cannot silently rot
