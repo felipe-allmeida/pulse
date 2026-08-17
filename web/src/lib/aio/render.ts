@@ -110,6 +110,13 @@ export interface DocumentOptions {
   head: string;
   /** Prerendered markup for `#root`. */
   app: string;
+  /**
+   * Built stylesheet source. Inlined into a <style> and the blocking <link>
+   * removed — 450ms of round trip on the audited profile, for 10 KB gzipped
+   * that these documents cannot cache anyway (they are served no-cache, since
+   * each embeds the hashed asset names).
+   */
+  css?: string;
 }
 
 /**
@@ -126,15 +133,27 @@ export interface DocumentOptions {
  * independent replacements over the same tag is how you end up with one of
  * them silently winning.
  */
-export function renderDocument({ template, page, head, app }: DocumentOptions): string {
+export function renderDocument({ template, page, head, app, css }: DocumentOptions): string {
   if (!template.includes(HEAD_MARKER) || !template.includes(APP_MARKER)) {
     throw new Error(
       `[pulse-aio] "${HEAD_MARKER}" / "${APP_MARKER}" not found in the built index.html — restore the markers in web/index.html.`,
     );
   }
 
-  return template
+  let html = template
     .replace('<html lang="en">', `<html lang="${page.locale}" class="dark">`)
     .replace(HEAD_MARKER, head)
     .replace(APP_MARKER, app);
+
+  if (css) {
+    // `</style>` inside a string literal in the CSS would close the tag early
+    // and hand the rest of the sheet to the HTML parser — the stylesheet
+    // equivalent of the JSON-LD escape in serialiseJsonLd above.
+    const safe = css.replace(/<\/style/gi, '<\\/style');
+    html = html
+      .replace(/<link[^>]+rel="stylesheet"[^>]*>/g, '')
+      .replace('</head>', `<style>${safe}</style></head>`);
+  }
+
+  return html;
 }

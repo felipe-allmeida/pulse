@@ -97,7 +97,7 @@ export function aio(options: AioOptions = {}): Plugin {
     },
 
     /** Runs once the bundle (including `index.html`) is on disk. */
-    async writeBundle(outputOptions) {
+    async writeBundle(outputOptions, bundle) {
       const outDir = outputOptions.dir;
       if (!outDir) return;
 
@@ -108,6 +108,12 @@ export function aio(options: AioOptions = {}): Plugin {
       if (!existsSync(templatePath)) return;
 
       const template = readFileSync(templatePath, 'utf8');
+
+      // The one stylesheet Vite emitted for the client build. Read from the
+      // bundle rather than globbed off disk so it always matches this build's
+      // hash.
+      const cssFile = Object.keys(bundle).find((name) => name.endsWith('.css'));
+      const css = cssFile ? readFileSync(join(outDir, cssFile), 'utf8') : undefined;
 
       const pages = buildAllPages();
       const lastmod = options.lastmod ?? new Date().toISOString().slice(0, 10);
@@ -129,6 +135,7 @@ export function aio(options: AioOptions = {}): Plugin {
           page,
           head: renderHead(page, base, site.name, profile.name),
           app,
+          css,
         });
         write(outDir, page.file, html);
         write(outDir, `${basenameForPath(page.path)}.md`, renderPageMarkdown(page, base));

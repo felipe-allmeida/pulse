@@ -14,14 +14,26 @@ const home = buildPages('en')[0];
 const ptHome = buildPages('pt-BR')[0];
 
 describe('theme resolution before first paint', () => {
-  it('runs the theme script before any stylesheet, so it beats the paint', () => {
-    const script = template.indexOf('pulse-theme');
-    expect(script).toBeGreaterThan(-1);
+  it('runs the theme script before the inlined styles', () => {
+    // Synthesised, because the source index.html has no stylesheet link — Vite
+    // injects one at build time and this task then inlines it. Reading the
+    // source file directly is what made the previous version of this test
+    // assert nothing. The link goes in alongside the marker rather than in
+    // place of it: Vite injects the tag, it does not consume the aio:head
+    // comment, and renderDocument needs that marker intact to fill the head.
+    const withLink = template.replace(
+      '<!--aio:head-->',
+      '<!--aio:head--><link rel="stylesheet" crossorigin href="/assets/index-abc.css">',
+    );
+    const html = renderDocument({
+      template: withLink,
+      page: home,
+      head: '',
+      app: '',
+      css: '.x{color:red}',
+    });
 
-    const stylesheet = template.search(/<link[^>]+rel="stylesheet"/);
-    // -1 means Vite injects it at build time, i.e. after everything authored
-    // here — which also satisfies the ordering requirement.
-    if (stylesheet !== -1) expect(script).toBeLessThan(stylesheet);
+    expect(html.indexOf('pulse-theme')).toBeLessThan(html.indexOf('<style>'));
   });
 
   it('uses no async attribute, since a deferred script cannot beat the paint', () => {
@@ -60,5 +72,52 @@ describe('renderDocument', () => {
     expect(() =>
       renderDocument({ template: '<html lang="en"></html>', page: home, head: '', app: '' }),
     ).toThrow(/marker/i);
+  });
+});
+
+describe('inlined stylesheet', () => {
+  it('inlines the css and drops the blocking link', () => {
+    // See the comment above on the marker/link ordering.
+    const withLink = template.replace(
+      '<!--aio:head-->',
+      '<!--aio:head--><link rel="stylesheet" crossorigin href="/assets/index-abc.css">',
+    );
+    const html = renderDocument({
+      template: withLink,
+      page: home,
+      head: '',
+      app: '',
+      css: '.x{color:red}',
+    });
+
+    expect(html).toContain('<style>.x{color:red}</style>');
+    expect(html).not.toContain('rel="stylesheet"');
+  });
+
+  it('leaves the document alone when no css is passed', () => {
+    const withLink = template.replace(
+      '<!--aio:head-->',
+      '<!--aio:head--><link rel="stylesheet" crossorigin href="/assets/index-abc.css">',
+    );
+    expect(renderDocument({ template: withLink, page: home, head: '', app: '' })).toContain(
+      'rel="stylesheet"',
+    );
+  });
+
+  it('escapes a closing style tag in the css so it cannot break out', () => {
+    const html = renderDocument({
+      template,
+      page: home,
+      head: '',
+      app: '',
+      css: 'a{content:"</style><script>x</script>"}',
+    });
+    // The raw, unescaped breakout sequence must not survive — a literal
+    // "<script>x</script>" is still present as inert text inside <style>
+    // (HTML treats style/script as raw-text elements: nothing inside is
+    // parsed as a tag until the literal closing sequence is seen), but the
+    // browser can only be fooled into leaving that raw-text mode early if
+    // "</style>" itself appears unescaped, which is exactly what this blocks.
+    expect(html).not.toContain('</style><script>x</script>');
   });
 });
