@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import type { Metrics, VisitorContext, VisitPoint } from '@/types/pulse';
+import type { Metrics, Stats, VisitorContext, VisitPoint } from '@/types/pulse';
 
 export async function fetchMetrics(): Promise<Metrics> {
   const r = await fetch('/api/metrics');
@@ -10,6 +10,12 @@ export async function fetchMetrics(): Promise<Metrics> {
 export async function fetchVisits(): Promise<VisitPoint[]> {
   const r = await fetch('/api/map');
   if (!r.ok) throw new Error('map');
+  return r.json();
+}
+
+export async function fetchStats(): Promise<Stats> {
+  const r = await fetch('/api/stats');
+  if (!r.ok) throw new Error('stats');
   return r.json();
 }
 
@@ -28,3 +34,10 @@ export const useMetrics = () => useQuery({ queryKey: ['metrics'], queryFn: fetch
 export const useVisitor = () =>
   useQuery({ queryKey: ['visitor'], queryFn: fetchVisitor, staleTime: Infinity, refetchOnWindowFocus: false });
 export const useVisits = () => useQuery({ queryKey: ['visits'], queryFn: fetchVisits, refetchInterval: 10000 });
+
+/**
+ * Polled far slower than the others: these are all-time aggregates over the
+ * whole audit log, so they move by one at a time and a 3s poll would spend
+ * database work to redraw the same numbers.
+ */
+export const useStats = () => useQuery({ queryKey: ['stats'], queryFn: fetchStats, refetchInterval: 60000 });

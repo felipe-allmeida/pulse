@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next';
 import { EventFeed } from '@/components/event-feed';
 import { KpiRow } from '@/components/kpi-row';
 import { LiveMap } from '@/components/live-map';
+import { ReachRow } from '@/components/reach-row';
 import { RecentVisitsTable } from '@/components/recent-visits-table';
 import { SectionEyebrow } from '@/components/signal/section-eyebrow';
 import { VisitsChart } from '@/components/visits-chart';
@@ -35,12 +36,25 @@ export function LivePage() {
 
         <KpiRow />
 
+        {/* Map sets the row height, table fills and scrolls — see RecentVisitsTable. */}
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
           <div className="lg:col-span-2">
             <LiveMap />
           </div>
-          <RecentVisitsTable />
+          <div className="relative">
+            <div className="lg:absolute lg:inset-0">
+              <RecentVisitsTable />
+            </div>
+          </div>
         </div>
+
+        {/*
+          The only all-time block on the page. Everything above and below it
+          describes the last hours of traffic; this answers how far the site
+          has travelled since the log began, which is what a ranking is
+          actually good for.
+        */}
+        <ReachRow />
 
         {/*
           Same arrangement as the home page's map/feed pair: the chart is a

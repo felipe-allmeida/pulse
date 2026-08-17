@@ -16,6 +16,17 @@
     "empty": "No visits yet.",
     "tooltipLabel": "Visits"
   },
+  "reach": {
+    "countriesTitle": "Top countries",
+    "citiesTitle": "Top cities",
+    "countryCount_one": "{{count}} country in all",
+    "countryCount_other": "{{count}} countries in all",
+    "cityCount_one": "{{count}} city in all",
+    "cityCount_other": "{{count}} cities in all"
+  },
+  "rankedPlaces": {
+    "empty": "No visits yet."
+  },
   "recentVisits": {
     "title": "Recent visits",
     "city": "City",

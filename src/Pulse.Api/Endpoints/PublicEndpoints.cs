@@ -36,8 +36,37 @@ public sealed record VisitorContextDto(
     long VisitsLast24h,
     PreviousVisitDto? Previous);
 
+/// <summary>One place the site has been reached from, and how often.</summary>
+public sealed record PlaceCountDto(string City, string Country, long Count);
+
+/// <summary>
+/// All-time reach, aggregated over the whole audit log rather than the 100-row
+/// window <c>/api/map</c> hands the map. Those two answer different questions:
+/// the map shows where traffic is arriving from *now*, this shows how far the
+/// site has travelled since the log began.
+///
+/// Every figure here shares <c>/api/map</c>'s <c>Country != "Unknown"</c>
+/// filter, so a reader comparing the ranking against the dots on the map is
+/// comparing like with like. That deliberately makes these counts smaller than
+/// <c>/api/metrics</c>' <c>TotalVisits</c>, which is a raw row count.
+/// </summary>
+/// <param name="Countries">Distinct countries with resolved geo.</param>
+/// <param name="Cities">Distinct city/country pairs — paired, so two same-named cities in different countries stay distinct.</param>
+/// <param name="FirstVisitAt">The oldest recorded visit, which is what the counts above are "all-time" relative to. Null before any visit resolves.</param>
+/// <param name="TopCountries">Busiest countries, most visits first. <c>City</c> is empty on these.</param>
+/// <param name="TopCities">Busiest cities, most visits first.</param>
+public sealed record StatsDto(
+    long Countries,
+    long Cities,
+    DateTimeOffset? FirstVisitAt,
+    IReadOnlyList<PlaceCountDto> TopCountries,
+    IReadOnlyList<PlaceCountDto> TopCities);
+
 public static class PublicEndpoints
 {
+    /// <summary>How many rows each ranking returns — enough to show a shape, short enough to read at a glance.</summary>
+    private const int TopPlaces = 5;
+
     public static void MapPublic(this WebApplication app)
     {
         app.MapGet("/api/metrics", async (IPresenceTracker t, PulseDbContext db) =>
@@ -49,6 +78,44 @@ public static class PublicEndpoints
                 .Select(v => new GeoPointDto(v.Lat, v.Lon, v.City, v.Country, v.OccurredAt)).ToListAsync())
            .RequireRateLimiting("public");
         app.MapGet("/api/visitor", GetVisitorAsync).RequireRateLimiting("public");
+        app.MapGet("/api/stats", GetStatsAsync).RequireRateLimiting("public");
+    }
+
+    private static async Task<StatsDto> GetStatsAsync(PulseDbContext db)
+    {
+        var known = db.VisitAudits.Where(v => v.Country != "Unknown");
+
+        var countries = await known.Select(v => v.Country).Distinct().LongCountAsync();
+        // Grouped by the pair, not by name: "Santiago" exists in Chile, Cuba and
+        // Spain, and counting it once would undercount the site's reach.
+        var cities = await known.Select(v => new { v.City, v.Country }).Distinct().LongCountAsync();
+        var firstVisitAt = await known.MinAsync(v => (DateTimeOffset?)v.OccurredAt);
+
+        // Grouped into anonymous types and mapped to the DTO after
+        // materialising: EF can't translate a positional-record constructor
+        // inside a GroupBy projection, and ordering by one of its properties
+        // afterwards leaves the whole query untranslatable.
+        var topCountries = (await known
+                .GroupBy(v => v.Country)
+                .Select(g => new { Country = g.Key, Count = g.LongCount() })
+                .OrderByDescending(x => x.Count).ThenBy(x => x.Country)
+                .Take(TopPlaces).ToListAsync())
+            .Select(x => new PlaceCountDto(string.Empty, x.Country, x.Count))
+            .ToList();
+
+        var topCities = (await known
+                .GroupBy(v => new { v.City, v.Country })
+                .Select(g => new { g.Key.City, g.Key.Country, Count = g.LongCount() })
+                .OrderByDescending(x => x.Count).ThenBy(x => x.City)
+                .Take(TopPlaces).ToListAsync())
+            .Select(x => new PlaceCountDto(x.City, x.Country, x.Count))
+            .ToList();
+
+        // ThenBy above is not cosmetic: without it, ties come back in whatever
+        // order the plan happens to produce, so a ranking with several 1-visit
+        // countries would reshuffle itself between polls while the reader looks
+        // at it.
+        return new StatsDto(countries, cities, firstVisitAt, topCountries, topCities);
     }
 
     /// <summary>

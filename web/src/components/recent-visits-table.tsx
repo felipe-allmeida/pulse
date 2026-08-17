@@ -46,11 +46,17 @@ export function RecentVisitsTable({ now = new Date() }: RecentVisitsTableProps =
   });
 
   return (
-    <Card className="border-signal/20 bg-signal-muted/10">
+    /*
+      Same arrangement as EventFeed: fifteen rows outgrew the map beside it, so
+      the grid stretched the *map's* card to match and left a tall empty band
+      under the world. The card now takes its height from the row and scrolls
+      the table inside it.
+    */
+    <Card className="flex h-full flex-col border-signal/20 bg-signal-muted/10">
       <CardHeader>
         <SubsectionHeading>{t('dashboard:recentVisits.title')}</SubsectionHeading>
       </CardHeader>
-      <CardContent>
+      <CardContent className="min-h-0 flex-1 overflow-y-auto">
         <Table className="font-mono text-xs tabular-nums">
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
