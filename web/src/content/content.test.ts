@@ -451,3 +451,17 @@ it('dietbox is the only project with a leadership section, localized and non-emp
     expectBothLocales(section.body, 'dietbox leadership body');
   }
 });
+
+it('ulbra-crm names the work as the team\'s, not the author\'s', () => {
+  const crm = projects.find((p) => p.slug === 'ulbra-crm');
+  expect(crm, 'the CRM is published').toBeDefined();
+  const boundary = crm!.detail!.contribution!.boundary!;
+  expect(boundary.en, 'the boundary must say the team implemented it').toMatch(/team|engineers/i);
+  expect(crm!.detail!.contribution!.summary.en).toMatch(/direct|led|set/i);
+});
+
+it('ulbra-crm carries the coverage figure, the one real number it has', () => {
+  const metrics = projects.find((p) => p.slug === 'ulbra-crm')!.detail!.metrics!;
+  expect(metrics.length).toBeGreaterThan(0);
+  expect(metrics.some((m) => /100%/.test(m.value.en))).toBe(true);
+});

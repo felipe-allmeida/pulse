@@ -1121,6 +1121,96 @@ export const projects: Project[] = [
     },
   },
   {
+    slug: 'ulbra-crm',
+    name: 'Ulbra CRM',
+    tagline: {
+      en: 'An inherited CRM taken from no tests to full coverage.',
+      'pt-BR': 'Um CRM herdado levado de zero testes a cobertura total.',
+    },
+    description: {
+      en: "The university's CRM platform, inherited with no automated tests and little structure. Rebuilt under the author's direction to full test coverage, with a front-end migration that stopped every screen change from throwing away the user's filters.",
+      'pt-BR':
+        'A plataforma de CRM da universidade, herdada sem testes automatizados e com pouca estrutura. Reconstruída sob a direção do autor até cobertura total de testes, com uma migração de front-end que acabou com a perda dos filtros do usuário a cada troca de tela.',
+    },
+    tech: ['React', 'TanStack Router', 'MongoDB', 'Docker Swarm'],
+    role: { en: 'Head of Technology — direction & review', 'pt-BR': 'Head de Tecnologia — direção & revisão' },
+    period: { en: 'Apr 2026 – Current', 'pt-BR': 'Abr 2026 – Atual' },
+    venture: 'ulbra',
+    visibility: 'private',
+    links: [],
+    detail: {
+      overview: {
+        en: "The CRM the university runs on, inherited rather than built: no automated tests, and a codebase whose structure had not kept up with it. It is now fully covered by tests and materially better to use, and the work was done by the team under the author's direction — he set the direction and reviewed it, and did not write it.",
+        'pt-BR':
+          'O CRM em que a universidade opera, herdado e não construído: sem testes automatizados e com uma estrutura que não acompanhou o próprio crescimento. Hoje está totalmente coberto por testes e sensivelmente melhor de usar, e o trabalho foi feito pelo time sob a direção do autor — ele definiu a direção e revisou, não escreveu.',
+      },
+      contribution: {
+        summary: {
+          en: 'Set the direction and reviewed the work; the engineering was the team\'s.',
+          'pt-BR': 'Definiu a direção e revisou o trabalho; a engenharia foi do time.',
+        },
+        areas: [
+          {
+            en: 'The decision to cover the codebase with tests before changing its behaviour.',
+            'pt-BR': 'A decisão de cobrir o código com testes antes de mudar seu comportamento.',
+          },
+          {
+            en: 'The routing migration that made filter state survive navigation.',
+            'pt-BR': 'A migração de rotas que fez o estado dos filtros sobreviver à navegação.',
+          },
+          { en: 'Review of the work as it landed.', 'pt-BR': 'Revisão do trabalho conforme entrava.' },
+        ],
+        boundary: {
+          en: 'None of this implementation is the author\'s. It was built by the engineers on the team; his part was deciding what to do and reviewing what came back.',
+          'pt-BR':
+            'Nada desta implementação é do autor. Foi construída pelos engenheiros do time; a parte dele foi decidir o que fazer e revisar o que voltava.',
+        },
+      },
+      problem: {
+        en: 'The CRM arrived with no automated tests at all, which made every change a gamble, and with usability debt that the people using it every day absorbed silently. The worst of it: changing screens reloaded the application, so the filters someone had just set were gone. Work that goes through the same three or four filters all day pays that cost on every navigation.',
+        'pt-BR':
+          'O CRM chegou sem nenhum teste automatizado, o que tornava toda mudança uma aposta, e com uma dívida de usabilidade que quem usava todo dia absorvia em silêncio. O pior sintoma: trocar de tela recarregava a aplicação, então os filtros recém-configurados sumiam. Um trabalho que passa pelos mesmos três ou quatro filtros o dia inteiro paga esse custo a cada navegação.',
+      },
+      metrics: [
+        {
+          value: { en: '0% → 100%', 'pt-BR': '0% → 100%' },
+          label: { en: 'test coverage', 'pt-BR': 'cobertura de testes' },
+        },
+        {
+          value: { en: '0', 'pt-BR': '0' },
+          label: { en: 'filter resets per navigation', 'pt-BR': 'perdas de filtro por navegação' },
+          note: { en: 'was: every one', 'pt-BR': 'antes: todas' },
+        },
+      ],
+      decisions: [
+        {
+          heading: { en: 'Tests first, behaviour second', 'pt-BR': 'Primeiro os testes, depois o comportamento' },
+          body: {
+            en: 'The codebase was unstructured and untested, and the temptation with both is to restructure first. The order was inverted: cover the existing behaviour, then change it. Coverage on code nobody has changed yet is what makes the later restructuring safe rather than hopeful — and it is the reason the number is worth quoting.',
+            'pt-BR':
+              'O código estava desestruturado e sem testes, e a tentação diante dos dois é reestruturar primeiro. A ordem foi invertida: cobrir o comportamento existente e só então mudá-lo. Cobertura sobre código que ninguém mexeu ainda é o que torna a reestruturação posterior segura em vez de esperançosa — e é a razão de o número valer a pena ser citado.',
+          },
+        },
+        {
+          heading: { en: 'Routing as state, not as navigation', 'pt-BR': 'Rotas como estado, não como navegação' },
+          body: {
+            en: 'Moving to a router that holds application state in the route turned filters from something the page owned into something the URL owned. The visible win is that a screen change no longer discards them; the quieter one is that a filtered view became a link somebody can send to a colleague.',
+            'pt-BR':
+              'Migrar para um roteador que guarda o estado da aplicação na própria rota transformou os filtros de algo que a página possuía em algo que a URL possui. O ganho visível é que trocar de tela não os descarta mais; o silencioso é que uma visão filtrada virou um link que alguém pode mandar para um colega.',
+          },
+        },
+        {
+          heading: { en: 'Directed, not written', 'pt-BR': 'Dirigido, não escrito' },
+          body: {
+            en: 'This is the one system in the group the author did not build. With three engineers and six systems, the lead\'s leverage is in deciding what gets done and reviewing what comes back, not in adding a fourth pair of hands to a codebase that already has an owner.',
+            'pt-BR':
+              'Este é o único sistema do grupo que o autor não construiu. Com três engenheiros e seis sistemas, a alavanca da liderança está em decidir o que é feito e revisar o que volta, não em somar um quarto par de mãos a um código que já tem dono.',
+          },
+        },
+      ],
+    },
+  },
+  {
     slug: 'dell-automated-caller',
     name: 'Dell Automated Caller',
     tagline: {

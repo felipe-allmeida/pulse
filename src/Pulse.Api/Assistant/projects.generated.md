@@ -174,6 +174,24 @@ system Felipe worked on; the "What Felipe did" line is the authoritative stateme
   - **The same conventions as the service desk, deliberately** — Endpoint shape, result type and migration strategy are copied from Ulbra Atende rather than reconsidered. With three engineers across six systems, an engineer moving between two codebases should not be learning a second set of rules — the consistency is worth more than any local improvement either codebase might have made alone.
   - **A modular monolith, not services** — An ERP is a set of tightly related domains that transact together. Splitting it into services would buy independent deployment at the cost of distributed transactions across modules that genuinely need consistency — and there is no team here to operate that. Modules give the boundaries; the single process keeps the transactions.
 
+### Ulbra CRM — An inherited CRM taken from no tests to full coverage.
+
+- **Role:** Head of Technology — direction & review (Apr 2026 – Current)
+- **Source:** closed — professional work described without the code
+- **Stack:** React, TanStack Router, MongoDB, Docker Swarm
+- **What it is:** The CRM the university runs on, inherited rather than built: no automated tests, and a codebase whose structure had not kept up with it. It is now fully covered by tests and materially better to use, and the work was done by the team under the author's direction — he set the direction and reviewed it, and did not write it.
+- **What Felipe did:** Set the direction and reviewed the work; the engineering was the team's.
+  - The decision to cover the codebase with tests before changing its behaviour.
+  - The routing migration that made filter state survive navigation.
+  - Review of the work as it landed.
+  - NOT his work: None of this implementation is the author's. It was built by the engineers on the team; his part was deciding what to do and reviewing what came back.
+- **Problem it solved:** The CRM arrived with no automated tests at all, which made every change a gamble, and with usability debt that the people using it every day absorbed silently. The worst of it: changing screens reloaded the application, so the filters someone had just set were gone. Work that goes through the same three or four filters all day pays that cost on every navigation.
+- **Results:** 0% → 100% test coverage; 0 filter resets per navigation (was: every one)
+- **Engineering decisions:**
+  - **Tests first, behaviour second** — The codebase was unstructured and untested, and the temptation with both is to restructure first. The order was inverted: cover the existing behaviour, then change it. Coverage on code nobody has changed yet is what makes the later restructuring safe rather than hopeful — and it is the reason the number is worth quoting.
+  - **Routing as state, not as navigation** — Moving to a router that holds application state in the route turned filters from something the page owned into something the URL owned. The visible win is that a screen change no longer discards them; the quieter one is that a filtered view became a link somebody can send to a colleague.
+  - **Directed, not written** — This is the one system in the group the author did not build. With three engineers and six systems, the lead's leverage is in deciding what gets done and reviewing what comes back, not in adding a fourth pair of hands to a codebase that already has an owner.
+
 ### Dell Automated Caller — Automated end-to-end testing for a phone system.
 
 - **Role:** Conception, architecture and implementation (2020)
