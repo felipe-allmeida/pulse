@@ -9,7 +9,7 @@ export interface PillProps {
    * live-count indicator). The pulse is disabled under
    * `prefers-reduced-motion: reduce`, and `data-motion` reflects which mode
    * is active ("static" | "animated") — same convention as
-   * `ArchitectureDiagram`/`HeroMap`. Omitted for static eyebrow-style badges
+   * `HelpDiagram`/`HeroMap`. Omitted for static eyebrow-style badges
    * that carry no live data.
    */
   dot?: boolean;

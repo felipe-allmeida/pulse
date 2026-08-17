@@ -39,9 +39,9 @@ const ICONS: Record<HelpCardKey, [typeof Hand, typeof Hand, typeof Hand]> = {
 
 /**
  * A small "by hand → on its own" diagram, one per help card. Three nodes and
- * two edges, in the same visual grammar as `ArchitectureDiagram` (mono
- * labels, signal accent, a dot travelling the edge) so the section reads as
- * part of this site rather than as a marketing block pasted onto it.
+ * two edges in the site's own visual grammar (mono labels, signal accent, a
+ * dot travelling the edge) so the section reads as part of this site rather
+ * than as a marketing block pasted onto it.
  *
  * The traversal plays once, when the diagram scrolls into view — the card is
  * not interactive, so there is no click to hang it off. Under

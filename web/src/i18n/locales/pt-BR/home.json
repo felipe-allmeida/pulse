@@ -47,9 +47,6 @@
     "about": "Sobre mim",
     "ask": "Pergunte à IA sobre mim"
   },
-  "showcase": {
-    "eyebrow": "o que você está vendo · ao vivo"
-  },
   "help": {
     "eyebrow": "o que eu resolvo",
     "heading": "Como eu posso te ajudar?",
@@ -117,14 +114,5 @@
     "eyebrow": "/live",
     "heading": "Painel ao vivo",
     "description": "Todas as métricas, o mapa ao vivo, as visitas recentes e o fluxo bruto de eventos — o painel completo por trás dos números da página inicial."
-  },
-  "arch": {
-    "web": "Web",
-    "api": "API",
-    "apiDetail": "SignalR · Redis",
-    "queue": "RabbitMQ",
-    "worker": "Worker",
-    "db": "Postgres",
-    "caption": "O pipeline por trás desta página, ao vivo: seu navegador mantém uma conexão SignalR com a API, presença e geolocalização passam pelo Redis, eventos entram na fila do RabbitMQ para o worker, e tudo é gravado no Postgres."
   }
 }
