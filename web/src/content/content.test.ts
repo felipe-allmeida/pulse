@@ -294,7 +294,7 @@ it('dell-automated-caller is last — it is the oldest work', () => {
  * Strips the specific placeholder forms a project narrative is allowed to
  * contain, so the guard below can run over *every* field of every project —
  * including `script.lines` — rather than exempting a whole field from
- * inspection. Three forms are sanctioned, and only these:
+ * inspection. Four forms are sanctioned, and only these:
  *
  * - RFC 2606 reserved domains (`example.com`, `.net`, `.org`) and this
  *   repo's `example.internal` convention for sample hostnames. These are
@@ -319,12 +319,19 @@ it('dell-automated-caller is last — it is the oldest work', () => {
  * - A dotted config-label key immediately followed by `=`, e.g.
  *   `traefik.enable=true` or `traefik.http.routers.myapp.rule=Host(...)` in
  *   `ulbra-infra`'s script sample. Docker/Traefik labels are dotted key
- *   paths, not hostnames, and a real domain name never has `=` appended to
- *   it directly — no scheme, port, path or quote sits between a hostname and
- *   an `=` sign in any of the forms this guard has to allow through. That
- *   makes `=` a safe, narrow terminator: sanctioning on it cannot swallow an
- *   actual leaked host, because a leaked host followed by `=` is not a shape
- *   that occurs anywhere else in this content.
+ *   paths, not hostnames — but the `=` terminator alone isn't a safe
+ *   sanction: host-keyed config lines (a properties file, a hosts-style
+ *   mapping) are ordinary in exactly this field, so an unanchored dotted-run-
+ *   before-`=` pattern launders any hostname written before an `=`. Anchoring
+ *   to the known `traefik.` label prefix keeps the sanction to the one label
+ *   family that actually appears in the sample, without opening a door for
+ *   an arbitrary host to walk through.
+ * - The literal name `Pagar.me`, a real, named public payment vendor in the
+ *   Dietbox case study — not an internal host. Restoring case-insensitivity
+ *   on the hostname pattern (see below) makes this the one false positive in
+ *   the whole corpus: it is domain-shaped, but it is a company name in an
+ *   unrelated case study, so it gets sanctioned by its literal name rather
+ *   than by loosening the pattern that catches real leaks.
  *
  * Anything else — a real TLD, a dotted internal hostname, a credential — is
  * left untouched and still fails the checks that follow.
@@ -337,8 +344,14 @@ function withoutSanctionedPlaceholders(text: string): string {
       // http://otel-collector:4317 — host has no dot, so no scheme+host survives.
       .replace(/\bhttps?:\/\/[a-z0-9-]+(?=[:/"']|$)/gi, 'PLACEHOLDER_URL')
       // traefik.enable=true, traefik.http.routers.myapp.rule=Host(...) — a label
-      // key, not a hostname; the `=` immediately after is what tells them apart.
-      .replace(/\b(?:[a-z0-9-]+\.)+[a-z0-9-]+(?==)/gi, 'PLACEHOLDER_LABEL_KEY')
+      // key, not a hostname. Anchored to the known `traefik.` prefix on
+      // purpose: an unanchored version would launder any hostname written
+      // immediately before an `=`, which is an ordinary shape for a
+      // host-keyed config line (a properties file, a hosts-style mapping).
+      .replace(/\btraefik(?:\.[a-z0-9-]+)+(?==)/gi, 'PLACEHOLDER_LABEL_KEY')
+      // Pagar.me — a named public payment vendor in the Dietbox case study,
+      // not an internal host. Sanctioned by literal name, not by pattern.
+      .replace(/\bPagar\.me\b/gi, 'PLACEHOLDER_VENDOR')
   );
 }
 
@@ -353,8 +366,11 @@ function withoutSanctionedPlaceholders(text: string): string {
  * shaped to look like a sanctioned placeholder — must survive untouched.
  */
 describe('withoutSanctionedPlaceholders', () => {
+  // Mirrors the real guard's own patterns (below), not an independent
+  // approximation of them — a narrower TLD list here once let a case
+  // masked by a bug in the neutraliser slip past this tripwire undetected.
   const hasUrlOrHostname = (text: string) =>
-    /https?:\/\//.test(text) || /\b[a-z0-9-]+\.(com|io|net|dev|internal)\b/i.test(text);
+    /https?:\/\//.test(text) || /\b[a-z0-9-]+\.[a-z]{2,}\b/i.test(text);
 
   const sanctioned: Array<[name: string, input: string]> = [
     ['example.internal', 'image: registry.example.internal/my-app:latest'],
@@ -366,6 +382,7 @@ describe('withoutSanctionedPlaceholders', () => {
       'a multi-segment label key immediately before =',
       'traefik.http.routers.myapp.rule=Host(`my-app.example.internal`)',
     ],
+    ['Pagar.me — a named public payment vendor', 'migrated billing from Iugu to Pagar.me'],
   ];
 
   for (const [name, input] of sanctioned) {
@@ -384,6 +401,9 @@ describe('withoutSanctionedPlaceholders', () => {
     ['a plain real URL', 'http://google.com'],
     ['a real bare hostname', 'api.stripe.com'],
     ['the exact host the plan names to keep out', 'https://signoz.ulbra.ai/x'],
+    ['an uppercase host — prose is not always lowercase', 'SIGNOZ.ULBRA.AI'],
+    ['a Title-Cased two-label host at a sentence start', 'Ulbra.br is the domain.'],
+    ['a real host written before = — not a traefik label', 'sau.ulbra.br=1'],
   ];
 
   for (const [name, input] of real) {
@@ -407,8 +427,12 @@ it('publishes no hostname, URL or credential in any project narrative', () => {
     if (!project.detail) continue;
     const narrative = withoutSanctionedPlaceholders(JSON.stringify(project.detail));
     expect(narrative, `${project.slug} detail contains a URL`).not.toMatch(/https?:\/\//);
+    // Case-insensitive on purpose: this scans prose, not config, and prose
+    // capitalises freely — including at the start of a sentence. A
+    // case-sensitive host matcher is blind to exactly the accident this
+    // guard exists to catch (e.g. `SIGNOZ.ULBRA.AI`, `Ulbra.br`).
     expect(narrative, `${project.slug} detail contains a hostname`).not.toMatch(
-      /\b[a-z0-9-]+\.[a-z]{2,}\b/,
+      /\b[a-z0-9-]+\.[a-z]{2,}\b/i,
     );
     expect(narrative, `${project.slug} detail contains a token-like string`).not.toMatch(
       /\b[a-f0-9]{32,}\b/i,
