@@ -19,7 +19,7 @@ export function ProjectContribution({ contribution }: ProjectContributionProps) 
 
   return (
     <div className="flex flex-col gap-4">
-      <p className="max-w-2xl text-base leading-relaxed text-foreground/80">{L(contribution.summary)}</p>
+      <p className="text-base leading-relaxed text-foreground/80">{L(contribution.summary)}</p>
       {contribution.areas && contribution.areas.length > 0 ? (
         <ul className="flex flex-col gap-2 border-l border-signal/25 pl-6">
           {contribution.areas.map((area, index) => (
@@ -31,7 +31,7 @@ export function ProjectContribution({ contribution }: ProjectContributionProps) 
         </ul>
       ) : null}
       {contribution.boundary ? (
-        <p className="max-w-2xl text-sm leading-relaxed text-muted-foreground">
+        <p className="text-sm leading-relaxed text-muted-foreground">
           {L(contribution.boundary)}
         </p>
       ) : null}

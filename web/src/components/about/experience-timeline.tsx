@@ -34,7 +34,7 @@ export function ExperienceTimeline() {
             )}
           </p>
           <p className="font-mono text-xs text-muted-foreground">{L(entry.period)}</p>
-          <p className="mt-1.5 max-w-xl text-sm text-muted-foreground">{L(entry.summary)}</p>
+          <p className="mt-1.5 text-sm text-muted-foreground">{L(entry.summary)}</p>
         </li>
       ))}
     </ol>

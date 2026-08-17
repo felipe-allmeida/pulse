@@ -111,7 +111,7 @@ export function ProjectDetail({ slug }: ProjectDetailProps) {
       {project.detail?.overview ? (
         <section className="flex flex-col gap-3">
           <SubsectionHeading>{t('projects:overviewHeading')}</SubsectionHeading>
-          <p className="max-w-2xl text-base leading-relaxed text-muted-foreground">{L(project.detail.overview)}</p>
+          <p className="text-base leading-relaxed text-muted-foreground">{L(project.detail.overview)}</p>
         </section>
       ) : null}
 
@@ -125,7 +125,7 @@ export function ProjectDetail({ slug }: ProjectDetailProps) {
       {project.detail?.problem ? (
         <section className="flex flex-col gap-3">
           <SubsectionHeading>{t('projects:problemHeading')}</SubsectionHeading>
-          <p className="max-w-2xl text-base leading-relaxed text-muted-foreground">{L(project.detail.problem)}</p>
+          <p className="text-base leading-relaxed text-muted-foreground">{L(project.detail.problem)}</p>
         </section>
       ) : null}
 

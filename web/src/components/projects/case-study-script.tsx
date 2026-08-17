@@ -37,7 +37,7 @@ export function CaseStudyScript({ script }: CaseStudyScriptProps) {
         </pre>
       </div>
       {script.note ? (
-        <figcaption className="max-w-2xl text-xs leading-relaxed text-muted-foreground">
+        <figcaption className="text-xs leading-relaxed text-muted-foreground">
           {L(script.note)}
         </figcaption>
       ) : null}

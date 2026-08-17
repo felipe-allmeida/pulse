@@ -46,7 +46,7 @@ export function CaseStudyComparison({ comparison }: CaseStudyComparisonProps) {
   };
 
   return (
-    <figure className="m-0 flex max-w-2xl flex-col gap-4">
+    <figure className="m-0 flex flex-col gap-4">
       {row(before, 'bg-signal/40')}
       {row(after, 'bg-signal')}
       {source ? (

@@ -31,7 +31,7 @@ export function FaqSection() {
               h2s). Slotting seven h3s in between would flatten that.
             */}
             <dt className="text-base font-semibold text-foreground">{L(entry.question)}</dt>
-            <dd className="max-w-[65ch] text-base leading-relaxed text-muted-foreground">{L(entry.answer)}</dd>
+            <dd className="text-base leading-relaxed text-muted-foreground">{L(entry.answer)}</dd>
           </div>
         ))}
       </dl>

@@ -22,7 +22,7 @@ export function CaseStudyDecisions({ sections }: CaseStudyDecisionsProps) {
         <li key={index} className="relative flex flex-col gap-1.5">
           <span aria-hidden className="absolute top-2 -left-[1.8125rem] size-2 rounded-full bg-signal" />
           <h3 className="text-sm font-semibold text-foreground">{L(section.heading)}</h3>
-          <p className="max-w-2xl text-sm leading-relaxed text-muted-foreground">{L(section.body)}</p>
+          <p className="text-sm leading-relaxed text-muted-foreground">{L(section.body)}</p>
         </li>
       ))}
     </ul>

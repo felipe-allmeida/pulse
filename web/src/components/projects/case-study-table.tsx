@@ -47,7 +47,7 @@ export function CaseStudyTable({ table }: CaseStudyTableProps) {
         </table>
       </div>
       {table.note ? (
-        <figcaption className="max-w-2xl text-xs leading-relaxed text-muted-foreground">
+        <figcaption className="text-xs leading-relaxed text-muted-foreground">
           {L(table.note)}
         </figcaption>
       ) : null}

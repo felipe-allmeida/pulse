@@ -56,7 +56,7 @@ export function VentureSection({ venture, projects }: VentureSectionProps) {
           {venture.team ? ` · ${L(venture.team)}` : ''}
         </p>
 
-        <p className="max-w-3xl text-sm leading-relaxed text-muted-foreground">{L(venture.summary)}</p>
+        <p className="text-sm leading-relaxed text-muted-foreground">{L(venture.summary)}</p>
       </div>
 
       {venture.practices ? (

@@ -52,11 +52,11 @@ export function AboutHero() {
             above, so this block stays quiet.
           */}
           <p className="text-lg font-medium text-muted-foreground sm:text-xl">{L(profile.title)}</p>
-          <p className="max-w-[65ch] text-base text-muted-foreground">{L(profile.tagline)}</p>
+          <p className="text-base text-muted-foreground">{L(profile.tagline)}</p>
         </div>
       </div>
 
-      <p className="max-w-[65ch] text-base leading-relaxed text-muted-foreground">{L(profile.bio)}</p>
+      <p className="text-base leading-relaxed text-muted-foreground">{L(profile.bio)}</p>
 
       <div>
         <CvButton className="h-10 px-6" />

@@ -25,7 +25,7 @@ export function CaseStudyFlow({ flow }: CaseStudyFlowProps) {
   return (
     <div className="flex flex-col gap-5">
       {flow.summary ? (
-        <p className="max-w-2xl text-base leading-relaxed text-muted-foreground">{L(flow.summary)}</p>
+        <p className="text-base leading-relaxed text-muted-foreground">{L(flow.summary)}</p>
       ) : null}
       <ol className="flex flex-col gap-4 border-l border-signal/25 pl-6">
         {flow.steps.map((step, index) => (
@@ -34,7 +34,7 @@ export function CaseStudyFlow({ flow }: CaseStudyFlowProps) {
             <span className="font-mono text-xs font-medium text-signal-strong sm:w-40 sm:shrink-0 sm:pt-0.5">
               {step.label}
             </span>
-            <span className="max-w-2xl text-sm leading-relaxed text-muted-foreground">{L(step.detail)}</span>
+            <span className="text-sm leading-relaxed text-muted-foreground">{L(step.detail)}</span>
           </li>
         ))}
       </ol>
