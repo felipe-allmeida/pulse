@@ -80,6 +80,15 @@ check "/sitemap.xml"      "no-cache"
 check "/favicon.svg"      "public, max-age=604800"
 check "/og.png"           "public, max-age=604800"
 
+# The author photo, at the root of public/ like the favicons. Checked because
+# it was NOT checked when it shipped: the matcher named its files one by one,
+# the photo was not on that list, and the request fell through to the SPA
+# fallback — answered 200 carrying index.html, so the <img> rendered broken
+# while every other check on the page still passed. The Content-Type assertion
+# is the one that catches it; the status is 200 either way.
+check      "/felipe.webp" "public, max-age=604800"
+check_type "/felipe.webp" "image/webp"
+
 # The document routes must still resolve to their own generated documents, not
 # to the SPA shell: /projects has a sibling directory of the same name, and the
 # `{path}.html`-first ordering in try_files is the only thing that stops it

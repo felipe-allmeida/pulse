@@ -118,6 +118,25 @@
 		file_server
 	}
 
+	# Files that live at the root of public/ — the favicons, the social card,
+	# the CV, the author photo. Matched by extension rather than named one by
+	# one, because the named list was a standing trap: every asset added to
+	# public/ since has had to be remembered here, and the one that was not
+	# (the About photo) came back as a 200 carrying index.html, so the <img>
+	# rendered broken while every check on the page still passed.
+	#
+	# Extensions, not a wildcard path, because the SPA's routes have no
+	# extension at all — /about, /pt/projects/pulse — so this cannot swallow
+	# one. `.md`, `.txt` and `.xml` are deliberately absent: the markdown
+	# mirrors, llms.txt and the sitemap are documents, and they belong to the
+	# SPA handle below where they get `no-cache` and the markdown Content-Type.
+	@rootStatic path *.webp *.png *.jpg *.jpeg *.svg *.ico *.pdf
+	handle @rootStatic {
+		header Cache-Control "public, max-age=604800"
+		root * /srv
+		file_server
+	}
+
 	# Everything else: the built SPA, with client-side-router fallback.
 	#
 	# The `{path}.html` step is what serves the AIO documents the web build
@@ -135,23 +154,17 @@
 	# no index.html of its own) and 404 instead of serving projects.html. The
 	# extra stat per asset request is not worth reordering for.
 	handle {
-		# Cache-Control, absent until now — which is why every visit refetched
-		# the whole asset graph. Two non-overlapping matchers rather than a
-		# broad default plus overrides, so the rule for any given request is
-		# readable from one line. /assets/* and /screenshots/* are no longer
-		# named here: they are handled above and never reach this block.
+		# Only documents reach this block now — the hashed assets, the
+		# screenshots and the root static files are all handled above, and
+		# `handle` blocks are mutually exclusive. So this needs no matcher: the
+		# HTML documents, the markdown mirrors, llms.txt, robots.txt and the
+		# sitemap all want the same thing.
 		#
-		# These few files keep their authored names (they come from public/, so
-		# no content hash), hence a week rather than forever.
-		#
-		# The documents are `no-cache` because each one embeds the hashed asset
-		# names: a cached document pins a released build in place and the next
-		# deploy is invisible until it expires.
-		@public path /favicon.ico /favicon.svg /apple-touch-icon.png /og.png /cv.pdf
-		header @public Cache-Control "public, max-age=604800"
-
-		@documents not path /favicon.ico /favicon.svg /apple-touch-icon.png /og.png /cv.pdf
-		header @documents Cache-Control "no-cache"
+		# `no-cache` because every document embeds this build's hashed asset
+		# names: caching one pins a released build in place, and the next deploy
+		# is invisible until it expires. It still revalidates cheaply — a
+		# matching ETag comes back 304 with no body.
+		header Cache-Control "no-cache"
 
 		root * /srv
 		try_files {path}.html {path} /index.html
