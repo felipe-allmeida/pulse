@@ -1,6 +1,7 @@
 import { expect, it } from 'vitest';
 import { profile } from './profile';
 import { projects } from './projects';
+import { ventures } from './ventures';
 import { LOCALES } from './types';
 import type { LocalizedString } from './types';
 
@@ -69,9 +70,58 @@ it('pulse is public with a repo link; ulbra projects are private with no repo li
   const bySlug = Object.fromEntries(projects.map((p) => [p.slug, p]));
   expect(bySlug.pulse.visibility).toBe('public');
   expect(bySlug.pulse.links.some((l) => /github/i.test(l.href))).toBe(true);
-  for (const slug of ['ulbra-atende', 'ulbra-one']) {
-    expect(bySlug[slug].visibility).toBe('private');
-    expect(bySlug[slug].links.some((l) => /github\.com|repo/i.test(l.href))).toBe(false);
+});
+
+it('every project venture resolves to a real venture', () => {
+  const slugs = new Set(ventures.map((v) => v.slug));
+  for (const project of projects) {
+    if (project.venture === undefined) continue;
+    expect(slugs.has(project.venture), `${project.slug} points at unknown venture ${project.venture}`).toBe(true);
+  }
+});
+
+it('projects sharing a venture are contiguous in the array', () => {
+  // The index groups by walking the array in order, so a split run would
+  // silently render two headers for one venture.
+  const seen = new Set<string>();
+  let previous: string | undefined;
+  for (const project of projects) {
+    if (project.venture !== previous) {
+      if (project.venture !== undefined) {
+        expect(seen.has(project.venture), `${project.venture} is split into two runs`).toBe(false);
+        seen.add(project.venture);
+      }
+      previous = project.venture;
+    }
+  }
+});
+
+/*
+  Replaces the per-slug list in `pulse is public with a repo link; ulbra
+  projects are private with no repo link`, which named `ulbra-atende` and
+  `ulbra-one` by hand and so would silently skip every project added after it.
+  Delete the `for (const slug of ['ulbra-atende', 'ulbra-one'])` loop from that
+  test and leave its `pulse` assertions in place.
+*/
+it('every venture project is private with no repository link', () => {
+  const inVentures = projects.filter((p) => p.venture !== undefined);
+  expect(inVentures.length).toBeGreaterThan(0);
+  for (const project of inVentures) {
+    expect(project.visibility, `${project.slug} visibility`).toBe('private');
+    expect(
+      project.links.some((l) => /github\.com|gitlab|repo/i.test(l.href)),
+      `${project.slug} links to a repository`,
+    ).toBe(false);
+  }
+});
+
+it('every ulbra project is led as Head of Technology, not as a nameless engineer', () => {
+  const ulbra = projects.filter((p) => p.venture === 'ulbra');
+  expect(ulbra.length).toBeGreaterThan(0);
+  for (const project of ulbra) {
+    expect(project.role.en, `${project.slug} role`).toMatch(/head of technology/i);
+    expect(project.period, `${project.slug} has no period`).toBeDefined();
+    expect(project.period!.en, `${project.slug} period is a non-answer`).not.toMatch(/professional work/i);
   }
 });
 

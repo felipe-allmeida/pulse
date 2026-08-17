@@ -116,7 +116,7 @@ system Felipe worked on; the "What Felipe did" line is the authoritative stateme
 
 ### Ulbra Atende — IT service desk for a university, replacing GLPI.
 
-- **Role:** Design & implementation (Professional work)
+- **Role:** Head of Technology — design & implementation (Apr 2026 – Current)
 - **Source:** closed — professional work described without the code
 - **Stack:** .NET 10, PostgreSQL 17, RabbitMQ, React 19, OpenIddict, MCP, OpenTelemetry, Docker Swarm
 - **What it is:** The IT service desk for ULBRA — a .NET 10 modular monolith that replaced GLPI as the single intake channel for the university's IT department, carrying a request from ticket to SLA to satisfaction survey.
@@ -155,7 +155,7 @@ system Felipe worked on; the "What Felipe did" line is the authoritative stateme
 
 ### Ulbra One — Internal ERP replacing legacy systems.
 
-- **Role:** Software engineer (Professional work)
+- **Role:** Head of Technology (Jun 2026 – Current)
 - **Source:** closed — professional work described without the code
 - **Stack:** .NET 10, PostgreSQL, EF Core, React, Tailwind
 - **What it is:** An internal ERP replacing legacy systems — a modular .NET platform on PostgreSQL with a React front end, covering core internal business operations.

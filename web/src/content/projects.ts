@@ -126,6 +126,12 @@ export interface Project {
   links: { label: string; href: string }[];
   visibility: 'public' | 'private';
   screenshot?: string;
+  /**
+   * The venture this project was built inside, by slug. Absent for independent
+   * work. Projects sharing a venture must be contiguous in this array — the
+   * index groups by walking it in order.
+   */
+  venture?: string;
   /** Extra content for the dedicated `/projects/$slug` page. */
   detail?: ProjectDetailContent;
 }
@@ -793,8 +799,9 @@ export const projects: Project[] = [
       'OpenTelemetry',
       'Docker Swarm',
     ],
-    role: { en: 'Design & implementation', 'pt-BR': 'Design & implementação' },
-    period: { en: 'Professional work', 'pt-BR': 'Trabalho profissional' },
+    role: { en: 'Head of Technology — design & implementation', 'pt-BR': 'Head de Tecnologia — design & implementação' },
+    period: { en: 'Apr 2026 – Current', 'pt-BR': 'Abr 2026 – Atual' },
+    venture: 'ulbra',
     visibility: 'private',
     links: [],
     screenshot: '/screenshots/ulbra-atende.png',
@@ -1024,8 +1031,9 @@ export const projects: Project[] = [
         'Um ERP interno construído para substituir sistemas legados — uma plataforma .NET modular sobre PostgreSQL com front-end em React, cobrindo as operações internas centrais do negócio.',
     },
     tech: ['.NET 10', 'PostgreSQL', 'EF Core', 'React', 'Tailwind'],
-    role: { en: 'Software engineer', 'pt-BR': 'Engenheiro de software' },
-    period: { en: 'Professional work', 'pt-BR': 'Trabalho profissional' },
+    role: { en: 'Head of Technology', 'pt-BR': 'Head de Tecnologia' },
+    period: { en: 'Jun 2026 – Current', 'pt-BR': 'Jun 2026 – Atual' },
+    venture: 'ulbra',
     visibility: 'private',
     screenshot: '/screenshots/ulbra-one.png',
     links: [],
