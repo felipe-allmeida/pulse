@@ -7,7 +7,7 @@ const fullContact = {
   calendly: 'https://calendly.com/felipe/30min',
   email: 'contato@pampadevs.com',
   linkedin: 'https://www.linkedin.com/in/felipe-allmeida',
-  whatsapp: 'https://wa.me/5551983468863',
+  whatsapp: 'https://wa.me/5551991635191',
 };
 
 describe('ContactButtons', () => {
@@ -48,7 +48,7 @@ describe('ContactButtons', () => {
 
     expect(screen.getByRole('link', { name: /whatsapp/i })).toHaveAttribute(
       'href',
-      'https://wa.me/5551983468863',
+      'https://wa.me/5551991635191',
     );
   });
 });

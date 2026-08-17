@@ -75,7 +75,7 @@ client work described without the code. One is not written up there:
 
 - Email: contato@pampadevs.com
 - LinkedIn: https://www.linkedin.com/in/felipe-allmeida
-- WhatsApp: +55 51 98346-8863
+- WhatsApp: +55 51 99163-5191
 - Book a call (Calendly): https://calendly.com/pampa-devs/bate-papo-sobre-seu-projeto
 
 ## FAQ
