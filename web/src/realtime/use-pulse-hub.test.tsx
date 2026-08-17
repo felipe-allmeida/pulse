@@ -33,7 +33,7 @@ function createFakeHub() {
 const fakeHub = createFakeHub();
 
 vi.mock('./hub', () => ({
-  buildHub: () => fakeHub,
+  buildHub: () => Promise.resolve(fakeHub),
 }));
 
 function Probe() {
@@ -65,6 +65,9 @@ describe('PulseHubProvider / usePulseHub', () => {
     );
 
     await act(async () => {
+      // Let the buildHub() promise settle so handlers are registered on the
+      // hub before we fire an event at it.
+      await Promise.resolve();
       fakeHub.fire('PresenceUpdated', 3);
     });
 
@@ -79,6 +82,9 @@ describe('PulseHubProvider / usePulseHub', () => {
     );
 
     await act(async () => {
+      // Let the buildHub() promise settle so handlers are registered on the
+      // hub before we fire an event at it.
+      await Promise.resolve();
       fakeHub.fire('ReactionReceived', { emoji: '🎉', at: '2026-08-04T10:00:00Z' });
     });
 
@@ -148,6 +154,9 @@ describe('PulseHubProvider / usePulseHub', () => {
     );
 
     await act(async () => {
+      // Let the buildHub() promise settle so connectionRef is populated
+      // before we invoke react() on it.
+      await Promise.resolve();
       screen.getByText('react').click();
     });
 

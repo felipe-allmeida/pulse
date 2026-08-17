@@ -30,61 +30,72 @@ export function PulseHubProvider({ children }: { children: ReactNode }) {
   const connectionRef = useRef<HubConnection | null>(null);
 
   useEffect(() => {
-    const hub = buildHub();
-    connectionRef.current = hub;
-    // Guards the initial-start retry loop so it stops scheduling once the
-    // effect has been cleaned up (unmount / StrictMode double-invoke).
+    // Guards every callback below (retry loop, handler registration, start,
+    // heartbeat) so a late-arriving buildHub() resolution — after unmount or
+    // React StrictMode's dev double-invoke — can't wire up state that
+    // nothing will ever tear down.
     let cancelled = false;
+    let hub: HubConnection | undefined;
+    let onPresenceUpdated: ((n: number) => void) | undefined;
+    let onReactionReceived: ((reaction: Reaction) => void) | undefined;
     let retryTimeout: ReturnType<typeof setTimeout> | undefined;
+    let heartbeat: ReturnType<typeof setInterval> | undefined;
 
-    const onPresenceUpdated = (n: number) => setCount(n);
-    const onReactionReceived = (reaction: Reaction) => {
-      // A reaction doesn't change visits or metrics server-side (presence is
-      // handled separately via PresenceUpdated/setCount), so there's nothing
-      // to invalidate here — metrics and visits already refetch on their own
-      // polling intervals (3s / 10s respectively).
-      useEventStore.getState().push({ kind: 'reaction', emoji: reaction.emoji, at: reaction.at });
-    };
+    void buildHub().then((built) => {
+      if (cancelled) return;
+      hub = built;
+      connectionRef.current = built;
 
-    hub.on('PresenceUpdated', onPresenceUpdated);
-    hub.on('ReactionReceived', onReactionReceived);
-    hub.onreconnecting(() => setConnection('reconnecting'));
-    hub.onreconnected(() => setConnection('connected'));
-    hub.onclose(() => setConnection('offline'));
+      onPresenceUpdated = (n: number) => setCount(n);
+      onReactionReceived = (reaction: Reaction) => {
+        // A reaction doesn't change visits or metrics server-side (presence
+        // is handled separately via PresenceUpdated/setCount), so there's
+        // nothing to invalidate here — metrics and visits already refetch on
+        // their own polling intervals (3s / 10s respectively).
+        useEventStore.getState().push({ kind: 'reaction', emoji: reaction.emoji, at: reaction.at });
+      };
 
-    // withAutomaticReconnect() only resumes a connection that previously
-    // succeeded — it never retries a failed *initial* start(). So a failure
-    // here (backend down at page load, CORS, etc.) needs its own bounded
-    // self-heal retry, otherwise the dashboard is stuck 'offline' forever
-    // even after the backend comes back up.
-    const attemptStart = () => {
-      hub
-        .start()
-        .then(() => {
-          if (!cancelled) setConnection('connected');
-        })
-        .catch(() => {
-          if (cancelled) return;
-          setConnection('offline');
-          retryTimeout = setTimeout(attemptStart, START_RETRY_MS);
-        });
-    };
-    attemptStart();
+      built.on('PresenceUpdated', onPresenceUpdated);
+      built.on('ReactionReceived', onReactionReceived);
+      built.onreconnecting(() => setConnection('reconnecting'));
+      built.onreconnected(() => setConnection('connected'));
+      built.onclose(() => setConnection('offline'));
 
-    const heartbeat = setInterval(() => {
-      hub.invoke('Heartbeat').catch(() => {});
-    }, HEARTBEAT_INTERVAL_MS);
+      // withAutomaticReconnect() only resumes a connection that previously
+      // succeeded — it never retries a failed *initial* start(). So a
+      // failure here (backend down at page load, CORS, etc.) needs its own
+      // bounded self-heal retry, otherwise the dashboard is stuck 'offline'
+      // forever even after the backend comes back up.
+      const attemptStart = () => {
+        built
+          .start()
+          .then(() => {
+            if (!cancelled) setConnection('connected');
+          })
+          .catch(() => {
+            if (cancelled) return;
+            setConnection('offline');
+            retryTimeout = setTimeout(attemptStart, START_RETRY_MS);
+          });
+      };
+      attemptStart();
+
+      heartbeat = setInterval(() => {
+        built.invoke('Heartbeat').catch(() => {});
+      }, HEARTBEAT_INTERVAL_MS);
+    });
 
     return () => {
       cancelled = true;
       if (retryTimeout) clearTimeout(retryTimeout);
-      clearInterval(heartbeat);
-      hub.off('PresenceUpdated', onPresenceUpdated);
-      hub.off('ReactionReceived', onReactionReceived);
+      if (heartbeat) clearInterval(heartbeat);
+      if (hub && onPresenceUpdated) hub.off('PresenceUpdated', onPresenceUpdated);
+      if (hub && onReactionReceived) hub.off('ReactionReceived', onReactionReceived);
       // stop() rejects when called mid-handshake (fast mount/unmount, e.g.
       // React StrictMode's dev double-invoke) — swallow it, we're tearing
-      // down regardless.
-      hub.stop().catch(() => {});
+      // down regardless. If the hub never finished loading, there's nothing
+      // to stop.
+      void hub?.stop().catch(() => {});
       connectionRef.current = null;
     };
   }, []);
