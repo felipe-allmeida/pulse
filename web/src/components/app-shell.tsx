@@ -51,7 +51,15 @@ export function AppShell({ children }: { children: ReactNode }) {
           </div>
         </div>
       </header>
-      <main className="mx-auto max-w-7xl p-6">{children}</main>
+      {/*
+        Vertical padding only. The horizontal gutter belongs to the page —
+        `PageShell` for the routed pages, the same `px-6 sm:px-10` inline on
+        the home page's full-bleed sections — and `p-6` here stacked on top of
+        it, so every page but the hero started its text 24px further in than
+        the hero did on a phone. Desktop is unchanged: the content column is
+        centred inside `max-w-7xl` either way.
+      */}
+      <main className="mx-auto max-w-7xl py-6">{children}</main>
     </div>
   );
 }
