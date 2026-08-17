@@ -67,7 +67,6 @@
           "Uma conferência entre duas bases rodando de madrugada, avisando só o que divergiu"
         ],
         "tech": "Filas e workers, agendamento, integrações por API e webhook, testes automatizados de ponta a ponta.",
-        "diagram": { "from": "na mão", "via": "rotina", "to": "pronto" },
         "transform": { "before": "alguém redigita, toda segunda", "after": "roda sozinha, no horário" }
       },
       "spreadsheet": {
@@ -79,7 +78,6 @@
           "Estoque abaixo do mínimo avisando quem compra, sem ninguém olhar"
         ],
         "tech": "Ingestão contínua pela API da ferramenta de origem, modelagem e agregação dos dados, painel interativo, e regras de gatilho disparando webhook, fila ou notificação.",
-        "diagram": { "from": "planilha", "via": "painel", "to": "ação" },
         "transform": { "before": "o caixa fecha no dia 5", "after": "painel que se atualiza sozinho" }
       },
       "ai": {
@@ -91,7 +89,6 @@
           "O chamado aberto, classificado e encaminhado direto de um e-mail"
         ],
         "tech": "Servidor MCP sobre o sistema, identidade e permissão resolvidas por usuário, base de conhecimento da empresa indexada.",
-        "diagram": { "from": "seus dados", "via": "assistente", "to": "resposta" },
         "transform": { "before": "a resposta está enterrada num PDF", "after": "resposta com a fonte citada" }
       },
       "idea": {
@@ -103,7 +100,6 @@
           "A decisão de arquitetura tomada agora que não trava vocês daqui a um ano"
         ],
         "tech": "12+ anos em .NET e React, arquitetura orientada a eventos, Head of Technology de times de 3 a 13 pessoas.",
-        "diagram": { "from": "ideia", "via": "produto", "to": "time" },
         "transform": { "before": "a ideia está no papel", "after": "MVP no ar e time tocando" }
       }
     },

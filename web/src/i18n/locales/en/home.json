@@ -67,7 +67,6 @@
           "A nightly reconciliation across two databases that reports only what disagreed"
         ],
         "tech": "Queues and workers, scheduling, API and webhook integrations, end-to-end automated testing.",
-        "diagram": { "from": "by hand", "via": "routine", "to": "done" },
         "transform": { "before": "someone retypes it, every Monday", "after": "runs on its own, on schedule" }
       },
       "spreadsheet": {
@@ -79,7 +78,6 @@
           "Stock below minimum alerting whoever buys, with nobody watching"
         ],
         "tech": "Continuous ingestion from the source tool's API, data modelling and aggregation, interactive dashboard, and trigger rules firing a webhook, queue or notification.",
-        "diagram": { "from": "spreadsheet", "via": "dashboard", "to": "action" },
         "transform": { "before": "cash closes on the 5th", "after": "a dashboard that updates itself" }
       },
       "ai": {
@@ -91,7 +89,6 @@
           "A ticket opened, classified and routed straight from an email"
         ],
         "tech": "An MCP server over the system, identity and permissions resolved per user, an indexed company knowledge base.",
-        "diagram": { "from": "your data", "via": "assistant", "to": "answer" },
         "transform": { "before": "the answer is buried in a PDF", "after": "an answer with the source cited" }
       },
       "idea": {
@@ -103,7 +100,6 @@
           "The architecture decision taken now that doesn't trap you a year from now"
         ],
         "tech": "12+ years in .NET and React, event-driven architecture, Head of Technology for teams of 3 to 13.",
-        "diagram": { "from": "idea", "via": "product", "to": "team" },
         "transform": { "before": "the idea is on paper", "after": "an MVP live and a team running it" }
       }
     },

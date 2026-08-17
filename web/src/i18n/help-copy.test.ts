@@ -17,7 +17,6 @@ type HelpBlock = {
       body: string;
       examples: string[];
       tech: string;
-      diagram: { from: string; via: string; to: string };
       transform: { before: string; after: string };
     }
   >;
@@ -68,9 +67,6 @@ describe('home:help copy', () => {
           expect(card.tech.length, `${locale}.${key}.tech`).toBeGreaterThan(0);
           expect(card.examples, `${locale}.${key}.examples`).toHaveLength(3);
           for (const example of card.examples) expect(example.length).toBeGreaterThan(0);
-          for (const node of ['from', 'via', 'to'] as const) {
-            expect(card.diagram[node].length, `${locale}.${key}.diagram.${node}`).toBeGreaterThan(0);
-          }
           for (const side of ['before', 'after'] as const) {
             expect(card.transform[side].length, `${locale}.${key}.transform.${side}`).toBeGreaterThan(0);
           }
