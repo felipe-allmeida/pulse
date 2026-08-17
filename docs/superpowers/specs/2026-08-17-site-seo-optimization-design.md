@@ -294,3 +294,128 @@ Acceptance criteria:
   assuming.
 - **Lazy boundaries introducing layout shift** as chunks land. CLS is in the
   acceptance criteria specifically to catch this.
+
+## Result
+
+Verified 2026-08-17, on the current branch, against baseline commit `3bc0965`
+(the state right before this plan's implementation tasks began).
+
+### Step 1 — build and run the full stack
+
+All green:
+
+- `pnpm -C web test` — **69 files / 457 tests passed**
+- `pnpm -C web exec tsc --noEmit` — clean, no errors
+- `pnpm -C web lint` — clean (oxlint exits 0; only pre-existing `react-refresh`/
+  `exhaustive-deps`/style warnings, no errors, none touched by this plan)
+- `docker build -f deploy/Dockerfile.web -t pulse-web .` — builds successfully
+- `docker run` + `deploy/cache-headers.test.sh` — **all cache headers correct**:
+  the hashed asset, `/`, `/about`, `/llms.txt`, `/sitemap.xml`, `/favicon.svg`
+  and `/og.png` all matched the spec 1.4 matrix. Container stopped after the
+  check.
+
+### Static payload measurement (in place of Lighthouse byte data)
+
+Lighthouse itself could not be run in this environment (no Lighthouse tooling,
+no browser capable of paint-timing traces). What follows is not a substitute
+for LCP/TBT/CLS/filmstrip — it is a real, reproducible measurement of the
+eager document weight Lighthouse's network panel would have shown, so the
+plan owner's Lighthouse run only needs to fill in the runtime metrics below.
+
+**Method:** for each document, "total eager payload" = the document's own
+bytes + its entry `<script type="module">` + every `<link rel="modulepreload">`
+it declares (all resources the browser fetches before the app can mount, since
+none are hydration-only or lazy). The critical CSS is inlined into the
+document in the current build (spec 1.6), so there is no separate stylesheet
+to add there; the baseline build still shipped it as a separate
+`<link rel="stylesheet">`, which is included in the baseline total. Raw =
+bytes on disk; gzip = `gzip -c` (level 6) of each file, summed — a slight
+under-estimate of over-the-wire brotli but consistent across both builds, so
+the comparison is fair. Baseline was built in a throwaway git worktree at
+`3bc0965` with `pnpm install --frozen-lockfile && pnpm build`, measured
+identically, then the worktree was removed.
+
+| Document | Total eager payload — baseline (raw / gzip) | Total eager payload — now (raw / gzip) | Change |
+|---|---|---|---|
+| `index.html` (`/`) | 738,295 B / 227,076 B (721.0 / 221.8 KiB) | 628,817 B / 196,350 B (614.1 / 191.7 KiB) | **−109,478 B raw (−14.8%), −30,726 B gzip (−13.5%)** |
+| `pt.html` (`/pt`) | 710,636 B / 222,717 B (694.0 / 217.5 KiB) | 629,181 B / 196,575 B (614.4 / 192.0 KiB) | **−81,455 B raw (−11.5%), −26,142 B gzip (−11.7%)** |
+| `projects/dietbox.html` | 736,660 B / 227,623 B (719.4 / 222.3 KiB) | 608,476 B / 188,663 B (594.2 / 184.2 KiB) | **−128,184 B raw (−17.4%), −38,960 B gzip (−17.1%)** |
+
+Document bytes alone, broken out (the number Lighthouse's "Document" row
+would show):
+
+| Document | Baseline doc bytes (raw / gzip) | Now doc bytes (raw / gzip) | Note |
+|---|---|---|---|
+| `index.html` | 35,262 / 6,815 | 93,024 / 17,225 | grew — gained inlined critical CSS |
+| `pt.html` | 7,603 / 2,456 | 93,388 / 17,450 | **grew ~12×** — baseline `#root` was **empty** (0 characters); now it carries the same real prerendered markup as `index.html`. This is the fix, not a regression: spec 1.9/Task 3+8's whole point was that `/pt/` stopped being blank to crawlers and to the first paint. |
+| `projects/dietbox.html` | 33,627 / 7,362 | 91,399 / 18,054 | grew — same inlined-CSS cause |
+
+Route chunk each document's mount waits on (the one `modulepreload` tag Task 9
+adds beyond what Vite emits on its own):
+
+| Document | Baseline: route-specific preload? | Now: route chunk preloaded | Chunk size (raw / gzip) |
+|---|---|---|---|
+| `index.html` | none — the actual home-route chunk (`routes-*.js`, ~30.3 KB) was not in the preload list at all; the browser only discovered and fetched it after the entry script ran | `routes-DxIvSn9K.js` | 30,398 B / 11,144 B |
+| `pt.html` | same as above (same route) | `routes-DxIvSn9K.js` | 30,398 B / 11,144 B |
+| `projects/dietbox.html` | none — `projects_.$slug`'s real component chunk (`projects_._slug-CH50S94z.js`, 11.68 KB) was likewise absent from the preload list | `projects_._slug-Cn2fFACC.js` | 11,682 B / 2,628 B |
+
+The chunk sizes themselves are essentially unchanged; what changed is that the
+chunk the mount actually depends on is now declared in `<head>` and fetched in
+parallel with the entry script, instead of being discovered late. The
+baseline's own preload list instead blanket-preloaded a fixed set of chunks
+(including a 100.9 KB `ask-widget-store` chunk) on every route regardless of
+relevance — narrowing that to the one chunk each route needs is itself most of
+the eager-payload reduction above.
+
+### Prerender guard (spec 1.1 / `web/plugins/aio.ts`)
+
+`buildBundle`'s `writeBundle` step throws if any rendered route is under 500
+characters — both the current build and the baseline build completed without
+that guard firing, on all 22 emitted documents in each. Spot-checked four
+documents in the current `web/dist` directly:
+
+| Document | `#root` length | `<h1>` found |
+|---|---|---|
+| `index.html` | 27,831 chars | "Felipe de Almeida" |
+| `pt.html` | 27,978 chars | "Felipe de Almeida" |
+| `pt/index.html` | 27,978 chars (identical to `pt.html`, by design — see `aio.ts`) | "Felipe de Almeida" |
+| `projects/dietbox.html` | 24,520 chars | "Dietbox" |
+
+All non-empty with real, route-appropriate content — the guard holds and the
+spot-check confirms it isn't just passing on whitespace.
+
+### Steps 2–4 — Lighthouse run and visual swap check: NOT PERFORMED
+
+No Lighthouse tooling and no browser capable of capturing paint timing or a
+loading filmstrip were available in this environment. Fabricating LCP, TBT,
+CLS, Speed Index, or filmstrip numbers, or a verdict on the swap, would be
+worse than leaving them blank, so none of the below was estimated or inferred
+— it is left for the plan owner to run for real, same profile as the Task 1
+baseline (Moto G Power emulated, slow 4G, `/pt/` and a project detail page,
+Clarity in the same state as the baseline run per spec 1.9).
+
+| Metric | Baseline | Target | Actual |
+|---|---|---|---|
+| LCP | 2.9s | < 2.5s | **PENDING — requires a real Lighthouse run; not measured here** |
+| TBT | 100ms | ≤ 100ms | **PENDING — requires a real Lighthouse run; not measured here** |
+| CLS | 0.003 | < 0.1 | **PENDING — requires a real Lighthouse run; not measured here** |
+| Speed Index | 3.9s | improved | **PENDING — requires a real Lighthouse run; not measured here** |
+| Blank frames in filmstrip | yes | **none** | **PENDING — requires a real Lighthouse run; not measured here** |
+
+Step 4 (watching the prerendered-to-mounted swap on a throttled connection for
+a visible jump or flicker — the one regression spec 1.3 warns this plan could
+cause) is likewise **not performed**; it needs a real browser under network
+throttling, which was not available here.
+
+### Honest summary
+
+The build/lint/type/test gate is fully green, the Docker image serves the
+correct cache headers, and the static payload data above is real and
+reproducible: eager payload per document dropped 11–17% (both raw and gzip)
+versus the pre-plan baseline, largely because Task 9 replaced a blanket
+route-chunk preload with a precise one and the entry bundle itself shrank.
+`/pt/` document bytes grew substantially, which is the empty-`#root` bug
+being fixed, not a regression. None of this substitutes for the runtime
+metrics — LCP, TBT, CLS, Speed Index, and the filmstrip — or for confirming
+the prerender-to-mount swap is invisible. Those remain unverified until the
+plan owner runs Lighthouse and a throttled visual check on this build.
