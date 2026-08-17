@@ -807,7 +807,7 @@ export const projects: Project[] = [
     screenshot: '/screenshots/ulbra-atende.png',
     detail: {
       overview: {
-        en: "The IT service desk for ULBRA — a .NET 10 modular monolith that replaced GLPI as the single intake channel for the university's IT department, carrying a request from ticket to SLA to satisfaction survey.",
+        en: "The IT service desk for ULBRA — a .NET 10 modular monolith that replaced GLPI as the single intake channel for the university’s IT department, carrying a request from ticket to SLA to satisfaction survey.",
         'pt-BR':
           'O service desk de TI da ULBRA — um monólito modular em .NET 10 que substituiu o GLPI como canal único de entrada da TI da universidade, levando um pedido do chamado ao SLA à pesquisa de satisfação.',
       },
@@ -830,7 +830,7 @@ export const projects: Project[] = [
         },
       },
       problem: {
-        en: "ULBRA's IT department took requests through GLPI, e-mail, and direct messages at the same time. There was no SLA per team, no audit trail on approvals, and no way to tell whether anyone was satisfied with the outcome. Ulbra Atende replaces GLPI as the single intake channel and makes each of those measurable — three months in, the median ticket closes in about an hour and a half.",
+        en: "ULBRA’s IT department took requests through GLPI, e-mail, and direct messages at the same time. There was no SLA per team, no audit trail on approvals, and no way to tell whether anyone was satisfied with the outcome. Ulbra Atende replaces GLPI as the single intake channel and makes each of those measurable — three months in, the median ticket closes in about an hour and a half.",
         'pt-BR':
           'A TI da ULBRA recebia demanda por GLPI, e-mail e mensagem direta ao mesmo tempo. Não havia SLA por time, nem rastro de aprovação, nem como saber se alguém ficou satisfeito com o resultado. O Ulbra Atende substitui o GLPI como canal único de entrada e torna cada uma dessas coisas mensurável — três meses depois, a mediana de fechamento é de cerca de uma hora e meia.',
       },
@@ -1030,7 +1030,7 @@ export const projects: Project[] = [
       'pt-BR': 'ERP interno substituindo sistemas legados.',
     },
     description: {
-      en: `An internal ERP replacing the university's legacy systems — a modular .NET monolith on PostgreSQL with a React front end. In testing, ahead of launch.`,
+      en: "An internal ERP replacing the university’s legacy systems — a modular .NET monolith on PostgreSQL with a React front end. In testing, ahead of launch.",
       'pt-BR':
         'Um ERP interno substituindo os sistemas legados da universidade — um monólito modular em .NET sobre PostgreSQL com front-end em React. Em teste, antes do lançamento.',
     },
@@ -1132,7 +1132,7 @@ export const projects: Project[] = [
       'pt-BR': 'Um CRM herdado levado de zero testes a cobertura total.',
     },
     description: {
-      en: "The university's CRM platform, inherited with no automated tests and little structure. Rebuilt under the author's direction to full test coverage, with a front-end migration that stopped every screen change from throwing away the user's filters.",
+      en: "The university’s CRM platform, inherited with no automated tests and little structure. Rebuilt under the author’s direction to full test coverage, with a front-end migration that stopped every screen change from throwing away the user’s filters.",
       'pt-BR':
         'A plataforma de CRM da universidade, herdada sem testes automatizados e com pouca estrutura. Reconstruída sob a direção do autor até cobertura total de testes, com uma migração de front-end que acabou com a perda dos filtros do usuário a cada troca de tela.',
     },
@@ -1144,13 +1144,13 @@ export const projects: Project[] = [
     links: [],
     detail: {
       overview: {
-        en: "The CRM the university runs on, inherited rather than built: no automated tests, and a codebase whose structure had not kept up with it. It is now fully covered by tests and materially better to use, and the work was done by the team under the author's direction — he set the direction and reviewed it, and did not write it.",
+        en: "The CRM the university runs on, inherited rather than built: no automated tests, and a codebase whose structure had not kept up with it. It is now fully covered by tests and materially better to use, and the work was done by the team under the author’s direction — he set the direction and reviewed it, and did not write it.",
         'pt-BR':
           'O CRM em que a universidade opera, herdado e não construído: sem testes automatizados e com uma estrutura que não acompanhou o próprio crescimento. Hoje está totalmente coberto por testes e sensivelmente melhor de usar, e o trabalho foi feito pelo time sob a direção do autor — ele definiu a direção e revisou, não escreveu.',
       },
       contribution: {
         summary: {
-          en: 'Set the direction and reviewed the work; the engineering was the team\'s.',
+          en: 'Set the direction and reviewed the work; the engineering was the team’s.',
           'pt-BR': 'Definiu a direção e revisou o trabalho; a engenharia foi do time.',
         },
         areas: [
@@ -1165,7 +1165,7 @@ export const projects: Project[] = [
           { en: 'Review of the work as it landed.', 'pt-BR': 'Revisão do trabalho conforme entrava.' },
         ],
         boundary: {
-          en: 'None of this implementation is the author\'s. It was built by the engineers on the team; his part was deciding what to do and reviewing what came back.',
+          en: 'None of this implementation is the author’s. It was built by the engineers on the team; his part was deciding what to do and reviewing what came back.',
           'pt-BR':
             'Nada desta implementação é do autor. Foi construída pelos engenheiros do time; a parte dele foi decidir o que fazer e revisar o que voltava.',
         },
@@ -1179,11 +1179,6 @@ export const projects: Project[] = [
         {
           value: { en: '0% → 100%', 'pt-BR': '0% → 100%' },
           label: { en: 'test coverage', 'pt-BR': 'cobertura de testes' },
-        },
-        {
-          value: { en: '0', 'pt-BR': '0' },
-          label: { en: 'filter resets per navigation', 'pt-BR': 'perdas de filtro por navegação' },
-          note: { en: 'was: every one', 'pt-BR': 'antes: todas' },
         },
       ],
       decisions: [
@@ -1206,7 +1201,7 @@ export const projects: Project[] = [
         {
           heading: { en: 'Directed, not written', 'pt-BR': 'Dirigido, não escrito' },
           body: {
-            en: 'This is the one system in the group the author did not build. With three engineers and six systems, the lead\'s leverage is in deciding what gets done and reviewing what comes back, not in adding a fourth pair of hands to a codebase that already has an owner.',
+            en: 'This is the one system in the group the author did not build. With three engineers and six systems, the lead’s leverage is in deciding what gets done and reviewing what comes back, not in adding a fourth pair of hands to a codebase that already has an owner.',
             'pt-BR':
               'Este é o único sistema do grupo que o autor não construiu. Com três engenheiros e seis sistemas, a alavanca da liderança está em decidir o que é feito e revisar o que volta, não em somar um quarto par de mãos a um código que já tem dono.',
           },
@@ -1214,7 +1209,7 @@ export const projects: Project[] = [
       ],
     },
   },
-    {
+  {
     slug: 'ulbra-admin',
     name: 'Ulbra Admin',
     tagline: {

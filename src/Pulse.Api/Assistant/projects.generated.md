@@ -119,7 +119,7 @@ system Felipe worked on; the "What Felipe did" line is the authoritative stateme
 - **Role:** Head of Technology — design & implementation (Apr 2026 – Current)
 - **Source:** closed — professional work described without the code
 - **Stack:** .NET 10, PostgreSQL 17, RabbitMQ, React 19, OpenIddict, MCP, OpenTelemetry, Docker Swarm
-- **What it is:** The IT service desk for ULBRA — a .NET 10 modular monolith that replaced GLPI as the single intake channel for the university's IT department, carrying a request from ticket to SLA to satisfaction survey.
+- **What it is:** The IT service desk for ULBRA — a .NET 10 modular monolith that replaced GLPI as the single intake channel for the university’s IT department, carrying a request from ticket to SLA to satisfaction survey.
 - **What Felipe did:** Principal author, from scratch — the architecture, the backend, the front end, and the deployment.
   - The modular monolith and the boundaries between its contexts.
   - The SLA engine, including pauses that record who stopped the clock and why.
@@ -127,7 +127,7 @@ system Felipe worked on; the "What Felipe did" line is the authoritative stateme
   - The OAuth authorization server and the MCP server behind its consent screen.
   - The React front end and the Docker Swarm deployment.
   - NOT his work: One engineer now works on this codebase alongside him.
-- **Problem it solved:** ULBRA's IT department took requests through GLPI, e-mail, and direct messages at the same time. There was no SLA per team, no audit trail on approvals, and no way to tell whether anyone was satisfied with the outcome. Ulbra Atende replaces GLPI as the single intake channel and makes each of those measurable — three months in, the median ticket closes in about an hour and a half.
+- **Problem it solved:** ULBRA’s IT department took requests through GLPI, e-mail, and direct messages at the same time. There was no SLA per team, no audit trail on approvals, and no way to tell whether anyone was satisfied with the outcome. Ulbra Atende replaces GLPI as the single intake channel and makes each of those measurable — three months in, the median ticket closes in about an hour and a half.
 - **Results:** ~2.4k tickets handled (85% closed); 200+ users (across ~30 teams); ~6 min median first response (SLA tracked per team); ~5.0 satisfaction score (400+ responses, 1-5 scale) — in ~3 months of production
 - **Architecture:** A .NET 10 modular monolith: one deployable, separate bounded contexts — Core, Identity, Notifications and MCP — each layered Domain → Application → Infrastructure with its own Postgres schema. Integration events travel over RabbitMQ through an EF transactional outbox. Attachments live in S3/MinIO, caching in Redis, tracing via OpenTelemetry; integration tests run against real Postgres, RabbitMQ and MinIO through Testcontainers.
   - React 19 SPA — TanStack Router and Query over a Tailwind design system.
@@ -180,18 +180,18 @@ system Felipe worked on; the "What Felipe did" line is the authoritative stateme
 - **Role:** Head of Technology — direction & review (Apr 2026 – Current)
 - **Source:** closed — professional work described without the code
 - **Stack:** React, TanStack Router, MongoDB, Docker Swarm
-- **What it is:** The CRM the university runs on, inherited rather than built: no automated tests, and a codebase whose structure had not kept up with it. It is now fully covered by tests and materially better to use, and the work was done by the team under the author's direction — he set the direction and reviewed it, and did not write it.
-- **What Felipe did:** Set the direction and reviewed the work; the engineering was the team's.
+- **What it is:** The CRM the university runs on, inherited rather than built: no automated tests, and a codebase whose structure had not kept up with it. It is now fully covered by tests and materially better to use, and the work was done by the team under the author’s direction — he set the direction and reviewed it, and did not write it.
+- **What Felipe did:** Set the direction and reviewed the work; the engineering was the team’s.
   - The decision to cover the codebase with tests before changing its behaviour.
   - The routing migration that made filter state survive navigation.
   - Review of the work as it landed.
-  - NOT his work: None of this implementation is the author's. It was built by the engineers on the team; his part was deciding what to do and reviewing what came back.
+  - NOT his work: None of this implementation is the author’s. It was built by the engineers on the team; his part was deciding what to do and reviewing what came back.
 - **Problem it solved:** The CRM arrived with no automated tests at all, which made every change a gamble, and with usability debt that the people using it every day absorbed silently. The worst of it: changing screens reloaded the application, so the filters someone had just set were gone. Work that goes through the same three or four filters all day pays that cost on every navigation.
-- **Results:** 0% → 100% test coverage; 0 filter resets per navigation (was: every one)
+- **Results:** 0% → 100% test coverage
 - **Engineering decisions:**
   - **Tests first, behaviour second** — The codebase was unstructured and untested, and the temptation with both is to restructure first. The order was inverted: cover the existing behaviour, then change it. Coverage on code nobody has changed yet is what makes the later restructuring safe rather than hopeful — and it is the reason the number is worth quoting.
   - **Routing as state, not as navigation** — Moving to a router that holds application state in the route turned filters from something the page owned into something the URL owned. The visible win is that a screen change no longer discards them; the quieter one is that a filtered view became a link somebody can send to a colleague.
-  - **Directed, not written** — This is the one system in the group the author did not build. With three engineers and six systems, the lead's leverage is in deciding what gets done and reviewing what comes back, not in adding a fourth pair of hands to a codebase that already has an owner.
+  - **Directed, not written** — This is the one system in the group the author did not build. With three engineers and six systems, the lead’s leverage is in deciding what gets done and reviewing what comes back, not in adding a fourth pair of hands to a codebase that already has an owner.
 
 ### Ulbra Admin — The numbers the board runs the university on.
 
