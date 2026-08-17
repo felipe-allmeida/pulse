@@ -84,4 +84,10 @@ describe('HowIHelp', () => {
     expect(screen.getByRole('button', { name: /me conta o seu caso/i })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /conversar comigo/i })).toBeInTheDocument();
   });
+
+  it('exposes the id the hero scroll cue scrolls to', async () => {
+    const { container } = await renderWithI18n(<HowIHelp />);
+
+    expect(container.querySelector('#how-i-help')).toBeInTheDocument();
+  });
 });

@@ -113,4 +113,12 @@ describe('Hero', () => {
       expect(control.className).toMatch(/sm:w-auto/);
     }
   });
+
+  it('renders the scroll cue that points at the section below', async () => {
+    useMetricsMock.mockReturnValue({ data: { activeConnections: 1, totalVisits: 10 } });
+
+    await renderHero();
+
+    expect(await screen.findByRole('button', { name: 'Scroll' })).toBeInTheDocument();
+  });
 });
