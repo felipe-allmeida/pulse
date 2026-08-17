@@ -1,24 +1,30 @@
 import { ChevronRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { HelpDiagram, type HelpCardKey } from '@/components/home/help/help-diagram';
+import { type HelpCardKey } from '@/components/home/help/help-cards';
+import { cn } from '@/lib/utils';
 
 /**
- * One offer, in two layers. The surface — diagram, headline, body — is
- * written for a founder and carries no technical vocabulary at all. The
- * `<details>` underneath holds three concrete examples and closes with one
- * dimmed line of real engineering terms, for whoever the founder forwards
- * this to.
+ * One offer, in two layers. The surface — headline, body, and the
+ * `hoje / depois` pair — is written for a founder and carries no technical
+ * vocabulary at all. The `<details>` underneath holds three concrete examples
+ * and closes with one dimmed line of real engineering terms, for whoever the
+ * founder forwards this to.
+ *
+ * Two sizes. The featured card runs the full width of the section and shows
+ * both sides of the transform; the three compact cards share a row and show
+ * only the outcome. The hierarchy is the card's size — no copy is cut, because
+ * this page is built to be read by answer engines and a shorter body would
+ * trade retrievable text for whitespace.
  *
  * Native `<details>`/`<summary>` rather than a custom disclosure: keyboard
  * accessible with no code of ours, works with JavaScript disabled, and
- * leaves the collapsed copy in the DOM for crawlers — which matters, since
- * this site is deliberately built to be read by answer engines.
+ * leaves the collapsed copy in the DOM for crawlers.
  */
 function isStringArray(value: unknown): value is string[] {
   return Array.isArray(value) && value.every((item) => typeof item === 'string');
 }
 
-export function HelpCard({ variant }: { variant: HelpCardKey }) {
+export function HelpCard({ variant, featured = false }: { variant: HelpCardKey; featured?: boolean }) {
   const { t } = useTranslation('home');
 
   // i18next's return type for `t()` is unconstrained here (no
@@ -32,16 +38,46 @@ export function HelpCard({ variant }: { variant: HelpCardKey }) {
   const examples = isStringArray(rawExamples) ? rawExamples : [];
 
   return (
-    <div className="flex h-full flex-col gap-4 rounded-lg border border-signal/20 bg-signal-muted/10 p-5">
-      <HelpDiagram variant={variant} />
-
-      <h3 className="text-lg font-semibold tracking-tight text-balance text-foreground">
+    <div
+      data-featured={featured ? 'true' : undefined}
+      className={cn(
+        'flex h-full flex-col gap-4 rounded-lg bg-signal-muted/10',
+        featured ? 'border-2 border-signal/50 p-6' : 'border border-signal/20 p-5',
+      )}
+    >
+      <h3
+        className={cn(
+          'font-semibold tracking-tight text-balance text-foreground',
+          featured ? 'text-xl' : 'text-base',
+        )}
+      >
         {t(`home:help.cards.${variant}.headline`)}
       </h3>
 
       <p className="max-w-[60ch] flex-1 text-sm leading-relaxed text-muted-foreground">
         {t(`home:help.cards.${variant}.body`)}
       </p>
+
+      {/*
+        What replaced the three-icon mini diagram. Two mono lines on the
+        featured card, one on the compact ones — same grammar as the event
+        feed and the architecture diagram, and no JavaScript at all: the old
+        version spent an IntersectionObserver and a reduced-motion branch
+        animating a dot along a 24px rule.
+      */}
+      {featured ? (
+        <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 border-y border-signal/15 py-2.5 font-mono text-xs leading-relaxed">
+          <dt className="text-muted-foreground">{t('home:help.transformLabels.before')}</dt>
+          <dd className="text-muted-foreground">{t(`home:help.cards.${variant}.transform.before`)}</dd>
+          <dt className="text-signal-strong">{t('home:help.transformLabels.after')}</dt>
+          <dd className="text-signal-strong">{t(`home:help.cards.${variant}.transform.after`)}</dd>
+        </dl>
+      ) : (
+        <p className="border-t border-signal/15 pt-3 font-mono text-xs leading-relaxed text-signal-strong">
+          <span aria-hidden="true">→ </span>
+          {t(`home:help.cards.${variant}.transform.after`)}
+        </p>
+      )}
 
       <details className="group border-t border-signal/15 pt-3">
         {/*

@@ -1,7 +1,7 @@
 import { Calendar, MessageCircle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { HelpCard } from '@/components/home/help/help-card';
-import { HELP_CARD_KEYS } from '@/components/home/help/help-diagram';
+import { HELP_CARD_KEYS } from '@/components/home/help/help-cards';
 import { SectionEyebrow } from '@/components/signal/section-eyebrow';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { profile } from '@/content/profile';

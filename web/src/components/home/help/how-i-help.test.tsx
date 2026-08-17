@@ -1,24 +1,13 @@
 import { fireEvent, screen } from '@testing-library/react';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 import { renderWithI18n } from '@/test/render-with-i18n';
 import { profile } from '@/content/profile';
 import { useAskWidgetStore } from '@/stores/ask-widget-store';
 import { HowIHelp } from './how-i-help';
 
-vi.mock('./help-diagram', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('./help-diagram')>();
-  return { ...actual, HelpDiagram: ({ variant }: { variant: string }) => <div data-testid={`diagram-${variant}`} /> };
-});
-
 describe('HowIHelp', () => {
   beforeEach(() => {
     useAskWidgetStore.setState({ isOpen: false, pendingQuestion: null });
-    window.matchMedia = vi.fn().mockImplementation((query: string) => ({
-      matches: false,
-      media: query,
-      addEventListener: vi.fn(),
-      removeEventListener: vi.fn(),
-    })) as unknown as typeof window.matchMedia;
   });
 
   it('renders the heading, eyebrow and lede', async () => {
@@ -31,10 +20,6 @@ describe('HowIHelp', () => {
 
   it('renders all four cards, in order', async () => {
     const { container } = await renderWithI18n(<HowIHelp />);
-
-    for (const variant of ['repetitive', 'spreadsheet', 'ai', 'idea']) {
-      expect(screen.getByTestId(`diagram-${variant}`)).toBeInTheDocument();
-    }
 
     const headings = Array.from(container.querySelectorAll('h3')).map((h) => h.textContent);
     expect(headings).toEqual([

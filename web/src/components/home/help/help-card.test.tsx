@@ -1,24 +1,10 @@
 import { screen, within } from '@testing-library/react';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import i18n from '@/i18n';
 import { renderWithI18n } from '@/test/render-with-i18n';
 import { HelpCard } from './help-card';
 
-vi.mock('./help-diagram', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('./help-diagram')>();
-  return { ...actual, HelpDiagram: ({ variant }: { variant: string }) => <div data-testid={`diagram-${variant}`} /> };
-});
-
 describe('HelpCard', () => {
-  beforeEach(() => {
-    window.matchMedia = vi.fn().mockImplementation((query: string) => ({
-      matches: false,
-      media: query,
-      addEventListener: vi.fn(),
-      removeEventListener: vi.fn(),
-    })) as unknown as typeof window.matchMedia;
-  });
-
   it('renders the headline and body for its variant', async () => {
     await renderWithI18n(<HelpCard variant="spreadsheet" />);
 
@@ -28,10 +14,35 @@ describe('HelpCard', () => {
     expect(screen.getByText(/The spreadsheet can stay/)).toBeInTheDocument();
   });
 
-  it('renders its diagram', async () => {
-    await renderWithI18n(<HelpCard variant="ai" />);
+  it('shows both sides of the transform when featured', async () => {
+    await renderWithI18n(<HelpCard variant="repetitive" featured />);
 
-    expect(screen.getByTestId('diagram-ai')).toBeInTheDocument();
+    expect(screen.getByText('today')).toBeInTheDocument();
+    expect(screen.getByText('someone retypes it, every Monday')).toBeInTheDocument();
+    expect(screen.getByText('after')).toBeInTheDocument();
+    expect(screen.getByText('runs on its own, on schedule')).toBeInTheDocument();
+  });
+
+  it('shows only the outcome when compact, so the three small cards stay short', async () => {
+    // Not `screen.getByText`: the repetitive card's body copy also contains
+    // the words "runs on its own, on schedule" as prose, so a text search
+    // matches both the body paragraph and the transform line. Scope to the
+    // transform line's own styling (mono, signal-strong, not inside the
+    // body paragraph) to assert on the right element.
+    const { container } = await renderWithI18n(<HelpCard variant="repetitive" />);
+
+    const transformLine = container.querySelector('p.font-mono.text-signal-strong');
+    expect(transformLine).toHaveTextContent('runs on its own, on schedule');
+    expect(screen.queryByText('someone retypes it, every Monday')).not.toBeInTheDocument();
+    expect(screen.queryByText('today')).not.toBeInTheDocument();
+  });
+
+  it('marks the featured card in the DOM, and only when featured', async () => {
+    const { container: plain } = await renderWithI18n(<HelpCard variant="ai" />);
+    expect(plain.querySelector('[data-featured="true"]')).toBeNull();
+
+    const { container: big } = await renderWithI18n(<HelpCard variant="ai" featured />);
+    expect(big.querySelector('[data-featured="true"]')).toBeInTheDocument();
   });
 
   it('puts the examples and the technical line inside a disclosure that starts closed', async () => {
