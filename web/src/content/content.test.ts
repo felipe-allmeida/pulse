@@ -298,7 +298,7 @@ it('dell-automated-caller is last — it is the oldest work', () => {
  * Strips the specific placeholder forms a project narrative is allowed to
  * contain, so the guard below can run over *every* field of every project —
  * including `script.lines` — rather than exempting a whole field from
- * inspection. Two forms are sanctioned, and only these:
+ * inspection. Three forms are sanctioned, and only these:
  *
  * - RFC 2606 reserved domains (`example.com`, `.net`, `.org`) and this
  *   repo's `example.internal` convention for sample hostnames. These are
@@ -320,6 +320,15 @@ it('dell-automated-caller is last — it is the oldest work', () => {
  *   an ordinary host like `google.com` the greedy match backtracks one
  *   character short of the dot and matches anyway, leaving a masked
  *   `PLACEHOLDER_URLe.com` behind with no word boundary in front of the TLD.
+ * - A dotted config-label key immediately followed by `=`, e.g.
+ *   `traefik.enable=true` or `traefik.http.routers.myapp.rule=Host(...)` in
+ *   `ulbra-infra`'s script sample. Docker/Traefik labels are dotted key
+ *   paths, not hostnames, and a real domain name never has `=` appended to
+ *   it directly — no scheme, port, path or quote sits between a hostname and
+ *   an `=` sign in any of the forms this guard has to allow through. That
+ *   makes `=` a safe, narrow terminator: sanctioning on it cannot swallow an
+ *   actual leaked host, because a leaked host followed by `=` is not a shape
+ *   that occurs anywhere else in this content.
  *
  * Anything else — a real TLD, a dotted internal hostname, a credential — is
  * left untouched and still fails the checks that follow.
@@ -331,6 +340,9 @@ function withoutSanctionedPlaceholders(text: string): string {
       .replace(/(?<![a-z0-9-])(?:[a-z0-9-]+\.)*example\.(?:com|net|org|internal)\b/gi, 'PLACEHOLDER_HOST')
       // http://otel-collector:4317 — host has no dot, so no scheme+host survives.
       .replace(/\bhttps?:\/\/[a-z0-9-]+(?=[:/"']|$)/gi, 'PLACEHOLDER_URL')
+      // traefik.enable=true, traefik.http.routers.myapp.rule=Host(...) — a label
+      // key, not a hostname; the `=` immediately after is what tells them apart.
+      .replace(/\b(?:[a-z0-9-]+\.)+[a-z0-9-]+(?==)/gi, 'PLACEHOLDER_LABEL_KEY')
   );
 }
 
@@ -353,6 +365,11 @@ describe('withoutSanctionedPlaceholders', () => {
     ['a sub-domained example.com', 'see docs.example.com for details'],
     ['dot-less URL alias with a port', 'http://otel-collector:4317'],
     ['dot-less URL alias at the end of a JSON string', '{"a":"http://myservice"}'],
+    ['a docker-compose label key immediately before =', 'traefik.enable=true'],
+    [
+      'a multi-segment label key immediately before =',
+      'traefik.http.routers.myapp.rule=Host(`my-app.example.internal`)',
+    ],
   ];
 
   for (const [name, input] of sanctioned) {
@@ -395,7 +412,7 @@ it('publishes no hostname, URL or credential in any project narrative', () => {
     const narrative = withoutSanctionedPlaceholders(JSON.stringify(project.detail));
     expect(narrative, `${project.slug} detail contains a URL`).not.toMatch(/https?:\/\//);
     expect(narrative, `${project.slug} detail contains a hostname`).not.toMatch(
-      /\b[a-z0-9-]+\.(com|io|net|dev|internal)\b/i,
+      /\b[a-z0-9-]+\.[a-z]{2,}\b/,
     );
     expect(narrative, `${project.slug} detail contains a token-like string`).not.toMatch(
       /\b[a-f0-9]{32,}\b/i,
