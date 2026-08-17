@@ -16,7 +16,10 @@ describe('AskWidget', () => {
   it('opens, sends, and streams an answer', async () => {
     await renderWithI18n(<AskWidget />);
     fireEvent.click(screen.getByRole('button', { name: /ask about felipe/i }));
-    expect(screen.getByText(/ai assistant/i)).toBeInTheDocument(); // disclaimer
+    // The panel body is a separate lazy chunk (fix round 1): it isn't in the
+    // document the instant the trigger is clicked, only once that chunk
+    // resolves.
+    expect(await screen.findByText(/ai assistant/i)).toBeInTheDocument(); // disclaimer
     fireEvent.change(screen.getByRole('textbox'), { target: { value: 'Kubernetes?' } });
     fireEvent.click(screen.getByRole('button', { name: /send/i }));
     await waitFor(() => expect(screen.getByText('Yes, extensively.')).toBeInTheDocument());
@@ -39,7 +42,7 @@ describe('AskWidget', () => {
 
     await renderWithI18n(<AskWidget />);
     fireEvent.click(screen.getByRole('button', { name: /ask about felipe/i }));
-    fireEvent.change(screen.getByRole('textbox'), { target: { value: 'Kubernetes?' } });
+    fireEvent.change(await screen.findByRole('textbox'), { target: { value: 'Kubernetes?' } });
     fireEvent.click(screen.getByRole('button', { name: /send/i }));
 
     await waitFor(() => expect(capturedSignal).toBeDefined());
@@ -59,7 +62,7 @@ describe('AskWidget', () => {
 
     fireEvent.click(screen.getByRole('button', { name: /pergunte sobre o felipe/i }));
 
-    expect(screen.getByText(/assistente de ia/i)).toBeInTheDocument();
+    expect(await screen.findByText(/assistente de ia/i)).toBeInTheDocument();
     expect(screen.getByText('O Felipe tem experiência com Kubernetes?')).toBeInTheDocument();
     expect(screen.getByPlaceholderText(/pergunte sobre a experiência do felipe/i)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /enviar/i })).toBeInTheDocument();
@@ -70,7 +73,7 @@ describe('AskWidget', () => {
 
     await renderWithI18n(<AskWidget />, { locale: 'pt-BR' });
     fireEvent.click(screen.getByRole('button', { name: /pergunte sobre o felipe/i }));
-    fireEvent.change(screen.getByRole('textbox'), { target: { value: 'Kubernetes?' } });
+    fireEvent.change(await screen.findByRole('textbox'), { target: { value: 'Kubernetes?' } });
     fireEvent.click(screen.getByRole('button', { name: /enviar/i }));
 
     await waitFor(() => expect(screen.getByText(/algo deu errado/i)).toBeInTheDocument());
