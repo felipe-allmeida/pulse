@@ -1133,7 +1133,40 @@ answers from — before anyone asked anything."
 - Consumes: `renderDocument` from Task 3
 - Produces: `DocumentOptions` gains `css?: string`
 
-- [ ] **Step 1: Write the failing test**
+- [ ] **Step 1: Replace the ordering test this task makes obsolete**
+
+Task 3's review found that `document.test.ts`'s "runs the theme script before any
+stylesheet" assertion never executes: it reads the source `index.html`, where Vite
+has not yet injected the stylesheet link, so its `if (stylesheet !== -1)` guard is
+always false. This task removes the blocking `<link>` altogether, which retires the
+property that test was reaching for and replaces it with a stronger one.
+
+Delete that `it(...)` block and put this in its place, inside the same
+`describe('theme resolution before first paint', ...)`:
+
+```ts
+  it('runs the theme script before the inlined styles', () => {
+    // Synthesised, because the source index.html has no stylesheet link — Vite
+    // injects one at build time and this task then inlines it. Reading the
+    // source file directly is what made the previous version of this test
+    // assert nothing.
+    const withLink = template.replace(
+      '<!--aio:head-->',
+      '<link rel="stylesheet" crossorigin href="/assets/index-abc.css">',
+    );
+    const html = renderDocument({
+      template: withLink,
+      page: home,
+      head: '',
+      app: '',
+      css: '.x{color:red}',
+    });
+
+    expect(html.indexOf('pulse-theme')).toBeLessThan(html.indexOf('<style>'));
+  });
+```
+
+- [ ] **Step 2: Write the failing test**
 
 Append to `web/src/document.test.ts`:
 
