@@ -823,21 +823,31 @@ Inside `LiveMap`, after `const points = data ?? EMPTY_POINTS;`:
 
 ```ts
   const world = useWorld();
-  // Rebuilt only when the geometry arrives — fitSize needs it, and until then
-  // there is nothing to project onto.
-  const { projection, path } = useMemo(() => {
-    const p = geoNaturalEarth1().fitSize([WIDTH, HEIGHT], world ?? { type: 'FeatureCollection', features: [] });
-    return { projection: p, path: geoPath(p) };
+  /*
+    Undefined until the geometry lands. Do NOT substitute an empty
+    FeatureCollection to keep this non-null: `fitSize` derives its scale from
+    the object's bounds, and empty bounds give an Infinity scale, so every
+    `projection([lon, lat])` call downstream returns NaN and the pings render
+    at NaN coordinates rather than not rendering.
+  */
+  const projected = useMemo(() => {
+    if (!world) return undefined;
+    const projection = geoNaturalEarth1().fitSize([WIDTH, HEIGHT], world);
+    return { projection, path: geoPath(projection) };
   }, [world]);
 ```
 
 Change the country-paths expression from `(import.meta.env.SSR ? [] : world.features)` to:
 
 ```tsx
-            {(world?.features ?? []).map((geo) => {
+            {(projected ? world!.features : []).map((geo) => {
 ```
 
+and read `path` from `projected` inside that callback (`projected.path(geo)`).
+
 The SSR check is no longer needed: during the build-time render effects never run, so `world` is `undefined` and the paths are skipped for exactly the same reason as before.
+
+Guard the pings block the same way — `{(projected ? pings : []).map(...)}`, reading `projected.projection` inside — so no marker is ever placed from a projection that has no geometry to fit to. The pings are live data, so they now appear a moment later than they used to; that is the same moment the countries appear, and the map is decoration around the numbers either way.
 
 In the dev-only unmatched-country effect, guard on the geometry:
 
@@ -1376,20 +1386,38 @@ In `writeBundle`, using the `bundle` parameter added in Task 8:
 
 ```ts
       /**
-       * The chunk holding a route's component. `autoCodeSplitting` emits one
-       * per route, named after the route file — `index`, `about`,
-       * `projects_._slug` — so match on `facadeModuleId` rather than the
-       * chunk name, which rolldown may prefix or dedupe.
+       * The chunk holding a route's component.
+       *
+       * The route path is NOT the route filename: `/projects/pulse` is served
+       * by `routes/projects_.$slug.tsx`, and deriving one from the other by
+       * string surgery gets that case wrong and silently emits no preload.
+       * The mapping is small and explicit instead.
        */
+      const ROUTE_FILES: Record<string, string> = {
+        '/': 'routes/index',
+        '/about': 'routes/about',
+        '/projects': 'routes/projects',
+        '/live': 'routes/live',
+      };
+
       const chunkForRoute = (routePath: string): string | undefined => {
-        const routeFile = routePath === '/' ? 'routes/index' : `routes/${routePath.slice(1)}`;
+        // Every /projects/<slug> shares one dynamic route file.
+        const routeFile = routePath.startsWith('/projects/')
+          ? 'routes/projects_.$slug'
+          : ROUTE_FILES[routePath];
+        if (!routeFile) return undefined;
+
         for (const [fileName, chunk] of Object.entries(bundle)) {
           if (chunk.type !== 'chunk') continue;
+          // facadeModuleId, not the chunk name — rolldown prefixes and dedupes
+          // names, but the facade points at the real source module.
           if (chunk.facadeModuleId?.includes(routeFile)) return `/${fileName}`;
         }
         return undefined;
       };
 ```
+
+If `buildAllPages()` yields a route path not in `ROUTE_FILES` and not under `/projects/`, `chunkForRoute` returns `undefined` and that document simply gets no extra preload — correct, not silent breakage. Step 6 checks the mapping actually resolves.
 
 and in the page loop:
 
