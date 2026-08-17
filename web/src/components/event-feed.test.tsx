@@ -37,6 +37,24 @@ describe('EventFeed', () => {
     expect(items[1].textContent).toContain('Older');
   });
 
+  it('lets the list fill the card rather than capping itself at a fixed height', async () => {
+    useEventStore
+      .getState()
+      .push({ kind: 'visit', city: 'Lisbon', country: 'Portugal', at: '2026-08-04T09:55:00Z' });
+
+    const { container } = await renderWithI18n(<EventFeed />);
+
+    // The card is stretched by its grid row (beside the map on `/`, beside the
+    // visits chart on `/live`); the list has to take that height from the card
+    // instead of a `max-h-*` of its own, which left dead space under the last
+    // entry whenever the two disagreed.
+    expect(container.querySelector('[data-slot="card"]')).toHaveClass('h-full');
+    const list = screen.getByRole('list');
+    expect(list.className).not.toMatch(/max-h-/);
+    expect(list).toHaveClass('h-full');
+    expect(list).toHaveClass('overflow-y-auto');
+  });
+
   it('shows an empty state when there are no events', async () => {
     await renderWithI18n(<EventFeed />);
     expect(screen.getByText(/no events yet/i)).toBeInTheDocument();

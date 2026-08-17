@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef, type ReactNode } from 'react';
 import { geoNaturalEarth1, geoPath } from 'd3-geo';
 import { useTranslation } from 'react-i18next';
 import { SubsectionHeading } from '@/components/signal/subsection-heading';
@@ -15,7 +15,17 @@ const RECENT_PING_COUNT = 20;
 const projection = geoNaturalEarth1().fitSize([WIDTH, HEIGHT], world);
 const path = geoPath(projection);
 
-export function LiveMap() {
+type LiveMapProps = {
+  /**
+   * Optional content rendered opposite the card's heading. The home page uses
+   * it to hang the live counters off the map's own header (see `MapStats`)
+   * instead of giving them a `KpiRow` band of their own; `/live`, which keeps
+   * that band, passes nothing and renders exactly as before.
+   */
+  stats?: ReactNode;
+};
+
+export function LiveMap({ stats }: LiveMapProps = {}) {
   const { t } = useTranslation('dashboard');
   const { data } = useVisits();
   const points = data ?? EMPTY_POINTS;
@@ -38,9 +48,15 @@ export function LiveMap() {
   }, [counts]);
 
   return (
-    <Card className="border-signal/20 bg-signal-muted/10">
-      <CardHeader>
+    <Card className="flex h-full flex-col border-signal/20 bg-signal-muted/10">
+      {/*
+        `CardHeader` is a grid by default; with stats present it becomes a row
+        that splits heading and counters to opposite ends, stacking on narrow
+        viewports so neither gets squeezed.
+      */}
+      <CardHeader className={stats ? 'flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between' : undefined}>
         <SubsectionHeading>{t('dashboard:liveMap.title')}</SubsectionHeading>
+        {stats}
       </CardHeader>
       <CardContent>
         <svg

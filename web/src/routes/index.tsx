@@ -6,8 +6,8 @@ import { EngineeringShowcase } from '@/components/home/engineering-showcase';
 import { Hero } from '@/components/home/hero';
 import { VisitHistory } from '@/components/home/visit-history';
 import { EventFeed } from '@/components/event-feed';
-import { KpiRow } from '@/components/kpi-row';
 import { LiveMap } from '@/components/live-map';
+import { MapStats } from '@/components/map-stats';
 import { SectionEyebrow } from '@/components/signal/section-eyebrow';
 import { useVisitFeed } from '@/hooks/use-visit-feed';
 
@@ -82,11 +82,17 @@ function Index() {
             </Link>
           </div>
 
-          <KpiRow />
-
+          {/*
+            The two live counters ride in the map card's header (`MapStats`)
+            rather than in a `KpiRow` band above it. That band was two cards
+            holding one number each stretched across the full 1024px column —
+            the emptiest strip in the section — and removing it lets the map
+            and the feed close up into a single dense block. `/live` keeps the
+            full `KpiRow`, sparklines included.
+          */}
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
             <div className="lg:col-span-2">
-              <LiveMap />
+              <LiveMap stats={<MapStats />} />
             </div>
             <EventFeed />
           </div>

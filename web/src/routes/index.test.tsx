@@ -99,8 +99,8 @@ describe('Index route (portfolio home)', () => {
     // EngineeringShowcase
     expect(screen.getByText(/what you're looking at/i)).toBeInTheDocument();
 
-    // Compact live-proof block: map + real stats (KpiRow) + event stream + a
-    // link out to the full panel.
+    // Compact live-proof block: map (carrying the live counters in its own
+    // header) + event stream + a link out to the full panel.
     expect(screen.getByText('Watch it happen')).toBeInTheDocument();
     expect(screen.getByRole('img', { name: /world map of live visitor locations/i })).toBeInTheDocument();
     expect(screen.getByText('Active connections')).toBeInTheDocument();
@@ -109,6 +109,50 @@ describe('Index route (portfolio home)', () => {
 
     // Exactly one h1 on the whole composed page
     expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
+  });
+
+  it('hangs the live counters off the map card instead of a KPI band of its own', async () => {
+    useMetricsMock.mockReturnValue({ data: { activeConnections: 7, totalVisits: 120 }, isLoading: false });
+    useVisitsMock.mockReturnValue({ data: [], isLoading: false });
+
+    const { container } = await renderIndexRoute();
+
+    // The counters used to be two full-width StatCards above the map — the
+    // emptiest strip in the section. They now ride in the map card's header,
+    // so they share that card rather than owning one apiece.
+    const mapHeading = screen.getByText('Live locations');
+    const mapCard = mapHeading.closest('[data-slot="card"]');
+    expect(mapCard).not.toBeNull();
+    expect(mapCard).toContainElement(screen.getByText('Active connections'));
+    expect(mapCard).toContainElement(screen.getByText('Total visits'));
+
+    // Three cards would mean the KPI band survived; the block is map + feed.
+    expect(container.querySelectorAll('[data-slot="card"]')).toHaveLength(2);
+
+    // The sparklines stay on /live, where KpiRow is untouched.
+    expect(container.querySelector('.recharts-responsive-container')).toBeNull();
+  });
+
+  it('shows the recent visits in the feed on arrival, without waiting for a new one', async () => {
+    useMetricsMock.mockReturnValue({ data: { activeConnections: 7, totalVisits: 120 }, isLoading: false });
+    useVisitsMock.mockReturnValue({
+      data: [
+        { lat: 38.7, lon: -9.1, city: 'Lisbon', country: 'Portugal', at: '2026-08-04T09:55:00Z' },
+        { lat: 40.7, lon: -74.0, city: 'NYC', country: 'United States', at: '2026-08-04T09:59:00Z' },
+      ],
+      isLoading: false,
+    });
+
+    await renderIndexRoute();
+
+    // The feed used to drop the whole first batch, so a reader landing on `/`
+    // saw an empty column beside a map full of dots until a stranger happened
+    // to visit while they watched.
+    const items = await screen.findAllByRole('listitem');
+    const feedItems = items.filter((item) => item.textContent?.includes('Visit from'));
+    expect(feedItems).toHaveLength(2);
+    expect(feedItems[0].textContent).toContain('NYC');
+    expect(feedItems[1].textContent).toContain('Lisbon');
   });
 
   it('does NOT render the full widget stack that moved to /live', async () => {
