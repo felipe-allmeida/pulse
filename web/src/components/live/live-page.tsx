@@ -42,9 +42,21 @@ export function LivePage() {
           <RecentVisitsTable />
         </div>
 
+        {/*
+          Same arrangement as the home page's map/feed pair: the chart is a
+          fixed-aspect figure and the feed grows with traffic, so the chart
+          sets the row height and the feed fills and scrolls inside it. Left
+          in flow, the feed outgrew the chart and the grid answered by
+          stretching the chart's card, leaving a tall empty band under the
+          plot.
+        */}
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
           <VisitsChart />
-          <EventFeed />
+          <div className="relative">
+            <div className="lg:absolute lg:inset-0">
+              <EventFeed />
+            </div>
+          </div>
         </div>
       </div>
     </div>

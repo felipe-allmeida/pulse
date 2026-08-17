@@ -65,7 +65,7 @@ async function renderIndexRoute(locale: Locale = 'en') {
 
 describe('Index route (portfolio home)', () => {
   beforeEach(() => {
-    useEventStore.setState({ events: [] });
+    useEventStore.setState({ events: [], seenVisits: new Set() });
     useMetricsMock.mockReturnValue({ data: undefined, isLoading: true });
     useVisitsMock.mockReturnValue({ data: undefined, isLoading: true });
     usePulseHubMock.mockReturnValue({ count: 0, connection: 'connected', react: vi.fn() });
@@ -153,6 +153,28 @@ describe('Index route (portfolio home)', () => {
     expect(feedItems).toHaveLength(2);
     expect(feedItems[0].textContent).toContain('NYC');
     expect(feedItems[1].textContent).toContain('Lisbon');
+  });
+
+  it('lets the map set the row height, with the feed filling it out of flow', async () => {
+    useMetricsMock.mockReturnValue({ data: { activeConnections: 7, totalVisits: 120 }, isLoading: false });
+    useVisitsMock.mockReturnValue({ data: [], isLoading: false });
+
+    const { container } = await renderIndexRoute();
+
+    const row = container.querySelector('.lg\\:grid-cols-5');
+    expect(row).not.toBeNull();
+
+    // The map is the fixed-aspect figure and the feed grows with traffic. Left
+    // in flow the feed eventually outgrew the map and the grid answered by
+    // stretching the map's card, leaving a band of empty card under it.
+    const mapCell = row?.querySelector('.lg\\:col-span-3');
+    expect(mapCell).toContainElement(screen.getByRole('img', { name: /world map of live visitor locations/i }));
+    const feedCell = row?.querySelector('.lg\\:col-span-2');
+    expect(feedCell).toHaveClass('relative');
+    expect(feedCell?.querySelector('.lg\\:absolute')).toContainElement(screen.getByText('Live activity'));
+
+    // Two fifths, not one third: at a third the rows wrapped mid-place-name.
+    expect(row?.querySelector('.lg\\:col-span-1')).toBeNull();
   });
 
   it('does NOT render the full widget stack that moved to /live', async () => {

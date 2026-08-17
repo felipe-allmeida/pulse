@@ -90,11 +90,33 @@ function Index() {
             and the feed close up into a single dense block. `/live` keeps the
             full `KpiRow`, sparklines included.
           */}
-          <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-            <div className="lg:col-span-2">
+          {/*
+            5 columns split 3/2, not 3 split 2/1: at a third of the row the
+            feed column was too narrow for "Visit from Council Bluffs, United
+            States" plus its timestamp, so nearly every row wrapped onto a
+            second line — breaking mid-place-name ("Visit from Porto Alegre," /
+            "Brazil"). Two fifths fits the longest city/country pair on one
+            line, and costs the map ~60px it doesn't miss.
+          */}
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-5">
+            <div className="lg:col-span-3">
               <LiveMap stats={<MapStats />} />
             </div>
-            <EventFeed />
+            {/*
+              The map sets the row's height and the feed fills it, rather than
+              the other way round. The feed's natural height rises with every
+              visit that lands, and once it passed the map's the grid stretched
+              the *map* card to match, parking a growing band of empty card
+              under the map's last row. Taking the feed out of flow (from `lg`
+              up, where the two sit side by side) leaves the map as the only
+              thing the row measures; the feed then gets an exact height to
+              fill and scrolls whatever doesn't fit.
+            */}
+            <div className="relative lg:col-span-2">
+              <div className="lg:absolute lg:inset-0">
+                <EventFeed />
+              </div>
+            </div>
           </div>
         </div>
       </section>

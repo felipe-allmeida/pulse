@@ -14,7 +14,7 @@ vi.mock('@/lib/api', () => ({
 
 describe('LivePage', () => {
   beforeEach(() => {
-    useEventStore.setState({ events: [] });
+    useEventStore.setState({ events: [], seenVisits: new Set() });
     useMetricsMock.mockReturnValue({ data: undefined, isLoading: true });
     useVisitsMock.mockReturnValue({ data: undefined, isLoading: true });
   });
