@@ -238,7 +238,7 @@ system Felipe worked on; the "What Felipe did" line is the authoritative stateme
   - Staff schedule content with start and end dates; it appears and expires on its own.
 - **Engineering decisions:**
   - **Polling, not a live connection** — The display asks the server for fresh data on a short interval rather than holding a socket open. A socket is the better answer when a human is watching and latency matters; this is a screen on a wall with nobody in front of it. Polling recovers from a dropped network by itself, and nobody has to walk to the building to restart it.
-  - **The analytics lakehouse as the source** — The schedule is read from the university’s analytics platform rather than from the academic system directly. It is the copy that is already shaped for reading, already has access controls the display can be granted narrowly, and â crucially â cannot be affected by a screen in a lobby querying it all day.
+  - **The analytics lakehouse as the source** — The schedule is read from the university’s analytics platform rather than from the academic system directly. It is the copy that is already shaped for reading, already has access controls the display can be granted narrowly, and — crucially — cannot be affected by a screen in a lobby querying it all day.
   - **One system, two audiences** — The kiosk has no login and no interaction; the admin has both. Splitting them into two deployments was the obvious move and was rejected: they share the content model entirely, and two services would mean two places to change when the shape of a slide changes. The boundary is a route and an auth check, not a process.
 
 ### Dell Automated Caller — Automated end-to-end testing for a phone system.

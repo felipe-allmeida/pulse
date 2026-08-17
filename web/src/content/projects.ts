@@ -1387,7 +1387,7 @@ export const projects: Project[] = [
         {
           heading: { en: 'The analytics lakehouse as the source', 'pt-BR': 'O lakehouse analítico como fonte' },
           body: {
-            en: "The schedule is read from the university’s analytics platform rather than from the academic system directly. It is the copy that is already shaped for reading, already has access controls the display can be granted narrowly, and â crucially â cannot be affected by a screen in a lobby querying it all day.",
+            en: 'The schedule is read from the university’s analytics platform rather than from the academic system directly. It is the copy that is already shaped for reading, already has access controls the display can be granted narrowly, and — crucially — cannot be affected by a screen in a lobby querying it all day.',
             'pt-BR':
               'O horário é lido da plataforma analítica da universidade e não do sistema acadêmico diretamente. É a cópia já modelada para leitura, que já tem controle de acesso concedível de forma restrita ao painel e que — o ponto decisivo — não é afetada por uma tela no saguão consultando o dia inteiro.',
           },
