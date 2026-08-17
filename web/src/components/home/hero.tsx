@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Link } from '@tanstack/react-router';
 import { CvButton } from '@/components/nav/cv-button';
 import { HeroMap } from '@/components/home/hero-map';
+import { ScrollCue } from '@/components/home/scroll-cue';
 import { VisitorLine } from '@/components/home/visitor-line';
 import { Chip } from '@/components/signal/chip';
 import { Pill } from '@/components/signal/pill';
@@ -110,6 +111,14 @@ export function Hero() {
           ))}
         </ul>
       </div>
+
+      {/*
+        Anchored to the section's own box (which is already `relative
+        isolate`), not to the content column — the cue belongs to the band and
+        centres on the viewport. It sits below the content in source order so
+        it also comes last in the tab order.
+      */}
+      <ScrollCue />
     </section>
   );
 }
