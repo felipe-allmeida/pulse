@@ -9,6 +9,7 @@ type HelpBlock = {
   lede: string;
   examplesLabel: string;
   techLabel: string;
+  transformLabels: { before: string; after: string };
   cards: Record<
     (typeof CARD_KEYS)[number],
     {
@@ -17,9 +18,10 @@ type HelpBlock = {
       examples: string[];
       tech: string;
       diagram: { from: string; via: string; to: string };
+      transform: { before: string; after: string };
     }
   >;
-  cta: { ask: string; book: string };
+  cta: { ask: string; book: string; askAria: string; whatsappMessage: string };
 };
 
 const locales = {
@@ -37,6 +39,23 @@ describe('home:help copy', () => {
         }
         expect(help.cta.ask.length).toBeGreaterThan(0);
         expect(help.cta.book.length).toBeGreaterThan(0);
+        for (const side of ['before', 'after'] as const) {
+          expect(help.transformLabels[side].length, `${locale}.help.transformLabels.${side}`).toBeGreaterThan(0);
+        }
+        expect(help.cta.askAria.length, `${locale}.help.cta.askAria`).toBeGreaterThan(0);
+        expect(help.cta.whatsappMessage.length, `${locale}.help.cta.whatsappMessage`).toBeGreaterThan(0);
+
+        // The message is handed to the founder mid-sentence so they finish it
+        // rather than facing an empty composer.
+        expect(
+          help.cta.whatsappMessage.endsWith(' '),
+          `${locale}.help.cta.whatsappMessage is an unfinished sentence`,
+        ).toBe(true);
+
+        // WCAG 2.5.3: the accessible name must start with the visible label.
+        expect(help.cta.askAria.startsWith(help.cta.ask), `${locale}.help.cta.askAria contains the visible label`).toBe(
+          true,
+        );
       });
 
       it('has all four cards, in order, each complete', () => {
@@ -51,6 +70,9 @@ describe('home:help copy', () => {
           for (const example of card.examples) expect(example.length).toBeGreaterThan(0);
           for (const node of ['from', 'via', 'to'] as const) {
             expect(card.diagram[node].length, `${locale}.${key}.diagram.${node}`).toBeGreaterThan(0);
+          }
+          for (const side of ['before', 'after'] as const) {
+            expect(card.transform[side].length, `${locale}.${key}.transform.${side}`).toBeGreaterThan(0);
           }
         }
       });
@@ -67,6 +89,10 @@ describe('home:help copy', () => {
         const card = help.cards[key];
         expect(card.headline, `${locale}.${key}.headline is jargon-free`).not.toMatch(JARGON);
         expect(card.body, `${locale}.${key}.body is jargon-free`).not.toMatch(JARGON);
+        // The transform pair sits on the card surface, so it is held to the
+        // same founder-readable standard as the headline and body.
+        expect(card.transform.before, `${locale}.${key}.transform.before is jargon-free`).not.toMatch(JARGON);
+        expect(card.transform.after, `${locale}.${key}.transform.after is jargon-free`).not.toMatch(JARGON);
       }
       expect(help.lede, `${locale}.lede is jargon-free`).not.toMatch(JARGON);
     }
