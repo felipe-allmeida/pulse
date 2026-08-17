@@ -134,10 +134,20 @@ targets, none of them needed for the first paint:
 
 - **`@microsoft/signalr`** — dynamic import inside `src/realtime/hub.ts`. It
   contributes nothing before the swap.
-- **`LiveMap`** (below the fold, `src/routes/index.tsx:89`) and the client-side
-  decode of the 108 KB `countries-110m.json`. `HeroMap` is pure geometry with no
-  `window` access, so it is already inlined as SVG in the prerendered document —
-  the topojson only has to arrive before the swap, not before the paint.
+- **The 108 KB `countries-110m.json`** and its decode. Neither map puts any of
+  that geometry into the prerendered document: `HeroMap` draws to a `<canvas>`
+  (`src/components/home/hero-map.tsx:145`), which prerenders as an empty
+  element, and `LiveMap` already skips the country paths under SSR by design
+  (`src/components/live-map.tsx:57` — its comment explains that ~200 KB of path
+  data per document carries nothing a crawler can use). So the geometry
+  contributes zero pixels to the first paint and is purely post-swap
+  decoration.
+
+  This makes it deferrable with no visual regression at first paint, which is
+  a larger and safer win than an earlier draft of this design assumed. The cost
+  is structural: `world` is imported at module scope by both maps, and
+  `live-map.tsx` builds `projection` and `path` at module scope too, so
+  deferring means reshaping those modules to load the geometry lazily.
 - **`recharts`** via `VisitsChart`, which appears only on `/live` and in the
   widget stack.
 
