@@ -15,26 +15,37 @@ describe('HelpCard', () => {
   });
 
   it('shows both sides of the transform when featured', async () => {
-    await renderWithI18n(<HelpCard variant="repetitive" featured />);
+    const { container } = await renderWithI18n(<HelpCard variant="repetitive" featured />);
 
     expect(screen.getByText('today')).toBeInTheDocument();
     expect(screen.getByText('someone retypes it, every Monday')).toBeInTheDocument();
     expect(screen.getByText('after')).toBeInTheDocument();
     expect(screen.getByText('runs on its own, on schedule')).toBeInTheDocument();
+
+    // The two shapes must not converge: a featured card gets the pair, never
+    // the compact single line.
+    expect(container.querySelector('[data-transform="pair"]')).toBeInTheDocument();
+    expect(container.querySelector('[data-transform="after"]')).not.toBeInTheDocument();
   });
 
   it('shows only the outcome when compact, so the three small cards stay short', async () => {
     // Not `screen.getByText`: the repetitive card's body copy also contains
     // the words "runs on its own, on schedule" as prose, so a text search
-    // matches both the body paragraph and the transform line. Scope to the
-    // transform line's own styling (mono, signal-strong, not inside the
-    // body paragraph) to assert on the right element.
+    // matches both the body paragraph and the transform line. `data-transform`
+    // targets the transform line itself rather than coupling the test to
+    // Tailwind class names, which would break on a purely cosmetic restyle
+    // and would silently pass nothing if the selector stopped matching.
     const { container } = await renderWithI18n(<HelpCard variant="repetitive" />);
 
-    const transformLine = container.querySelector('p.font-mono.text-signal-strong');
-    expect(transformLine).toHaveTextContent('runs on its own, on schedule');
+    const line = container.querySelector('[data-transform="after"]');
+    expect(line).toBeInTheDocument();
+    expect(line).toHaveTextContent('runs on its own, on schedule');
     expect(screen.queryByText('someone retypes it, every Monday')).not.toBeInTheDocument();
     expect(screen.queryByText('today')).not.toBeInTheDocument();
+
+    // The two shapes must not converge: a compact card gets the single line,
+    // never the featured pair.
+    expect(container.querySelector('[data-transform="pair"]')).not.toBeInTheDocument();
   });
 
   it('marks the featured card in the DOM, and only when featured', async () => {

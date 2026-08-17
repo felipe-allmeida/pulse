@@ -66,14 +66,20 @@ export function HelpCard({ variant, featured = false }: { variant: HelpCardKey; 
         animating a dot along a 24px rule.
       */}
       {featured ? (
-        <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 border-y border-signal/15 py-2.5 font-mono text-xs leading-relaxed">
+        <dl
+          data-transform="pair"
+          className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 border-y border-signal/15 py-2.5 font-mono text-xs leading-relaxed"
+        >
           <dt className="text-muted-foreground">{t('home:help.transformLabels.before')}</dt>
           <dd className="text-muted-foreground">{t(`home:help.cards.${variant}.transform.before`)}</dd>
           <dt className="text-signal-strong">{t('home:help.transformLabels.after')}</dt>
           <dd className="text-signal-strong">{t(`home:help.cards.${variant}.transform.after`)}</dd>
         </dl>
       ) : (
-        <p className="border-t border-signal/15 pt-3 font-mono text-xs leading-relaxed text-signal-strong">
+        <p
+          data-transform="after"
+          className="border-t border-signal/15 pt-3 font-mono text-xs leading-relaxed text-signal-strong"
+        >
           <span aria-hidden="true">→ </span>
           {t(`home:help.cards.${variant}.transform.after`)}
         </p>
