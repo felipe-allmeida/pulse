@@ -121,9 +121,9 @@ export const profile: Profile = {
       url: 'https://www.ulbra.br',
       period: { en: 'Apr 2026 – Current', 'pt-BR': 'Abr 2026 – Atual' },
       summary: {
-        en: "Leads a three-engineer team building the university's internal platform from scratch — an IT service desk in production, an ERP replacing the legacy systems, a CRM taken over and rebuilt to full test coverage, administrative dashboards for the board, and the datacenter automation all of it deploys onto. Introduced a spec-first, AI-assisted delivery model in which the team's time goes to specification and code review.",
+        en: "Leads a three-engineer team building the university's internal platform from scratch — an IT service desk in production, an ERP replacing the legacy systems, a CRM taken over and rebuilt to full test coverage, administrative dashboards for the board, a student dashboard, and the datacenter automation all of it deploys onto. Introduced a spec-first, AI-assisted delivery model in which the team's time goes to specification and code review.",
         'pt-BR':
-          'Lidera um time de três engenheiros construindo do zero a plataforma interna da universidade — um service desk de TI em produção, um ERP substituindo os sistemas legados, um CRM assumido e reconstruído até cobertura total de testes, dashboards administrativos para a diretoria e a automação de datacenter em que tudo isso é publicado. Introduziu um modelo de entrega assistido por IA e guiado por especificação, em que o tempo do time vai para especificar e revisar código.',
+          'Lidera um time de três engenheiros construindo do zero a plataforma interna da universidade — um service desk de TI em produção, um ERP substituindo os sistemas legados, um CRM assumido e reconstruído até cobertura total de testes, dashboards administrativos para a diretoria, um painel para os alunos e a automação de datacenter em que tudo isso é publicado. Introduziu um modelo de entrega assistido por IA e guiado por especificação, em que o tempo do time vai para especificar e revisar código.',
       },
     },
     {

@@ -55,9 +55,9 @@ export const ventures: Venture[] = [
     period: { en: 'Apr 2026 – Current', 'pt-BR': 'Abr 2026 – Atual' },
     engagement: { en: 'Client of Pampa Devs', 'pt-BR': 'Cliente da Pampa Devs' },
     summary: {
-      en: "The university's internal technology platform, built from scratch by a small team: an IT service desk in production, an ERP replacing the legacy systems, a CRM taken over and rebuilt, administrative dashboards, and the datacenter automation all of it deploys onto.",
+      en: "The university's internal technology platform, built from scratch by a small team: an IT service desk in production, an ERP replacing the legacy systems, a CRM taken over and rebuilt, administrative dashboards, a student dashboard, and the datacenter automation all of it deploys onto.",
       'pt-BR':
-        'A plataforma de tecnologia interna da universidade, construída do zero por um time pequeno: um service desk de TI em produção, um ERP substituindo os sistemas legados, um CRM assumido e reconstruído, dashboards administrativos e a automação de datacenter em que tudo isso é publicado.',
+        'A plataforma de tecnologia interna da universidade, construída do zero por um time pequeno: um service desk de TI em produção, um ERP substituindo os sistemas legados, um CRM assumido e reconstruído, dashboards administrativos, um painel para os alunos e a automação de datacenter em que tudo isso é publicado.',
     },
     team: {
       en: 'Three engineers — two inherited on arrival, one hired in May 2026.',
