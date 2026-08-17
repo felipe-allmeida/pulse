@@ -75,6 +75,27 @@
 	# no index.html of its own) and 404 instead of serving projects.html. The
 	# extra stat per asset request is not worth reordering for.
 	handle {
+		# Cache-Control, absent until now — which is why every visit refetched
+		# the whole asset graph. Three non-overlapping matchers rather than a
+		# broad default plus overrides, so the rule for any given request is
+		# readable from one line.
+		#
+		# /assets/* carries Vite's content hashes, so it is safe to freeze
+		# forever. Files in public/ keep their authored names and must not be,
+		# hence the separate, shorter window.
+		#
+		# The documents are `no-cache` because each one embeds the hashed asset
+		# names: a cached document pins a released build in place and the next
+		# deploy is invisible until it expires.
+		@assets path /assets/*
+		header @assets Cache-Control "public, max-age=31536000, immutable"
+
+		@public path /favicon.ico /favicon.svg /apple-touch-icon.png /og.png /cv.pdf /screenshots/*
+		header @public Cache-Control "public, max-age=604800"
+
+		@documents not path /assets/* /favicon.ico /favicon.svg /apple-touch-icon.png /og.png /cv.pdf /screenshots/*
+		header @documents Cache-Control "no-cache"
+
 		root * /srv
 		try_files {path}.html {path} /index.html
 		file_server
