@@ -344,15 +344,22 @@ describe('HelpDiagram', () => {
     expect(screen.getByText('ação')).toBeInTheDocument();
   });
 
-  it('gives each variant its own distinct icon triple', async () => {
+  it('gives each variant its own triple of three distinct icons', async () => {
     const { container: repetitive } = await renderWithI18n(<HelpDiagram variant="repetitive" />);
     const { container: idea } = await renderWithI18n(<HelpDiagram variant="idea" />);
 
+    // lucide-react stamps every icon with a `lucide-<name>` class — the only
+    // stable handle on *which* icon rendered. The exact names are not
+    // asserted: they change across lucide majors, and what matters is that
+    // each card gets three different icons and no two cards share a triple.
     const iconsOf = (root: HTMLElement) =>
-      Array.from(root.querySelectorAll('svg')).map((svg) => svg.getAttribute('data-node'));
+      Array.from(root.querySelectorAll('svg')).map(
+        (svg) => Array.from(svg.classList).find((c) => c.startsWith('lucide-')) ?? '',
+      );
 
     expect(iconsOf(repetitive)).toHaveLength(3);
-    expect(iconsOf(idea)).toHaveLength(3);
+    expect(new Set(iconsOf(repetitive)).size, 'three distinct icons within a card').toBe(3);
+    expect(new Set(iconsOf(idea)).size, 'three distinct icons within a card').toBe(3);
     expect(iconsOf(repetitive)).not.toEqual(iconsOf(idea));
   });
 
@@ -490,7 +497,7 @@ export function HelpDiagram({ variant }: { variant: HelpCardKey }) {
         <div key={node.key} className="flex items-center">
           <div className="flex w-16 flex-col items-center gap-1.5 text-center">
             <div className="flex size-8 items-center justify-center rounded-full border border-signal/40 bg-background text-signal-strong">
-              <node.Icon data-node={node.key} className="size-4" aria-hidden="true" />
+              <node.Icon className="size-4" aria-hidden="true" />
             </div>
             <div className="text-[10px] leading-tight text-muted-foreground">{node.label}</div>
           </div>
@@ -958,6 +965,8 @@ In `web/src/routes/index.test.tsx`, replace the two tests at lines 74–82:
     expect(screen.queryByRole('button', { name: /enviar um pulso/i })).not.toBeInTheDocument();
   });
 ```
+
+Still in `web/src/routes/index.test.tsx`, `send-pulse.tsx` was the only consumer of `usePulseHub` anywhere in this route's tree (`EventFeed`, `LiveMap` and `MapStats` do not use it), so its mock becomes dead once the component is gone. Remove the `usePulseHubMock` declaration (line 14), the `vi.mock('@/realtime/use-pulse-hub', …)` block (lines 22–24), and the `usePulseHubMock.mockReturnValue(…)` line inside `beforeEach` (line 71).
 
 In `web/src/components/home/engineering-showcase.test.tsx`, delete the two tests at lines 49–65 (`hosts the "send a pulse" button…` and `places "send a pulse" before the diagram…`) and the now-unused `usePulseHubMock` declaration and `vi.mock` at lines 14–18, plus its `mockReturnValue` line inside `beforeEach` (line 25). The dynamic `await import('./engineering-showcase')` at line 20 existed only to sequence that mock — turn it into a plain top-level import:
 
