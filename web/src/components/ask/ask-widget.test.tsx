@@ -25,6 +25,15 @@ describe('AskWidget', () => {
     await waitFor(() => expect(screen.getByText('Yes, extensively.')).toBeInTheDocument());
   });
 
+  it('pins the trigger to the fixed bottom-right corner of the viewport', async () => {
+    await renderWithI18n(<AskWidget />);
+
+    const trigger = screen.getByRole('button', { name: /ask about felipe/i });
+    expect(trigger).toHaveClass('fixed');
+    expect(trigger).toHaveClass('right-6');
+    expect(trigger).toHaveClass('bottom-6');
+  });
+
   it('aborts the in-flight stream when the sheet is closed', async () => {
     let capturedSignal: AbortSignal | undefined;
     let rejectStream: (err: unknown) => void = () => {};
