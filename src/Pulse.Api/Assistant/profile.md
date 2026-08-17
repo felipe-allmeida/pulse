@@ -16,7 +16,7 @@ Software Engineer & Architect, and engineering leader. 12+ years building and ru
 - **Looking for:** Staff / Principal Engineer, or Head of Engineering / CTO.
 - **Domains of interest:** He likes building products and taking an active part in building the business, not just the code. Drawn to services at scale, where the work reaches many lives — impact and reach matter more to him than any one industry.
 - **Company type/stage:** Prefers early-stage startups and scale-ups.
-- Currently taking on freelance work through **Pampa Devs** (his software studio) — building internal enterprise platforms (a support/ticketing system and an ERP) in .NET & React.
+- Currently Head of Technology at **ULBRA** (a Brazilian university), on an engagement through his own studio **Pampa Devs** — leading three engineers building the university's internal platform in .NET & React: an IT service desk in production, an ERP replacing the legacy systems, a CRM rebuilt to full test coverage, administrative dashboards, and the datacenter automation all of it deploys onto. He introduced a spec-first, AI-assisted delivery model there: work enters through one tracker, implementation is largely generated, and the team's time goes to writing specs and reviewing code.
 
 ## Location & remote
 
@@ -31,6 +31,7 @@ Software Engineer & Architect, and engineering leader. 12+ years building and ru
 
 ## Experience
 
+- **Head of Technology, ULBRA** (Apr 2026 – current, engagement via Pampa Devs, https://www.ulbra.br) — leads a three-engineer team building the university's internal platform from scratch: service desk, ERP, CRM, administrative dashboards, and the datacenter automation underneath them.
 - **Founder & Software Engineer/Architect, Pampa Devs** (current, freelance, https://pampadevs.com) — his software studio; internal enterprise platforms (support/ticketing + ERP) in .NET & React, plus web and e-commerce delivery for SMBs on Azure, .NET, Node.js and Vue.js.
 - **Senior Product Engineer, Kota.io** (Oct 2025 – Jul 2026, https://kota.io) — API-driven employee-benefits & health-insurance platform for European teams. Impact: designed and shipped the platform's intent layer (enrollment, policy amendment, dependents, renewal) with full CRUD APIs, compliance screening and multi-provider support; migrated the webhooks to an event-driven V2 with granular change-tracking; built an adaptive requirements system shipped behind feature flags; built a copy-on-write taxonomy/versioning module for insurance benefits; delivered integrations across nine insurers plus compliance re-screening flows; led the company-wide .NET 10 upgrade and designed a multi-agent AI code-review pipeline that cut review turnaround from 2–3 days to under an hour.
 - **R&D Engineer, Airia** (Jun 2025 – Oct 2025, contract, part-time, https://airia.com) — web, console and on-premise applications in .NET 9; integrated multiple AI providers (AWS Bedrock, Azure AI Foundry, n8n) into production workflows; owned architecture and CI/CD design for new projects.
@@ -82,7 +83,7 @@ site's own project pages. These two are not written up there:
 Yes — he's available now and actively looking for Staff/Principal Engineer or Head of Engineering / CTO roles, remote, in European or US time zones. Reach out via email, LinkedIn, WhatsApp, or book a call.
 
 **What is Felipe's current situation?**
-He's freelancing through his studio Pampa Devs (internal enterprise platforms in .NET/React) and open to full-time roles.
+He is Head of Technology at ULBRA, a Brazilian university, on an engagement through his studio Pampa Devs — leading three engineers across the university's internal platform — and open to full-time roles.
 
 **How much experience does Felipe have?**
 12+ years, since 2015, almost entirely on .NET platforms — roughly the last 4 in lead or head-of roles.

@@ -1,4 +1,4 @@
-import type { Project } from '@/content/projects';
+import type { Project } from '../content/projects';
 
 /**
  * A run of consecutive projects that render together: either loose cards, or

@@ -20,7 +20,9 @@ import { projects } from '../../content/projects';
 import type { Project } from '../../content/projects';
 import type { Locale, LocalizedString } from '../../content/types';
 import { LOCALES } from '../../content/types';
+import { ventureBySlug } from '../../content/ventures';
 import { localeFromPathname, pathForLocale, routePathFromPathname } from '../../i18n/locale-url';
+import { groupProjects } from '../project-groups';
 
 export interface AioSection {
   heading: string;
@@ -69,6 +71,7 @@ const COPY = {
   stack: { en: 'Stack', 'pt-BR': 'Stack' },
   highlights: { en: 'Highlights', 'pt-BR': 'Destaques' },
   role: { en: 'Role', 'pt-BR': 'Papel' },
+  venturePractices: { en: 'How the team works', 'pt-BR': 'Como o time trabalha' },
   selectedProjects: { en: 'Selected projects', 'pt-BR': 'Projetos selecionados' },
   whatThisPageIs: { en: 'What is on this page', 'pt-BR': 'O que há nesta página' },
   aboutTitlePrefix: { en: 'About', 'pt-BR': 'Sobre' },
@@ -220,6 +223,45 @@ function aboutPage(locale: Locale): AioPage {
   });
 }
 
+/**
+ * The index as a crawler sees it: a venture is introduced before the projects
+ * it contains, so six systems from one client read as one engagement rather
+ * than as six unrelated entries.
+ */
+function projectsIndexSections(locale: Locale): AioSection[] {
+  const L = localizer(locale);
+  const sections: AioSection[] = [];
+
+  const projectSection = (p: Project): AioSection => ({
+    heading: p.name,
+    paragraphs: [L(p.description)],
+    bullets: [`${L(COPY.stack)}: ${p.tech.join(', ')}`, `${L(COPY.role)}: ${L(p.role)}`],
+  });
+
+  for (const group of groupProjects(projects)) {
+    if (group.kind === 'venture') {
+      const venture = ventureBySlug(group.ventureSlug);
+      if (venture) {
+        sections.push({
+          heading: venture.name,
+          paragraphs: [
+            L(venture.summary),
+            [L(venture.role), L(venture.period), venture.engagement ? L(venture.engagement) : undefined, venture.team ? L(venture.team) : undefined]
+              .filter(Boolean)
+              .join(' · '),
+          ],
+          bullets: (venture.practices ?? []).map(
+            (section) => `${L(section.heading)} — ${L(section.body)}`,
+          ),
+        });
+      }
+    }
+    for (const p of group.projects) sections.push(projectSection(p));
+  }
+
+  return sections;
+}
+
 function projectsPage(locale: Locale): AioPage {
   const L = localizer(locale);
   return page(locale, '/projects', {
@@ -228,11 +270,7 @@ function projectsPage(locale: Locale): AioPage {
       .replace('{name}', profile.name)
       .replace('{list}', projects.map((p) => p.name).join(', ')),
     heading: `${L(COPY.projectsHeading)} ${profile.name}`,
-    sections: projects.map((p) => ({
-      heading: p.name,
-      paragraphs: [L(p.description)],
-      bullets: [`${L(COPY.stack)}: ${p.tech.join(', ')}`, `${L(COPY.role)}: ${L(p.role)}`],
-    })),
+    sections: projectsIndexSections(locale),
     priority: 0.9,
   });
 }
