@@ -146,7 +146,7 @@ export const projects: Project[] = [
     tech: ['.NET 10', 'SignalR', 'RabbitMQ', 'Redis', 'Postgres', 'React 19', 'Docker', 'Terraform'],
     role: { en: 'Design & implementation', 'pt-BR': 'Design & implementação' },
     visibility: 'public',
-    screenshot: '/screenshots/pulse.png',
+    screenshot: '/screenshots/pulse.webp',
     links: [
       { label: 'Live site', href: 'https://pulse.felipealmeida.tech' },
       { label: 'GitHub', href: 'https://github.com/felipe-allmeida/pulse' },
@@ -314,7 +314,7 @@ export const projects: Project[] = [
     },
     period: { en: 'Professional work', 'pt-BR': 'Trabalho profissional' },
     visibility: 'private',
-    screenshot: '/screenshots/kota.png',
+    screenshot: '/screenshots/kota.webp',
     links: [{ label: 'Website', href: 'https://kota.io' }],
     detail: {
       overview: {
@@ -546,7 +546,7 @@ export const projects: Project[] = [
     },
     period: { en: '2020–2024', 'pt-BR': '2020–2024' },
     visibility: 'private',
-    screenshot: '/screenshots/dietbox.png',
+    screenshot: '/screenshots/dietbox.webp',
     links: [{ label: 'Website', href: 'https://dietbox.me' }],
     detail: {
       overview: {
@@ -797,7 +797,7 @@ export const projects: Project[] = [
     period: { en: 'Professional work', 'pt-BR': 'Trabalho profissional' },
     visibility: 'private',
     links: [],
-    screenshot: '/screenshots/ulbra-atende.png',
+    screenshot: '/screenshots/ulbra-atende.webp',
     detail: {
       overview: {
         en: "The IT service desk for ULBRA — a .NET 10 modular monolith that replaced GLPI as the single intake channel for the university's IT department, carrying a request from ticket to SLA to satisfaction survey.",
@@ -1027,7 +1027,7 @@ export const projects: Project[] = [
     role: { en: 'Software engineer', 'pt-BR': 'Engenheiro de software' },
     period: { en: 'Professional work', 'pt-BR': 'Trabalho profissional' },
     visibility: 'private',
-    screenshot: '/screenshots/ulbra-one.png',
+    screenshot: '/screenshots/ulbra-one.webp',
     links: [],
     detail: {
       overview: {
@@ -1074,7 +1074,7 @@ export const projects: Project[] = [
     },
     period: { en: '2020', 'pt-BR': '2020' },
     visibility: 'private',
-    screenshot: '/screenshots/dell-automated-caller.png',
+    screenshot: '/screenshots/dell-automated-caller.webp',
     links: [],
     detail: {
       overview: {
