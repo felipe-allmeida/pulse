@@ -54,6 +54,16 @@ describe('HelpCard', () => {
     expect(items[0]).toHaveTextContent('The WhatsApp order entering the system on its own');
   });
 
+  it('renders the technical line at full opacity, not a fractional-opacity muted colour', async () => {
+    const { container } = await renderWithI18n(<HelpCard variant="idea" />);
+
+    const details = container.querySelector('details') as HTMLDetailsElement;
+    const techLine = within(details).getByText(/12\+ years in \.NET and React/).closest('p') as HTMLParagraphElement;
+
+    expect(techLine.className).toMatch(/text-muted-foreground/);
+    expect(techLine.className).not.toMatch(/text-muted-foreground\/70/);
+  });
+
   it('renders pt-BR copy', async () => {
     await renderWithI18n(<HelpCard variant="repetitive" />, { locale: 'pt-BR' });
 

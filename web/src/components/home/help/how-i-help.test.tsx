@@ -57,6 +57,17 @@ describe('HowIHelp', () => {
     ).toBeNull();
   });
 
+  it('gives both CTAs a 44px+ tap target', async () => {
+    await renderWithI18n(<HowIHelp />);
+
+    const ask = screen.getByRole('button', { name: /tell me your case/i });
+    const book = screen.getByRole('link', { name: /talk to me/i });
+
+    for (const cta of [ask, book]) {
+      expect(cta.className).toMatch(/min-h-11|min-h-\[44px\]/);
+    }
+  });
+
   it('links the secondary CTA to the booking link, in a new tab', async () => {
     await renderWithI18n(<HowIHelp />);
 

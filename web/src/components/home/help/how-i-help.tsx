@@ -47,7 +47,7 @@ export function HowIHelp() {
             type="button"
             size="lg"
             onClick={() => openAskWidget()}
-            className="border-transparent bg-signal text-signal-foreground hover:bg-signal/90"
+            className="min-h-11 border-transparent bg-signal text-signal-foreground hover:bg-signal/90"
           >
             <MessageCircle aria-hidden="true" />
             {t('home:help.cta.ask')}
@@ -58,7 +58,7 @@ export function HowIHelp() {
               href={profile.contact.calendly}
               target="_blank"
               rel="noreferrer"
-              className={cn(buttonVariants({ variant: 'outline', size: 'lg' }))}
+              className={cn(buttonVariants({ variant: 'outline', size: 'lg' }), 'min-h-11')}
             >
               <Calendar aria-hidden="true" />
               {t('home:help.cta.book')}

@@ -69,8 +69,8 @@ export function HelpCard({ variant }: { variant: HelpCardKey }) {
 
         {/* The one place technical vocabulary is allowed. Small and dimmed on
             purpose: the founder's eye slides past it, the engineer's doesn't. */}
-        <p className="mt-3 font-mono text-[11px] leading-relaxed text-muted-foreground/70">
-          <span className="text-signal-strong/70">{t('home:help.techLabel')}</span>{' '}
+        <p className="mt-3 font-mono text-[11px] leading-relaxed text-muted-foreground">
+          <span className="text-signal-strong">{t('home:help.techLabel')}</span>{' '}
           {t(`home:help.cards.${variant}.tech`)}
         </p>
       </details>
