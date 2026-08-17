@@ -142,7 +142,15 @@ export function aio(options: AioOptions = {}): Plugin {
         if (!routeFile) return undefined;
 
         for (const [fileName, chunk] of Object.entries(bundle)) {
-          if (chunk.type !== 'chunk') continue;
+          // isDynamicEntry, not just chunk.type: TanStack's autoCodeSplitting
+          // also produces an eager route-registration chunk for the same
+          // source file (needed by every page so the client router can match
+          // URL patterns) — it's already in every document's static graph,
+          // and we must never preload it a second time, let alone let it
+          // shadow the real component chunk we're actually looking for.
+          // isDynamicEntry is true only on the chunk reached solely via
+          // import(), which is exactly the one this preload is for.
+          if (chunk.type !== 'chunk' || !chunk.isDynamicEntry) continue;
           // facadeModuleId, not the chunk name — rolldown prefixes and dedupes
           // names, but the facade points at the real source module.
           if (chunk.facadeModuleId?.includes(routeFile)) return `/${fileName}`;
