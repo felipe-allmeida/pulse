@@ -58,6 +58,33 @@
 	@markdown path *.md
 	header @markdown Content-Type "text/markdown; charset=utf-8"
 
+	# Build assets are public, content-hashed, and — the part that is easy to
+	# miss — fetched cross-origin by anything that re-renders this site outside
+	# a browser tab pointed at it. Microsoft Clarity replays recorded sessions
+	# inside an iframe on its own origin, and Vite stamps `crossorigin` onto the
+	# <link rel="stylesheet"> it emits, which makes that fetch CORS-mode: with
+	# no Access-Control-Allow-Origin the browser blocks the stylesheet outright
+	# and every playback and heatmap renders as bare unstyled HTML. Nothing
+	# under /assets is private or credentialed, so "*" is the whole requirement
+	# — it is also exactly what Clarity asks for ("allow public and cross-origin
+	# access to your site").
+	@assets path /assets/*
+	header @assets Access-Control-Allow-Origin "*"
+
+	# Assets are also served WITHOUT the SPA fallback below, so one that does
+	# not exist 404s. Each deploy publishes a fresh set of hashes and drops the
+	# previous set, so the asset URL baked into an already-recorded session
+	# routinely stops existing — and under the catch-all `try_files` that URL
+	# answered 200 with the `text/html` of /index.html rather than 404. Clarity
+	# then caches an HTML document as this page's stylesheet, which no browser
+	# will apply, so the recording stays unstyled even once the header above is
+	# in place. A truthful 404 also keeps a half-published deploy from looking
+	# like a success to the module loader, and to whoever is debugging it.
+	handle /assets/* {
+		root * /srv
+		file_server
+	}
+
 	# Everything else: the built SPA, with client-side-router fallback.
 	#
 	# The `{path}.html` step is what serves the AIO documents the web build
