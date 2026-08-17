@@ -17,7 +17,8 @@
 - **No jargon on the card surface.** Headline and body must contain no technical terms. Technical vocabulary appears only in the `tech` line inside the collapsed layer.
 - **Motion respects `prefers-reduced-motion`,** and the animated element carries `data-motion="static" | "animated"` — the convention `architecture-diagram.tsx`, `hero-map.tsx` and `pill.tsx` already follow.
 - **Components must survive SSR.** `pnpm -C web build` prerenders via `vite build --ssr src/entry-prerender.tsx`. Never touch `window`, `document` or `IntersectionObserver` during render — only inside `useEffect`.
-- **This project uses pnpm, and commands run from the repo root** via `-C web`, exactly as CI does (`.github/workflows/ci.yml`). Tests: `pnpm -C web test`. A single file: `pnpm -C web test src/path/to/file.test.tsx`. Lint: `pnpm -C web lint`. Typecheck: `pnpm -C web exec tsc --noEmit`. Build: `pnpm -C web build`. Never `npm`.
+- **This project uses pnpm, and commands run from the repo root** via `-C web`, exactly as CI does (`.github/workflows/ci.yml`). Tests: `pnpm -C web test`. A single file: `pnpm -C web test src/path/to/file.test.tsx`. Lint: `pnpm -C web lint`. Typecheck: `pnpm -C web exec tsc -b`. Build: `pnpm -C web build`. Never `npm`.
+- **`tsc -b` is the authoritative typecheck, not `tsc --noEmit`.** The build script runs `tsc -b`, which resolves `web/tsconfig.app.json` — that config sets `erasableSyntaxOnly`, `strict`, `noUnusedLocals` and `noUnusedParameters`, and it *includes the test files*. `tsc --noEmit` passes on code that `tsc -b` rejects. In particular, TypeScript parameter properties (`constructor(private x: T)`) emit runtime code and are forbidden by `erasableSyntaxOnly` — write a plain field and assign in the constructor body instead.
 - **Tests are co-located** as `<name>.test.tsx` beside the component, and render through `renderWithI18n` from `@/test/render-with-i18n`.
 
 ---
@@ -1076,7 +1077,7 @@ Expected: no output.
 
 - [ ] **Step 8: Lint and build**
 
-Run: `pnpm -C web lint && pnpm -C web exec tsc --noEmit && pnpm -C web build`
+Run: `pnpm -C web lint && pnpm -C web exec tsc -b && pnpm -C web build`
 Expected: both succeed. The build includes the SSR prerender pass, which is what proves `HelpDiagram`'s `IntersectionObserver` use is safely confined to `useEffect`.
 
 - [ ] **Step 9: Commit**
