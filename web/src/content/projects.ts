@@ -859,6 +859,10 @@ export const projects: Project[] = [
           label: { en: 'satisfaction score', 'pt-BR': 'nota de satisfação' },
           note: { en: '400+ responses, 1-5 scale', 'pt-BR': '400+ respostas, escala 1-5' },
         },
+        {
+          value: { en: '~200', 'pt-BR': '~200' },
+          label: { en: 'users served', 'pt-BR': 'usuários atendidos' },
+        },
       ],
       architecture: {
         summary: {

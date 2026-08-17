@@ -162,7 +162,7 @@ it('ulbra-atende has a full case study, localized in every locale', () => {
   expectBothLocales(detail!.problem!, 'problem');
   expectBothLocales(detail!.metricsNote!, 'metricsNote');
 
-  expect(detail!.metrics).toHaveLength(4);
+  expect(detail!.metrics).toHaveLength(5);
   for (const metric of detail!.metrics!) {
     expectBothLocales(metric.value, 'metric.value');
     expectBothLocales(metric.label, 'metric.label');
