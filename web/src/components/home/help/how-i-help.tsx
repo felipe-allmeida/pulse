@@ -3,9 +3,8 @@ import { useTranslation } from 'react-i18next';
 import { HelpCard } from '@/components/home/help/help-card';
 import { HELP_CARD_KEYS } from '@/components/home/help/help-cards';
 import { SectionEyebrow } from '@/components/signal/section-eyebrow';
-import { Button, buttonVariants } from '@/components/ui/button';
+import { buttonVariants } from '@/components/ui/button';
 import { profile } from '@/content/profile';
-import { useAskWidgetStore } from '@/stores/ask-widget-store';
 import { cn } from '@/lib/utils';
 
 /**
@@ -18,7 +17,6 @@ import { cn } from '@/lib/utils';
  */
 export function HowIHelp() {
   const { t } = useTranslation('home');
-  const openAskWidget = useAskWidgetStore((s) => s.open);
   const [featuredKey, ...compactKeys] = HELP_CARD_KEYS;
 
   return (
@@ -50,20 +48,29 @@ export function HowIHelp() {
         </div>
 
         {/*
-          `open()` with no argument, unlike AskChips: this button asks the
-          visitor to describe their own situation, so the widget opens with
-          an empty composer rather than submitting a question for them.
+          A real channel, not the Ask widget. That widget is a retrieval
+          assistant scoped to Felipe's profile — a founder who accepted this
+          invitation and described their actual problem was told the assistant
+          had no information about Felipe, at the highest point of buying
+          intent on the page. The message is handed over mid-sentence so the
+          founder finishes it instead of facing an empty composer.
         */}
         <div className="flex flex-wrap items-center gap-3">
-          <Button
-            type="button"
-            size="lg"
-            onClick={() => openAskWidget()}
-            className="min-h-11 border-transparent bg-signal text-signal-foreground hover:bg-signal/90"
-          >
-            <MessageCircle aria-hidden="true" />
-            {t('home:help.cta.ask')}
-          </Button>
+          {profile.contact.whatsapp !== '' && (
+            <a
+              href={`${profile.contact.whatsapp}?text=${encodeURIComponent(t('home:help.cta.whatsappMessage'))}`}
+              target="_blank"
+              rel="noreferrer"
+              aria-label={t('home:help.cta.askAria')}
+              className={cn(
+                buttonVariants({ size: 'lg' }),
+                'min-h-11 border-transparent bg-signal text-signal-foreground hover:bg-signal/90',
+              )}
+            >
+              <MessageCircle aria-hidden="true" />
+              {t('home:help.cta.ask')}
+            </a>
+          )}
 
           {profile.contact.calendly !== '' && (
             <a

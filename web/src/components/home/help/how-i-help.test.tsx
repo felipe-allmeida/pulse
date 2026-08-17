@@ -1,15 +1,10 @@
-import { fireEvent, screen } from '@testing-library/react';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { screen } from '@testing-library/react';
+import { describe, expect, it } from 'vitest';
 import { renderWithI18n } from '@/test/render-with-i18n';
 import { profile } from '@/content/profile';
-import { useAskWidgetStore } from '@/stores/ask-widget-store';
 import { HowIHelp } from './how-i-help';
 
 describe('HowIHelp', () => {
-  beforeEach(() => {
-    useAskWidgetStore.setState({ isOpen: false, pendingQuestion: null });
-  });
-
   it('renders the heading, eyebrow and lede', async () => {
     await renderWithI18n(<HowIHelp />);
 
@@ -30,22 +25,30 @@ describe('HowIHelp', () => {
     ]);
   });
 
-  it('opens the Ask widget with an empty composer when the primary CTA is clicked', async () => {
+  it('sends the primary CTA to WhatsApp with the message half-written', async () => {
     await renderWithI18n(<HowIHelp />);
 
-    fireEvent.click(screen.getByRole('button', { name: /tell me your case/i }));
+    const ask = screen.getByRole('link', { name: /tell me your case/i });
+    const href = ask.getAttribute('href') ?? '';
 
-    expect(useAskWidgetStore.getState().isOpen).toBe(true);
-    expect(
-      useAskWidgetStore.getState().pendingQuestion,
-      'the visitor types their own case — nothing is submitted for them',
-    ).toBeNull();
+    expect(href.startsWith(`${profile.contact.whatsapp}?text=`), href).toBe(true);
+    expect(decodeURIComponent(href.split('?text=')[1] ?? '')).toBe(
+      "Hi Felipe, I came from your site. What's stuck here today is ",
+    );
+    expect(ask).toHaveAttribute('target', '_blank');
+    expect(ask).toHaveAttribute('rel', 'noreferrer');
+  });
+
+  it('names WhatsApp in the accessible name, keeping the visible label as its prefix', async () => {
+    await renderWithI18n(<HowIHelp />);
+
+    expect(screen.getByRole('link', { name: 'Tell me your case on WhatsApp' })).toBeInTheDocument();
   });
 
   it('gives both CTAs a 44px+ tap target', async () => {
     await renderWithI18n(<HowIHelp />);
 
-    const ask = screen.getByRole('button', { name: /tell me your case/i });
+    const ask = screen.getByRole('link', { name: /tell me your case/i });
     const book = screen.getByRole('link', { name: /talk to me/i });
 
     for (const cta of [ask, book]) {
@@ -66,7 +69,7 @@ describe('HowIHelp', () => {
     await renderWithI18n(<HowIHelp />, { locale: 'pt-BR' });
 
     expect(screen.getByRole('heading', { name: 'Como eu posso te ajudar?' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /me conta o seu caso/i })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /me conta o seu caso/i })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /conversar comigo/i })).toBeInTheDocument();
   });
 
