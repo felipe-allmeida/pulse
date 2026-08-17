@@ -71,7 +71,6 @@ const COPY = {
   stack: { en: 'Stack', 'pt-BR': 'Stack' },
   highlights: { en: 'Highlights', 'pt-BR': 'Destaques' },
   role: { en: 'Role', 'pt-BR': 'Papel' },
-  venturePractices: { en: 'How the team works', 'pt-BR': 'Como o time trabalha' },
   selectedProjects: { en: 'Selected projects', 'pt-BR': 'Projetos selecionados' },
   whatThisPageIs: { en: 'What is on this page', 'pt-BR': 'O que há nesta página' },
   aboutTitlePrefix: { en: 'About', 'pt-BR': 'Sobre' },

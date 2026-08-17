@@ -65,9 +65,10 @@ Software Engineer & Architect, and engineering leader. 12+ years building and ru
 ## Other work
 
 Written-up projects are in the "Project case studies" section appended below, which is generated from the
-site's own project pages. These two are not written up there:
+site's own project pages. The ULBRA platform is there too — six case studies (service desk, ERP, CRM,
+administrative dashboards, student dashboard, and the datacenter automation underneath them), all closed-source
+client work described without the code. One is not written up there:
 
-- **Internal enterprise platforms (freelance)** — a support/ticketing platform and an internal ERP, built in .NET & React. (Proprietary client work — described at a high level.)
 - **Pampa Devs** — his software studio / open-source templates and tools for the developer community.
 
 ## Contact
