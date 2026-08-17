@@ -69,4 +69,24 @@ describe('HowIHelp', () => {
     expect(screen.getByRole('button', { name: /me conta o seu caso/i })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /conversar comigo/i })).toBeInTheDocument();
   });
+
+  it('features exactly one card, and it is the first', async () => {
+    const { container } = await renderWithI18n(<HowIHelp />);
+
+    const featured = container.querySelectorAll('[data-featured="true"]');
+    expect(featured, 'hierarchy comes from one card being larger, not from four equal ones').toHaveLength(1);
+
+    expect(featured[0]?.querySelector('h3')).toHaveTextContent(
+      'Your team spends the day doing work a machine would do.',
+    );
+  });
+
+  it('puts the three remaining cards in one row from md up', async () => {
+    const { container } = await renderWithI18n(<HowIHelp />);
+
+    const row = container.querySelector('[data-help-row]');
+    expect(row).toBeInTheDocument();
+    expect(row?.className).toMatch(/md:grid-cols-3/);
+    expect(row?.querySelectorAll('h3')).toHaveLength(3);
+  });
 });

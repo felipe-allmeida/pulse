@@ -19,6 +19,7 @@ import { cn } from '@/lib/utils';
 export function HowIHelp() {
   const { t } = useTranslation('home');
   const openAskWidget = useAskWidgetStore((s) => s.open);
+  const [featuredKey, ...compactKeys] = HELP_CARD_KEYS;
 
   return (
     <section className="bg-background px-6 py-14 text-foreground sm:px-10 md:py-20">
@@ -31,10 +32,21 @@ export function HowIHelp() {
           <p className="max-w-prose text-sm leading-relaxed text-muted-foreground">{t('home:help.lede')}</p>
         </div>
 
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          {HELP_CARD_KEYS.map((variant) => (
-            <HelpCard key={variant} variant={variant} />
-          ))}
+        {/*
+          Asymmetric on purpose. Four identically weighted cards gave the
+          reader no entry point, so the first — repetitive manual work, the
+          problem a founder recognises fastest — runs the full width and the
+          other three share a row beneath it. Promoting a different offer is a
+          reorder of HELP_CARD_KEYS, not a rewrite of this file.
+        */}
+        <div className="flex flex-col gap-4">
+          <HelpCard variant={featuredKey} featured />
+
+          <div data-help-row className="grid grid-cols-1 gap-4 md:grid-cols-3">
+            {compactKeys.map((variant) => (
+              <HelpCard key={variant} variant={variant} />
+            ))}
+          </div>
         </div>
 
         {/*
