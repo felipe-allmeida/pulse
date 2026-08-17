@@ -294,20 +294,46 @@ it('dell-automated-caller is last — it is the oldest work', () => {
   expect(projects[projects.length - 1].slug).toBe('dell-automated-caller');
 });
 
+/**
+ * Strips the specific placeholder forms a project narrative is allowed to
+ * contain, so the guard below can run over *every* field of every project —
+ * including `script.lines` — rather than exempting a whole field from
+ * inspection. Two forms are sanctioned, and only these:
+ *
+ * - RFC 2606 reserved domains (`example.com`, `.net`, `.org`) and this
+ *   repo's `example.internal` convention for sample hostnames. These are
+ *   reserved by specification precisely so they can never resolve to a real
+ *   host, so a match here cannot be a leak.
+ * - A dot-less hostname inside a URL, e.g. `http://otel-collector:4317`.
+ *   DNS requires a dot for a name to be publicly resolvable, so a bare,
+ *   dot-less name is a container/service alias by construction — it cannot
+ *   be a real internet-facing address no matter which config it appears in.
+ *
+ * Anything else — a real TLD, a dotted internal hostname, a credential — is
+ * left untouched and still fails the checks that follow.
+ */
+function withoutSanctionedPlaceholders(text: string): string {
+  return (
+    text
+      // registry.example.internal, my-app.example.internal, example.com, ...
+      .replace(/\b(?:[a-z0-9-]+\.)*example\.(?:com|net|org|internal)\b/gi, 'PLACEHOLDER_HOST')
+      // http://otel-collector:4317 — host has no dot, so no scheme+host survives.
+      .replace(/\bhttps?:\/\/[a-z0-9-]+(?!\.)/gi, 'PLACEHOLDER_URL')
+  );
+}
+
 it('publishes no hostname, URL or credential in any project narrative', () => {
   // Deliberately pattern-based rather than a list of the specific internal
   // hosts to keep out: this repository is public, so a guard naming them would
   // publish exactly what it exists to protect — the same trap a name-list guard
   // fell into on an earlier project. `links` is excluded because a public repo
-  // link is the one URL that belongs in content. `script.lines` is excluded
-  // because it is verbatim sample code, not prose — ulbra-infra's script
-  // legitimately carries placeholder hosts (registry.example.internal) and a
-  // placeholder URL, and has its own dedicated real-host check below.
+  // link is the one URL that belongs in content. Everything else — including
+  // `script.lines`, which is verbatim sample code rather than prose — is
+  // scanned, with only the sanctioned placeholder forms neutralised first;
+  // see `withoutSanctionedPlaceholders`.
   for (const project of projects) {
     if (!project.detail) continue;
-    const { script, ...rest } = project.detail;
-    const narrativeSource = script ? { ...rest, script: { ...script, lines: [] } } : rest;
-    const narrative = JSON.stringify(narrativeSource);
+    const narrative = withoutSanctionedPlaceholders(JSON.stringify(project.detail));
     expect(narrative, `${project.slug} detail contains a URL`).not.toMatch(/https?:\/\//);
     expect(narrative, `${project.slug} detail contains a hostname`).not.toMatch(
       /\b[a-z0-9-]+\.(com|io|net|dev|internal)\b/i,
