@@ -58,12 +58,37 @@ it('the experience timeline is keyed uniquely — Dietbox appears twice, under t
   expect(profile.experience.filter((e) => e.org === 'Dietbox')).toHaveLength(2);
 });
 
-it('only the current role has an open-ended period; the rest carry real dates', () => {
-  const [current, ...past] = profile.experience;
-  expect(current.period.en).toBe('Current');
-  for (const entry of past) {
-    expect(entry.period.en, `${entry.org} has no dated period`).toMatch(/^[A-Z][a-z]{2} \d{4} – [A-Z][a-z]{2} \d{4}$/);
+/**
+ * Two roles are open-ended at once and both are true: ULBRA is a client of
+ * Pampa Devs, so the studio engagement and the Head of Technology mandate run
+ * simultaneously. What is still worth asserting is that every *closed* role
+ * carries a real date range rather than a word like "Recent".
+ */
+it('open-ended periods end in Current; every closed role carries real dates', () => {
+  const isOpenEnded = (period: string) => /(^|– )Current$/.test(period);
+
+  const open = profile.experience.filter((e) => isOpenEnded(e.period.en));
+  expect(open.length, 'at least one role is current').toBeGreaterThan(0);
+  expect(profile.experience[0], 'a current role leads the timeline').toBe(open[0]);
+
+  for (const entry of profile.experience.filter((e) => !isOpenEnded(e.period.en))) {
+    expect(entry.period.en, `${entry.org} has no dated period`).toMatch(
+      /^[A-Z][a-z]{2} \d{4} – [A-Z][a-z]{2} \d{4}$/,
+    );
   }
+});
+
+it('ULBRA is on the timeline, named as an engagement rather than a ninth employer', () => {
+  const ulbra = profile.experience.find((e) => e.org === 'ULBRA');
+  expect(ulbra, 'the ULBRA mandate is on the timeline').toBeDefined();
+  expect(ulbra!.role.en, 'the role must name whose engagement this is').toMatch(/pampa devs/i);
+  expect(ulbra!.role['pt-BR']).toMatch(/pampa devs/i);
+  expect(ulbra!.url).toBe('https://www.ulbra.br');
+});
+
+it('the bio names the current mandate', () => {
+  expect(profile.bio.en).toMatch(/ulbra/i);
+  expect(profile.bio['pt-BR']).toMatch(/ulbra/i);
 });
 
 it('pulse is public with a repo link; ulbra projects are private with no repo link', () => {

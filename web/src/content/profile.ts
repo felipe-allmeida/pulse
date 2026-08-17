@@ -43,9 +43,9 @@ export const profile: Profile = {
     'pt-BR': 'Construo sistemas distribuídos, plataformas para desenvolvedores e infraestrutura em cloud.',
   },
   bio: {
-    en: 'Software engineer and architect with 12+ years building and running .NET platforms — distributed systems, event-driven design, and CI/CD. As Head of Technology at Dietbox he led a 13-person engineering, QA, UX and support organization while staying hands-on in architecture and delivery. Most recently Senior Product Engineer at Kota.io, building health-insurance infrastructure for the European market. Currently freelancing through Pampa Devs — his software studio — and open to new roles.',
+    en: 'Software engineer and architect with 12+ years building and running .NET platforms — distributed systems, event-driven design, and CI/CD. As Head of Technology at Dietbox he led a 13-person engineering, QA, UX and support organization while staying hands-on in architecture and delivery. Most recently Senior Product Engineer at Kota.io, building health-insurance infrastructure for the European market. Currently freelancing through Pampa Devs — his software studio — where he is Head of Technology for ULBRA, leading three engineers across the university\'s internal platform, and open to new roles.',
     'pt-BR':
-      'Engenheiro e arquiteto de software com mais de 12 anos construindo e operando plataformas .NET — sistemas distribuídos, arquitetura orientada a eventos e CI/CD. Como Head of Technology na Dietbox, liderou uma organização de 13 pessoas entre engenharia, QA, UX e suporte sem sair da arquitetura e da entrega. Mais recentemente, Senior Product Engineer na Kota.io, construindo infraestrutura de seguro-saúde para o mercado europeu. Atualmente atuando como freelancer pela Pampa Devs — seu estúdio de software — e aberto a novas oportunidades.',
+      'Engenheiro e arquiteto de software com mais de 12 anos construindo e operando plataformas .NET — sistemas distribuídos, arquitetura orientada a eventos e CI/CD. Como Head of Technology na Dietbox, liderou uma organização de 13 pessoas entre engenharia, QA, UX e suporte sem sair da arquitetura e da entrega. Mais recentemente, Senior Product Engineer na Kota.io, construindo infraestrutura de seguro-saúde para o mercado europeu. Atualmente atuando como freelancer pela Pampa Devs — seu estúdio de software —, onde é Head de Tecnologia da ULBRA, liderando três engenheiros na plataforma interna da universidade, e aberto a novas oportunidades.',
   },
   contact: {
     calendly: 'https://calendly.com/pampa-devs/bate-papo-sobre-seu-projeto',
@@ -95,11 +95,37 @@ export const profile: Profile = {
         'Scrum / Kanban',
         'Trunk-Based Development',
         'DORA metrics',
+        'AI-assisted delivery',
         'Roadmap & budget',
       ],
     },
   ],
   experience: [
+    /*
+      ULBRA is a client of Pampa Devs, not a ninth employer — the role says so,
+      the same way the ROLÊ row says "side venture". Both rows are open-ended
+      because both are true at once: the studio holds the contract and this is
+      the mandate inside it.
+
+      The period starts in April rather than at the May contract date because
+      the first commits — `infra` on 9 Apr, the service desk on 18 Apr — are
+      the author's own, and a timeline that postdates its own evidence is the
+      one thing a checkable page must not do.
+    */
+    {
+      role: {
+        en: 'Head of Technology (engagement via Pampa Devs)',
+        'pt-BR': 'Head de Tecnologia (contrato via Pampa Devs)',
+      },
+      org: 'ULBRA',
+      url: 'https://www.ulbra.br',
+      period: { en: 'Apr 2026 – Current', 'pt-BR': 'Abr 2026 – Atual' },
+      summary: {
+        en: "Leads a three-engineer team building the university's internal platform from scratch — an IT service desk in production, an ERP replacing the legacy systems, a CRM taken over and rebuilt to full test coverage, administrative dashboards for the board, and the datacenter automation all of it deploys onto. Introduced a spec-first, AI-assisted delivery model in which the team's time goes to specification and code review.",
+        'pt-BR':
+          'Lidera um time de três engenheiros construindo do zero a plataforma interna da universidade — um service desk de TI em produção, um ERP substituindo os sistemas legados, um CRM assumido e reconstruído até cobertura total de testes, dashboards administrativos para a diretoria e a automação de datacenter em que tudo isso é publicado. Introduziu um modelo de entrega assistido por IA e guiado por especificação, em que o tempo do time vai para especificar e revisar código.',
+      },
+    },
     {
       role: { en: 'Founder & Software Engineer/Architect', 'pt-BR': 'Fundador & Engenheiro/Arquiteto de Software' },
       org: 'Pampa Devs',
