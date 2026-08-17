@@ -113,9 +113,11 @@ of Technology for teams of 3 to 13.
 - **Lede:** in the register of *"I don't sell technology. I fix the process
   that today only moves when someone remembers to do it by hand."*
 - **CTA, at the foot of the section:** primary **"Tell me your case"** opening
-  the Ask widget with that question pre-submitted (`useAskWidgetStore.open`,
-  the same mechanism `AskChips` uses); secondary **"Talk to me"** linking to
-  `profile.contact.calendly`.
+  the Ask widget with an **empty composer** — `useAskWidgetStore.open()` called
+  with no argument. `AskChips` passes a question because it offers a specific
+  pre-written one; this button asks the visitor to speak, so submitting a
+  question on their behalf would contradict the label. Secondary **"Talk to
+  me"** links to `profile.contact.calendly`.
 
 All copy ships in both `en` and `pt-BR`. The Portuguese is the original — it is
 the language the founder conversation happens in — and the English is a
