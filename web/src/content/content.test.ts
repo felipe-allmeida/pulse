@@ -1,4 +1,4 @@
-import { expect, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { profile } from './profile';
 import { projects } from './projects';
 import { ventures } from './ventures';
@@ -303,11 +303,23 @@ it('dell-automated-caller is last — it is the oldest work', () => {
  * - RFC 2606 reserved domains (`example.com`, `.net`, `.org`) and this
  *   repo's `example.internal` convention for sample hostnames. These are
  *   reserved by specification precisely so they can never resolve to a real
- *   host, so a match here cannot be a leak.
+ *   host, so a match here cannot be a leak. The negative lookbehind requires
+ *   that nothing already part of a domain label (a letter, digit or hyphen)
+ *   sits immediately before the match — without it, `evil-example.com`
+ *   reads as a subdomain of `example.com` and gets wrongly neutralised,
+ *   because a hyphen still satisfies a plain `\b` word boundary.
  * - A dot-less hostname inside a URL, e.g. `http://otel-collector:4317`.
  *   DNS requires a dot for a name to be publicly resolvable, so a bare,
  *   dot-less name is a container/service alias by construction — it cannot
  *   be a real internet-facing address no matter which config it appears in.
+ *   The host run must be followed by a port, a path, a closing quote (the
+ *   input is `JSON.stringify`'d, so a URL at the end of a string is
+ *   followed by `"`) or the end of input. Asserting that terminator directly
+ *   — rather than forbidding a trailing dot with `(?!\.)` — matters: `(?!\.)`
+ *   only rejects backtracking to the exact boundary of a dotted label, so on
+ *   an ordinary host like `google.com` the greedy match backtracks one
+ *   character short of the dot and matches anyway, leaving a masked
+ *   `PLACEHOLDER_URLe.com` behind with no word boundary in front of the TLD.
  *
  * Anything else — a real TLD, a dotted internal hostname, a credential — is
  * left untouched and still fails the checks that follow.
@@ -316,11 +328,58 @@ function withoutSanctionedPlaceholders(text: string): string {
   return (
     text
       // registry.example.internal, my-app.example.internal, example.com, ...
-      .replace(/\b(?:[a-z0-9-]+\.)*example\.(?:com|net|org|internal)\b/gi, 'PLACEHOLDER_HOST')
+      .replace(/(?<![a-z0-9-])(?:[a-z0-9-]+\.)*example\.(?:com|net|org|internal)\b/gi, 'PLACEHOLDER_HOST')
       // http://otel-collector:4317 — host has no dot, so no scheme+host survives.
-      .replace(/\bhttps?:\/\/[a-z0-9-]+(?!\.)/gi, 'PLACEHOLDER_URL')
+      .replace(/\bhttps?:\/\/[a-z0-9-]+(?=[:/"']|$)/gi, 'PLACEHOLDER_URL')
   );
 }
+
+/**
+ * `withoutSanctionedPlaceholders` is logic, not content, and a silent
+ * regression in it disables the guard below without any test going red —
+ * which is exactly what happened once already (a field-wide exclusion) and
+ * a second time after that (a backtracking URL regex that quietly masked
+ * real hosts, including the exact one the plan's Global Constraints name).
+ * So it gets its own case-by-case test: every sanctioned placeholder must
+ * be neutralised, and every real host or URL — including ones deliberately
+ * shaped to look like a sanctioned placeholder — must survive untouched.
+ */
+describe('withoutSanctionedPlaceholders', () => {
+  const hasUrlOrHostname = (text: string) =>
+    /https?:\/\//.test(text) || /\b[a-z0-9-]+\.(com|io|net|dev|internal)\b/i.test(text);
+
+  const sanctioned: Array<[name: string, input: string]> = [
+    ['example.internal', 'image: registry.example.internal/my-app:latest'],
+    ['a sub-domained example.com', 'see docs.example.com for details'],
+    ['dot-less URL alias with a port', 'http://otel-collector:4317'],
+    ['dot-less URL alias at the end of a JSON string', '{"a":"http://myservice"}'],
+  ];
+
+  for (const [name, input] of sanctioned) {
+    it(`neutralises: ${name}`, () => {
+      const output = withoutSanctionedPlaceholders(input);
+      expect(output, `${name}: was not changed at all`).not.toBe(input);
+      expect(hasUrlOrHostname(output), `${name}: still reads as a URL/hostname after neutralising`).toBe(
+        false,
+      );
+    });
+  }
+
+  const real: Array<[name: string, input: string]> = [
+    ['notexample.com is not a subdomain of example.com', 'http://notexample.com'],
+    ['evil-example.com.attacker.net — a label-prefix trick', 'http://evil-example.com.attacker.net'],
+    ['a plain real URL', 'http://google.com'],
+    ['a real bare hostname', 'api.stripe.com'],
+    ['the exact host the plan names to keep out', 'https://signoz.ulbra.ai/x'],
+  ];
+
+  for (const [name, input] of real) {
+    it(`leaves intact: ${name}`, () => {
+      const output = withoutSanctionedPlaceholders(input);
+      expect(hasUrlOrHostname(output), `${name}: was masked by the neutraliser`).toBe(true);
+    });
+  }
+});
 
 it('publishes no hostname, URL or credential in any project narrative', () => {
   // Deliberately pattern-based rather than a list of the specific internal
