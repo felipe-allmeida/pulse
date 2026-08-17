@@ -824,6 +824,10 @@ export const projects: Project[] = [
           { en: 'The OAuth authorization server and the MCP server behind its consent screen.', 'pt-BR': 'O servidor de autorização OAuth e o servidor MCP atrás da sua tela de consentimento.' },
           { en: 'The React front end and the Docker Swarm deployment.', 'pt-BR': 'O front-end em React e o deploy em Docker Swarm.' },
         ],
+        boundary: {
+          en: 'One engineer now works on this codebase alongside him.',
+          'pt-BR': 'Um engenheiro agora trabalha neste código ao lado dele.',
+        },
       },
       problem: {
         en: "ULBRA's IT department took requests through GLPI, e-mail, and direct messages at the same time. There was no SLA per team, no audit trail on approvals, and no way to tell whether anyone was satisfied with the outcome. Ulbra Atende replaces GLPI as the single intake channel and makes each of those measurable — three months in, the median ticket closes in about an hour and a half.",
