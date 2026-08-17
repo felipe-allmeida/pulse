@@ -2,8 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { profile } from './profile';
 import { projects } from './projects';
 import { ventures } from './ventures';
-import { LOCALES } from './types';
-import type { LocalizedString } from './types';
+import { expectBothLocales } from '@/test/expect-both-locales';
 
 it('profile has bio, skills and experience', () => {
   expect(profile.name).toMatch(/felipe/i);
@@ -61,14 +60,17 @@ it('the experience timeline is keyed uniquely — Dietbox appears twice, under t
 /**
  * Two roles are open-ended at once and both are true: ULBRA is a client of
  * Pampa Devs, so the studio engagement and the Head of Technology mandate run
- * simultaneously. What is still worth asserting is that every *closed* role
- * carries a real date range rather than a word like "Recent".
+ * simultaneously — no more, no fewer, so the count is asserted rather than
+ * just its presence, which would silently tolerate a third role losing its
+ * end date by accident. What is still worth asserting beyond that is that
+ * every *closed* role carries a real date range rather than a word like
+ * "Recent".
  */
 it('open-ended periods end in Current; every closed role carries real dates', () => {
   const isOpenEnded = (period: string) => /(^|– )Current$/.test(period);
 
   const open = profile.experience.filter((e) => isOpenEnded(e.period.en));
-  expect(open.length, 'at least one role is current').toBeGreaterThan(0);
+  expect(open, 'exactly ULBRA and Pampa Devs are current').toHaveLength(2);
   expect(profile.experience[0], 'a current role leads the timeline').toBe(open[0]);
 
   for (const entry of profile.experience.filter((e) => !isOpenEnded(e.period.en))) {
@@ -122,15 +124,16 @@ it('projects sharing a venture are contiguous in the array', () => {
 });
 
 /*
-  Replaces the per-slug list in `pulse is public with a repo link; ulbra
-  projects are private with no repo link`, which named `ulbra-atende` and
-  `ulbra-one` by hand and so would silently skip every project added after it.
-  Delete the `for (const slug of ['ulbra-atende', 'ulbra-one'])` loop from that
-  test and leave its `pulse` assertions in place.
+  Replaces the per-slug list that used to live in `pulse is public with a repo
+  link; ulbra projects are private with no repo link`, which named
+  `ulbra-atende` and `ulbra-one` by hand. A rule keyed on `venture` covers
+  every project in the venture automatically, including ones added after this
+  test was written — a hand-maintained list of slugs would silently stop
+  covering a new project the moment someone forgot to add it here.
 */
 it('every venture project is private with no repository link', () => {
   const inVentures = projects.filter((p) => p.venture !== undefined);
-  expect(inVentures.length).toBeGreaterThan(0);
+  expect(inVentures, 'all six ULBRA projects').toHaveLength(6);
   for (const project of inVentures) {
     expect(project.visibility, `${project.slug} visibility`).toBe('private');
     expect(
@@ -142,20 +145,13 @@ it('every venture project is private with no repository link', () => {
 
 it('every ulbra project is led as Head of Technology, not as a nameless engineer', () => {
   const ulbra = projects.filter((p) => p.venture === 'ulbra');
-  expect(ulbra.length).toBeGreaterThan(0);
+  expect(ulbra, 'all six ULBRA projects').toHaveLength(6);
   for (const project of ulbra) {
     expect(project.role.en, `${project.slug} role`).toMatch(/head of technology/i);
     expect(project.period, `${project.slug} has no period`).toBeDefined();
     expect(project.period!.en, `${project.slug} period is a non-answer`).not.toMatch(/professional work/i);
   }
 });
-
-function expectBothLocales(value: LocalizedString, label: string) {
-  for (const locale of LOCALES) {
-    expect(value[locale], `${label} missing ${locale}`).toBeTruthy();
-    expect(value[locale].trim(), `${label} empty in ${locale}`).not.toBe('');
-  }
-}
 
 it('ulbra-atende has a full case study, localized in every locale', () => {
   const project = projects.find((p) => p.slug === 'ulbra-atende');

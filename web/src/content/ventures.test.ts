@@ -1,13 +1,6 @@
 import { expect, it } from 'vitest';
 import { ventures, ventureBySlug } from './ventures';
-import { LOCALES } from './types';
-import type { LocalizedString } from './types';
-
-function expectBothLocales(value: LocalizedString, label: string) {
-  for (const locale of LOCALES) {
-    expect(value[locale], `${label} missing ${locale}`).toBeTruthy();
-  }
-}
+import { expectBothLocales } from '@/test/expect-both-locales';
 
 it('every venture string is localized in every locale', () => {
   expect(ventures.length).toBeGreaterThan(0);
