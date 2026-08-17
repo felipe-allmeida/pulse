@@ -12,9 +12,16 @@ export function useWorld(): World | undefined {
   useEffect(() => {
     if (world) return;
     let cancelled = false;
-    void loadWorld().then((loaded) => {
-      if (!cancelled) setWorld(loaded);
-    });
+    loadWorld()
+      .then((loaded) => {
+        if (!cancelled) setWorld(loaded);
+      })
+      .catch(() => {
+        // Stay undefined — every consumer already renders without geometry.
+        // `loadWorld` resets its in-flight promise on rejection, so a later
+        // mount (or a future render of this same hook) gets a fresh attempt;
+        // this hook doesn't retry or surface an error state itself.
+      });
     return () => {
       cancelled = true;
     };

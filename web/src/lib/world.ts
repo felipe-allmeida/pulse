@@ -34,7 +34,13 @@ export async function loadWorld(): Promise<World> {
     }>;
     cached = feature(typed, typed.objects.countries) as World;
     return cached;
-  })();
+  })().catch((error: unknown) => {
+    // One failed fetch must not poison every later attempt: the geometry is
+    // a separately-fetched chunk, so a transient network failure is real,
+    // and a component mounting later deserves a fresh try.
+    inFlight = undefined;
+    throw error;
+  });
   return inFlight;
 }
 
