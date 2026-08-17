@@ -119,6 +119,37 @@ export function aio(options: AioOptions = {}): Plugin {
       const lastmod = options.lastmod ?? new Date().toISOString().slice(0, 10);
       const { renderRoute } = await loadPrerenderer(process.cwd());
 
+      /**
+       * The chunk holding a route's component.
+       *
+       * The route path is NOT the route filename: `/projects/pulse` is served
+       * by `routes/projects_.$slug.tsx`, and deriving one from the other by
+       * string surgery gets that case wrong and silently emits no preload.
+       * The mapping is small and explicit instead.
+       */
+      const ROUTE_FILES: Record<string, string> = {
+        '/': 'routes/index',
+        '/about': 'routes/about',
+        '/projects': 'routes/projects',
+        '/live': 'routes/live',
+      };
+
+      const chunkForRoute = (routePath: string): string | undefined => {
+        // Every /projects/<slug> shares one dynamic route file.
+        const routeFile = routePath.startsWith('/projects/')
+          ? 'routes/projects_.$slug'
+          : ROUTE_FILES[routePath];
+        if (!routeFile) return undefined;
+
+        for (const [fileName, chunk] of Object.entries(bundle)) {
+          if (chunk.type !== 'chunk') continue;
+          // facadeModuleId, not the chunk name — rolldown prefixes and dedupes
+          // names, but the facade points at the real source module.
+          if (chunk.facadeModuleId?.includes(routeFile)) return `/${fileName}`;
+        }
+        return undefined;
+      };
+
       for (const page of pages) {
         const app = await renderRoute(page.routePath, page.locale);
         if (app.length < 500) {
@@ -130,12 +161,14 @@ export function aio(options: AioOptions = {}): Plugin {
               `Check renderRoute() for this route/locale pair.`,
           );
         }
+        const routeChunk = chunkForRoute(page.routePath);
         const html = renderDocument({
           template,
           page,
           head: renderHead(page, base, site.name, profile.name),
           app,
           css,
+          modulePreloads: routeChunk ? [routeChunk] : [],
         });
         write(outDir, page.file, html);
         write(outDir, `${basenameForPath(page.path)}.md`, renderPageMarkdown(page, base));

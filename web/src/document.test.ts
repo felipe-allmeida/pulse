@@ -121,3 +121,32 @@ describe('inlined stylesheet', () => {
     expect(html).not.toContain('</style><script>x</script>');
   });
 });
+
+describe('route chunk preload', () => {
+  it('emits a modulepreload for each extra chunk', () => {
+    const html = renderDocument({
+      template,
+      page: home,
+      head: '',
+      app: '',
+      modulePreloads: ['/assets/index-abc.js'],
+    });
+    expect(html).toContain('<link rel="modulepreload" crossorigin href="/assets/index-abc.js">');
+  });
+
+  it('adds nothing when there is nothing to preload', () => {
+    const html = renderDocument({ template, page: home, head: '', app: '', modulePreloads: [] });
+    expect(html).not.toContain('rel="modulepreload"');
+  });
+
+  it('escapes the href so a filename can never break out of the attribute', () => {
+    const html = renderDocument({
+      template,
+      page: home,
+      head: '',
+      app: '',
+      modulePreloads: ['/assets/a".js'],
+    });
+    expect(html).toContain('&quot;');
+  });
+});

@@ -117,6 +117,13 @@ export interface DocumentOptions {
    * each embeds the hashed asset names).
    */
   css?: string;
+  /**
+   * Extra chunks to preload, on top of the entry graph Vite already emits.
+   * Specifically the route component's own chunk: it is a dynamic import, so
+   * Vite cannot know to preload it, and the mount now waits on it (see
+   * mount-when-ready.ts) — without this it is discovered a round trip late.
+   */
+  modulePreloads?: string[];
 }
 
 /**
@@ -133,7 +140,14 @@ export interface DocumentOptions {
  * independent replacements over the same tag is how you end up with one of
  * them silently winning.
  */
-export function renderDocument({ template, page, head, app, css }: DocumentOptions): string {
+export function renderDocument({
+  template,
+  page,
+  head,
+  app,
+  css,
+  modulePreloads,
+}: DocumentOptions): string {
   if (!template.includes(HEAD_MARKER) || !template.includes(APP_MARKER)) {
     throw new Error(
       `[pulse-aio] "${HEAD_MARKER}" / "${APP_MARKER}" not found in the built index.html — restore the markers in web/index.html.`,
@@ -144,6 +158,13 @@ export function renderDocument({ template, page, head, app, css }: DocumentOptio
     .replace('<html lang="en">', `<html lang="${page.locale}" class="dark">`)
     .replace(HEAD_MARKER, head)
     .replace(APP_MARKER, app);
+
+  if (modulePreloads?.length) {
+    const tags = modulePreloads
+      .map((href) => `<link rel="modulepreload" crossorigin href="${escapeHtml(href)}">`)
+      .join('\n    ');
+    html = html.replace('</head>', `${tags}</head>`);
+  }
 
   if (css) {
     // `</style>` inside a string literal in the CSS would close the tag early
