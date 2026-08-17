@@ -283,7 +283,7 @@ describe('ProjectDetail', () => {
     );
     expect(screen.getByRole('link', { name: /live site/i })).toHaveAttribute(
       'href',
-      'https://pulse.felipealmeida.tech',
+      'https://felipealmeida.tech',
     );
   });
 

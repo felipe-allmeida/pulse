@@ -12,7 +12,7 @@ a production-grade engineering reference, not a toy demo.
 
 ## Live demo
 
-**https://pulse.felipealmeida.tech**
+**https://felipealmeida.tech**
 
 The same hostname the deployment already targets — NPM proxies it to
 `pulse-web` (see [`deploy/compose.prod.yml`](deploy/compose.prod.yml)) and it is
@@ -269,7 +269,7 @@ Only the bare root ever redirects: a first-time visitor whose browser prefers
 Portuguese is sent from `/` to `/pt` before anything renders. A deep link is a
 language choice and is never rewritten.
 
-Canonical URLs default to `https://pulse.felipealmeida.tech`; build with
+Canonical URLs default to `https://felipealmeida.tech`; build with
 `PULSE_SITE_URL=https://preview.example.com pnpm -C web build` to stamp a
 different origin.
 

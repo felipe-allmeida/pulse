@@ -14,7 +14,7 @@
  * with `PULSE_SITE_URL=https://example.com pnpm build` so a preview deploy
  * doesn't emit canonicals pointing at prod.
  */
-export const DEFAULT_SITE_URL = 'https://pulse.felipealmeida.tech';
+export const DEFAULT_SITE_URL = 'https://felipealmeida.tech';
 
 export interface SiteConfig {
   url: string;

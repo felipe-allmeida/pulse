@@ -301,7 +301,7 @@ it('no private project links to a repository', () => {
 it('pulse points at both its source and the running site', () => {
   const pulse = projects.find((p) => p.slug === 'pulse')!;
   expect(pulse.links.some((l) => /github\.com/.test(l.href))).toBe(true);
-  expect(pulse.links.some((l) => l.href === 'https://pulse.felipealmeida.tech')).toBe(true);
+  expect(pulse.links.some((l) => l.href === 'https://felipealmeida.tech')).toBe(true);
 });
 
 it('dietbox has a case study, localized in every locale', () => {

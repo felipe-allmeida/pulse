@@ -9,7 +9,7 @@ system Felipe worked on; the "What Felipe did" line is the authoritative stateme
 ### Pulse — A live, real-time system embedded in a portfolio.
 
 - **Role:** Design & implementation
-- **Source:** public — Live site: https://pulse.felipealmeida.tech · GitHub: https://github.com/felipe-allmeida/pulse
+- **Source:** public — Live site: https://felipealmeida.tech · GitHub: https://github.com/felipe-allmeida/pulse
 - **Stack:** .NET 10, SignalR, RabbitMQ, Redis, Postgres, React 19, Docker, Terraform
 - **What it is:** A self-hosted portfolio that doubles as a live systems demo: presence, visits, and metrics travel through a real event-driven backend in real time, not canned data.
 - **What Felipe did:** Solo project — the design, the event-driven backend, the front end, and the infrastructure it runs on.

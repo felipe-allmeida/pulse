@@ -148,7 +148,7 @@ export const projects: Project[] = [
     visibility: 'public',
     screenshot: '/screenshots/pulse.png',
     links: [
-      { label: 'Live site', href: 'https://pulse.felipealmeida.tech' },
+      { label: 'Live site', href: 'https://felipealmeida.tech' },
       { label: 'GitHub', href: 'https://github.com/felipe-allmeida/pulse' },
     ],
     detail: {

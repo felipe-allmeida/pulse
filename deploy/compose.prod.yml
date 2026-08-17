@@ -6,8 +6,8 @@
 # :latest to GHCR → in Portainer "Update the stack" with "Re-pull image" (or the stack webhook).
 #
 # Secrets come from the stack's Environment variables in Portainer (never committed) — see the
-# table in README/deploy docs. NPM proxies https://pulse.felipealmeida.tech → pulse-web:80
-# (Websockets Support ON, Let's Encrypt cert).
+# table in README/deploy docs. NPM proxies https://felipealmeida.tech → pulse-web:80
+# (Websockets Support ON, Let's Encrypt cert). www is a separate NPM Redirection Host → 301 apex.
 # ═══════════════════════════════════════════════════════════════════════════════════════════════
 
 services:
@@ -72,7 +72,7 @@ services:
       ConnectionStrings__Postgres: "Host=postgres;Port=5432;Database=${POSTGRES_DB:-pulse};Username=${POSTGRES_USER:-postgres};Password=${POSTGRES_PASSWORD}"
       ConnectionStrings__Redis: "redis:6379,password=${REDIS_PASSWORD}"
       ConnectionStrings__RabbitMq: "amqp://${RABBITMQ_USER:-pulse}:${RABBITMQ_PASSWORD}@rabbitmq:5672"
-      Cors__Origins: ${APP_BASE_URL:-https://pulse.felipealmeida.tech}
+      Cors__Origins: ${APP_BASE_URL:-https://felipealmeida.tech}
       # AI recruiter chat — VAZIO = degrada gracioso ("not configured"), não quebra.
       OpenAI__ApiKey: ${OPENAI_API_KEY:-}
       # ── Geo real do visitante (DB-IP Lite) ──────────────────────────────────────
