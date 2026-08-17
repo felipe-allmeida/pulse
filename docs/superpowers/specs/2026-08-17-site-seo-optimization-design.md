@@ -419,3 +419,44 @@ being fixed, not a regression. None of this substitutes for the runtime
 metrics — LCP, TBT, CLS, Speed Index, and the filmstrip — or for confirming
 the prerender-to-mount swap is invisible. Those remain unverified until the
 plan owner runs Lighthouse and a throttled visual check on this build.
+
+## Follow-ups this work surfaced but did not fix
+
+Each was found by review, measured, and deliberately left out of scope. None
+blocks the merge; all are recorded here because the execution ledger is scratch
+and this document is not.
+
+**`/watched` prerenders "Not Found" in both locales.** `src/lib/aio/pages.ts`
+defines the page — so it gets a full head, JSON-LD, a markdown mirror, and
+`<loc>` entries in both `sitemap.xml` and `llms.txt` — but `src/routes/` has no
+matching route file, so its `#root` reads "Not Found". Pre-existing, unrelated
+to this work. Worth noting that both guards this work added pass on it: the
+build's `app.length < 500` check and the widened prerender test both assert
+"not empty", where the invariant that would have caught this is "the route
+actually rendered". Either delete the page from `pages.ts` or add the route.
+
+**`/pt/` with a trailing slash serves the English document.** `/pt` is correct;
+`/pt/` falls through Caddy's `try_files` to the English `index.html`, with
+`lang="en"` and an English title. Byte-identical to the behaviour before this
+work. Browsers are unaffected because the SPA reads the locale from the path
+and boots in Portuguese, but a crawler that follows a trailing-slash link
+receives the wrong document — which is precisely the class of problem the AIO
+step exists to prevent. The plugin already writes `dist/pt/index.html` for this
+case, so the fix is in the serving rules, not the build.
+
+**Fixed-path files in `public/` still fall through to the SPA.** The blocker
+fixed during final review gave `/assets/*` and `/screenshots/*` their own
+handlers so a missing file 404s instead of returning HTML cached long-term. The
+five fixed-path files — `/favicon.ico`, `/favicon.svg`, `/apple-touch-icon.png`,
+`/og.png`, `/cv.pdf` — were deliberately left alone: they carry no content hash,
+so there is no stale-URL rollback class, and the cache window is a week rather
+than a year with no `immutable`. It is the same shape of bug at much lower
+severity, and closing it is a two-line change if desired.
+
+**Two vacuous-test patterns worth auditing more widely.** Both were found in
+existing tests, not introduced here. First, an assertion that fires before an
+awaited value resolves passes regardless of the production code — this bit four
+separate tests across this work. Second, `window.addEventListener('unhandledrejection')`
+never fires in jsdom for rejections originating in module code, so any test
+asserting on that array always sees it empty; `process.on('unhandledRejection')`
+does fire. A sweep of the suite for both patterns would likely find more.
