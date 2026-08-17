@@ -192,6 +192,33 @@ system Felipe worked on; the "What Felipe did" line is the authoritative stateme
   - **Routing as state, not as navigation** — Moving to a router that holds application state in the route turned filters from something the page owned into something the URL owned. The visible win is that a screen change no longer discards them; the quieter one is that a filtered view became a link somebody can send to a colleague.
   - **Directed, not written** — This is the one system in the group the author did not build. With three engineers and six systems, the lead's leverage is in deciding what gets done and reviewing what comes back, not in adding a fourth pair of hands to a codebase that already has an owner.
 
+### Ulbra Admin — The numbers the board runs the university on.
+
+- **Role:** Head of Technology — design & implementation (Aug 2026 – Current)
+- **Source:** closed — professional work described without the code
+- **Stack:** .NET 10, React 19, PostgreSQL, MongoDB, TanStack Router, Docker Swarm
+- **What it is:** The dashboards the presidency and the board use to check the university’s numbers. A .NET 10 API and a React 19 front end that read two systems neither of them owns: prospect data from the CRM, and confirmed enrollment from the legacy Oracle platform through a typed HTTP client rather than a database connection.
+- **What Felipe did:** Built it end to end — the API, the integrations, the front end and the deployment.
+  - The read-only integration with the CRM’s datastore.
+  - The typed client that fronts the legacy enrollment system.
+  - The dashboards themselves and the React front end.
+  - Authentication and the Swarm deployment.
+- **Problem it solved:** The people accountable for the university’s numbers could not see them without asking. Enrollment lived in a legacy platform, prospects lived in the CRM, and reconciling the two meant a request to IT and a spreadsheet that was stale by the time it arrived. The question being asked was not complicated; the answer was just never at hand.
+- **Architecture:** Two sources, neither of them owned by this system, behind one API.
+  - CRM store — Prospect and pipeline data, read-only.
+  - Enrollment API — A typed HTTP client over the legacy platform — never the database directly.
+  - Admin API — Joins the two and serves the dashboards.
+  - Dashboards — What the board actually looks at.
+- **What it does:**
+  - Prospect and enrollment figures side by side, from the two systems that own them.
+  - Reads the CRM’s datastore strictly read-only — the dashboards can never corrupt the system of record.
+  - Single sign-on, so access follows the accounts the university already manages.
+  - The same design tokens as the service desk, so six systems read as one platform.
+- **Engineering decisions:**
+  - **Deliberately the simplest architecture in the group** — Single project, no modules, no DDD — written into the codebase as a rule, in a house whose service desk is a modular monolith. This system owns almost no domain: it reads two other systems and draws charts. Giving it aggregates and bounded contexts would be ceremony around a query. The architecture is chosen per problem, and the honest answer here was "less".
+  - **Never query the legacy database directly** — Enrollment could have been read straight from the legacy platform’s database, and it would have been faster to write. It goes through a typed API instead, so the definition of "an enrolled student" lives in one place rather than being reimplemented in a SQL query — and so the day the legacy platform is replaced, one client changes rather than every consumer of it.
+  - **Read-only by construction** — The connection to the CRM’s datastore is read-only, not by convention but by the credentials it holds. A reporting system that can write to the system of record is one bug away from corrupting the numbers it exists to report.
+
 ### Dell Automated Caller — Automated end-to-end testing for a phone system.
 
 - **Role:** Conception, architecture and implementation (2020)

@@ -1210,6 +1210,112 @@ export const projects: Project[] = [
       ],
     },
   },
+    {
+    slug: 'ulbra-admin',
+    name: 'Ulbra Admin',
+    tagline: {
+      en: 'The numbers the board runs the university on.',
+      'pt-BR': 'Os números com que a diretoria conduz a universidade.',
+    },
+    description: {
+      en: 'Administrative dashboards for the presidency and the board, reading enrollment from the legacy Oracle system through a typed API and prospect data from the CRM — deliberately the simplest architecture in the group.',
+      'pt-BR':
+        'Dashboards administrativos para a presidência e a diretoria, lendo matrícula do sistema Oracle legado através de uma API tipada e dados de captação do CRM — deliberadamente a arquitetura mais simples do grupo.',
+    },
+    tech: ['.NET 10', 'React 19', 'PostgreSQL', 'MongoDB', 'TanStack Router', 'Docker Swarm'],
+    role: { en: 'Head of Technology — design & implementation', 'pt-BR': 'Head de Tecnologia — design & implementação' },
+    period: { en: 'Aug 2026 – Current', 'pt-BR': 'Ago 2026 – Atual' },
+    venture: 'ulbra',
+    visibility: 'private',
+    links: [],
+    detail: {
+      overview: {
+        en: 'The dashboards the presidency and the board use to check the university’s numbers. A .NET 10 API and a React 19 front end that read two systems neither of them owns: prospect data from the CRM, and confirmed enrollment from the legacy Oracle platform through a typed HTTP client rather than a database connection.',
+        'pt-BR':
+          'Os dashboards que a presidência e a diretoria usam para conferir os números da universidade. Uma API em .NET 10 e um front-end React 19 que leem dois sistemas que não lhes pertencem: dados de captação vindos do CRM e matrícula confirmada da plataforma Oracle legada, por um cliente HTTP tipado e não por conexão de banco.',
+      },
+      contribution: {
+        summary: {
+          en: 'Built it end to end — the API, the integrations, the front end and the deployment.',
+          'pt-BR': 'Construiu de ponta a ponta — a API, as integrações, o front-end e o deploy.',
+        },
+        areas: [
+          { en: 'The read-only integration with the CRM’s datastore.', 'pt-BR': 'A integração somente-leitura com a base do CRM.' },
+          { en: 'The typed client that fronts the legacy enrollment system.', 'pt-BR': 'O cliente tipado que fica à frente do sistema legado de matrícula.' },
+          { en: 'The dashboards themselves and the React front end.', 'pt-BR': 'Os próprios dashboards e o front-end React.' },
+          { en: 'Authentication and the Swarm deployment.', 'pt-BR': 'Autenticação e o deploy em Swarm.' },
+        ],
+      },
+      problem: {
+        en: 'The people accountable for the university’s numbers could not see them without asking. Enrollment lived in a legacy platform, prospects lived in the CRM, and reconciling the two meant a request to IT and a spreadsheet that was stale by the time it arrived. The question being asked was not complicated; the answer was just never at hand.',
+        'pt-BR':
+          'Quem responde pelos números da universidade não conseguia vê-los sem pedir. A matrícula ficava numa plataforma legada, a captação no CRM, e cruzar as duas significava um chamado para a TI e uma planilha que já chegava desatualizada. A pergunta não era complicada; a resposta é que nunca estava à mão.',
+      },
+      highlights: [
+        {
+          en: 'Prospect and enrollment figures side by side, from the two systems that own them.',
+          'pt-BR': 'Números de captação e de matrícula lado a lado, vindos dos dois sistemas que os detêm.',
+        },
+        {
+          en: 'Reads the CRM’s datastore strictly read-only — the dashboards can never corrupt the system of record.',
+          'pt-BR':
+            'Lê a base do CRM estritamente em modo leitura — os dashboards não têm como corromper o sistema de origem.',
+        },
+        {
+          en: 'Single sign-on, so access follows the accounts the university already manages.',
+          'pt-BR': 'Login único, então o acesso segue as contas que a universidade já administra.',
+        },
+        {
+          en: 'The same design tokens as the service desk, so six systems read as one platform.',
+          'pt-BR': 'Os mesmos design tokens do service desk, para que seis sistemas leiam como uma plataforma só.',
+        },
+      ],
+      architecture: {
+        summary: {
+          en: 'Two sources, neither of them owned by this system, behind one API.',
+          'pt-BR': 'Duas fontes, nenhuma delas própria deste sistema, atrás de uma API.',
+        },
+        steps: [
+          { label: 'CRM store', detail: { en: 'Prospect and pipeline data, read-only.', 'pt-BR': 'Dados de captação e funil, somente leitura.' } },
+          { label: 'Enrollment API', detail: { en: 'A typed HTTP client over the legacy platform — never the database directly.', 'pt-BR': 'Um cliente HTTP tipado sobre a plataforma legada — nunca o banco diretamente.' } },
+          { label: 'Admin API', detail: { en: 'Joins the two and serves the dashboards.', 'pt-BR': 'Junta as duas e serve os dashboards.' } },
+          { label: 'Dashboards', detail: { en: 'What the board actually looks at.', 'pt-BR': 'O que a diretoria de fato olha.' } },
+        ],
+      },
+      decisions: [
+        {
+          heading: {
+            en: 'Deliberately the simplest architecture in the group',
+            'pt-BR': 'Deliberadamente a arquitetura mais simples do grupo',
+          },
+          body: {
+            en: 'Single project, no modules, no DDD — written into the codebase as a rule, in a house whose service desk is a modular monolith. This system owns almost no domain: it reads two other systems and draws charts. Giving it aggregates and bounded contexts would be ceremony around a query. The architecture is chosen per problem, and the honest answer here was "less".',
+            'pt-BR':
+              'Projeto único, sem módulos, sem DDD — escrito no código como regra, numa casa cujo service desk é um monólito modular. Este sistema quase não tem domínio próprio: ele lê dois outros sistemas e desenha gráficos. Dar-lhe agregados e contextos delimitados seria cerimônia em volta de uma consulta. A arquitetura é escolhida por problema, e a resposta honesta aqui era "menos".',
+          },
+        },
+        {
+          heading: {
+            en: 'Never query the legacy database directly',
+            'pt-BR': 'Nunca consultar o banco legado diretamente',
+          },
+          body: {
+            en: 'Enrollment could have been read straight from the legacy platform’s database, and it would have been faster to write. It goes through a typed API instead, so the definition of "an enrolled student" lives in one place rather than being reimplemented in a SQL query — and so the day the legacy platform is replaced, one client changes rather than every consumer of it.',
+            'pt-BR':
+              'A matrícula poderia ser lida direto do banco da plataforma legada, e teria sido mais rápido de escrever. Ela passa por uma API tipada, para que a definição de "aluno matriculado" viva em um lugar só em vez de ser reimplementada numa consulta SQL — e para que, no dia em que a plataforma legada for substituída, mude um cliente e não todos os consumidores.',
+          },
+        },
+        {
+          heading: { en: 'Read-only by construction', 'pt-BR': 'Somente leitura por construção' },
+          body: {
+            en: 'The connection to the CRM’s datastore is read-only, not by convention but by the credentials it holds. A reporting system that can write to the system of record is one bug away from corrupting the numbers it exists to report.',
+            'pt-BR':
+              'A conexão com a base do CRM é somente leitura, não por convenção mas pelas credenciais que ela carrega. Um sistema de relatórios capaz de escrever no sistema de origem está a um bug de corromper os números que existe para reportar.',
+          },
+        },
+      ],
+    },
+  },
   {
     slug: 'dell-automated-caller',
     name: 'Dell Automated Caller',

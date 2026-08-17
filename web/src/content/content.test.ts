@@ -465,3 +465,12 @@ it('ulbra-crm carries the coverage figure, the one real number it has', () => {
   expect(metrics.length).toBeGreaterThan(0);
   expect(metrics.some((m) => /100%/.test(m.value.en))).toBe(true);
 });
+
+it('ulbra-admin explains why it is architecturally the opposite of the service desk', () => {
+  const admin = projects.find((p) => p.slug === 'ulbra-admin');
+  expect(admin, 'the admin platform is published').toBeDefined();
+  const decisions = admin!.detail!.decisions!;
+  expect(decisions.length).toBeGreaterThan(0);
+  const bodies = decisions.map((d) => d.body.en).join(' ');
+  expect(bodies, 'the simplicity decision states its reason').toMatch(/no modules|no ddd|simple/i);
+});
