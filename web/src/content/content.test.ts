@@ -62,20 +62,21 @@ it('the experience timeline is keyed uniquely — Dietbox appears twice, under t
  * Pampa Devs, so the studio engagement and the Head of Technology mandate run
  * simultaneously — no more, no fewer, so the count is asserted rather than
  * just its presence, which would silently tolerate a third role losing its
- * end date by accident. What is still worth asserting beyond that is that
- * every *closed* role carries a real date range rather than a word like
- * "Recent".
+ * end date by accident. Beyond that, every row — open or closed — has to
+ * begin on a real month rather than on a word like "Recent". The studio row
+ * read as a bare "Current" for a while: an open end date is fine, a missing
+ * start date is the one thing a timeline ordered by start date cannot show.
  */
-it('open-ended periods end in Current; every closed role carries real dates', () => {
-  const isOpenEnded = (period: string) => /(^|– )Current$/.test(period);
+it('every period begins on a real month; open-ended ones end in Current', () => {
+  const isOpenEnded = (period: string) => / – Current$/.test(period);
 
   const open = profile.experience.filter((e) => isOpenEnded(e.period.en));
   expect(open, 'exactly ULBRA and Pampa Devs are current').toHaveLength(2);
   expect(profile.experience[0], 'a current role leads the timeline').toBe(open[0]);
 
-  for (const entry of profile.experience.filter((e) => !isOpenEnded(e.period.en))) {
-    expect(entry.period.en, `${entry.org} has no dated period`).toMatch(
-      /^[A-Z][a-z]{2} \d{4} – [A-Z][a-z]{2} \d{4}$/,
+  for (const entry of profile.experience) {
+    expect(entry.period.en, `${entry.org} has no start month`).toMatch(
+      /^[A-Z][a-z]{2} \d{4} – ([A-Z][a-z]{2} \d{4}|Current)$/,
     );
   }
 });

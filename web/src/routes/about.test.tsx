@@ -121,7 +121,7 @@ describe('AboutPage', () => {
     expect(screen.getByText('Experiência')).toBeInTheDocument();
     expect(screen.getByText('Habilidades')).toBeInTheDocument();
     expect(screen.getByText('Formação')).toBeInTheDocument();
-    expect(screen.getByText('Atual')).toBeInTheDocument();
+    expect(screen.getByText('Mar 2026 – Atual')).toBeInTheDocument();
     expect(screen.getByText('Out 2025 – Jul 2026')).toBeInTheDocument();
     expect(screen.getByText(profile.languages['pt-BR'])).toBeInTheDocument();
   });

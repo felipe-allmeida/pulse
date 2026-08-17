@@ -152,7 +152,7 @@ export const profile: Profile = {
       role: { en: 'Founder & Software Engineer/Architect', 'pt-BR': 'Fundador & Engenheiro/Arquiteto de Software' },
       org: 'Pampa Devs',
       url: 'https://pampadevs.com',
-      period: { en: 'Current', 'pt-BR': 'Atual' },
+      period: { en: 'Mar 2026 – Current', 'pt-BR': 'Mar 2026 – Atual' },
       summary: {
         en: 'His software studio — internal enterprise platforms (support/ticketing + ERP) in .NET & React, and web and e-commerce delivery for small and mid-sized businesses on Azure.',
         'pt-BR':
