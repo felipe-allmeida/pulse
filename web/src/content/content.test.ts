@@ -299,10 +299,15 @@ it('publishes no hostname, URL or credential in any project narrative', () => {
   // hosts to keep out: this repository is public, so a guard naming them would
   // publish exactly what it exists to protect — the same trap a name-list guard
   // fell into on an earlier project. `links` is excluded because a public repo
-  // link is the one URL that belongs in content.
+  // link is the one URL that belongs in content. `script.lines` is excluded
+  // because it is verbatim sample code, not prose — ulbra-infra's script
+  // legitimately carries placeholder hosts (registry.example.internal) and a
+  // placeholder URL, and has its own dedicated real-host check below.
   for (const project of projects) {
     if (!project.detail) continue;
-    const narrative = JSON.stringify(project.detail);
+    const { script, ...rest } = project.detail;
+    const narrativeSource = script ? { ...rest, script: { ...script, lines: [] } } : rest;
+    const narrative = JSON.stringify(narrativeSource);
     expect(narrative, `${project.slug} detail contains a URL`).not.toMatch(/https?:\/\//);
     expect(narrative, `${project.slug} detail contains a hostname`).not.toMatch(
       /\b[a-z0-9-]+\.(com|io|net|dev|internal)\b/i,
@@ -479,4 +484,18 @@ it('the student dashboard says where it is actually installed', () => {
   const dashboard = projects.find((p) => p.slug === 'ulbra-student-dashboard');
   expect(dashboard, 'the student dashboard is published').toBeDefined();
   expect(dashboard!.detail!.overview!.en).toMatch(/medic/i);
+});
+
+it('ulbra-infra describes the delivery loop and leaks no address', () => {
+  const infra = projects.find((p) => p.slug === 'ulbra-infra');
+  expect(infra, 'the infrastructure work is published').toBeDefined();
+
+  const decisions = infra!.detail!.decisions!.map((d) => d.body.en).join(' ');
+  expect(decisions, 'the alert-to-PR loop is explained').toMatch(/alert/i);
+
+  // The narrative test at the top of this file covers prose; the script block
+  // is verbatim lines and needs its own check.
+  for (const line of infra!.detail!.script!.lines) {
+    expect(line, `script leaks a real host: ${line}`).not.toMatch(/ulbra\.(ai|br)/i);
+  }
 });

@@ -241,6 +241,42 @@ system Felipe worked on; the "What Felipe did" line is the authoritative stateme
   - **The analytics lakehouse as the source** — The schedule is read from the university’s analytics platform rather than from the academic system directly. It is the copy that is already shaped for reading, already has access controls the display can be granted narrowly, and — crucially — cannot be affected by a screen in a lobby querying it all day.
   - **One system, two audiences** — The kiosk has no login and no interaction; the admin has both. Splitting them into two deployments was the obvious move and was rejected: they share the content model entirely, and two services would mean two places to change when the shape of a slide changes. The boundary is a route and an auth check, not a process.
 
+### Ulbra Infra — From a person on the box to a repository and a pipeline.
+
+- **Role:** Head of Technology — design & implementation (Apr 2026 – Current)
+- **Source:** closed — professional work described without the code
+- **Stack:** Docker Swarm, Traefik, GitHub Actions, OpenTelemetry, SigNoz, Prometheus, Grafana, Metabase
+- **What it is:** The platform underneath every other system in this group. It began as on-premise servers with no automation at all — deployment meant a person on the machine, installing a runtime and starting the application by hand. It is now a provisioning script, a container orchestrator, a reverse proxy, two observability tools with a declared split, and a delivery loop in which an alert can investigate itself and open a pull request.
+- **What Felipe did:** Designed and built the platform, and the delivery model that runs on it.
+  - The one-run provisioning script and the cluster it produces.
+  - The reverse proxy and the routing convention every application follows.
+  - The split between application and host observability.
+  - The CI pipeline, and the alert-to-pull-request loop built on top of it.
+  - The delivery dashboard that reads the team’s own task tracker.
+- **Problem it solved:** Everything ran on-premise with nothing automated around it. Getting an application into production meant connecting to a server, installing a runtime and starting the process by hand — which makes every deployment a memory exercise, every server subtly different from the last, and every outage an archaeology problem. Nothing was measured, so nothing could be improved on purpose.
+- **Provision once, then per application:** The server is set up in one run; after that, shipping an application is a repository and a pipeline.
+  - Provision — One script: runtime, firewall, cluster, overlay networks.
+  - Platform — Reverse proxy and the observability stacks come up with it.
+  - Push — CI builds the image and pushes it to the registry.
+  - Deploy — The pipeline deploys the stack; the proxy picks up the route from labels.
+  - Observe — Traces, logs and metrics flow in from environment variables alone.
+- **From an alert to a merged fix:** What the team automated is the investigation, not the judgement.
+  - Alert — Application telemetry crosses a threshold.
+  - Investigate — A coding agent reads the trace and the code around it.
+  - Pull request — A proposed fix arrives as a normal change to review.
+  - Review — An engineer accepts, amends or rejects it.
+  - Merge — The same pipeline every other change goes through.
+- **What it does:**
+  - One script takes a bare server to ready: container runtime, firewall, cluster, overlay networks, proxy and monitoring.
+  - A new application needs a compose file and a workflow — the routing and the certificate follow from labels.
+  - Telemetry is opt-in through environment variables; nothing else has to be wired.
+  - An alert can be investigated automatically and arrive as a pull request for a human to judge.
+- **Engineering decisions:**
+  - **Two observability tools, on a stated boundary** — Application telemetry — logs, traces, metrics — goes to one tool over OpenTelemetry; host metrics like CPU, memory and disk stay in another. Running two looks like drift until you read the rule written into the configuration: applications do not report to the host stack. Each tool is good at one of the two jobs, and the alternative considered and rejected was one tool doing both badly.
+  - **Alerts investigate themselves; humans still merge** — When application telemetry raises an alert, a coding agent reads the trace and the surrounding code and opens a pull request with a proposed fix. What was automated is the investigation — the part that is mechanical and slow at three in the morning. The merge is not automated, and deliberately so: a change nobody approved reaching production is a worse failure than a slow fix.
+  - **An orchestrator sized for the team** — Kubernetes was the default answer and was not taken. The cluster is small, on-premise, and operated by three engineers who are also writing six applications. Swarm gives multi-node scheduling, rolling updates and overlay networking with a fraction of the operational surface — and the cost of the ceiling it imposes is far below the cost of a control plane nobody has time to run.
+  - **The team measures itself with its own pipeline** — A dashboard reads the team’s task tracker through an ETL sidecar, so delivery is visible in the same place the systems’ numbers are. It is a small piece of plumbing carrying a large claim: a working model that is measured can be argued about with evidence, and one that is only asserted cannot.
+
 ### Dell Automated Caller — Automated end-to-end testing for a phone system.
 
 - **Role:** Conception, architecture and implementation (2020)

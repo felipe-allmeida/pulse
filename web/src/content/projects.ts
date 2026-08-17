@@ -1404,6 +1404,158 @@ export const projects: Project[] = [
     },
   },
   {
+    slug: 'ulbra-infra',
+    name: 'Ulbra Infra',
+    tagline: {
+      en: 'From a person on the box to a repository and a pipeline.',
+      'pt-BR': 'De uma pessoa no servidor a um repositório e um pipeline.',
+    },
+    description: {
+      en: 'The internal datacenter platform every other system here deploys onto: one script takes a bare server to ready, applications ship from a repository through CI, and an alert can open its own pull request.',
+      'pt-BR':
+        'A plataforma de datacenter interno em que todos os outros sistemas daqui são publicados: um script leva um servidor cru até pronto, as aplicações sobem de um repositório via CI, e um alerta pode abrir seu próprio pull request.',
+    },
+    tech: ['Docker Swarm', 'Traefik', 'GitHub Actions', 'OpenTelemetry', 'SigNoz', 'Prometheus', 'Grafana', 'Metabase'],
+    role: { en: 'Head of Technology — design & implementation', 'pt-BR': 'Head de Tecnologia — design & implementação' },
+    period: { en: 'Apr 2026 – Current', 'pt-BR': 'Abr 2026 – Atual' },
+    venture: 'ulbra',
+    visibility: 'private',
+    links: [],
+    detail: {
+      overview: {
+        en: 'The platform underneath every other system in this group. It began as on-premise servers with no automation at all — deployment meant a person on the machine, installing a runtime and starting the application by hand. It is now a provisioning script, a container orchestrator, a reverse proxy, two observability tools with a declared split, and a delivery loop in which an alert can investigate itself and open a pull request.',
+        'pt-BR':
+          'A plataforma sob todos os outros sistemas deste grupo. Começou como servidores on-premise sem nenhuma automação — publicar significava uma pessoa na máquina, instalando um runtime e subindo a aplicação na mão. Hoje é um script de provisionamento, um orquestrador de contêineres, um proxy reverso, duas ferramentas de observabilidade com uma divisão declarada e um ciclo de entrega em que um alerta pode investigar a si mesmo e abrir um pull request.',
+      },
+      contribution: {
+        summary: {
+          en: 'Designed and built the platform, and the delivery model that runs on it.',
+          'pt-BR': 'Desenhou e construiu a plataforma e o modelo de entrega que roda sobre ela.',
+        },
+        areas: [
+          { en: 'The one-run provisioning script and the cluster it produces.', 'pt-BR': 'O script de provisionamento em uma execução e o cluster que ele produz.' },
+          { en: 'The reverse proxy and the routing convention every application follows.', 'pt-BR': 'O proxy reverso e a convenção de roteamento que toda aplicação segue.' },
+          { en: 'The split between application and host observability.', 'pt-BR': 'A divisão entre observabilidade de aplicação e de host.' },
+          { en: 'The CI pipeline, and the alert-to-pull-request loop built on top of it.', 'pt-BR': 'O pipeline de CI e o ciclo alerta-para-pull-request construído sobre ele.' },
+          { en: 'The delivery dashboard that reads the team’s own task tracker.', 'pt-BR': 'O painel de entrega que lê o próprio rastreador de tarefas do time.' },
+        ],
+      },
+      problem: {
+        en: 'Everything ran on-premise with nothing automated around it. Getting an application into production meant connecting to a server, installing a runtime and starting the process by hand — which makes every deployment a memory exercise, every server subtly different from the last, and every outage an archaeology problem. Nothing was measured, so nothing could be improved on purpose.',
+        'pt-BR':
+          'Tudo rodava on-premise sem nenhuma automação em volta. Colocar uma aplicação em produção significava conectar num servidor, instalar um runtime e subir o processo na mão — o que torna todo deploy um exercício de memória, todo servidor sutilmente diferente do anterior e toda queda um problema de arqueologia. Nada era medido, então nada podia ser melhorado de propósito.',
+      },
+      highlights: [
+        {
+          en: 'One script takes a bare server to ready: container runtime, firewall, cluster, overlay networks, proxy and monitoring.',
+          'pt-BR':
+            'Um script leva um servidor cru até pronto: runtime de contêiner, firewall, cluster, redes overlay, proxy e monitoramento.',
+        },
+        {
+          en: 'A new application needs a compose file and a workflow — the routing and the certificate follow from labels.',
+          'pt-BR':
+            'Uma aplicação nova precisa de um compose e um workflow — o roteamento e o certificado saem dos labels.',
+        },
+        {
+          en: 'Telemetry is opt-in through environment variables; nothing else has to be wired.',
+          'pt-BR': 'A telemetria é opcional por variáveis de ambiente; nada mais precisa ser ligado.',
+        },
+        {
+          en: 'An alert can be investigated automatically and arrive as a pull request for a human to judge.',
+          'pt-BR':
+            'Um alerta pode ser investigado automaticamente e chegar como um pull request para um humano julgar.',
+        },
+      ],
+      architecture: {
+        caption: { en: 'Provision once, then per application', 'pt-BR': 'Provisiona uma vez, depois por aplicação' },
+        summary: {
+          en: 'The server is set up in one run; after that, shipping an application is a repository and a pipeline.',
+          'pt-BR':
+            'O servidor é configurado numa execução; depois disso, publicar uma aplicação é um repositório e um pipeline.',
+        },
+        steps: [
+          { label: 'Provision', detail: { en: 'One script: runtime, firewall, cluster, overlay networks.', 'pt-BR': 'Um script: runtime, firewall, cluster, redes overlay.' } },
+          { label: 'Platform', detail: { en: 'Reverse proxy and the observability stacks come up with it.', 'pt-BR': 'O proxy reverso e as stacks de observabilidade sobem junto.' } },
+          { label: 'Push', detail: { en: 'CI builds the image and pushes it to the registry.', 'pt-BR': 'A CI constrói a imagem e envia para o registry.' } },
+          { label: 'Deploy', detail: { en: 'The pipeline deploys the stack; the proxy picks up the route from labels.', 'pt-BR': 'O pipeline publica a stack; o proxy pega a rota pelos labels.' } },
+          { label: 'Observe', detail: { en: 'Traces, logs and metrics flow in from environment variables alone.', 'pt-BR': 'Traces, logs e métricas chegam só pelas variáveis de ambiente.' } },
+        ],
+      },
+      states: {
+        caption: { en: 'From an alert to a merged fix', 'pt-BR': 'De um alerta a uma correção mesclada' },
+        summary: {
+          en: 'What the team automated is the investigation, not the judgement.',
+          'pt-BR': 'O que o time automatizou é a investigação, não o julgamento.',
+        },
+        steps: [
+          { label: 'Alert', detail: { en: 'Application telemetry crosses a threshold.', 'pt-BR': 'A telemetria da aplicação cruza um limiar.' } },
+          { label: 'Investigate', detail: { en: 'A coding agent reads the trace and the code around it.', 'pt-BR': 'Um agente de código lê o trace e o código em volta.' } },
+          { label: 'Pull request', detail: { en: 'A proposed fix arrives as a normal change to review.', 'pt-BR': 'Uma correção proposta chega como uma mudança normal para revisar.' } },
+          { label: 'Review', detail: { en: 'An engineer accepts, amends or rejects it.', 'pt-BR': 'Um engenheiro aceita, ajusta ou rejeita.' } },
+          { label: 'Merge', detail: { en: 'The same pipeline every other change goes through.', 'pt-BR': 'O mesmo pipeline por onde passa qualquer outra mudança.' } },
+        ],
+      },
+      script: {
+        caption: { en: 'What an application declares', 'pt-BR': 'O que uma aplicação declara' },
+        lines: [
+          'services:',
+          '  my-app:',
+          '    image: registry.example.internal/my-app:latest',
+          '    networks: [proxy, monitoring]',
+          '    environment:',
+          '      - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4317',
+          '      - OTEL_SERVICE_NAME=my-app',
+          '    deploy:',
+          '      labels:',
+          '        - "traefik.enable=true"',
+          '        - "traefik.http.routers.myapp.rule=Host(`my-app.example.internal`)"',
+        ],
+        note: {
+          en: 'Hostnames are placeholders. Routing, certificates and telemetry all follow from this block — there is no second place to register an application.',
+          'pt-BR':
+            'Os hostnames são fictícios. Roteamento, certificados e telemetria saem todos deste bloco — não há um segundo lugar onde registrar uma aplicação.',
+        },
+      },
+      decisions: [
+        {
+          heading: {
+            en: 'Two observability tools, on a stated boundary',
+            'pt-BR': 'Duas ferramentas de observabilidade, numa fronteira declarada',
+          },
+          body: {
+            en: 'Application telemetry — logs, traces, metrics — goes to one tool over OpenTelemetry; host metrics like CPU, memory and disk stay in another. Running two looks like drift until you read the rule written into the configuration: applications do not report to the host stack. Each tool is good at one of the two jobs, and the alternative considered and rejected was one tool doing both badly.',
+            'pt-BR':
+              'A telemetria de aplicação — logs, traces, métricas — vai para uma ferramenta via OpenTelemetry; métricas de host como CPU, memória e disco ficam em outra. Manter as duas parece deriva até se ler a regra escrita na configuração: aplicações não reportam para a stack de host. Cada ferramenta é boa em um dos dois trabalhos, e a alternativa considerada e descartada era uma só fazendo os dois mal.',
+          },
+        },
+        {
+          heading: { en: 'Alerts investigate themselves; humans still merge', 'pt-BR': 'Alertas se investigam; humanos ainda mesclam' },
+          body: {
+            en: 'When application telemetry raises an alert, a coding agent reads the trace and the surrounding code and opens a pull request with a proposed fix. What was automated is the investigation — the part that is mechanical and slow at three in the morning. The merge is not automated, and deliberately so: a change nobody approved reaching production is a worse failure than a slow fix.',
+            'pt-BR':
+              'Quando a telemetria de aplicação dispara um alerta, um agente de código lê o trace e o código em volta e abre um pull request com uma correção proposta. O que foi automatizado é a investigação — a parte mecânica e lenta às três da manhã. O merge não é automatizado, e de propósito: uma mudança que ninguém aprovou chegando em produção é uma falha pior do que uma correção lenta.',
+          },
+        },
+        {
+          heading: { en: 'An orchestrator sized for the team', 'pt-BR': 'Um orquestrador do tamanho do time' },
+          body: {
+            en: 'Kubernetes was the default answer and was not taken. The cluster is small, on-premise, and operated by three engineers who are also writing six applications. Swarm gives multi-node scheduling, rolling updates and overlay networking with a fraction of the operational surface — and the cost of the ceiling it imposes is far below the cost of a control plane nobody has time to run.',
+            'pt-BR':
+              'Kubernetes era a resposta padrão e não foi adotado. O cluster é pequeno, on-premise, e operado por três engenheiros que também escrevem seis aplicações. O Swarm dá agendamento multi-nó, rolling update e rede overlay com uma fração da superfície operacional — e o custo do teto que ele impõe é muito menor que o de um control plane que ninguém tem tempo de operar.',
+          },
+        },
+        {
+          heading: { en: 'The team measures itself with its own pipeline', 'pt-BR': 'O time se mede com o próprio pipeline' },
+          body: {
+            en: 'A dashboard reads the team’s task tracker through an ETL sidecar, so delivery is visible in the same place the systems’ numbers are. It is a small piece of plumbing carrying a large claim: a working model that is measured can be argued about with evidence, and one that is only asserted cannot.',
+            'pt-BR':
+              'Um painel lê o rastreador de tarefas do time por um sidecar de ETL, então a entrega fica visível no mesmo lugar em que estão os números dos sistemas. É um encanamento pequeno carregando uma afirmação grande: um modelo de trabalho que é medido pode ser discutido com evidência, e um que é apenas afirmado, não.',
+          },
+        },
+      ],
+    },
+  },
+  {
     slug: 'dell-automated-caller',
     name: 'Dell Automated Caller',
     tagline: {
