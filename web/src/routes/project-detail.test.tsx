@@ -130,12 +130,12 @@ describe('ProjectDetail', () => {
     ]);
   });
 
-  it('omits every case-study section for a project that has none', async () => {
+  it('renders Ulbra One with its case study sections', async () => {
     await renderDetail('ulbra-one');
 
     await screen.findAllByRole('heading', { level: 1 });
     const headings = screen.getAllByRole('heading', { level: 2 }).map((h) => h.textContent);
-    expect(headings).toEqual(['Overview', 'What it does']);
+    expect(headings).toEqual(['Overview', 'What I did', 'The problem', 'What it does', 'Engineering decisions']);
     expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
   });
 
@@ -263,14 +263,6 @@ describe('ProjectDetail', () => {
     const headings = screen.getAllByRole('heading', { level: 2 }).map((h) => h.textContent);
     expect(headings[1]).toBe('O que eu fiz');
     expect(headings[5]).toBe('A vida de uma adesão');
-  });
-
-  it('renders no contribution section for a project without one', async () => {
-    await renderDetail('ulbra-one');
-    await screen.findAllByRole('heading', { level: 1 });
-
-    const headings = screen.getAllByRole('heading', { level: 2 }).map((h) => h.textContent);
-    expect(headings).toEqual(['Overview', 'What it does']);
   });
 
   it('renders the live-site link and the repository link for pulse', async () => {

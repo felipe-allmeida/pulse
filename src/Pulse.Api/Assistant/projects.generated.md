@@ -116,17 +116,18 @@ system Felipe worked on; the "What Felipe did" line is the authoritative stateme
 
 ### Ulbra Atende — IT service desk for a university, replacing GLPI.
 
-- **Role:** Design & implementation (Professional work)
+- **Role:** Head of Technology — design & implementation (Apr 2026 – Current)
 - **Source:** closed — professional work described without the code
 - **Stack:** .NET 10, PostgreSQL 17, RabbitMQ, React 19, OpenIddict, MCP, OpenTelemetry, Docker Swarm
-- **What it is:** The IT service desk for ULBRA — a .NET 10 modular monolith that replaced GLPI as the single intake channel for the university's IT department, carrying a request from ticket to SLA to satisfaction survey.
+- **What it is:** The IT service desk for ULBRA — a .NET 10 modular monolith that replaced GLPI as the single intake channel for the university’s IT department, carrying a request from ticket to SLA to satisfaction survey.
 - **What Felipe did:** Principal author, from scratch — the architecture, the backend, the front end, and the deployment.
   - The modular monolith and the boundaries between its contexts.
   - The SLA engine, including pauses that record who stopped the clock and why.
   - The transactional outbox and the notification fan-out it feeds.
   - The OAuth authorization server and the MCP server behind its consent screen.
   - The React front end and the Docker Swarm deployment.
-- **Problem it solved:** ULBRA's IT department took requests through GLPI, e-mail, and direct messages at the same time. There was no SLA per team, no audit trail on approvals, and no way to tell whether anyone was satisfied with the outcome. Ulbra Atende replaces GLPI as the single intake channel and makes each of those measurable — three months in, the median ticket closes in about an hour and a half.
+  - NOT his work: One engineer now works on this codebase alongside him.
+- **Problem it solved:** ULBRA’s IT department took requests through GLPI, e-mail, and direct messages at the same time. There was no SLA per team, no audit trail on approvals, and no way to tell whether anyone was satisfied with the outcome. Ulbra Atende replaces GLPI as the single intake channel and makes each of those measurable — three months in, the median ticket closes in about an hour and a half.
 - **Results:** ~2.4k tickets handled (85% closed); 200+ users (across ~30 teams); ~6 min median first response (SLA tracked per team); ~5.0 satisfaction score (400+ responses, 1-5 scale) — in ~3 months of production
 - **Architecture:** A .NET 10 modular monolith: one deployable, separate bounded contexts — Core, Identity, Notifications and MCP — each layered Domain → Application → Infrastructure with its own Postgres schema. Integration events travel over RabbitMQ through an EF transactional outbox. Attachments live in S3/MinIO, caching in Redis, tracing via OpenTelemetry; integration tests run against real Postgres, RabbitMQ and MinIO through Testcontainers.
   - React 19 SPA — TanStack Router and Query over a Tailwind design system.
@@ -155,15 +156,127 @@ system Felipe worked on; the "What Felipe did" line is the authoritative stateme
 
 ### Ulbra One — Internal ERP replacing legacy systems.
 
-- **Role:** Software engineer (Professional work)
+- **Role:** Head of Technology (Jun 2026 – Current)
 - **Source:** closed — professional work described without the code
-- **Stack:** .NET 10, PostgreSQL, EF Core, React, Tailwind
-- **What it is:** An internal ERP replacing legacy systems — a modular .NET platform on PostgreSQL with a React front end, covering core internal business operations.
+- **Stack:** .NET 10, PostgreSQL 17, EF Core, React, Tailwind, shadcn/ui
+- **What it is:** An internal ERP built to take the university off its legacy systems — a modular .NET 10 monolith on PostgreSQL 17 with a React front end, covering core internal business operations. It is in testing, ahead of launch, so this describes what has been built rather than what is running.
+- **What Felipe did:** Set the architecture and the conventions, and built alongside one engineer who carries the day-to-day of this codebase.
+  - The module boundaries, and the conventions carried over from the service desk.
+  - The PostgreSQL schema and the code-first migration path.
+  - Review of every change into the codebase.
+  - NOT his work: One engineer owns this codebase day to day; much of the implementation is theirs.
+- **Problem it solved:** The university runs its internal operations on licensed legacy systems that neither its data nor its processes fit well. Ulbra One is the platform meant to replace them, built in-house so that the business rules live somewhere the team can change.
 - **What it does:**
-  - A modular architecture organized by business domain.
-  - Migrates core operations off legacy systems onto a unified platform.
-  - PostgreSQL persistence via EF Core.
-  - A modern React + Tailwind front end replacing older internal tools.
+  - A modular monolith organized by business domain rather than by technical layer.
+  - PostgreSQL via EF Core, code-first, with snake_case naming applied by convention rather than by attribute.
+  - A React and Tailwind front end sharing the design tokens of the service desk.
+  - Migrations run on startup, so an environment is never a manual step behind the code.
+- **Engineering decisions:**
+  - **The same conventions as the service desk, deliberately** — Endpoint shape, result type and migration strategy are copied from Ulbra Atende rather than reconsidered. With three engineers across six systems, an engineer moving between two codebases should not be learning a second set of rules — the consistency is worth more than any local improvement either codebase might have made alone.
+  - **A modular monolith, not services** — An ERP is a set of tightly related domains that transact together. Splitting it into services would buy independent deployment at the cost of distributed transactions across modules that genuinely need consistency — and there is no team here to operate that. Modules give the boundaries; the single process keeps the transactions.
+
+### Ulbra CRM — An inherited CRM taken from no tests to full coverage.
+
+- **Role:** Head of Technology — direction & review (Apr 2026 – Current)
+- **Source:** closed — professional work described without the code
+- **Stack:** React, TanStack Router, MongoDB, Docker Swarm
+- **What it is:** The CRM the university runs on, inherited rather than built: no automated tests, and a codebase whose structure had not kept up with it. It is now fully covered by tests and materially better to use, and the work was done by the team under the author’s direction — he set the direction and reviewed it, and did not write it.
+- **What Felipe did:** Set the direction and reviewed the work; the engineering was the team’s.
+  - The decision to cover the codebase with tests before changing its behaviour.
+  - The routing migration that made filter state survive navigation.
+  - Review of the work as it landed.
+  - NOT his work: None of this implementation is the author’s. It was built by the engineers on the team; his part was deciding what to do and reviewing what came back.
+- **Problem it solved:** The CRM arrived with no automated tests at all, which made every change a gamble, and with usability debt that the people using it every day absorbed silently. The worst of it: changing screens reloaded the application, so the filters someone had just set were gone. Work that goes through the same three or four filters all day pays that cost on every navigation.
+- **Results:** 0% → 100% test coverage
+- **Engineering decisions:**
+  - **Tests first, behaviour second** — The codebase was unstructured and untested, and the temptation with both is to restructure first. The order was inverted: cover the existing behaviour, then change it. Coverage on code nobody has changed yet is what makes the later restructuring safe rather than hopeful — and it is the reason the number is worth quoting.
+  - **Routing as state, not as navigation** — Moving to a router that holds application state in the route turned filters from something the page owned into something the URL owned. The visible win is that a screen change no longer discards them; the quieter one is that a filtered view became a link somebody can send to a colleague.
+  - **Directed, not written** — This is the one system in the group the author did not build. With three engineers and six systems, the lead’s leverage is in deciding what gets done and reviewing what comes back, not in adding a fourth pair of hands to a codebase that already has an owner.
+
+### Ulbra Admin — The numbers the board runs the university on.
+
+- **Role:** Head of Technology — design & implementation (Aug 2026 – Current)
+- **Source:** closed — professional work described without the code
+- **Stack:** .NET 10, React 19, PostgreSQL, MongoDB, TanStack Router, Docker Swarm
+- **What it is:** The dashboards the presidency and the board use to check the university’s numbers. A .NET 10 API and a React 19 front end that read two systems neither of them owns: prospect data from the CRM, and confirmed enrollment from the legacy Oracle platform through a typed HTTP client rather than a database connection.
+- **What Felipe did:** Built it end to end — the API, the integrations, the front end and the deployment.
+  - The read-only integration with the CRM’s datastore.
+  - The typed client that fronts the legacy enrollment system.
+  - The dashboards themselves and the React front end.
+  - Authentication and the Swarm deployment.
+- **Problem it solved:** The people accountable for the university’s numbers could not see them without asking. Enrollment lived in a legacy platform, prospects lived in the CRM, and reconciling the two meant a request to IT and a spreadsheet that was stale by the time it arrived. The question being asked was not complicated; the answer was just never at hand.
+- **Architecture:** Two sources, neither of them owned by this system, behind one API.
+  - CRM store — Prospect and pipeline data, read-only.
+  - Enrollment API — A typed HTTP client over the legacy platform — never the database directly.
+  - Admin API — Joins the two and serves the dashboards.
+  - Dashboards — What the board actually looks at.
+- **What it does:**
+  - Prospect and enrollment figures side by side, from the two systems that own them.
+  - Reads the CRM’s datastore strictly read-only — the dashboards can never corrupt the system of record.
+  - Single sign-on, so access follows the accounts the university already manages.
+  - The same design tokens as the service desk, so six systems read as one platform.
+- **Engineering decisions:**
+  - **Deliberately the simplest architecture in the group** — Single project, no modules, no DDD — written into the codebase as a rule, in a house whose service desk is a modular monolith. This system owns almost no domain: it reads two other systems and draws charts. Giving it aggregates and bounded contexts would be ceremony around a query. The architecture is chosen per problem, and the honest answer here was "less".
+  - **Never query the legacy database directly** — Enrollment could have been read straight from the legacy platform’s database, and it would have been faster to write. It goes through a typed API instead, so the definition of "an enrolled student" lives in one place rather than being reimplemented in a SQL query — and so the day the legacy platform is replaced, one client changes rather than every consumer of it.
+  - **Read-only by construction** — The connection to the CRM’s datastore is read-only, not by convention but by the credentials it holds. A reporting system that can write to the system of record is one bug away from corrupting the numbers it exists to report.
+
+### Student Dashboard — A screen on a wall that tells students where to be.
+
+- **Role:** Head of Technology — design & implementation (Apr 2026 – Current)
+- **Source:** closed — professional work described without the code
+- **Stack:** .NET 10, React 19, PostgreSQL, Microsoft Fabric, ODBC, Docker Swarm
+- **What it is:** A schedule display installed in the university’s first building, the medical school, where it shows students the day’s classes. One system with two faces: an unattended fullscreen kiosk, and a sign-in-protected admin where staff manage the content it rotates. Academic data comes from the university’s analytics lakehouse.
+- **What Felipe did:** Built it end to end — the API, the lakehouse integration, both front ends and the deployment.
+  - The lakehouse connection that supplies the schedule.
+  - The kiosk display, its rotation and its day/night themes.
+  - The content admin and its scheduled playlist.
+  - Deployment onto the internal cluster.
+- **Problem it solved:** Students arriving at the building had no way to see the day’s schedule without looking it up on a phone, and the university had no way to put anything in front of them at the moment they walked in. A printed sheet answers the first problem badly and the second not at all.
+- **What it does:**
+  - A fullscreen kiosk sized for the physical panel it runs on, not for a browser window.
+  - Rotates between schedule pages and campus content on a fixed cadence.
+  - Switches between a day and a night theme by the clock, so it is readable in both.
+  - Staff schedule content with start and end dates; it appears and expires on its own.
+- **Engineering decisions:**
+  - **Polling, not a live connection** — The display asks the server for fresh data on a short interval rather than holding a socket open. A socket is the better answer when a human is watching and latency matters; this is a screen on a wall with nobody in front of it. Polling recovers from a dropped network by itself, and nobody has to walk to the building to restart it.
+  - **The analytics lakehouse as the source** — The schedule is read from the university’s analytics platform rather than from the academic system directly. It is the copy that is already shaped for reading, already has access controls the display can be granted narrowly, and — crucially — cannot be affected by a screen in a lobby querying it all day.
+  - **One system, two audiences** — The kiosk has no login and no interaction; the admin has both. Splitting them into two deployments was the obvious move and was rejected: they share the content model entirely, and two services would mean two places to change when the shape of a slide changes. The boundary is a route and an auth check, not a process.
+
+### Ulbra Infra — From a person on the box to a repository and a pipeline.
+
+- **Role:** Head of Technology — design & implementation (Apr 2026 – Current)
+- **Source:** closed — professional work described without the code
+- **Stack:** Docker Swarm, Traefik, GitHub Actions, OpenTelemetry, SigNoz, Prometheus, Grafana, Metabase
+- **What it is:** The platform underneath every other system in this group. It began as on-premise servers with no automation at all — deployment meant a person on the machine, installing a runtime and starting the application by hand. It is now a provisioning script, a container orchestrator, a reverse proxy, two observability tools with a declared split, and a delivery loop in which an alert can investigate itself and open a pull request.
+- **What Felipe did:** Designed and built the platform, and the delivery model that runs on it.
+  - The one-run provisioning script and the cluster it produces.
+  - The reverse proxy and the routing convention every application follows.
+  - The split between application and host observability.
+  - The CI pipeline, and the alert-to-pull-request loop built on top of it.
+  - The delivery dashboard that reads the team’s own task tracker.
+- **Problem it solved:** Everything ran on-premise with nothing automated around it. Getting an application into production meant connecting to a server, installing a runtime and starting the process by hand — which makes every deployment a memory exercise, every server subtly different from the last, and every outage an archaeology problem. Nothing was measured, so nothing could be improved on purpose.
+- **Provision once, then per application:** The server is set up in one run; after that, shipping an application is a repository and a pipeline.
+  - Provision — One script: runtime, firewall, cluster, overlay networks.
+  - Platform — Reverse proxy and the observability stacks come up with it.
+  - Push — CI builds the image and pushes it to the registry.
+  - Deploy — The pipeline deploys the stack; the proxy picks up the route from labels.
+  - Observe — Traces, logs and metrics flow in from environment variables alone.
+- **From an alert to a merged fix:** What the team automated is the investigation, not the judgement.
+  - Alert — Application telemetry crosses a threshold.
+  - Investigate — A coding agent reads the trace and the code around it.
+  - Pull request — A proposed fix arrives as a normal change to review.
+  - Review — An engineer accepts, amends or rejects it.
+  - Merge — The same pipeline every other change goes through.
+- **What it does:**
+  - One script takes a bare server to ready: container runtime, firewall, cluster, overlay networks, proxy and monitoring.
+  - A new application needs a compose file and a workflow — the routing and the certificate follow from labels.
+  - Telemetry is opt-in through environment variables; nothing else has to be wired.
+  - An alert can be investigated automatically and arrive as a pull request for a human to judge.
+- **Engineering decisions:**
+  - **Two observability tools, on a stated boundary** — Application telemetry — logs, traces, metrics — goes to one tool over OpenTelemetry; host metrics like CPU, memory and disk stay in another. Running two looks like drift until you read the rule written into the configuration: applications do not report to the host stack. Each tool is good at one of the two jobs, and the alternative considered and rejected was one tool doing both badly.
+  - **Alerts investigate themselves; humans still merge** — When application telemetry raises an alert, a coding agent reads the trace and the surrounding code and opens a pull request with a proposed fix. What was automated is the investigation — the part that is mechanical and slow at three in the morning. The merge is not automated, and deliberately so: a change nobody approved reaching production is a worse failure than a slow fix.
+  - **An orchestrator sized for the team** — Kubernetes was the default answer and was not taken. The cluster is small, on-premise, and operated by three engineers who are also writing six applications. Swarm gives multi-node scheduling, rolling updates and overlay networking with a fraction of the operational surface — and the cost of the ceiling it imposes is far below the cost of a control plane nobody has time to run.
+  - **The team measures itself with its own pipeline** — A dashboard reads the team’s task tracker through an ETL sidecar, so delivery is visible in the same place the systems’ numbers are. It is a small piece of plumbing carrying a large claim: a working model that is measured can be argued about with evidence, and one that is only asserted cannot.
 
 ### Dell Automated Caller — Automated end-to-end testing for a phone system.
 

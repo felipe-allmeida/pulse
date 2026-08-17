@@ -45,9 +45,9 @@ export const faq: FaqEntry[] = [
       'pt-BR': 'No que o Felipe está trabalhando agora?',
     },
     answer: {
-      en: 'He is freelancing through Pampa Devs, his own software studio, building internal enterprise platforms in .NET and React — a support and ticketing system, and an ERP replacing legacy internal tools. He remains open to full-time roles.',
+      en: 'He is Head of Technology for ULBRA, a Brazilian university, on an engagement through his own software studio Pampa Devs. He leads three engineers building the university’s internal platform in .NET and React — an IT service desk in production, an ERP replacing the legacy systems, a CRM rebuilt to full test coverage, administrative dashboards, a student dashboard, and the datacenter automation all of it deploys onto. He remains open to full-time roles.',
       'pt-BR':
-        'Está atuando como freelancer pela Pampa Devs, seu próprio estúdio de software, construindo plataformas internas corporativas em .NET e React — um sistema de suporte e chamados e um ERP substituindo ferramentas internas legadas. Segue aberto a posições full-time.',
+        'É Head de Tecnologia da ULBRA, uma universidade brasileira, em um contrato através do seu próprio estúdio de software, a Pampa Devs. Lidera três engenheiros construindo a plataforma interna da universidade em .NET e React — um service desk de TI em produção, um ERP substituindo os sistemas legados, um CRM reconstruído até cobertura total de testes, dashboards administrativos, um painel para os alunos e a automação de datacenter em que tudo isso é publicado. Segue aberto a posições full-time.',
     },
   },
   {

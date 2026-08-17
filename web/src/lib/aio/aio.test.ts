@@ -5,6 +5,7 @@ import { projects } from '../../content/projects';
 import { faq } from '../../content/faq';
 import { profile } from '../../content/profile';
 import type { Locale } from '../../content/types';
+import { LOCALES } from '../../content/types';
 import { buildAllPages, buildPages, pageForPath } from './pages';
 import { jsonLdForPage } from './json-ld';
 import { renderHead, serialiseJsonLd } from './render';
@@ -305,4 +306,19 @@ describe('faq', () => {
     expect(renderPageMarkdown(page('/about', 'pt-BR'), BASE)).toContain('## Perguntas frequentes');
     expect(renderPageMarkdown(page('/about', 'pt-BR'), BASE)).toContain(faq[0].answer['pt-BR']);
   });
+});
+
+it('the projects index tells a crawler that the ULBRA systems are one engagement', () => {
+  for (const locale of LOCALES) {
+    const page = buildPages(locale).find((p) => p.routePath === '/projects')!;
+    const headings = page.sections.map((s) => s.heading);
+    expect(headings, `${locale} names the venture`).toContain('ULBRA');
+
+    const venture = page.sections.find((s) => s.heading === 'ULBRA')!;
+    expect(venture.paragraphs?.[0], `${locale} venture summary`).toBeTruthy();
+    expect(venture.bullets?.length, `${locale} venture practices`).toBeGreaterThan(0);
+
+    // The venture is introduced before the projects it contains.
+    expect(headings.indexOf('ULBRA')).toBeLessThan(headings.indexOf('Ulbra Atende'));
+  }
 });
