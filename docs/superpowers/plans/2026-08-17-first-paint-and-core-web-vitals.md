@@ -654,6 +654,164 @@ fine and is completely inert."
 
 ---
 
+## Task 4b: Prerender the Portuguese home page at all
+
+Found while verifying Task 4, pre-existing and unrelated to any task in this plan.
+`renderRoute('/', 'pt-BR')` returns **0 bytes**, so `dist/pt.html` and
+`dist/pt/index.html` ship an empty `#root` — 24 bytes of markup against 27,855 for
+the English home and 39,696 for `/pt/about`.
+
+Reproduced twice: against the built prerender bundle, and from source with the
+router driven directly.
+
+The cause is an exact-string collision. `pathForLocale('/', 'pt-BR')` returns
+`/pt`, which is also `basepathForLocale('pt-BR')`. TanStack Router strips the
+basepath from the history entry, leaving `''`, which matches no route. Driving the
+same router with `/pt/` instead renders 27,978 bytes. `web/plugins/aio.ts` already
+notes that the router renders its own home link as `/pt/`; the prerender entry never
+got the same treatment.
+
+Why it matters here: this is the URL the original Lighthouse audit ran against, and
+the one Portuguese visitors land on. Until it is fixed, Task 4 has no markup to keep
+on screen there, so the central fix of this plan does nothing on that page.
+
+**Files:**
+- Modify: `web/src/entry-prerender.tsx`
+- Modify: `web/src/entry-prerender.test.ts`
+- Modify: `web/plugins/aio.ts`
+
+**Interfaces:**
+- Consumes: `pathForLocale`, `basepathForLocale` from `web/src/i18n/locale-url.ts`
+- Produces: nothing other tasks read
+
+- [ ] **Step 1: Write the failing test**
+
+In `web/src/entry-prerender.test.ts`, the existing `it.each(ROUTES)` suite only ever
+runs the `en` locale, which is why this shipped. Widen it to both. Replace the
+`ROUTES` constant and that block with:
+
+```ts
+const CASES = (['en', 'pt-BR'] as const).flatMap((locale) =>
+  buildPages(locale).map((page) => ({ locale, routePath: page.routePath })),
+);
+```
+
+```ts
+  it.each(CASES)('renders $routePath in $locale without touching the DOM', async ({ routePath, locale }) => {
+    const html = await renderRoute(routePath, locale);
+
+    expect(html.length).toBeGreaterThan(500);
+    expect(html).toContain('pulse');
+  });
+```
+
+Keep every other test in the file as it is.
+
+- [ ] **Step 2: Run it to verify it fails**
+
+```bash
+pnpm -C web test src/entry-prerender.test.ts
+```
+
+Expected: FAIL on exactly one case — `/` in `pt-BR`, receiving 0 characters. Every
+other case passes. If more than one fails, stop and report: the diagnosis is wrong.
+
+- [ ] **Step 3: Fix the history entry**
+
+In `web/src/entry-prerender.tsx`, `renderRoute` currently builds the router with
+`initialEntries: [pathForLocale(routePath, locale)]`. Replace that with:
+
+```tsx
+  const basepath = basepathForLocale(locale);
+  const path = pathForLocale(routePath, locale);
+  /*
+    A prefixed locale's home is the one case where the public path and the
+    basepath are the same string (`/pt`). The router strips the basepath from
+    the history entry, which would leave `''` — matching no route, rendering
+    nothing, and shipping a document whose #root is empty. `/pt/` is the form
+    the router itself produces for that link (see web/plugins/aio.ts).
+  */
+  const initialEntry = path === basepath ? `${path}/` : path;
+
+  const router = createRouter({
+    routeTree,
+    basepath,
+    history: createMemoryHistory({ initialEntries: [initialEntry] }),
+  });
+```
+
+Add `basepathForLocale` to the existing import from `./i18n/locale-url` if it is not
+already there.
+
+- [ ] **Step 4: Run the test to verify it passes**
+
+```bash
+pnpm -C web test src/entry-prerender.test.ts
+```
+
+Expected: PASS, every locale/route case.
+
+- [ ] **Step 5: Make the build refuse to ship an empty `#root`**
+
+This failure was invisible for its whole life because an empty `#root` looks
+completely normal in a browser — the SPA mounts over it — and is only wrong for the
+crawlers that never run the bundle. `web/plugins/aio.ts` already treats a missing
+prerender bundle as fatal for exactly this reason; extend that to the output.
+
+In `writeBundle`, immediately after `const app = await renderRoute(...)`:
+
+```ts
+        if (app.length < 500) {
+          // Same reasoning as loadPrerenderer's throw: a document with an empty
+          // #root renders fine for every human and is worthless to every
+          // crawler, so nothing downstream would ever surface this.
+          throw new Error(
+            `[pulse-aio] ${page.path} prerendered to ${app.length} characters — expected a full document. ` +
+              `Check renderRoute() for this route/locale pair.`,
+          );
+        }
+```
+
+- [ ] **Step 6: Prove the guard would have caught the original bug**
+
+Temporarily revert only the Step 3 change, run `pnpm -C web build`, and confirm the
+build now FAILS naming `/pt`. Then restore the fix and confirm the build passes.
+Record both outputs in your report. A guard that does not fire is not a guard.
+
+- [ ] **Step 7: Verify the emitted documents**
+
+```bash
+pnpm -C web test && pnpm -C web build
+python3 -c "
+for f in ['web/dist/index.html','web/dist/pt.html','web/dist/pt/index.html']:
+    h=open(f).read(); print(f, 'total=', len(h), 'h1=', h.count('<h1'))
+"
+```
+
+Expected: all three well over 20,000 bytes with one `<h1>` each. Before this task
+`pt.html` and `pt/index.html` were 8,657 bytes with zero.
+
+- [ ] **Step 8: Commit**
+
+```bash
+git add web/src/entry-prerender.tsx web/src/entry-prerender.test.ts web/plugins/aio.ts
+git commit -m "fix(web): prerender the Portuguese home page
+
+renderRoute('/', 'pt-BR') returned nothing, so /pt and /pt/index.html
+shipped an empty #root — 24 bytes against 27,855 for the English home.
+
+pathForLocale('/', 'pt-BR') is '/pt', which is also the router basepath.
+Stripping the basepath left '', which matches no route. '/pt/' is the form
+the router produces for that link itself.
+
+The prerender test only ever ran the English locale, which is why this
+survived; it now runs both. The build also refuses to emit a document
+whose #root is empty, since that failure is invisible in a browser and
+only wrong for the crawlers the whole prerender step exists to serve."
+```
+
+---
+
 ## Task 5: Get the map geometry out of the route chunk
 
 `use-visit-feed-*.js` is **431 KB raw / 140 KB gzip**, the largest chunk in the build, and it is not preloaded — it is discovered only after the entry evaluates. After Task 4 the swap waits on exactly this. Most of it is the 108 KB topojson and its decode.
