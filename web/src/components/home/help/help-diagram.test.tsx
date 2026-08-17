@@ -21,7 +21,9 @@ let triggerIntersection: ((isIntersecting: boolean) => void) | null = null;
 function stubIntersectionObserver() {
   triggerIntersection = null;
   class Stub {
-    constructor(private cb: IntersectionObserverCallback) {
+    cb: IntersectionObserverCallback;
+    constructor(cb: IntersectionObserverCallback) {
+      this.cb = cb;
       triggerIntersection = (isIntersecting: boolean) =>
         this.cb([{ isIntersecting } as IntersectionObserverEntry], this as unknown as IntersectionObserver);
     }

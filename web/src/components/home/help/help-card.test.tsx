@@ -75,7 +75,20 @@ describe('HelpCard', () => {
     });
 
     afterEach(() => {
-      i18n.addResource('en', 'home', key, originalExamples);
+      // `originalExamples` is really `string[]` here (that's what this key
+      // resolves to in home.json), but `i18n.addResource`'s declared type
+      // only allows a `string` value — a real gap in i18next's own types,
+      // not a reason to weaken this. `addResourceBundle` deep-merges a
+      // resource object and is typed `resources: any`, which actually
+      // matches what the resource store accepts, so it restores the array
+      // at the same nested path without any cast.
+      i18n.addResourceBundle(
+        'en',
+        'home',
+        { help: { cards: { repetitive: { examples: originalExamples } } } },
+        true,
+        true,
+      );
     });
 
     it('still renders the headline and body, and produces no example list items', async () => {
