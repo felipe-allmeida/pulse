@@ -33,9 +33,9 @@ export const faq: FaqEntry[] = [
       'pt-BR': 'Felipe de Almeida está aberto a novas oportunidades?',
     },
     answer: {
-      en: 'Yes. He is available now and actively looking for Staff or Principal Engineer roles, and for Head of Engineering / CTO positions. He works remotely and is open to roles in both European and US time zones. The fastest way to reach him is email (contato@felipealmeida.tech) or LinkedIn.',
+      en: 'Yes. He is available now and actively looking for Staff or Principal Engineer roles, and for Head of Engineering / CTO positions. He works remotely and is open to roles in both European and US time zones. The fastest way to reach him is email (contato@pampadevs.com) or LinkedIn.',
       'pt-BR':
-        'Sim. Está disponível agora e procurando ativamente posições de Staff ou Principal Engineer, e também de Head of Engineering / CTO. Trabalha remotamente e está aberto a vagas tanto em fusos europeus quanto americanos. O caminho mais rápido é e-mail (contato@felipealmeida.tech) ou LinkedIn.',
+        'Sim. Está disponível agora e procurando ativamente posições de Staff ou Principal Engineer, e também de Head of Engineering / CTO. Trabalha remotamente e está aberto a vagas tanto em fusos europeus quanto americanos. O caminho mais rápido é e-mail (contato@pampadevs.com) ou LinkedIn.',
     },
   },
   {

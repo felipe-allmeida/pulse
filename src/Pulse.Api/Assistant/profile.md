@@ -71,7 +71,7 @@ site's own project pages. These two are not written up there:
 
 ## Contact
 
-- Email: contato@felipealmeida.tech
+- Email: contato@pampadevs.com
 - LinkedIn: https://www.linkedin.com/in/felipe-allmeida
 - WhatsApp: +55 51 98346-8863
 - Book a call (Calendly): https://calendly.com/pampa-devs/bate-papo-sobre-seu-projeto

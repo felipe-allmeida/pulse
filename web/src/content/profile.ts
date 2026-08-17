@@ -49,7 +49,7 @@ export const profile: Profile = {
   },
   contact: {
     calendly: 'https://calendly.com/pampa-devs/bate-papo-sobre-seu-projeto',
-    email: 'contato@felipealmeida.tech',
+    email: 'contato@pampadevs.com',
     linkedin: 'https://www.linkedin.com/in/felipe-allmeida',
     whatsapp: 'https://wa.me/5551983468863',
   },

@@ -5,7 +5,7 @@ import { ContactButtons } from './contact-buttons';
 
 const fullContact = {
   calendly: 'https://calendly.com/felipe/30min',
-  email: 'contato@felipealmeida.tech',
+  email: 'contato@pampadevs.com',
   linkedin: 'https://www.linkedin.com/in/felipe-allmeida',
   whatsapp: 'https://wa.me/5551983468863',
 };
