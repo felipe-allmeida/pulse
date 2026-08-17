@@ -37,6 +37,17 @@ describe('prerender', () => {
     expect(html).toContain('pulse');
   });
 
+  it('keeps the English home rendering substance, not just a shell — pins the basepath/path collision fix', async () => {
+    // Regression pin for entry-prerender's initialEntry branch: `en`'s home
+    // has the same collision shape as `pt-BR`'s (`pathForLocale('/', 'en')`
+    // is also `/`), but its basepath IS the root, so it must NOT take the
+    // trailing-slash branch. If that condition were ever widened back to
+    // `path === basepath` without the `basepath !== '/'` guard, `en`'s home
+    // would build `initialEntries: ['//']` instead of `['/']`.
+    const text = textOf(await renderRoute('/', 'en'));
+    expect(text).toContain('Watch it happen');
+  });
+
   it('puts the About page’s substance in the markup, not just the shell', async () => {
     const text = textOf(await renderRoute('/about', 'en'));
 

@@ -37,13 +37,15 @@ export async function renderRoute(routePath: string, locale: Locale): Promise<st
   const basepath = basepathForLocale(locale);
   const path = pathForLocale(routePath, locale);
   /*
-    A prefixed locale's home is the one case where the public path and the
-    basepath are the same string (`/pt`). The router strips the basepath from
-    the history entry, which would leave `''` — matching no route, rendering
-    nothing, and shipping a document whose #root is empty. `/pt/` is the form
-    the router itself produces for that link (see web/plugins/aio.ts).
+    A locale with a non-root basepath (e.g. `/pt`) is the one case where its
+    home's public path and its basepath are the same string. The router
+    strips the basepath from the history entry, which would leave `''` —
+    matching no route, rendering nothing, and shipping a document whose
+    #root is empty. `/pt/` is the form the router itself produces for that
+    link (see web/plugins/aio.ts). `en` is excluded because its basepath IS
+    the root (`/`), so there is no collision to correct for.
   */
-  const initialEntry = path === basepath ? `${path}/` : path;
+  const initialEntry = routePath === '/' && basepath !== '/' ? `${path}/` : path;
 
   const router = createRouter({
     routeTree,
