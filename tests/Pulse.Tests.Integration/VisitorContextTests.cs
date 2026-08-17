@@ -1,37 +1,18 @@
 using System.Net;
 using System.Net.Http.Json;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
-using Testcontainers.PostgreSql;
-using Testcontainers.RabbitMq;
-using Testcontainers.Redis;
 using Pulse.Api.Endpoints;
 using Pulse.Api.Geo;
 using Pulse.Domain.Audit;
 using Pulse.Domain.Geo;
-using Pulse.Persistence;
+using Pulse.Tests.Integration.Infrastructure;
 
 /// <summary>Pins the caller's resolved geo so the tests don't depend on DemoGeoLocator's round-robin.</summary>
 public sealed class StubGeoLocator(GeoResult result) : IGeoLocator
 {
     public GeoResult Locate(string ip) => result;
-}
-
-public sealed class VisitorApiFactory(string pg, string redis, string rabbitMq, IGeoLocator geo)
-    : WebApplicationFactory<Program>
-{
-    protected override void ConfigureWebHost(IWebHostBuilder b)
-    {
-        b.UseEnvironment("Testing")
-         .UseSetting("ConnectionStrings:Postgres", pg)
-         .UseSetting("ConnectionStrings:Redis", redis)
-         .UseSetting("ConnectionStrings:RabbitMq", rabbitMq)
-         .UseSetting("Cors:Origins", "http://localhost:5173");
-        // Runs after Program's own registration, so this instance is what resolves.
-        b.ConfigureTestServices(s => s.AddSingleton<IGeoLocator>(geo));
-    }
 }
 
 /// <summary>
@@ -40,36 +21,43 @@ public sealed class VisitorApiFactory(string pg, string redis, string rabbitMq, 
 /// "first from your city" must be about *your* city, and "the last person before
 /// you" must never be able to be you.
 /// </summary>
-public class VisitorContextTests : IAsyncLifetime
+[Collection("Integration")]
+public class VisitorContextTests(PulseTestFixture fixture) : IntegrationTestBase(fixture)
 {
-    private readonly PostgreSqlContainer _pg = new PostgreSqlBuilder().WithImage("postgres:17").Build();
-    private readonly RedisContainer _redis = new RedisBuilder().WithImage("redis:7").Build();
-    private readonly RabbitMqContainer _rabbitMq = new RabbitMqBuilder().WithImage("rabbitmq:3-management").Build();
-
     private static readonly GeoResult PortoAlegre = new("Brazil", "Porto Alegre", -30.03, -51.23);
     private static readonly GeoResult Curitiba = new("Brazil", "Curitiba", -25.43, -49.27);
     private static readonly GeoResult Unresolved = new("Unknown", "Unknown", 0, 0);
 
-    private VisitorApiFactory _fromPortoAlegre = default!;
-    private VisitorApiFactory _fromCuritiba = default!;
-    private VisitorApiFactory _fromNowhere = default!;
-
     /// <summary>The seeded Porto Alegre visit the "last from your city" assertions expect.</summary>
     private DateTimeOffset _recentPortoAlegreAt;
 
-    public async Task InitializeAsync()
+    /// <summary>
+    /// A host whose caller always resolves to <paramref name="geo"/>.
+    ///
+    /// <para>These are three fixed configurations, so they memoise to three hosts for the whole
+    /// class instead of three per <c>[Fact]</c>. Each GeoResult is a static readonly field paired
+    /// one-to-one with its key, which is what keeps the key contract in
+    /// <see cref="PulseTestFixture.GetOrCreateHost"/> honest: the key alone says what the callback
+    /// will register.</para>
+    /// </summary>
+    private WebApplicationFactory<Program> HostSeeingCallerFrom(string key, GeoResult geo) =>
+        Fixture.GetOrCreateHost($"visitor:geo:{key}", b =>
+            // Runs after Program's own registration, so this instance is what resolves.
+            b.ConfigureTestServices(s => s.AddSingleton<IGeoLocator>(new StubGeoLocator(geo))));
+
+    private WebApplicationFactory<Program> FromPortoAlegre => HostSeeingCallerFrom("porto-alegre", PortoAlegre);
+    private WebApplicationFactory<Program> FromCuritiba => HostSeeingCallerFrom("curitiba", Curitiba);
+    private WebApplicationFactory<Program> FromNowhere => HostSeeingCallerFrom("unresolved", Unresolved);
+
+    public override async Task InitializeAsync()
     {
-        await Task.WhenAll(_pg.StartAsync(), _redis.StartAsync(), _rabbitMq.StartAsync());
-        var (pg, redis, rabbit) = (_pg.GetConnectionString(), _redis.GetConnectionString(), _rabbitMq.GetConnectionString());
-        _fromPortoAlegre = new VisitorApiFactory(pg, redis, rabbit, new StubGeoLocator(PortoAlegre));
-        _fromCuritiba = new VisitorApiFactory(pg, redis, rabbit, new StubGeoLocator(Curitiba));
-        _fromNowhere = new VisitorApiFactory(pg, redis, rabbit, new StubGeoLocator(Unresolved));
+        // Reset first, then seed — every count below is exact.
+        await base.InitializeAsync();
 
         var now = DateTimeOffset.UtcNow;
         _recentPortoAlegreAt = now.AddMinutes(-30);
 
-        using var scope = _fromPortoAlegre.Services.CreateScope();
-        var db = scope.ServiceProvider.GetRequiredService<PulseDbContext>();
+        await using var db = Fixture.NewDbContext();
         db.VisitAudits.AddRange(
             VisitAudit.FromGeo(Guid.NewGuid(), new GeoResult("Portugal", "Lisbon", 38.72, -9.13), now.AddHours(-3)),
             VisitAudit.FromGeo(Guid.NewGuid(), PortoAlegre, now.AddDays(-10)),
@@ -79,17 +67,7 @@ public class VisitorContextTests : IAsyncLifetime
         await db.SaveChangesAsync();
     }
 
-    public async Task DisposeAsync()
-    {
-        _fromPortoAlegre.Dispose();
-        _fromCuritiba.Dispose();
-        _fromNowhere.Dispose();
-        await _pg.DisposeAsync();
-        await _redis.DisposeAsync();
-        await _rabbitMq.DisposeAsync();
-    }
-
-    private static async Task<VisitorContextDto> GetVisitorAsync(VisitorApiFactory factory)
+    private static async Task<VisitorContextDto> GetVisitorAsync(WebApplicationFactory<Program> factory)
     {
         var response = await factory.CreateClient().GetAsync("/api/visitor");
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -101,7 +79,7 @@ public class VisitorContextTests : IAsyncLifetime
     [Fact]
     public async Task Visitor_ReturnsCallersOwnCoarseGeo()
     {
-        var visitor = await GetVisitorAsync(_fromPortoAlegre);
+        var visitor = await GetVisitorAsync(FromPortoAlegre);
 
         Assert.NotNull(visitor.Geo);
         Assert.Equal("Porto Alegre", visitor.Geo!.City);
@@ -111,7 +89,7 @@ public class VisitorContextTests : IAsyncLifetime
     [Fact]
     public async Task Visitor_CountsPriorVisitsFromTheCallersCity()
     {
-        var visitor = await GetVisitorAsync(_fromPortoAlegre);
+        var visitor = await GetVisitorAsync(FromPortoAlegre);
 
         // Two Porto Alegre rows seeded (10 days ago, 30 minutes ago) — the other
         // three cities must not leak into this count.
@@ -123,7 +101,7 @@ public class VisitorContextTests : IAsyncLifetime
     [Fact]
     public async Task Visitor_NeverSeenCity_ReportsCallerAsTheFirst()
     {
-        var visitor = await GetVisitorAsync(_fromCuritiba);
+        var visitor = await GetVisitorAsync(FromCuritiba);
 
         // This is what makes the rarest tier of the copy ("the first person from
         // Curitiba to open this page") safe to render.
@@ -134,7 +112,7 @@ public class VisitorContextTests : IAsyncLifetime
     [Fact]
     public async Task Visitor_PreviousVisit_SkipsTheCallersOwnCity()
     {
-        var visitor = await GetVisitorAsync(_fromPortoAlegre);
+        var visitor = await GetVisitorAsync(FromPortoAlegre);
 
         // The newest known-geo row overall is Porto Alegre (30 min ago) — the
         // caller's own city. "The last person before you" would then be the
@@ -149,7 +127,7 @@ public class VisitorContextTests : IAsyncLifetime
         // Caller's city is unknown, so nothing is skipped for being "their own" —
         // the newest row overall is the Unknown one (1h ago), which must still be
         // filtered out in favour of the newest *locatable* visit.
-        var visitor = await GetVisitorAsync(_fromNowhere);
+        var visitor = await GetVisitorAsync(FromNowhere);
 
         Assert.NotNull(visitor.Previous);
         Assert.Equal("Porto Alegre", visitor.Previous!.City);
@@ -158,7 +136,7 @@ public class VisitorContextTests : IAsyncLifetime
     [Fact]
     public async Task Visitor_UnresolvedGeo_OmitsGeoButKeepsHistory()
     {
-        var visitor = await GetVisitorAsync(_fromNowhere);
+        var visitor = await GetVisitorAsync(FromNowhere);
 
         // Degrades to the city-less copy rather than inventing a location.
         Assert.Null(visitor.Geo);
@@ -170,7 +148,7 @@ public class VisitorContextTests : IAsyncLifetime
     [Fact]
     public async Task Visitor_Totals_CountEveryVisitButWindowOnlyTheLast24h()
     {
-        var visitor = await GetVisitorAsync(_fromPortoAlegre);
+        var visitor = await GetVisitorAsync(FromPortoAlegre);
 
         // All five seeded rows, unresolved geo included — same as /api/metrics.
         Assert.Equal(5, visitor.TotalVisits);
@@ -182,9 +160,9 @@ public class VisitorContextTests : IAsyncLifetime
     [Fact]
     public async Task Visitor_DoesNotRecordAVisitOfItsOwn()
     {
-        var before = await GetVisitorAsync(_fromPortoAlegre);
-        await GetVisitorAsync(_fromPortoAlegre);
-        var after = await GetVisitorAsync(_fromPortoAlegre);
+        var before = await GetVisitorAsync(FromPortoAlegre);
+        await GetVisitorAsync(FromPortoAlegre);
+        var after = await GetVisitorAsync(FromPortoAlegre);
 
         // Visits are published by the hub on connect. If this read endpoint also
         // published one, every page load would count twice and the "nth person"

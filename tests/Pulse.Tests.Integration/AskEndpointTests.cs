@@ -1,15 +1,12 @@
 using System.Net;
 using System.Net.Http.Json;
 using System.Runtime.CompilerServices;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Pulse.Api.Assistant;
-using Testcontainers.PostgreSql;
-using Testcontainers.RabbitMq;
-using Testcontainers.Redis;
+using Pulse.Tests.Integration.Infrastructure;
 
 public sealed class FakeAi(IEnumerable<string> chunks) : IAiClient
 {
@@ -26,6 +23,11 @@ public sealed class FakeAi(IEnumerable<string> chunks) : IAiClient
 public sealed class CapturingAi : IAiClient
 {
     public IReadOnlyList<ChatMessage>? LastMessages { get; private set; }
+
+    /// <summary>Drops what the previous test captured. The host holding this instance is memoised
+    /// across tests (see AskEndpointTests.WithCapturingAi), so nothing else would.</summary>
+    public void Clear() => LastMessages = null;
+
     public async IAsyncEnumerable<string> StreamAsync(IReadOnlyList<ChatMessage> messages, [EnumeratorCancellation] CancellationToken ct)
     {
         LastMessages = messages;
@@ -34,38 +36,47 @@ public sealed class CapturingAi : IAiClient
     }
 }
 
-public class AskEndpointTests : IAsyncLifetime
+[Collection("Integration")]
+public class AskEndpointTests(PulseTestFixture fixture) : IntegrationTestBase(fixture)
 {
-    private readonly PostgreSqlContainer _pg = new PostgreSqlBuilder().WithImage("postgres:17").Build();
-    private readonly RedisContainer _redis = new RedisBuilder().WithImage("redis:7").Build();
-    private readonly RabbitMqContainer _rabbitMq = new RabbitMqBuilder().WithImage("rabbitmq:3-management").Build();
-    private PulseApiFactory _factory = default!;
-
-    public async Task InitializeAsync()
-    {
-        await Task.WhenAll(_pg.StartAsync(), _redis.StartAsync(), _rabbitMq.StartAsync());
-        _factory = new PulseApiFactory(_pg.GetConnectionString(), _redis.GetConnectionString(), _rabbitMq.GetConnectionString());
-    }
-
-    public async Task DisposeAsync()
-    {
-        _factory.Dispose();
-        await _pg.DisposeAsync();
-        await _redis.DisposeAsync();
-        await _rabbitMq.DisposeAsync();
-    }
-
-    private WebApplicationFactory<Program> WithFakeAi(IEnumerable<string> chunks) =>
-        _factory.WithWebHostBuilder(b => b.ConfigureTestServices(s =>
+    /// <summary>
+    /// A host whose IAiClient replays <paramref name="chunks"/>. FakeAi is stateless, so the chunks
+    /// alone describe the configuration — which is what lets them be the memoisation key.
+    /// </summary>
+    private WebApplicationFactory<Program> WithFakeAi(params string[] chunks) =>
+        Fixture.GetOrCreateHost($"ask:fake-ai:{string.Join('|', chunks)}", b => b.ConfigureTestServices(s =>
         {
             s.RemoveAll<IAiClient>();
             s.AddSingleton<IAiClient>(new FakeAi(chunks));
         }));
 
+    /// <summary>
+    /// A host that records the messages the endpoint hands the AI client.
+    ///
+    /// <para>CapturingAi is stateful, so it must not be captured by the configure callback — that
+    /// would put per-test state behind a shared key, which is the one thing
+    /// <see cref="PulseTestFixture.GetOrCreateHost"/> forbids. Instead the host registers the type
+    /// and each test resolves the instance and clears it, so the key still describes the whole
+    /// configuration and no test can read what a previous one captured.</para>
+    /// </summary>
+    private (WebApplicationFactory<Program> Factory, CapturingAi Ai) WithCapturingAi()
+    {
+        var factory = Fixture.GetOrCreateHost("ask:capturing-ai", b => b.ConfigureTestServices(s =>
+        {
+            s.RemoveAll<IAiClient>();
+            s.AddSingleton<CapturingAi>();
+            s.AddSingleton<IAiClient>(sp => sp.GetRequiredService<CapturingAi>());
+        }));
+
+        var ai = factory.Services.GetRequiredService<CapturingAi>();
+        ai.Clear();
+        return (factory, ai);
+    }
+
     [Fact]
     public async Task Ask_StreamsAnswer_FromAiClient()
     {
-        using var factory = WithFakeAi(["Hello", " world"]);
+        var factory = WithFakeAi("Hello", " world");
         var res = await factory.CreateClient().PostAsJsonAsync("/api/ask", new { question = "hi", history = Array.Empty<object>() });
         Assert.Equal(HttpStatusCode.OK, res.StatusCode);
         Assert.Equal("Hello world", await res.Content.ReadAsStringAsync());
@@ -74,7 +85,7 @@ public class AskEndpointTests : IAsyncLifetime
     [Fact]
     public async Task Ask_RejectsOverLongQuestion()
     {
-        using var factory = WithFakeAi(["irrelevant"]);
+        var factory = WithFakeAi("irrelevant");
         var longQuestion = new string('a', 501);
         var res = await factory.CreateClient().PostAsJsonAsync("/api/ask", new { question = longQuestion, history = Array.Empty<object>() });
         Assert.Equal(HttpStatusCode.BadRequest, res.StatusCode);
@@ -83,7 +94,7 @@ public class AskEndpointTests : IAsyncLifetime
     [Fact]
     public async Task Ask_RejectsEmptyQuestion()
     {
-        using var factory = WithFakeAi(["irrelevant"]);
+        var factory = WithFakeAi("irrelevant");
         var res = await factory.CreateClient().PostAsJsonAsync("/api/ask", new { question = "", history = Array.Empty<object>() });
         Assert.Equal(HttpStatusCode.BadRequest, res.StatusCode);
     }
@@ -91,12 +102,7 @@ public class AskEndpointTests : IAsyncLifetime
     [Fact]
     public async Task Ask_WithPtBrLocale_InstructsAssistantInBrazilianPortuguese()
     {
-        var capturing = new CapturingAi();
-        using var factory = _factory.WithWebHostBuilder(b => b.ConfigureTestServices(s =>
-        {
-            s.RemoveAll<IAiClient>();
-            s.AddSingleton<IAiClient>(capturing);
-        }));
+        var (factory, capturing) = WithCapturingAi();
 
         var res = await factory.CreateClient().PostAsJsonAsync("/api/ask", new
         {
@@ -114,12 +120,7 @@ public class AskEndpointTests : IAsyncLifetime
     [Fact]
     public async Task Ask_WithOutOfAllowListLocale_CoercesToEnglish_AndDoesNotReturnBadRequest()
     {
-        var capturing = new CapturingAi();
-        using var factory = _factory.WithWebHostBuilder(b => b.ConfigureTestServices(s =>
-        {
-            s.RemoveAll<IAiClient>();
-            s.AddSingleton<IAiClient>(capturing);
-        }));
+        var (factory, capturing) = WithCapturingAi();
 
         var res = await factory.CreateClient().PostAsJsonAsync("/api/ask", new
         {
@@ -137,12 +138,7 @@ public class AskEndpointTests : IAsyncLifetime
     [Fact]
     public async Task Ask_NeverForwardsClientSuppliedSystemRoleHistory_ToTheAiClient()
     {
-        var capturing = new CapturingAi();
-        using var factory = _factory.WithWebHostBuilder(b => b.ConfigureTestServices(s =>
-        {
-            s.RemoveAll<IAiClient>();
-            s.AddSingleton<IAiClient>(capturing);
-        }));
+        var (factory, capturing) = WithCapturingAi();
 
         var res = await factory.CreateClient().PostAsJsonAsync("/api/ask", new
         {

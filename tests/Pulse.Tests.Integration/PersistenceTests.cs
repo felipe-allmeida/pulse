@@ -1,22 +1,17 @@
-using Testcontainers.PostgreSql;
 using Microsoft.EntityFrameworkCore;
 using Pulse.Domain.Audit;
 using Pulse.Domain.Geo;
-using Pulse.Persistence;
+using Pulse.Tests.Integration.Infrastructure;
 
-public class PersistenceTests : IAsyncLifetime
+[Collection("Integration")]
+public class PersistenceTests(PulseTestFixture fixture) : IntegrationTestBase(fixture)
 {
-    private readonly PostgreSqlContainer _pg = new PostgreSqlBuilder().WithImage("postgres:17").Build();
-    public Task InitializeAsync() => _pg.StartAsync();
-    public Task DisposeAsync() => _pg.DisposeAsync().AsTask();
-
     [Fact]
     public async Task CanPersistAndReadVisitAudit()
     {
-        var opts = new DbContextOptionsBuilder<PulseDbContext>()
-            .UseNpgsql(_pg.GetConnectionString()).UseSnakeCaseNamingConvention().Options;
-        await using var ctx = new PulseDbContext(opts);
-        await ctx.Database.MigrateAsync();
+        // The fixture migrated the shared database once and TRUNCATEd it before this test, so the
+        // exact count below still means "the row this test wrote".
+        await using var ctx = Fixture.NewDbContext();
 
         ctx.VisitAudits.Add(VisitAudit.FromGeo(Guid.NewGuid(),
             new GeoResult("Portugal", "Lisbon", 38.72, -9.13), DateTimeOffset.UtcNow));

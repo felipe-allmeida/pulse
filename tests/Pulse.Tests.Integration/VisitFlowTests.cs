@@ -2,43 +2,43 @@ using MassTransit;
 using MassTransit.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Testcontainers.PostgreSql;
 using Pulse.Domain.Events;
 using Pulse.Persistence;
+using Pulse.Tests.Integration.Infrastructure;
 using Pulse.Worker.Consumers;
 
-public class VisitFlowTests : IAsyncLifetime
+[Collection("Integration")]
+public class VisitFlowTests(PulseTestFixture fixture) : IntegrationTestBase(fixture)
 {
-    private readonly PostgreSqlContainer _pg = new PostgreSqlBuilder().WithImage("postgres:17").Build();
     private ServiceProvider _provider = default!;
     private ITestHarness _harness = default!;
 
-    public async Task InitializeAsync()
+    public override async Task InitializeAsync()
     {
-        await _pg.StartAsync();
+        // TRUNCATEs visit_audits (and the outbox tables) before the harness starts, which is what
+        // keeps the exact count below meaning "the row this test wrote".
+        await base.InitializeAsync();
 
+        // The harness stays per-test: it is in-memory and costs no container, and a fresh bus per
+        // test is what keeps the Consumed assertion about this test's message only.
         var services = new ServiceCollection();
         services.AddDbContext<PulseDbContext>(o =>
-            o.UseNpgsql(_pg.GetConnectionString()).UseSnakeCaseNamingConvention());
+            o.UseNpgsql(Fixture.PostgresConnectionString).UseSnakeCaseNamingConvention());
         services.AddMassTransitTestHarness(x => x.AddConsumer<VisitStartedConsumer>());
         _provider = services.BuildServiceProvider(true);
 
-        await using (var scope = _provider.CreateAsyncScope())
-            await scope.ServiceProvider.GetRequiredService<PulseDbContext>().Database.MigrateAsync();
-
+        // No MigrateAsync here — the fixture owns the schema for the whole assembly.
         _harness = _provider.GetRequiredService<ITestHarness>();
         await _harness.Start();
     }
 
-    public async Task DisposeAsync()
+    public override async Task DisposeAsync()
     {
         await _harness.Stop();
         await _provider.DisposeAsync();
-        await _pg.DisposeAsync();
     }
 
-    private PulseDbContext NewContext() => new(new DbContextOptionsBuilder<PulseDbContext>()
-        .UseNpgsql(_pg.GetConnectionString()).UseSnakeCaseNamingConvention().Options);
+    private PulseDbContext NewContext() => Fixture.NewDbContext();
 
     [Fact]
     public async Task PublishingVisitStarted_WritesAuditRow()
