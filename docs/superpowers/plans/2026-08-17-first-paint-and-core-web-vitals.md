@@ -1810,11 +1810,25 @@ being discovered a full round trip late."
 
 - [ ] **Step 1: Convert**
 
+`cwebp` is not installed on this machine, and installing a system package is out of
+scope for this task. Pillow is available and has WebP support, so use it:
+
 ```bash
-cd web/public/screenshots && for f in *.png; do cwebp -q 82 "$f" -o "${f%.png}.webp"; done && ls -la
+python3 - <<'PY'
+from pathlib import Path
+from PIL import Image
+
+for png in sorted(Path('web/public/screenshots').glob('*.png')):
+    webp = png.with_suffix('.webp')
+    with Image.open(png) as im:
+        # RGBA is preserved; these are UI screenshots and some have transparency.
+        im.save(webp, 'WEBP', quality=82, method=6)
+    print(f'{png.name}: {png.stat().st_size/1024:7.1f} KB -> {webp.stat().st_size/1024:7.1f} KB')
+PY
 ```
 
-If `cwebp` is unavailable, install it (`brew install webp`). Do not substitute a lossless converter — the point is the size reduction.
+`method=6` is the slowest, best-compressing setting. These are six one-off files, so
+the encode time does not matter and the bytes do.
 
 - [ ] **Step 2: Check the result is worth it and still looks right**
 
@@ -1822,7 +1836,13 @@ If `cwebp` is unavailable, install it (`brew install webp`). Do not substitute a
 du -ch web/public/screenshots/*.webp | tail -1
 ```
 
-Expected: well under 400 KB total. Open two or three `.webp` files and compare against the PNGs by eye — these are UI screenshots, so text must stay legible. If any looks degraded, re-encode that one at `-q 90` rather than accepting it.
+Expected: well under 400 KB total. These are UI screenshots, so legibility of small
+text is the thing quality 82 could plausibly damage. Check it rather than assuming —
+report each file's dimensions and its before/after bytes, and re-encode any file whose
+ratio looks anomalous (for example, one that barely shrank, which usually means it was
+already heavily compressed, or one that shrank far more than the rest, which can mean
+detail was thrown away) at `quality=90`. Say in your report which files you re-encoded
+and why.
 
 - [ ] **Step 3: Point the content at them and remove the PNGs**
 
