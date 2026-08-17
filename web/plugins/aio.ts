@@ -28,7 +28,7 @@ import type { Plugin } from 'vite';
 import type { Locale } from '../src/content/types';
 import { resolveSiteUrl, site } from '../src/content/site';
 import { buildAllPages, basenameForPath } from '../src/lib/aio/pages';
-import { renderHead } from '../src/lib/aio/render';
+import { renderHead, renderDocument } from '../src/lib/aio/render';
 import {
   renderLlmsFullTxt,
   renderLlmsTxt,
@@ -108,14 +108,6 @@ export function aio(options: AioOptions = {}): Plugin {
       if (!existsSync(templatePath)) return;
 
       const template = readFileSync(templatePath, 'utf8');
-      if (!template.includes(HEAD_MARKER) || !template.includes(APP_MARKER)) {
-        // The markers are the contract between index.html and this plugin. If
-        // they are gone the build would silently ship un-optimized documents,
-        // which is exactly the failure this plugin exists to prevent.
-        throw new Error(
-          `[pulse-aio] "${HEAD_MARKER}" / "${APP_MARKER}" not found in the built index.html — restore the markers in web/index.html.`,
-        );
-      }
 
       const pages = buildAllPages();
       const lastmod = options.lastmod ?? new Date().toISOString().slice(0, 10);
@@ -123,13 +115,12 @@ export function aio(options: AioOptions = {}): Plugin {
 
       for (const page of pages) {
         const app = await renderRoute(page.routePath, page.locale);
-        const html = template
-          // The template is built from `<html lang="en">`; the Portuguese
-          // documents have to say so, or every one of them announces the
-          // wrong language to crawlers and screen readers alike.
-          .replace('<html lang="en">', `<html lang="${page.locale}">`)
-          .replace(HEAD_MARKER, renderHead(page, base, site.name, profile.name))
-          .replace(APP_MARKER, app);
+        const html = renderDocument({
+          template,
+          page,
+          head: renderHead(page, base, site.name, profile.name),
+          app,
+        });
         write(outDir, page.file, html);
         write(outDir, `${basenameForPath(page.path)}.md`, renderPageMarkdown(page, base));
 

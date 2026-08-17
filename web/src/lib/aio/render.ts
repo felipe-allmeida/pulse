@@ -97,3 +97,44 @@ export function renderHead(page: AioPage, base: string, siteName: string, author
 
   return tags.join('\n    ');
 }
+
+/** Placeholders in index.html that every emitted document fills in. */
+const HEAD_MARKER = '<!--aio:head-->';
+const APP_MARKER = '<!--aio:app-->';
+
+export interface DocumentOptions {
+  /** The built index.html, with both markers still in place. */
+  template: string;
+  page: AioPage;
+  /** Output of `renderHead()`. */
+  head: string;
+  /** Prerendered markup for `#root`. */
+  app: string;
+}
+
+/**
+ * Assembles one emitted document.
+ *
+ * This exists so there is a single place a document is put together. It used
+ * to be a chain of `.replace()` calls inside the build plugin, which meant
+ * every new thing a document needed — the theme class here, the inlined CSS
+ * and route preload later — added another link to that chain, untested,
+ * inside a Vite hook.
+ *
+ * The `dark` class is stamped in the same substitution as `lang`, rather than
+ * a second one: they both rewrite the opening `<html>` tag, and two
+ * independent replacements over the same tag is how you end up with one of
+ * them silently winning.
+ */
+export function renderDocument({ template, page, head, app }: DocumentOptions): string {
+  if (!template.includes(HEAD_MARKER) || !template.includes(APP_MARKER)) {
+    throw new Error(
+      `[pulse-aio] "${HEAD_MARKER}" / "${APP_MARKER}" not found in the built index.html — restore the markers in web/index.html.`,
+    );
+  }
+
+  return template
+    .replace('<html lang="en">', `<html lang="${page.locale}" class="dark">`)
+    .replace(HEAD_MARKER, head)
+    .replace(APP_MARKER, app);
+}
