@@ -4,6 +4,7 @@ import { RouterProvider, createRouter } from '@tanstack/react-router';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { routeTree } from './routeTree.gen';
 import { queryClient } from './lib/query-client';
+import { loadClarity } from './lib/clarity';
 import { useThemeStore } from './stores/theme-store';
 import i18n from './i18n';
 import {
@@ -52,6 +53,11 @@ if (redirectTo) {
   // redirect above, but it never decides what this page renders in.
   void i18n.changeLanguage(locale);
   document.documentElement.lang = locale;
+
+  // Inside the else on purpose: a visitor bounced off the bare root never
+  // stays on that document, and recording it would open every such session
+  // with a page they were never shown. Dev builds drop the call entirely.
+  if (import.meta.env.PROD) loadClarity();
 
   ReactDOM.createRoot(document.getElementById('root')!).render(
     <React.StrictMode>
