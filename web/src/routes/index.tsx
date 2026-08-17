@@ -27,8 +27,8 @@ function Index() {
     <div className="flex flex-col pb-24">
       {/*
         Hero + EngineeringShowcase are designed full-bleed (Task 1/3), but
-        AppShell's <main> is `mx-auto max-w-7xl p-6` — without this breakout
-        wrapper they'd sit inset by that 24px gutter and capped at 1280px,
+        AppShell's <main> is `mx-auto max-w-7xl py-6` — without this breakout
+        wrapper they'd sit capped at 1280px with a 24px band above,
         which reads as a visible frame around the "immersive" dark band
         (most obvious in light theme, where the gutter turns white). This
         cancels just that padding/max-width for these two sections; nothing
