@@ -1,3 +1,7 @@
+/// <reference types="node" />
+import { readFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { render, waitFor } from '@testing-library/react';
 import {
   RouterProvider,
@@ -95,5 +99,21 @@ describe('useRouteHead', () => {
     // crawlers guessing which one describes the page.
     expect(document.head.querySelectorAll('title')).toHaveLength(1);
     expect(document.head.querySelectorAll('meta[name="description"]')).toHaveLength(1);
+  });
+
+  it('does not pull the page model into the initial render', async () => {
+    // The served document already carries this route's title from the AIO
+    // build step, so nothing about the first paint needs the page model —
+    // and reaching for it statically drags faq, profile and projects (~82 KB)
+    // onto every page in the site.
+    const modules = await import('./use-route-head');
+    const source = readFileSync(
+      join(dirname(fileURLToPath(import.meta.url)), 'use-route-head.ts'),
+      'utf-8',
+    );
+
+    expect(modules).toBeDefined();
+    expect(source).not.toMatch(/^import .*\bfrom '\.\/pages'/m);
+    expect(source).toMatch(/await import\('\.\/pages'\)/);
   });
 });

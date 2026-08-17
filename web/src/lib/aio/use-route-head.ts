@@ -6,7 +6,6 @@ import {
   pathForLocale,
   routePathFromPathname,
 } from '../../i18n/locale-url';
-import { pageForPath } from './pages';
 
 /**
  * Keeps the document head in step with client-side navigation.
@@ -44,14 +43,34 @@ export function useRouteHead(): void {
   );
 
   useEffect(() => {
-    const page = pageForPath(pathForLocale(routePathFromPathname(routerPath), locale));
-    if (!page) return;
+    let cancelled = false;
 
-    document.title = page.title;
-    setAttribute('meta[name="description"]', 'content', page.description);
-    setAttribute('meta[property="og:title"]', 'content', page.title);
-    setAttribute('meta[property="og:description"]', 'content', page.description);
-    // Canonical is deliberately left alone: it is stamped at build time with
-    // the deploy's real origin, which the browser cannot know here.
+    async function retitle(): Promise<void> {
+      // Loaded on demand rather than imported statically: `pages.ts` builds
+      // the full `AioPage` model for every route in both locales, which
+      // pulls in `faq`, `profile` and `projects` (~82 KB). The served
+      // document already carries this route's title from the AIO build
+      // step, so nothing about the first paint needs any of that — only a
+      // later client-side navigation does, and by then a rendered page is
+      // already on screen.
+      const { pageForPath } = await import('./pages');
+      if (cancelled) return;
+
+      const page = pageForPath(pathForLocale(routePathFromPathname(routerPath), locale));
+      if (!page) return;
+
+      document.title = page.title;
+      setAttribute('meta[name="description"]', 'content', page.description);
+      setAttribute('meta[property="og:title"]', 'content', page.title);
+      setAttribute('meta[property="og:description"]', 'content', page.description);
+      // Canonical is deliberately left alone: it is stamped at build time with
+      // the deploy's real origin, which the browser cannot know here.
+    }
+
+    void retitle();
+
+    return () => {
+      cancelled = true;
+    };
   }, [routerPath, locale]);
 }
