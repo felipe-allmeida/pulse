@@ -11,16 +11,11 @@ import type { Locale } from '@/content/types';
 const useMetricsMock = vi.fn();
 const useVisitsMock = vi.fn();
 const useVisitorMock = vi.fn(() => ({ data: undefined }));
-const usePulseHubMock = vi.fn();
 
 vi.mock('@/lib/api', () => ({
   useMetrics: () => useMetricsMock(),
   useVisits: () => useVisitsMock(),
   useVisitor: () => useVisitorMock(),
-}));
-
-vi.mock('@/realtime/use-pulse-hub', () => ({
-  usePulseHub: () => usePulseHubMock(),
 }));
 
 // Import the route module the same way production does: the real, code-split
@@ -53,9 +48,8 @@ async function renderIndexRoute(locale: Locale = 'en') {
       {/*
         AskWidget isn't part of the `/` route tree in production — it's
         mounted once in `__root.tsx`, alongside the route's <Outlet />. It's
-        rendered here too so the "doesn't overlap" test below reflects the
-        real composed page, where the Ask trigger and the "send a pulse"
-        button are both on screen at once.
+        rendered here too so the composed page matches production, with the
+        Ask trigger on screen alongside everything else.
       */}
       <RouterProvider router={router} />
       <AskWidget />
@@ -68,19 +62,20 @@ describe('Index route (portfolio home)', () => {
     useEventStore.setState({ events: [], seenVisits: new Set() });
     useMetricsMock.mockReturnValue({ data: undefined, isLoading: true });
     useVisitsMock.mockReturnValue({ data: undefined, isLoading: true });
-    usePulseHubMock.mockReturnValue({ count: 0, connection: 'connected', react: vi.fn() });
   });
 
-  it('renders the "Send a pulse" button in en', async () => {
+  it('renders the "How can I help you?" section in en', async () => {
     await renderIndexRoute('en');
 
-    expect(screen.getByRole('button', { name: /send a pulse/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'How can I help you?' })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /send a pulse/i })).not.toBeInTheDocument();
   });
 
-  it('renders the "Enviar um pulso" button in pt-BR', async () => {
+  it('renders the "Como eu posso te ajudar?" section in pt-BR', async () => {
     await renderIndexRoute('pt-BR');
 
-    expect(screen.getByRole('button', { name: /enviar um pulso/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Como eu posso te ajudar?' })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /enviar um pulso/i })).not.toBeInTheDocument();
   });
 
   it('composes the hero, engineering showcase, and a compact live-proof block, with exactly one h1', async () => {
@@ -185,19 +180,6 @@ describe('Index route (portfolio home)', () => {
 
     expect(screen.queryByText('Visits over time')).not.toBeInTheDocument();
     expect(screen.queryByText('Recent visits')).not.toBeInTheDocument();
-  });
-
-  it('renders "send a pulse" inline in the showcase, not as a viewport-fixed element overlapping the hero', async () => {
-    await renderIndexRoute();
-
-    const pulseButton = screen.getByRole('button', { name: /send a pulse/i }).closest('.fixed');
-    expect(pulseButton).toBeNull();
-
-    // The Ask widget's floating trigger stays the only fixed bottom-right element.
-    const askTrigger = screen.getByRole('button', { name: /ask about felipe/i });
-    expect(askTrigger).toHaveClass('fixed');
-    expect(askTrigger).toHaveClass('right-6');
-    expect(askTrigger).toHaveClass('bottom-6');
   });
 
   it('shows pt-BR hero and live-proof copy on the composed home', async () => {

@@ -3,6 +3,7 @@ import { ArrowRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { AskChips } from '@/components/ask/ask-chips';
 import { EngineeringShowcase } from '@/components/home/engineering-showcase';
+import { HowIHelp } from '@/components/home/help/how-i-help';
 import { Hero } from '@/components/home/hero';
 import { VisitHistory } from '@/components/home/visit-history';
 import { EventFeed } from '@/components/event-feed';
@@ -26,18 +27,29 @@ function Index() {
   return (
     <div className="flex flex-col pb-24">
       {/*
-        Hero + EngineeringShowcase are designed full-bleed (Task 1/3), but
-        AppShell's <main> is `mx-auto max-w-7xl py-6` — without this breakout
-        wrapper they'd sit capped at 1280px with a 24px band above,
-        which reads as a visible frame around the "immersive" dark band
-        (most obvious in light theme, where the gutter turns white). This
-        cancels just that padding/max-width for these two sections; nothing
-        else on the page (or any other route) is affected. The `w-screen`
-        (100vw) here can overflow past a classic (non-overlay) scrollbar's
-        width; the `overflow-x: hidden` on `body` in styles.css clips that.
+        Hero is designed full-bleed, but AppShell's <main> is
+        `mx-auto max-w-7xl py-6` — without this breakout wrapper it'd sit
+        capped at 1280px with a 24px band above, which reads as a visible
+        frame around the "immersive" dark band (most obvious in light theme,
+        where the gutter turns white). The `w-screen` (100vw) here can
+        overflow past a classic (non-overlay) scrollbar's width; the
+        `overflow-x: hidden` on `body` in styles.css clips that.
       */}
       <div className="-mt-6 ml-[calc(50%-50vw)] mr-[calc(50%-50vw)] w-screen">
         <Hero />
+      </div>
+
+      {/*
+        The offer, in the slot "send a pulse" used to hold — first thing
+        after the hero, before any engineering. An ordinary `max-w-5xl`
+        section like the live-proof block below, not full-bleed: the
+        immersive dark band is the hero's alone.
+      */}
+      <HowIHelp />
+
+      {/* Same breakout as the hero, minus the `-mt-6` — that cancels
+          <main>'s top padding and only the first block needs it. */}
+      <div className="ml-[calc(50%-50vw)] mr-[calc(50%-50vw)] w-screen">
         <EngineeringShowcase />
       </div>
 
@@ -48,9 +60,6 @@ function Index() {
         as an ops console bolted onto a portfolio. What stays here is a
         compact, self-contained "live proof" slice: the map + 2 real stats +
         the event stream, pointing at /live for anyone who wants the rest.
-        "Send a pulse" (the old docked Reactions widget's replacement) lives
-        in EngineeringShowcase above, next to the eyebrow above the diagram
-        it animates — proving the pipeline is not this block's job.
 
         This section now follows the site-wide theme like every other
         surface: `bg-background`/`text-foreground` resolve per theme, and the

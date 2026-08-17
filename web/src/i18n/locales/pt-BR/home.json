@@ -126,13 +126,5 @@
     "worker": "Worker",
     "db": "Postgres",
     "caption": "O pipeline por trás desta página, ao vivo: seu navegador mantém uma conexão SignalR com a API, presença e geolocalização passam pelo Redis, eventos entram na fila do RabbitMQ para o worker, e tudo é gravado no Postgres."
-  },
-  "sendPulse": {
-    "button": "Enviar um pulso",
-    "sending": "Enviando…",
-    "result": "{{ms}} ms · cliente → API → volta",
-    "seenBy_one": "visto por {{count}} pessoa aqui",
-    "seenBy_other": "visto por {{count}} pessoas aqui",
-    "error": "Não foi possível alcançar o servidor — tente de novo"
   }
 }

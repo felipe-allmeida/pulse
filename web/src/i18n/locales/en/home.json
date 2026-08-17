@@ -126,13 +126,5 @@
     "worker": "Worker",
     "db": "Postgres",
     "caption": "The request pipeline behind this page, live: your browser holds a SignalR connection through the API, presence and geolocation flow through Redis, events queue on RabbitMQ for the worker, and everything lands in Postgres."
-  },
-  "sendPulse": {
-    "button": "Send a pulse",
-    "sending": "Sending…",
-    "result": "{{ms}} ms · client → API → back",
-    "seenBy_one": "seen by {{count}} person here",
-    "seenBy_other": "seen by {{count}} people here",
-    "error": "Couldn't reach the server — try again"
   }
 }
