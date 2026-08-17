@@ -1,4 +1,4 @@
-import { Suspense, lazy, useEffect, useState } from 'react';
+import { Component, Suspense, lazy, useEffect, useState, type ReactNode } from 'react';
 import { MessageCircle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
@@ -12,6 +12,33 @@ import { useAskWidgetStore } from '@/stores/ask-widget-store';
   for crawlers) with no chunk fetch in between. Only `AskPanel` is lazy.
 */
 const AskPanel = lazy(() => import('./ask-panel').then((m) => ({ default: m.AskPanel })));
+
+/**
+ * Contains a failure to load (or render) the panel to the panel itself.
+ *
+ * Without this, `Suspense` handles the pending chunk but nothing handles a
+ * *rejected* one, so the throw walks all the way out to the router's global
+ * boundary and replaces the entire site with an error screen — measured: an
+ * `#root` of 218,598 bytes on /pt became 377. That is a decorative widget
+ * taking the page down, and `lazy` caches the rejection, so reopening does
+ * nothing and only a reload recovers.
+ *
+ * `null` is the right fallback precisely because this is optional: the visitor
+ * loses a chat panel they may not have wanted, and keeps the page they came
+ * for. Nothing here is recoverable in place — the cached rejection means a
+ * retry button would be a lie — so there is nothing to offer them either.
+ */
+class AskPanelBoundary extends Component<{ children: ReactNode }, { failed: boolean }> {
+  state = { failed: false };
+
+  static getDerivedStateFromError() {
+    return { failed: true };
+  }
+
+  render() {
+    return this.state.failed ? null : this.props.children;
+  }
+}
 
 export function AskWidget() {
   const { t } = useTranslation('ask');
@@ -52,9 +79,11 @@ export function AskWidget() {
         </Button>
       </SheetTrigger>
       {hasOpened && (
-        <Suspense fallback={null}>
-          <AskPanel />
-        </Suspense>
+        <AskPanelBoundary>
+          <Suspense fallback={null}>
+            <AskPanel />
+          </Suspense>
+        </AskPanelBoundary>
       )}
     </Sheet>
   );

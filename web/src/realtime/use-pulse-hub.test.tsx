@@ -202,11 +202,15 @@ describe('PulseHubProvider / usePulseHub', () => {
 
   it('recovers from a failed initial start by retrying after 5s, without throwing', async () => {
     vi.useFakeTimers();
+    // On `process`, not `window`: jsdom never dispatches the DOM
+    // `unhandledrejection` event for a rejection raised in module code, so the
+    // window listener this used to use recorded nothing and the assertion
+    // below passed no matter what. Node's hook is the one that fires.
     const unhandledRejections: unknown[] = [];
-    const onUnhandledRejection = (event: Event) => {
-      unhandledRejections.push((event as PromiseRejectionEvent).reason);
+    const onUnhandledRejection = (reason: unknown) => {
+      unhandledRejections.push(reason);
     };
-    window.addEventListener('unhandledrejection', onUnhandledRejection);
+    process.on('unhandledRejection', onUnhandledRejection);
 
     try {
       // First start() rejects (handshake failure at page load); subsequent
@@ -236,7 +240,99 @@ describe('PulseHubProvider / usePulseHub', () => {
       expect(screen.getByTestId('connection').textContent).toBe('connected');
       expect(unhandledRejections).toEqual([]);
     } finally {
-      window.removeEventListener('unhandledrejection', onUnhandledRejection);
+      process.off('unhandledRejection', onUnhandledRejection);
+      vi.useRealTimers();
+    }
+  });
+
+  it('recovers from a failed buildHub() by retrying after 5s, without an unhandled rejection', async () => {
+    vi.useFakeTimers();
+    // On `process`, not `window`: jsdom never dispatches the DOM
+    // `unhandledrejection` event for a rejection raised in module code, so the
+    // window listener this used to use recorded nothing and the assertion
+    // below passed no matter what. Node's hook is the one that fires.
+    const unhandledRejections: unknown[] = [];
+    const onUnhandledRejection = (reason: unknown) => {
+      unhandledRejections.push(reason);
+    };
+    process.on('unhandledRejection', onUnhandledRejection);
+
+    try {
+      // buildHub() dynamically imports the SignalR client, so this is what a
+      // failed chunk fetch looks like: offline at mount, or a deploy that
+      // rotated the hash out from under an already-open tab.
+      let attempts = 0;
+      buildHubImpl = () => {
+        attempts += 1;
+        return attempts === 1
+          ? Promise.reject(new Error('Failed to fetch dynamically imported module'))
+          : Promise.resolve(fakeHub);
+      };
+
+      render(
+        <PulseHubProvider>
+          <Probe />
+        </PulseHubProvider>,
+      );
+
+      await act(async () => {
+        await Promise.resolve();
+        await Promise.resolve();
+      });
+
+      // Nothing to connect with yet — but the failure was handled, not thrown
+      // into the void.
+      expect(attempts).toBe(1);
+      expect(fakeHub.start).not.toHaveBeenCalled();
+      expect(screen.getByTestId('connection').textContent).toBe('offline');
+
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(5_000);
+      });
+
+      // The whole point: the same self-heal a failed start() already got. A
+      // chunk that failed once must not pin presence 'offline' for the life of
+      // the page once the network is back.
+      expect(attempts).toBe(2);
+      expect(fakeHub.start).toHaveBeenCalledTimes(1);
+      expect(screen.getByTestId('connection').textContent).toBe('connected');
+      expect(unhandledRejections).toEqual([]);
+    } finally {
+      process.off('unhandledRejection', onUnhandledRejection);
+      vi.useRealTimers();
+    }
+  });
+
+  it('stops retrying a failed buildHub() once unmounted', async () => {
+    vi.useFakeTimers();
+    try {
+      let attempts = 0;
+      buildHubImpl = () => {
+        attempts += 1;
+        return Promise.reject(new Error('still offline'));
+      };
+
+      const { unmount } = render(
+        <PulseHubProvider>
+          <Probe />
+        </PulseHubProvider>,
+      );
+
+      await act(async () => {
+        await Promise.resolve();
+        await Promise.resolve();
+      });
+      expect(attempts).toBe(1);
+
+      unmount();
+
+      // A retry loop that outlives the component is a leak, and would call
+      // setState on an unmounted tree every 5s forever.
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(30_000);
+      });
+      expect(attempts).toBe(1);
+    } finally {
       vi.useRealTimers();
     }
   });

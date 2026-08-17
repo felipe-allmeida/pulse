@@ -12,7 +12,11 @@
  *
  * A failed load still renders. Leaving the prerendered markup up forever would
  * look fine and be completely inert — no navigation, no live data, no way for
- * the visitor to tell. Mounting lets the router surface the failure and retry.
+ * the visitor to tell. Mounting hands the failure to the router, which raises
+ * it on its own error boundary: `defaultErrorComponent` in main.tsx, a legible
+ * message in the visitor's language with a reload. (Before that existed this
+ * comment claimed a retry the app did not have — what a failed load actually
+ * produced was TanStack's unstyled built-in screen.)
  */
 export async function mountWhenReady(
   load: () => Promise<unknown>,

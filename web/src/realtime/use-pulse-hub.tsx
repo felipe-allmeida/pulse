@@ -41,49 +41,74 @@ export function PulseHubProvider({ children }: { children: ReactNode }) {
     let retryTimeout: ReturnType<typeof setTimeout> | undefined;
     let heartbeat: ReturnType<typeof setInterval> | undefined;
 
-    void buildHub().then((built) => {
-      if (cancelled) return;
-      hub = built;
-      connectionRef.current = built;
+    // Named so its own failure path can call it again. `buildHub()` used to be
+    // a static import and could not fail; it now dynamically imports the
+    // SignalR client, so a chunk fetch that fails (offline, a deploy that
+    // rotated the hash out from under an open tab) rejects here. Unhandled,
+    // that left presence pinned 'offline' for the life of the page and
+    // `react()` rejecting 'not connected' forever, with no self-heal even once
+    // the network came back — while the identical failure one level down, a
+    // rejected start(), had a retry loop sitting right there. Same failure,
+    // same treatment.
+    const attemptConnect = () => {
+      buildHub()
+        .then((built) => {
+          if (cancelled) return;
+          hub = built;
+          connectionRef.current = built;
 
-      onPresenceUpdated = (n: number) => setCount(n);
-      onReactionReceived = (reaction: Reaction) => {
-        // A reaction doesn't change visits or metrics server-side (presence
-        // is handled separately via PresenceUpdated/setCount), so there's
-        // nothing to invalidate here — metrics and visits already refetch on
-        // their own polling intervals (3s / 10s respectively).
-        useEventStore.getState().push({ kind: 'reaction', emoji: reaction.emoji, at: reaction.at });
-      };
+          onPresenceUpdated = (n: number) => setCount(n);
+          onReactionReceived = (reaction: Reaction) => {
+            // A reaction doesn't change visits or metrics server-side
+            // (presence is handled separately via PresenceUpdated/setCount),
+            // so there's nothing to invalidate here — metrics and visits
+            // already refetch on their own polling intervals (3s / 10s).
+            useEventStore
+              .getState()
+              .push({ kind: 'reaction', emoji: reaction.emoji, at: reaction.at });
+          };
 
-      built.on('PresenceUpdated', onPresenceUpdated);
-      built.on('ReactionReceived', onReactionReceived);
-      built.onreconnecting(() => setConnection('reconnecting'));
-      built.onreconnected(() => setConnection('connected'));
-      built.onclose(() => setConnection('offline'));
+          built.on('PresenceUpdated', onPresenceUpdated);
+          built.on('ReactionReceived', onReactionReceived);
+          built.onreconnecting(() => setConnection('reconnecting'));
+          built.onreconnected(() => setConnection('connected'));
+          built.onclose(() => setConnection('offline'));
 
-      // withAutomaticReconnect() only resumes a connection that previously
-      // succeeded — it never retries a failed *initial* start(). So a
-      // failure here (backend down at page load, CORS, etc.) needs its own
-      // bounded self-heal retry, otherwise the dashboard is stuck 'offline'
-      // forever even after the backend comes back up.
-      const attemptStart = () => {
-        built
-          .start()
-          .then(() => {
-            if (!cancelled) setConnection('connected');
-          })
-          .catch(() => {
-            if (cancelled) return;
-            setConnection('offline');
-            retryTimeout = setTimeout(attemptStart, START_RETRY_MS);
-          });
-      };
-      attemptStart();
+          // withAutomaticReconnect() only resumes a connection that previously
+          // succeeded — it never retries a failed *initial* start(). So a
+          // failure here (backend down at page load, CORS, etc.) needs its own
+          // bounded self-heal retry, otherwise the dashboard is stuck 'offline'
+          // forever even after the backend comes back up.
+          const attemptStart = () => {
+            built
+              .start()
+              .then(() => {
+                if (!cancelled) setConnection('connected');
+              })
+              .catch(() => {
+                if (cancelled) return;
+                setConnection('offline');
+                retryTimeout = setTimeout(attemptStart, START_RETRY_MS);
+              });
+          };
+          attemptStart();
 
-      heartbeat = setInterval(() => {
-        built.invoke('Heartbeat').catch(() => {});
-      }, HEARTBEAT_INTERVAL_MS);
-    });
+          heartbeat = setInterval(() => {
+            built.invoke('Heartbeat').catch(() => {});
+          }, HEARTBEAT_INTERVAL_MS);
+        })
+        .catch(() => {
+          if (cancelled) return;
+          setConnection('offline');
+          // Only a failed *build* is retried from here. If `hub` is already
+          // set the wiring above got far enough that attemptStart() owns the
+          // retry, and re-entering would build a second connection and leak
+          // the first — cleanup only knows about one.
+          if (hub) return;
+          retryTimeout = setTimeout(attemptConnect, START_RETRY_MS);
+        });
+    };
+    attemptConnect();
 
     return () => {
       cancelled = true;

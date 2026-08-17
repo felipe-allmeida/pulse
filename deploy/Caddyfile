@@ -58,6 +58,45 @@
 	@markdown path *.md
 	header @markdown Content-Type "text/markdown; charset=utf-8"
 
+	# Static files get their own `handle` blocks, ABOVE the SPA one, and they
+	# deliberately have no try_files.
+	#
+	# `handle` blocks are mutually exclusive — the first one whose matcher fits
+	# wins and the request never reaches the ones below — which is the whole
+	# point here. A matcher *inside* the SPA handle only labels the request
+	# path: by the time the Cache-Control header was stamped, the SPA's
+	# `try_files … /index.html` had already turned a request for a missing
+	# asset into a 200 carrying index.html, so a .js URL came back as HTML with
+	# a year of `immutable` on it. Content hashing is what normally makes a
+	# stale asset URL self-correcting (v2 deploys, a tab still on v1 lazily
+	# fetches a v1 chunk, it 404s, the app reloads); caching a document under
+	# that URL for a year destroys that, and rolling back to v1 then resolves
+	# the real chunk's URL out of cache as HTML.
+	#
+	# handle_errors below keeps the same poisoning from happening in reverse:
+	# without it these `header` lines apply to the 404 too, and a year-long
+	# immutable 404 breaks the rollback just as thoroughly.
+	handle /assets/* {
+		# Vite content-hashes every name in here, so the bytes behind a given
+		# URL never change — safe to freeze forever.
+		header Cache-Control "public, max-age=31536000, immutable"
+		root * /srv
+		file_server
+	}
+
+	# Same reasoning, same fix: /screenshots/* is an image directory with no SPA
+	# route beneath it, so the fallback could only ever answer an <img> request
+	# with a whole HTML document. Milder — a week rather than a year, and no
+	# `immutable`, so it does expire — but a broken image pinned for a week is
+	# still a week, and there is no reason to prefer a lying 200 to an honest
+	# 404. Files under public/ keep their authored names (no content hash),
+	# which is why the window is short.
+	handle /screenshots/* {
+		header Cache-Control "public, max-age=604800"
+		root * /srv
+		file_server
+	}
+
 	# Everything else: the built SPA, with client-side-router fallback.
 	#
 	# The `{path}.html` step is what serves the AIO documents the web build
@@ -76,28 +115,36 @@
 	# extra stat per asset request is not worth reordering for.
 	handle {
 		# Cache-Control, absent until now — which is why every visit refetched
-		# the whole asset graph. Three non-overlapping matchers rather than a
+		# the whole asset graph. Two non-overlapping matchers rather than a
 		# broad default plus overrides, so the rule for any given request is
-		# readable from one line.
+		# readable from one line. /assets/* and /screenshots/* are no longer
+		# named here: they are handled above and never reach this block.
 		#
-		# /assets/* carries Vite's content hashes, so it is safe to freeze
-		# forever. Files in public/ keep their authored names and must not be,
-		# hence the separate, shorter window.
+		# These few files keep their authored names (they come from public/, so
+		# no content hash), hence a week rather than forever.
 		#
 		# The documents are `no-cache` because each one embeds the hashed asset
 		# names: a cached document pins a released build in place and the next
 		# deploy is invisible until it expires.
-		@assets path /assets/*
-		header @assets Cache-Control "public, max-age=31536000, immutable"
-
-		@public path /favicon.ico /favicon.svg /apple-touch-icon.png /og.png /cv.pdf /screenshots/*
+		@public path /favicon.ico /favicon.svg /apple-touch-icon.png /og.png /cv.pdf
 		header @public Cache-Control "public, max-age=604800"
 
-		@documents not path /assets/* /favicon.ico /favicon.svg /apple-touch-icon.png /og.png /cv.pdf /screenshots/*
+		@documents not path /favicon.ico /favicon.svg /apple-touch-icon.png /og.png /cv.pdf
 		header @documents Cache-Control "no-cache"
 
 		root * /srv
 		try_files {path}.html {path} /index.html
 		file_server
+	}
+
+	# An error response inherits whatever Cache-Control the matching block
+	# already set on it, so without this a missing /assets/* file 404s with a
+	# year of `immutable` — the same rollback poisoning as the 200 fallback,
+	# just inverted (roll back to a build whose chunk really does exist and the
+	# client answers from a cached 404 instead). Nothing that failed is worth
+	# remembering; `no-store` on every error, unconditionally.
+	handle_errors {
+		header Cache-Control "no-store"
+		respond "{err.status_code} {err.status_text}" {err.status_code}
 	}
 }

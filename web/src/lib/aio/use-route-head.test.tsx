@@ -19,7 +19,7 @@ import { useRouteHead } from './use-route-head';
  * locale basepath the app uses, so the test exercises the same lookup the
  * browser does.
  */
-function mountAt(pathname: string, basepath: string) {
+async function mountAt(pathname: string, basepath: string) {
   window.history.replaceState({}, '', pathname);
 
   function RootProbe() {
@@ -38,6 +38,14 @@ function mountAt(pathname: string, basepath: string) {
     history: createMemoryHistory({ initialEntries: [pathname] }),
   });
 
+  // The app resolves the initial route *before* it mounts (see
+  // mount-when-ready.ts), so the first thing the hook ever sees is the route
+  // the document was served for. Without loading first, RouterProvider commits
+  // nothing until the match resolves — a navigate() issued in the meantime
+  // lands as the *first* render, and the hook is then right to treat it as the
+  // served route rather than a navigation.
+  await router.load();
+
   // This ad-hoc tree is not the app's registered router type.
   render(<RouterProvider router={router as never} />);
   return router;
@@ -54,27 +62,28 @@ describe('useRouteHead', () => {
       '<title>stale</title><meta name="description" content="stale" /><meta property="og:title" content="stale" /><meta property="og:description" content="stale" />';
   });
 
-  it('titles the landing route', async () => {
-    mountAt('/about', '/');
+  it('leaves the served head alone on the route the document was served for', async () => {
+    await mountAt('/about', '/');
 
-    await waitFor(() => expect(document.title).toContain('About Felipe de Almeida'));
-    expect(head('meta[name="description"]')).toContain('Software engineer and architect');
+    // The landing route's head is already correct — the AIO build step wrote
+    // it — so touching it can only cost a page-model import for no change.
+    // `stale` here stands in for whatever the server sent.
+    await waitFor(() => expect(document.title).toBe('stale'));
+    expect(head('meta[name="description"]')).toBe('stale');
   });
 
   it('retitles on client-side navigation instead of leaving the landing title', async () => {
-    const router = mountAt('/about', '/');
-    await waitFor(() => expect(document.title).toContain('About'));
+    const router = await mountAt('/about', '/');
 
     await router.navigate({ to: '/projects' });
 
     await waitFor(() => expect(document.title).toBe('Projects — Felipe de Almeida'));
     expect(head('meta[property="og:title"]')).toBe('Projects — Felipe de Almeida');
+    expect(head('meta[name="description"]')).not.toBe('stale');
   });
 
   it('reads the locale off the address bar, not the router-internal path', async () => {
-    const router = mountAt('/pt/about', '/pt');
-
-    await waitFor(() => expect(document.title).toContain('Sobre Felipe de Almeida'));
+    const router = await mountAt('/pt/about', '/pt');
 
     await router.navigate({ to: '/projects' });
 
@@ -82,16 +91,21 @@ describe('useRouteHead', () => {
   });
 
   it('leaves the head alone on a route with no generated document', async () => {
-    mountAt('/projects/does-not-exist', '/');
+    const router = await mountAt('/about', '/');
+
+    await router.navigate({ to: '/projects' });
+    await waitFor(() => expect(document.title).toContain('Projects'));
+
+    await router.navigate({ to: '/projects/$slug', params: { slug: 'does-not-exist' } });
 
     // Better a stale title than a wrong one: the hook only speaks for routes
-    // it actually has content for.
-    await waitFor(() => expect(document.title).toBe('stale'));
+    // it actually has content for. Navigating in from a route it *did* title
+    // is what makes this non-vacuous — the hook ran and declined to write.
+    await waitFor(() => expect(document.title).toBe('Projects — Felipe de Almeida'));
   });
 
   it('never appends a second title or description tag', async () => {
-    const router = mountAt('/about', '/');
-    await waitFor(() => expect(document.title).toContain('About'));
+    const router = await mountAt('/about', '/');
     await router.navigate({ to: '/projects' });
     await waitFor(() => expect(document.title).toContain('Projects'));
 
