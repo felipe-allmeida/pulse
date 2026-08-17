@@ -24,7 +24,7 @@ function mountTarget() {
   const scrollIntoView = vi.fn();
   target.scrollIntoView = scrollIntoView;
   document.body.appendChild(target);
-  return { target, scrollIntoView };
+  return { scrollIntoView };
 }
 
 afterEach(() => {
@@ -87,6 +87,7 @@ describe('ScrollCue', () => {
 
   it('fades out and stops taking clicks once the page is scrolled', async () => {
     mockMatchMedia(false);
+    const { scrollIntoView } = mountTarget();
 
     await renderWithI18n(<ScrollCue />);
     const cue = await screen.findByTestId('scroll-cue');
@@ -97,6 +98,9 @@ describe('ScrollCue', () => {
     expect(cue).toHaveClass('opacity-0');
     expect(cue).toHaveClass('pointer-events-none');
     expect(cue).toHaveAttribute('tabindex', '-1');
+
+    fireEvent.click(cue);
+    expect(scrollIntoView).not.toHaveBeenCalled();
   });
 
   it('comes back when the page returns to the top', async () => {

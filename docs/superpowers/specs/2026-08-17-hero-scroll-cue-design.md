@@ -103,6 +103,19 @@ the cue.
 
 ## Out of scope
 
-- Changing the hero's height, padding, or any existing hero content.
+- Changing the hero's height or any existing hero content. (Its bottom padding
+  is amended below — the height and content stay out of scope.)
 - Any scroll cue on other pages or between other sections.
 - Scroll-driven animation of the hero itself.
+
+## Amendment: hero bottom padding (2026-08-17)
+
+The hero's natural content height (773px) means `md:min-h-[85vh]` only becomes
+the binding constraint above ~909px of viewport height. Below that, the
+original `md:py-28` left a fixed 6px of clearance between the stack-chip row
+and the cue (112px bottom padding − 32px `bottom-8` − 74px cue height), which
+reads as a bare uppercase "Scroll" jammed under the last chip at common laptop
+viewports like 1440×900. The hero's `md` padding was changed from `md:py-28`
+to `md:pt-28 md:pb-40`, adding clearance for the cue at every height while
+leaving the top padding, `md:min-h-[85vh]`, and all other hero content
+untouched.

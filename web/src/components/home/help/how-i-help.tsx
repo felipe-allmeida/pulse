@@ -20,9 +20,9 @@ export function HowIHelp() {
   const { t } = useTranslation('home');
   const openAskWidget = useAskWidgetStore((s) => s.open);
 
-  // `id` is the hero's ScrollCue target — see components/home/scroll-cue.tsx.
   return (
-    <section id="how-i-help" className="bg-background px-6 py-14 text-foreground sm:px-10 md:py-20">
+    <section id="how-i-help" className="scroll-mt-24 bg-background px-6 py-14 text-foreground sm:px-10 md:py-20">
+      {/* `id` is the hero's ScrollCue target — see components/home/scroll-cue.tsx. */}
       <div className="mx-auto flex w-full max-w-5xl flex-col gap-6">
         <div className="flex flex-col gap-3">
           <SectionEyebrow>{t('home:help.eyebrow')}</SectionEyebrow>

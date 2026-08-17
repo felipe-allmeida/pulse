@@ -35,7 +35,7 @@ export function Hero() {
   const openAskWidget = useAskWidgetStore((s) => s.open);
 
   return (
-    <section className="relative isolate flex flex-col justify-center overflow-hidden bg-background px-6 py-20 text-foreground sm:px-10 md:min-h-[85vh] md:py-28">
+    <section className="relative isolate flex flex-col justify-center overflow-hidden bg-background px-6 py-20 text-foreground sm:px-10 md:min-h-[85vh] md:pt-28 md:pb-40">
       <HeroMap className="z-0" />
 
       <div className="relative z-10 mx-auto flex w-full max-w-5xl flex-col gap-8">

@@ -5,10 +5,10 @@ import { cn } from '@/lib/utils';
 
 /**
  * The id of the section directly below the hero — see
- * `components/home/help/how-i-help.tsx`. Kept here because this component is
- * the only thing that scrolls to it.
+ * `components/home/help/how-i-help.tsx`. Kept here (module-private) because
+ * this component is the only thing that scrolls to it.
  */
-export const SCROLL_CUE_TARGET_ID = 'how-i-help';
+const SCROLL_CUE_TARGET_ID = 'how-i-help';
 
 /**
  * Past this much scroll the cue has served its purpose and gets out of the
@@ -38,10 +38,10 @@ const HIDE_AFTER_PX = 32;
 export function ScrollCue() {
   const { t } = useTranslation('home');
   const reducedMotion = useReducedMotion();
-  const [hidden, setHidden] = useState(false);
+  const [scrolledPast, setScrolledPast] = useState(false);
 
   useEffect(() => {
-    const onScroll = () => setHidden(window.scrollY > HIDE_AFTER_PX);
+    const onScroll = () => setScrolledPast(window.scrollY > HIDE_AFTER_PX);
     onScroll();
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
@@ -58,13 +58,14 @@ export function ScrollCue() {
     <button
       type="button"
       onClick={scrollToNextSection}
+      disabled={scrolledPast}
       data-testid="scroll-cue"
       data-motion={reducedMotion ? 'static' : 'animated'}
-      aria-hidden={hidden || undefined}
-      tabIndex={hidden ? -1 : undefined}
+      aria-hidden={scrolledPast || undefined}
+      tabIndex={scrolledPast ? -1 : undefined}
       className={cn(
-        'group absolute inset-x-0 bottom-8 z-10 mx-auto hidden w-fit min-h-11 flex-col items-center gap-2.5 transition-opacity duration-300 md:flex',
-        hidden ? 'pointer-events-none opacity-0' : 'opacity-100',
+        'group absolute inset-x-0 bottom-8 z-10 mx-auto hidden w-fit min-h-11 flex-col items-center gap-2.5 transition-opacity duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal-strong focus-visible:ring-offset-2 focus-visible:ring-offset-background md:flex',
+        scrolledPast ? 'pointer-events-none opacity-0' : 'opacity-100',
       )}
     >
       <span className="font-mono text-xs tracking-[0.18em] text-muted-foreground uppercase transition-colors group-hover:text-signal-strong">
