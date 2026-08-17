@@ -70,37 +70,26 @@ describe('Index route (portfolio home)', () => {
     expect(screen.queryByRole('button', { name: /enviar um pulso/i })).not.toBeInTheDocument();
   });
 
-  it('places the help section between the hero and the engineering showcase in DOM order', async () => {
+  it('places the help section between the hero and the live-proof block in DOM order', async () => {
     await renderIndexRoute();
 
     // The router is code-split, so wait for whatever resolves first — same
     // reasoning as the composed test below. Once that settles, the rest of
-    // the tree (including EngineeringShowcase, in the same chunk) is present
-    // too, so the remaining queries can be synchronous.
+    // the tree (in the same chunk) is present too, so the remaining queries
+    // can be synchronous.
     const heroHeading = await screen.findByRole('heading', { level: 1, name: profile.name });
     const helpHeading = screen.getByRole('heading', { name: 'How can I help you?' });
-
-    // Hero's own tech-stack chips also say "RabbitMQ" (the stack list), so
-    // there are two matches on the composed page: Hero's chip (always
-    // before the help heading) and the architecture diagram's node label.
-    // Anchoring on "whichever RabbitMQ comes after the help heading" isolates
-    // the diagram's copy without depending on markup only the diagram has —
-    // the same node the deleted engineering-showcase.test.tsx test anchored
-    // on when EngineeringShowcase was rendered in isolation.
-    const rabbitNodes = screen.getAllByText('RabbitMQ');
-    const diagramNode = rabbitNodes.find(
-      // eslint-disable-next-line no-bitwise
-      (node) => helpHeading.compareDocumentPosition(node) & Node.DOCUMENT_POSITION_FOLLOWING,
-    );
-    expect(diagramNode, 'expected one "RabbitMQ" node — the diagram\'s — after the help heading').toBeDefined();
+    const liveProofHeading = screen.getByRole('heading', { name: 'Watch it happen' });
 
     // DOCUMENT_POSITION_FOLLOWING means the second node comes after the
     // first in DOM order.
     // eslint-disable-next-line no-bitwise
     expect(heroHeading.compareDocumentPosition(helpHeading) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    // eslint-disable-next-line no-bitwise
+    expect(helpHeading.compareDocumentPosition(liveProofHeading) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
 
-  it('composes the hero, engineering showcase, and a compact live-proof block, with exactly one h1', async () => {
+  it('composes the hero, the help section, and a compact live-proof block, with exactly one h1', async () => {
     useMetricsMock.mockReturnValue({ data: { activeConnections: 7, totalVisits: 120 }, isLoading: false });
     useVisitsMock.mockReturnValue({
       data: [{ lat: 38.7, lon: -9.1, city: 'Lisbon', country: 'Portugal', at: '2026-08-04T10:00:00Z' }],
@@ -113,8 +102,10 @@ describe('Index route (portfolio home)', () => {
     expect(await screen.findByRole('heading', { level: 1, name: profile.name })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /see the projects/i })).toHaveAttribute('href', '/projects');
 
-    // EngineeringShowcase
-    expect(screen.getByText(/what you're looking at/i)).toBeInTheDocument();
+    // How I Help — the offer, in the slot the engineering showcase used to
+    // hold between the hero and the live proof.
+    expect(screen.getByRole('heading', { name: 'How can I help you?' })).toBeInTheDocument();
+    expect(screen.queryByText(/what you're looking at/i)).not.toBeInTheDocument();
 
     // Compact live-proof block: map (carrying the live counters in its own
     // header) + event stream + a link out to the full panel.
