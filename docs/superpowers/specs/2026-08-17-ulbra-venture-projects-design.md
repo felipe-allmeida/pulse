@@ -66,6 +66,8 @@ export interface Venture {
   summary: LocalizedString;
   /** The team led, when there is one. */
   team?: LocalizedString;
+  /** How the organization works — reuses the `decisions` shape. */
+  practices?: CaseStudySection[];
 }
 ```
 
@@ -155,6 +157,28 @@ dates on every closed one, which is the invariant that was actually worth having
 The team is two engineers inherited on arrival plus one hired on 21 May 2026.
 That hire is stated in the venture `team` string, not as a separate timeline
 event.
+
+## The development model
+
+Three engineers and six systems in five months is the kind of claim a reader
+discounts on sight. The operating model is why it is true, so the site states it
+where the claim is made — and it is split in two, because the two halves answer
+different questions.
+
+**The practice — `venture.practices`, rendered in the ULBRA section header.**
+Work enters through Linear, which is also what the coding agents read to pick up
+a task. Implementation is largely generated; the team's time goes into writing
+the spec up front and reviewing what comes back. The reviewers are the same three
+engineers, so the throughput comes from moving human attention from typing to
+specifying and reviewing — not from adding people.
+
+**The machine — `decisions` and `architecture` on the Infra case study**, where
+it physically runs. See below.
+
+This is the site's second `leadership`-shaped claim, and the more unusual one.
+It is stated as what the team does, not as advocacy for the approach: the page
+is a record of the author's work, and a reader who disagrees with AI-assisted
+delivery should still be able to see clearly what was done.
 
 ## The six case studies
 
@@ -247,18 +271,39 @@ on the box installing Node and running the app by hand.
 
 **After:** `setup-servidor.sh` takes a bare server to ready in one run — Docker
 and dependencies, daemon and firewall, Node Exporter, Swarm initialized as
-manager, overlay networks, then Traefik and the observability stack (Grafana,
-Prometheus, Loki, Tempo). Per application it is a compose file with Traefik
-labels and a GitHub Actions workflow: push → build image → push to registry →
-SSH → `docker stack deploy`. OpenTelemetry is opt-in through two environment
-variables, after which metrics, logs and traces appear in Grafana without
-further wiring.
+manager, overlay networks, then Traefik and the monitoring stack. Per
+application it is a compose file with Traefik labels and a GitHub Actions
+workflow: push → build image → push to registry → SSH → `docker stack deploy`.
+OpenTelemetry is opt-in through a handful of environment variables, after which
+logs, traces and metrics arrive without further wiring.
 
-Rendered with `architecture` (the two-phase flow: provision once, then per app)
-and a sanitized `script` excerpt. **`content.test.ts:222` forbids publishing any
-hostname, URL or credential in a project narrative, and the infra README is full
-of internal hostnames.** Every sample is rewritten with placeholder domains
-before it is committed; the test is the enforcement.
+**Two observability tools, on a boundary the codebase states rather than
+implies.** SigNoz is the application APM — logs, traces and metrics over OTLP —
+and its README records that it replaced Loki, Tempo and Promtail. Prometheus,
+Node Exporter and Grafana keep host metrics: CPU, memory, disk, network. The
+monitoring compose file says it outright: applications do not send telemetry
+here. Running two is a decision with a stated reason, not drift, and that is
+what makes it worth a `decisions` entry — the alternative, one tool doing both
+badly, is the thing being rejected.
+
+**The delivery machine.** A SigNoz alert is picked up by a coding agent, which
+investigates and opens a pull request; a human decides whether to merge. Linear
+carries tasks and bugs and is also what the agents read to pick work up. A
+Metabase stack with a Linear ETL sidecar turns that same Linear data into a
+delivery dashboard — so the team's own throughput is measured by the pipeline it
+works in.
+
+That last piece matters to the write-up more than its size suggests: it is the
+difference between asserting a way of working and instrumenting it. It is also
+the evidence behind `venture.practices`, which is why the two cross-link.
+
+Rendered with `architecture` (provision once, then per app, then the alert →
+investigation → PR loop) and a sanitized `script` excerpt.
+**`content.test.ts:222` forbids publishing any hostname, URL or credential in a
+project narrative, and these repositories are full of them** — the observability
+docs alone carry two internal domains and an SSH host alias. Every sample is
+rewritten with placeholder domains before it is committed; the test is the
+enforcement, and this is the project that most needs it.
 
 `comparison` — the site's to-scale before/after figure — is the natural fit for
 manual-versus-CI, but it needs two numbers to draw. Pending (Open questions); if
@@ -303,6 +348,10 @@ listed so that none is discovered as a surprise:
   It says nothing about ULBRA and must.
 - **FAQ** — "what is he working on now" is answered by the About page's current
   role. That answer is now incomplete.
+- **`profile.skills`** — the Leadership group lists team building, mentoring,
+  Scrum/Kanban, trunk-based development, DORA metrics, roadmap and budget. The
+  development model described above is a leadership practice the site now
+  documents in detail and does not name in the one place a reader scans for it.
 
 ## Tests
 
@@ -317,6 +366,9 @@ New:
   rule at `content.test.ts:68`).
 - Ulbra CRM names the work as the team's.
 - The venture URL is absolute https.
+- `venture.practices` is localized and no section is present but empty — the
+  existing `no case-study section is present but empty` rule extended to
+  ventures.
 
 Changed:
 
@@ -346,3 +398,14 @@ as an explicit gap.
    Absent numbers, `metrics` is omitted per project — the type allows it and an
    invented figure is worse than a missing section. Infra's `comparison` figure
    depends on this.
+5. **Does ULBRA agree to this being published?** The development model is a
+   client's internal process, described in more detail than the systems it
+   produces. The author is that client's Head of Technology and the call is his
+   to make, but it is worth making deliberately rather than by omission — the
+   six systems being private while the process that builds them is public is a
+   line someone should have drawn on purpose.
+6. **How autonomous is the alert → PR loop, exactly?** "Investigates
+   automatically and opens a PR, and we fix it" leaves open whether the agent
+   runs unattended on every alert or is triggered by a person. The distinction
+   is the whole claim, and the wrong version of it is the kind of thing an
+   interviewer probes. The write-up needs the precise version.
