@@ -1320,13 +1320,13 @@ export const projects: Project[] = [
     slug: 'ulbra-student-dashboard',
     name: 'Student Dashboard',
     tagline: {
-      en: "A screen on a wall that tells students where to be.",
-      'pt-BR': "Uma tela na parede que diz aos alunos onde estar.",
+      en: 'A screen on a wall that tells students where to be.',
+      'pt-BR': 'Uma tela na parede que diz aos alunos onde estar.',
     },
     description: {
-      en: "A class-schedule display installed in the medical school building, plus the admin behind it: an unattended kiosk that rotates schedules and campus content, switching themes between day and night.",
+      en: 'A class-schedule display installed in the medical school building, plus the admin behind it: an unattended kiosk that rotates schedules and campus content, switching themes between day and night.',
       'pt-BR':
-        "Um painel de horários de aula instalado no prédio da medicina, e a administração por trás dele: um totem desassistido que alterna horários e conteúdo do campus, trocando de tema entre dia e noite.",
+        'Um painel de horários de aula instalado no prédio da medicina, e a administração por trás dele: um totem desassistido que alterna horários e conteúdo do campus, trocando de tema entre dia e noite.',
     },
     tech: ['.NET 10', 'React 19', 'PostgreSQL', 'Microsoft Fabric', 'ODBC', 'Docker Swarm'],
     role: { en: 'Head of Technology — design & implementation', 'pt-BR': 'Head de Tecnologia — design & implementação' },
@@ -1336,9 +1336,9 @@ export const projects: Project[] = [
     links: [],
     detail: {
       overview: {
-        en: "A schedule display installed in the university's first building, the medical school, where it shows students the day's classes. One system with two faces: an unattended fullscreen kiosk, and a sign-in-protected admin where staff manage the content it rotates. Academic data comes from the university's analytics lakehouse.",
+        en: "A schedule display installed in the university’s first building, the medical school, where it shows students the day’s classes. One system with two faces: an unattended fullscreen kiosk, and a sign-in-protected admin where staff manage the content it rotates. Academic data comes from the university’s analytics lakehouse.",
         'pt-BR':
-          "Um painel de horários instalado no prédio 1 da universidade, o da medicina, onde mostra aos alunos as aulas do dia. Um sistema com duas faces: um totem em tela cheia, desassistido, e uma administração protegida por login em que a equipe gerencia o conteúdo que ele alterna. Os dados acadêmicos vêm do lakehouse analítico da universidade.",
+          'Um painel de horários instalado no prédio 1 da universidade, o da medicina, onde mostra aos alunos as aulas do dia. Um sistema com duas faces: um totem em tela cheia, desassistido, e uma administração protegida por login em que a equipe gerencia o conteúdo que ele alterna. Os dados acadêmicos vêm do lakehouse analítico da universidade.',
       },
       contribution: {
         summary: {
@@ -1353,9 +1353,9 @@ export const projects: Project[] = [
         ],
       },
       problem: {
-        en: "Students arriving at the building had no way to see the day's schedule without looking it up on a phone, and the university had no way to put anything in front of them at the moment they walked in. A printed sheet answers the first problem badly and the second not at all.",
+        en: "Students arriving at the building had no way to see the day’s schedule without looking it up on a phone, and the university had no way to put anything in front of them at the moment they walked in. A printed sheet answers the first problem badly and the second not at all.",
         'pt-BR':
-          "Alunos chegando ao prédio não tinham como ver o horário do dia sem consultar o celular, e a universidade não tinha como colocar nada à frente deles no momento em que entravam. Uma folha impressa responde mal à primeira necessidade e não responde à segunda.",
+          'Alunos chegando ao prédio não tinham como ver o horário do dia sem consultar o celular, e a universidade não tinha como colocar nada à frente deles no momento em que entravam. Uma folha impressa responde mal à primeira necessidade e não responde à segunda.',
       },
       highlights: [
         {
@@ -1371,7 +1371,7 @@ export const projects: Project[] = [
           'pt-BR': 'Troca entre tema diurno e noturno pelo relógio, para ser legível nos dois.',
         },
         {
-          en: "Staff schedule content with start and end dates; it appears and expires on its own.",
+          en: 'Staff schedule content with start and end dates; it appears and expires on its own.',
           'pt-BR': 'A equipe agenda conteúdo com data de início e fim; ele aparece e expira sozinho.',
         },
       ],
@@ -1379,25 +1379,25 @@ export const projects: Project[] = [
         {
           heading: { en: 'Polling, not a live connection', 'pt-BR': 'Polling, não conexão persistente' },
           body: {
-            en: "The display asks the server for fresh data on a short interval rather than holding a socket open. A socket is the better answer when a human is watching and latency matters; this is a screen on a wall with nobody in front of it. Polling recovers from a dropped network by itself, and nobody has to walk to the building to restart it.",
+            en: 'The display asks the server for fresh data on a short interval rather than holding a socket open. A socket is the better answer when a human is watching and latency matters; this is a screen on a wall with nobody in front of it. Polling recovers from a dropped network by itself, and nobody has to walk to the building to restart it.',
             'pt-BR':
-              "O painel pede dados novos ao servidor em intervalos curtos em vez de manter um socket aberto. Socket é a melhor resposta quando há alguém olhando e a latência importa; aqui é uma tela na parede sem ninguém à frente. O polling se recupera sozinho de uma queda de rede, e ninguém precisa ir até o prédio reiniciar nada.",
+              'O painel pede dados novos ao servidor em intervalos curtos em vez de manter um socket aberto. Socket é a melhor resposta quando há alguém olhando e a latência importa; aqui é uma tela na parede sem ninguém à frente. O polling se recupera sozinho de uma queda de rede, e ninguém precisa ir até o prédio reiniciar nada.',
           },
         },
         {
           heading: { en: 'The analytics lakehouse as the source', 'pt-BR': 'O lakehouse analítico como fonte' },
           body: {
-            en: "The schedule is read from the university's analytics platform rather than from the academic system directly. It is the copy that is already shaped for reading, already has access controls the display can be granted narrowly, and — crucially — cannot be affected by a screen in a lobby querying it all day.",
+            en: "The schedule is read from the university’s analytics platform rather than from the academic system directly. It is the copy that is already shaped for reading, already has access controls the display can be granted narrowly, and â crucially â cannot be affected by a screen in a lobby querying it all day.",
             'pt-BR':
-              "O horário é lido da plataforma analítica da universidade e não do sistema acadêmico diretamente. É a cópia já modelada para leitura, que já tem controle de acesso concedível de forma restrita ao painel e que — o ponto decisivo — não é afetada por uma tela no saguão consultando o dia inteiro.",
+              'O horário é lido da plataforma analítica da universidade e não do sistema acadêmico diretamente. É a cópia já modelada para leitura, que já tem controle de acesso concedível de forma restrita ao painel e que — o ponto decisivo — não é afetada por uma tela no saguão consultando o dia inteiro.',
           },
         },
         {
           heading: { en: 'One system, two audiences', 'pt-BR': 'Um sistema, dois públicos' },
           body: {
-            en: "The kiosk has no login and no interaction; the admin has both. Splitting them into two deployments was the obvious move and was rejected: they share the content model entirely, and two services would mean two places to change when the shape of a slide changes. The boundary is a route and an auth check, not a process.",
+            en: 'The kiosk has no login and no interaction; the admin has both. Splitting them into two deployments was the obvious move and was rejected: they share the content model entirely, and two services would mean two places to change when the shape of a slide changes. The boundary is a route and an auth check, not a process.',
             'pt-BR':
-              "O totem não tem login nem interação; a administração tem os dois. Separá-los em dois deploys era o movimento óbvio e foi descartado: eles compartilham inteiramente o modelo de conteúdo, e dois serviços significariam dois lugares para mudar quando o formato de um slide mudasse. A fronteira é uma rota e uma verificação de acesso, não um processo.",
+              'O totem não tem login nem interação; a administração tem os dois. Separá-los em dois deploys era o movimento óbvio e foi descartado: eles compartilham inteiramente o modelo de conteúdo, e dois serviços significariam dois lugares para mudar quando o formato de um slide mudasse. A fronteira é uma rota e uma verificação de acesso, não um processo.',
           },
         },
       ],
