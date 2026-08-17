@@ -12,14 +12,23 @@ export function AboutHero() {
     <div className="flex flex-col gap-6">
       <StatusPill detail={t('about:heroStatusDetail')} />
 
-      <div className="flex flex-col items-start gap-6 sm:flex-row sm:items-center">
+      {/*
+        The photo sits *above* the name, not beside it. Beside it — which is
+        what `sm:flex-row` used to do from the `sm` breakpoint up — it pushed
+        the h1, the role and the tagline 104px in while the eyebrow, the
+        status pill, the bio and the CV button stayed on the column's edge, so
+        the page carried two left margins and the name was the only thing that
+        did not line up with the home page's. Stacking is also what mobile
+        already did, so this is one layout at every width.
+      */}
+      <div className="flex flex-col items-start gap-6">
         {/*
-          Empty alt on purpose: the <h1> beside this carries the same name, and
+          Empty alt on purpose: the <h1> under this carries the same name, and
           a screen reader announcing it twice is worse than not announcing the
           photo at all.
 
           Explicit width/height, and NOT lazy-loaded: this is above the fold on
-          /about, so a deferred load would reflow the heading beside it. At a
+          /about, so a deferred load would reflow the heading under it. At a
           240px source for an 80px slot it is ~12 KB, which is cheaper than the
           shift would be.
         */}
@@ -33,7 +42,7 @@ export function AboutHero() {
           className="size-20 shrink-0 rounded-2xl border-2 border-signal/50 object-cover"
         />
 
-        <div className="flex flex-1 flex-col gap-2">
+        <div className="flex flex-col gap-2">
           <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl">{profile.name}</h1>
           {/*
             Role + tagline: sans prose, same muted-foreground treatment as
