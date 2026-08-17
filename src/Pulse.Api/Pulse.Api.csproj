@@ -16,5 +16,7 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Assistant/profile.md" />
+    <!-- Generated from web/src/content/projects.ts by `pnpm gen:assistant`. -->
+    <EmbeddedResource Include="Assistant/projects.generated.md" />
   </ItemGroup>
 </Project>
