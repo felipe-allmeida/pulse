@@ -493,11 +493,21 @@ git commit -m "feat(web): fold the project list into venture runs"
 
 - [ ] **Step 1: Write the failing test**
 
-Create `web/src/components/projects/venture-section.test.tsx`. Follow the render helper already used by `project-card.test.tsx` in this directory — import it the same way that file does.
+Create `web/src/components/projects/venture-section.test.tsx`.
+
+`VentureSection` renders `ProjectCard`, which renders a TanStack `<Link>`, so the component needs a router in the test — and it calls `useTranslation`, so it needs the i18n provider. Both come from the harness `project-card.test.tsx` already uses in this directory: `renderWithI18n` from `@/test/render-with-i18n`, wrapped around a `RouterProvider` built with a memory history. A bare `render()` from `@testing-library/react` throws.
 
 ```tsx
-import { render, screen } from '@testing-library/react';
+import {
+  RouterProvider,
+  createMemoryHistory,
+  createRootRoute,
+  createRoute,
+  createRouter,
+} from '@tanstack/react-router';
+import { screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
+import { renderWithI18n } from '@/test/render-with-i18n';
 import { VentureSection } from './venture-section';
 import type { Venture } from '@/content/ventures';
 import type { Project } from '@/content/projects';
@@ -531,33 +541,59 @@ const project: Project = {
   venture: 'ulbra',
 };
 
+function renderSection(v: Venture = venture) {
+  const rootRoute = createRootRoute({
+    component: () => <VentureSection venture={v} projects={[project]} />,
+  });
+  const indexRoute = createRoute({ getParentRoute: () => rootRoute, path: '/', component: () => null });
+  const detailRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: '/projects/$slug',
+    component: () => null,
+  });
+  const routeTree = rootRoute.addChildren([indexRoute, detailRoute]);
+  const router = createRouter({ routeTree, history: createMemoryHistory({ initialEntries: ['/'] }) });
+
+  return renderWithI18n(<RouterProvider router={router} />);
+}
+
 describe('VentureSection', () => {
-  it('names the venture and links it', () => {
-    render(<VentureSection venture={venture} projects={[project]} />);
-    const link = screen.getByRole('link', { name: 'ULBRA' });
+  it('names the venture and links it', async () => {
+    await renderSection();
+    const link = await screen.findByRole('link', { name: 'ULBRA' });
     expect(link).toHaveAttribute('href', 'https://www.ulbra.br');
+    expect(link).toHaveAttribute('target', '_blank');
   });
 
-  it('states the engagement, so the reader does not read it as employment', () => {
-    render(<VentureSection venture={venture} projects={[project]} />);
-    expect(screen.getByText(/client of pampa devs/i)).toBeInTheDocument();
+  it('states the engagement, so the reader does not read it as employment', async () => {
+    await renderSection();
+    expect(await screen.findByText(/client of pampa devs/i)).toBeInTheDocument();
   });
 
-  it('renders the venture practices', () => {
-    render(<VentureSection venture={venture} projects={[project]} />);
-    expect(screen.getByText('One queue')).toBeInTheDocument();
+  it('renders the venture practices', async () => {
+    await renderSection();
+    expect(await screen.findByText('One queue')).toBeInTheDocument();
     expect(screen.getByText('Work enters through Linear.')).toBeInTheDocument();
   });
 
-  it('renders a card per project', () => {
-    render(<VentureSection venture={venture} projects={[project]} />);
-    expect(screen.getByRole('heading', { name: 'Ulbra Atende' })).toBeInTheDocument();
+  it('renders a card per project', async () => {
+    await renderSection();
+    expect(await screen.findByRole('heading', { name: 'Ulbra Atende' })).toBeInTheDocument();
   });
 
-  it('renders the name as plain text when the venture has no url', () => {
-    render(<VentureSection venture={{ ...venture, url: undefined }} projects={[project]} />);
+  it('renders the name as plain text when the venture has no url', async () => {
+    await renderSection({ ...venture, url: undefined });
     expect(screen.queryByRole('link', { name: 'ULBRA' })).not.toBeInTheDocument();
-    expect(screen.getByText('ULBRA')).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: 'ULBRA' })).toBeInTheDocument();
+  });
+
+  it('keeps one heading level between the venture and its practices', async () => {
+    await renderSection();
+    // h1 (page) → h2 (venture) → h3 (each practice). The practices label is
+    // deliberately not a heading, so it cannot collide with the venture's h2.
+    expect(await screen.findByRole('heading', { level: 2, name: 'ULBRA' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 3, name: 'One queue' })).toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: /how the team works/i })).not.toBeInTheDocument();
   });
 });
 ```
@@ -589,7 +625,6 @@ Create `web/src/components/projects/venture-section.tsx`:
 import { useTranslation } from 'react-i18next';
 import { CaseStudyDecisions } from '@/components/projects/case-study-decisions';
 import { ProjectCard } from '@/components/projects/project-card';
-import { SubsectionHeading } from '@/components/signal/subsection-heading';
 import type { Project } from '@/content/projects';
 import type { Venture } from '@/content/ventures';
 import { useLocalized } from '@/i18n/use-localized';
@@ -650,7 +685,15 @@ export function VentureSection({ venture, projects }: VentureSectionProps) {
 
       {venture.practices ? (
         <div className="flex flex-col gap-3">
-          <SubsectionHeading>{t('projects:venturePracticesHeading')}</SubsectionHeading>
+          {/*
+            A label, not a heading. The venture's name is this section's `<h2>`
+            and `CaseStudyDecisions` emits an `<h3>` per practice, so a second
+            `<h2>` here would put a group label at the same outline level as
+            the thing it groups.
+          */}
+          <p className="font-mono text-xs tracking-wide text-muted-foreground uppercase">
+            {t('projects:venturePracticesHeading')}
+          </p>
           <CaseStudyDecisions sections={venture.practices} />
         </div>
       ) : null}
