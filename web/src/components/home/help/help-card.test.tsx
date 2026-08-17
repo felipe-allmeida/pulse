@@ -1,5 +1,6 @@
 import { screen, within } from '@testing-library/react';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import i18n from '@/i18n';
 import { renderWithI18n } from '@/test/render-with-i18n';
 import { HelpCard } from './help-card';
 
@@ -60,5 +61,33 @@ describe('HelpCard', () => {
       screen.getByText('Seu time gasta o dia em trabalho que a máquina faria.'),
     ).toBeInTheDocument();
     expect(screen.getByText(/exemplos/i)).toBeInTheDocument();
+  });
+
+  describe('when the examples key does not resolve to an array of strings', () => {
+    const key = 'help.cards.repetitive.examples';
+    let originalExamples: unknown;
+
+    beforeEach(() => {
+      originalExamples = i18n.getResource('en', 'home', key);
+      // Simulate what real i18next returns for a missing/malformed key: the
+      // key path itself, as a plain string rather than an array.
+      i18n.addResource('en', 'home', key, `home:${key}`);
+    });
+
+    afterEach(() => {
+      i18n.addResource('en', 'home', key, originalExamples);
+    });
+
+    it('still renders the headline and body, and produces no example list items', async () => {
+      const { container } = await renderWithI18n(<HelpCard variant="repetitive" />);
+
+      expect(
+        screen.getByText('Your team spends the day doing work a machine would do.'),
+      ).toBeInTheDocument();
+      expect(screen.getByText(/An order arrives on WhatsApp/)).toBeInTheDocument();
+
+      const items = container.querySelectorAll('details li');
+      expect(items).toHaveLength(0);
+    });
   });
 });

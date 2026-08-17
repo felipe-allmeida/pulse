@@ -14,10 +14,22 @@ import { HelpDiagram, type HelpCardKey } from '@/components/home/help/help-diagr
  * leaves the collapsed copy in the DOM for crawlers — which matters, since
  * this site is deliberately built to be read by answer engines.
  */
+function isStringArray(value: unknown): value is string[] {
+  return Array.isArray(value) && value.every((item) => typeof item === 'string');
+}
+
 export function HelpCard({ variant }: { variant: HelpCardKey }) {
   const { t } = useTranslation('home');
 
-  const examples = t(`home:help.cards.${variant}.examples`, { returnObjects: true }) as string[];
+  // i18next's return type for `t()` is unconstrained here (no
+  // `CustomTypeOptions` module augmentation in this repo), so a missing or
+  // malformed key resolves to the key path itself rather than an array. If
+  // that untyped value were cast and rendered directly, `.map()` on a
+  // string would throw during render — including during the SSR prerender.
+  // Narrow it at runtime instead: a missing/malformed key costs the
+  // examples list, not the page.
+  const rawExamples: unknown = t(`home:help.cards.${variant}.examples`, { returnObjects: true });
+  const examples = isStringArray(rawExamples) ? rawExamples : [];
 
   return (
     <div className="flex h-full flex-col gap-4 rounded-lg border border-signal/20 bg-signal-muted/10 p-5">
