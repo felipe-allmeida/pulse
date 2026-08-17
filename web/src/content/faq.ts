@@ -12,10 +12,11 @@ import type { LocalizedString } from './types';
  *
  * Scope rule: every answer here is already established elsewhere in this repo
  * — `src/content/profile.ts`, the site copy, or the assistant's curated
- * `src/Pulse.Api/Assistant/profile.md`. The blanks still open in that file
- * (work authorization, English level, years of experience, relocation) are
- * deliberately absent rather than guessed at; add them here once they are
- * filled in there.
+ * `src/Pulse.Api/Assistant/profile.md`. Nothing here is inferred: if a fact is
+ * not established in one of those places, it does not get an answer — a
+ * plausible-sounding guess about work authorization or notice period is worse
+ * than no answer at all, because this is the text an answer engine quotes
+ * verbatim to a recruiter.
  */
 export interface FaqEntry {
   /** Stable anchor id — also the deep-link target for the question. */
@@ -32,9 +33,9 @@ export const faq: FaqEntry[] = [
       'pt-BR': 'Felipe de Almeida está aberto a novas oportunidades?',
     },
     answer: {
-      en: 'Yes. He is available now and actively looking for Staff or Principal Engineer roles, and for Head of Engineering / CTO positions. He is open to remote work on Europe-friendly hours. The fastest way to reach him is email (contato@felipealmeida.tech) or LinkedIn.',
+      en: 'Yes. He is available now and actively looking for Staff or Principal Engineer roles, and for Head of Engineering / CTO positions. He works remotely and is open to roles in both European and US time zones. The fastest way to reach him is email (contato@felipealmeida.tech) or LinkedIn.',
       'pt-BR':
-        'Sim. Está disponível agora e procurando ativamente posições de Staff ou Principal Engineer, e também de Head of Engineering / CTO. Está aberto a trabalho remoto em horários compatíveis com a Europa. O caminho mais rápido é e-mail (contato@felipealmeida.tech) ou LinkedIn.',
+        'Sim. Está disponível agora e procurando ativamente posições de Staff ou Principal Engineer, e também de Head of Engineering / CTO. Trabalha remotamente e está aberto a vagas tanto em fusos europeus quanto americanos. O caminho mais rápido é e-mail (contato@felipealmeida.tech) ou LinkedIn.',
     },
   },
   {
@@ -50,6 +51,30 @@ export const faq: FaqEntry[] = [
     },
   },
   {
+    id: 'what-he-is-looking-for',
+    question: {
+      en: 'What kind of company and work is Felipe looking for?',
+      'pt-BR': 'Que tipo de empresa e de trabalho o Felipe procura?',
+    },
+    answer: {
+      en: 'Early-stage startups and scale-ups. He wants to build products and take an active part in building the business, not only the code, and he is drawn to services at scale — where the work reaches a lot of people. The reach of the problem matters more to him than the industry it sits in.',
+      'pt-BR':
+        'Startups early-stage e scale-ups. Ele quer construir produtos e participar ativamente da construção do negócio, não só do código, e se sente atraído por serviços de escala — onde o trabalho chega a muita gente. O alcance do problema pesa mais para ele do que o setor em que ele está.',
+    },
+  },
+  {
+    id: 'work-authorization',
+    question: {
+      en: 'Can Felipe work in Europe or the US? Does he need visa sponsorship?',
+      'pt-BR': 'O Felipe pode trabalhar na Europa ou nos EUA? Ele precisa de sponsorship?',
+    },
+    answer: {
+      en: 'Remotely, yes — that is how he already works with companies abroad, contracting from Brazil, most recently for Kota.io in the European market. He is Brazilian and based in Brazil, and does not hold an EU or US work permit, so an on-site role in either would require visa sponsorship. He would consider relocating for the right opportunity, but remote is what he is looking for.',
+      'pt-BR':
+        'Remotamente, sim — é assim que ele já trabalha com empresas de fora, contratado a partir do Brasil, mais recentemente para a Kota.io no mercado europeu. Ele é brasileiro e mora no Brasil, e não tem visto ou permissão de trabalho na UE nem nos EUA, então uma vaga presencial em qualquer um dos dois exigiria sponsorship. Consideraria mudar de país pela oportunidade certa, mas o que ele procura é remoto.',
+    },
+  },
+  {
     id: 'distributed-systems',
     question: {
       en: 'Does Felipe have real distributed-systems experience?',
@@ -62,15 +87,39 @@ export const faq: FaqEntry[] = [
     },
   },
   {
+    id: 'experience-years',
+    question: {
+      en: 'How many years of experience does Felipe de Almeida have?',
+      'pt-BR': 'Quantos anos de experiência o Felipe de Almeida tem?',
+    },
+    answer: {
+      en: 'More than 12 years, starting in 2015 and spent almost entirely on .NET platforms. The path runs Vox Game Studio (development lead), Dell, Poatek, Dietbox (senior engineer, then Head of Technology), ADP Brazil Labs (lead engineer), Airia and Kota.io (senior product engineer). Roughly the last four of those years were in lead or head-of roles.',
+      'pt-BR':
+        'Mais de 12 anos, começando em 2015 e passados quase inteiramente em plataformas .NET. A trajetória vai de Vox Game Studio (development lead) a Dell, Poatek, Dietbox (engenheiro sênior e depois Head of Technology), ADP Brazil Labs (lead engineer), Airia e Kota.io (senior product engineer). Aproximadamente os últimos quatro desses anos foram em posições de liderança.',
+    },
+  },
+  {
     id: 'leadership',
     question: {
       en: 'Does Felipe have engineering leadership experience?',
       'pt-BR': 'O Felipe tem experiência em liderança de engenharia?',
     },
     answer: {
-      en: 'Yes. He was Head of Technology at Dietbox, owning technology and architecture, and Lead Software Engineer at ADP Brazil Labs, leading engineering on payroll and HR platform work. He founded and runs Pampa Devs. He sets technical direction, mentors, and hires while staying hands-on in the code.',
+      en: 'Yes. As Head of Technology at Dietbox he led a 13-person organization spanning engineering, QA, UX and support, introduced Scrum and trunk-based development — cutting lead time from a month to a week and a half — reduced monthly cloud spend by 21%, and reported KPIs and DORA metrics to the executive team. He was also Lead Software Engineer at ADP Brazil Labs, leading architecture and planning for legacy modernization, and he founded and runs Pampa Devs. He sets technical direction, mentors, and hires while staying hands-on in the code.',
       'pt-BR':
-        'Sim. Foi Head of Technology na Dietbox, responsável por tecnologia e arquitetura, e Lead Software Engineer no ADP Brazil Labs, liderando a engenharia de uma plataforma de folha de pagamento e RH. Fundou e toca a Pampa Devs. Define direção técnica, mentora e contrata sem sair do código.',
+        'Sim. Como Head of Technology na Dietbox, liderou uma organização de 13 pessoas entre engenharia, QA, UX e suporte, introduziu Scrum e trunk-based development — reduzindo o lead time de um mês para uma semana e meia —, cortou 21% do gasto mensal em cloud e reportava KPIs e métricas DORA para a diretoria. Também foi Lead Software Engineer no ADP Brazil Labs, liderando arquitetura e planejamento da modernização de sistemas legados, e fundou e toca a Pampa Devs. Define direção técnica, mentora e contrata sem sair do código.',
+    },
+  },
+  {
+    id: 'education',
+    question: {
+      en: 'What is Felipe de Almeida’s education, and what languages does he speak?',
+      'pt-BR': 'Qual é a formação do Felipe de Almeida e que idiomas ele fala?',
+    },
+    answer: {
+      en: 'He holds a B.S. in Digital Games and a postgraduate degree in Software Engineering, both from Universidade do Vale do Rio dos Sinos, and is completing an MBA in Business Management at Fundação Getúlio Vargas. He speaks Portuguese natively and English at an advanced level.',
+      'pt-BR':
+        'É bacharel em Jogos Digitais e pós-graduado em Engenharia de Software, ambos pela Universidade do Vale do Rio dos Sinos, e está concluindo um MBA em Gestão Empresarial na Fundação Getúlio Vargas. Fala português nativo e inglês avançado.',
     },
   },
   {
@@ -80,9 +129,9 @@ export const faq: FaqEntry[] = [
       'pt-BR': 'Onde o Felipe mora e ele trabalha remoto?',
     },
     answer: {
-      en: 'He is based in Porto Alegre, Brazil (GMT-3) and works remotely, with hours that overlap the European working day.',
+      en: 'He is based in Porto Alegre, Brazil (GMT-3) and works remotely. GMT-3 overlaps both the European and the US working day, and he is open to roles in either time zone.',
       'pt-BR':
-        'Ele mora em Porto Alegre, Brasil (GMT-3), e trabalha remotamente, com horários que se sobrepõem ao dia útil europeu.',
+        'Ele mora em Porto Alegre, Brasil (GMT-3), e trabalha remotamente. O GMT-3 se sobrepõe tanto ao dia útil europeu quanto ao americano, e ele está aberto a vagas em qualquer um dos dois fusos.',
     },
   },
   {

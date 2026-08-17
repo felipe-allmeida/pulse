@@ -74,7 +74,13 @@ describe('pages', () => {
     const ptAbout = page('/about', 'pt-BR');
     expect(ptAbout.heading).toBe(`Sobre ${profile.name}`);
     expect(ptAbout.description).toBe(profile.bio['pt-BR']);
-    expect(ptAbout.sections.map((s) => s.heading)).toEqual(['Biografia', 'Experiência', 'Competências', 'Contato']);
+    expect(ptAbout.sections.map((s) => s.heading)).toEqual([
+      'Biografia',
+      'Experiência',
+      'Competências',
+      'Formação',
+      'Contato',
+    ]);
     // No English section heading survives into the Portuguese document.
     expect(page('/live', 'pt-BR').title).toContain('Métricas do sistema ao vivo');
   });

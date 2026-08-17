@@ -10,6 +10,61 @@ it('profile has bio, skills and experience', () => {
   expect(profile.experience.length).toBeGreaterThan(0);
 });
 
+it('every experience, education and skill string is localized in every locale', () => {
+  expectBothLocales(profile.bio, 'bio');
+  expectBothLocales(profile.languages, 'languages');
+
+  for (const group of profile.skills) {
+    expectBothLocales(group.group, 'skills.group');
+    expect(group.items.length, `${group.group.en} has no items`).toBeGreaterThan(0);
+    expect(new Set(group.items).size, `${group.group.en} repeats an item`).toBe(group.items.length);
+  }
+
+  for (const entry of profile.experience) {
+    expectBothLocales(entry.role, `${entry.org} role`);
+    expectBothLocales(entry.period, `${entry.org} period`);
+    expectBothLocales(entry.summary, `${entry.org} summary`);
+    expect(entry.org.trim(), 'experience org').not.toBe('');
+  }
+
+  for (const entry of profile.education) {
+    expectBothLocales(entry.credential, `${entry.org} credential`);
+    expectBothLocales(entry.period, `${entry.org} period`);
+    expect(entry.org.trim(), 'education org').not.toBe('');
+  }
+});
+
+it('every employer link is absolute https, and side ventures are labelled as such', () => {
+  for (const entry of profile.experience) {
+    if (entry.url === undefined) continue;
+    expect(entry.url, `${entry.org}: ${entry.url}`).toMatch(/^https:\/\//);
+  }
+
+  // ROLÊ ran alongside the day job. The label is what keeps the timeline from
+  // reading as nine consecutive employers, so it is asserted rather than left
+  // to survive the next copy edit by luck.
+  const role = profile.experience.find((e) => e.org.startsWith('ROLÊ'));
+  expect(role, 'the ROLÊ side venture is on the timeline').toBeDefined();
+  expect(role!.role.en).toMatch(/side venture/i);
+  expect(role!.role['pt-BR']).toMatch(/paralelo/i);
+});
+
+it('the experience timeline is keyed uniquely — Dietbox appears twice, under two roles', () => {
+  // `ExperienceTimeline` keys rows on `org` + English role, so two rows sharing
+  // both would silently collapse into one in React's reconciliation.
+  const keys = profile.experience.map((e) => `${e.org}-${e.role.en}`);
+  expect(new Set(keys).size).toBe(keys.length);
+  expect(profile.experience.filter((e) => e.org === 'Dietbox')).toHaveLength(2);
+});
+
+it('only the current role has an open-ended period; the rest carry real dates', () => {
+  const [current, ...past] = profile.experience;
+  expect(current.period.en).toBe('Current');
+  for (const entry of past) {
+    expect(entry.period.en, `${entry.org} has no dated period`).toMatch(/^[A-Z][a-z]{2} \d{4} – [A-Z][a-z]{2} \d{4}$/);
+  }
+});
+
 it('pulse is public with a repo link; ulbra projects are private with no repo link', () => {
   const bySlug = Object.fromEntries(projects.map((p) => [p.slug, p]));
   expect(bySlug.pulse.visibility).toBe('public');

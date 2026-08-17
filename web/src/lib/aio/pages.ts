@@ -59,6 +59,10 @@ const COPY = {
   experience: { en: 'Experience', 'pt-BR': 'Experiência' },
   skills: { en: 'Skills', 'pt-BR': 'Competências' },
   coreSkills: { en: 'Core skills', 'pt-BR': 'Principais competências' },
+  education: { en: 'Education', 'pt-BR': 'Formação' },
+  // "Spoken", not just "Languages": the skills block above already owns that
+  // word for programming languages.
+  languages: { en: 'Spoken languages', 'pt-BR': 'Idiomas' },
   contact: { en: 'Contact', 'pt-BR': 'Contato' },
   faq: { en: 'FAQ', 'pt-BR': 'Perguntas frequentes' },
   overview: { en: 'Overview', 'pt-BR': 'Visão geral' },
@@ -190,9 +194,18 @@ function aboutPage(locale: Locale): AioPage {
       { heading: L(COPY.biography), paragraphs: [L(profile.bio)] },
       {
         heading: L(COPY.experience),
-        bullets: profile.experience.map((e) => `${L(e.role)}, ${e.org} (${L(e.period)}) — ${L(e.summary)}`),
+        bullets: profile.experience.map(
+          (e) => `${L(e.role)}, ${e.org} (${L(e.period)}) — ${L(e.summary)}${e.url ? ` ${e.url}` : ''}`,
+        ),
       },
       { heading: L(COPY.skills), bullets: profile.skills.map((g) => `${L(g.group)}: ${g.items.join(', ')}`) },
+      {
+        heading: L(COPY.education),
+        bullets: [
+          ...profile.education.map((e) => `${L(e.credential)} — ${e.org} (${L(e.period)})`),
+          `${L(COPY.languages)}: ${L(profile.languages)}`,
+        ],
+      },
       {
         heading: L(COPY.contact),
         bullets: [

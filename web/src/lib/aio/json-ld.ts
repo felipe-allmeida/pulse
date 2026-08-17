@@ -38,6 +38,18 @@ function knowsAbout(): string[] {
   return [...new Set(profile.skills.flatMap((g) => g.items))];
 }
 
+/**
+ * `alumniOf`, deduped by institution — two degrees from one university is
+ * still one alma mater, and a graph listing it twice invites a crawler to
+ * merge them into two lookalike organisations.
+ */
+function alumniOf(): JsonLdNode[] {
+  return [...new Set(profile.education.map((e) => e.org))].map((name) => ({
+    '@type': 'CollegeOrUniversity',
+    name,
+  }));
+}
+
 function personNode(base: string, locale: Locale): JsonLdNode {
   const L = localizer(locale);
   const current = profile.experience[0];
@@ -54,7 +66,13 @@ function personNode(base: string, locale: Locale): JsonLdNode {
     knowsAbout: knowsAbout(),
     knowsLanguage: LOCALES,
     sameAs: [profile.contact.linkedin, 'https://github.com/felipe-allmeida'],
-    worksFor: { '@type': 'Organization', name: current.org },
+    worksFor: { '@type': 'Organization', name: current.org, ...(current.url ? { url: current.url } : {}) },
+    alumniOf: alumniOf(),
+    hasCredential: profile.education.map((e) => ({
+      '@type': 'EducationalOccupationalCredential',
+      name: L(e.credential),
+      recognizedBy: { '@type': 'CollegeOrUniversity', name: e.org },
+    })),
     hasOccupation: {
       '@type': 'Occupation',
       name: L(profile.title),

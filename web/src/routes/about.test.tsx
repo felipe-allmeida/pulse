@@ -36,33 +36,64 @@ describe('AboutPage', () => {
     expect(screen.getByText('Kubernetes')).toBeInTheDocument();
   });
 
+  it('renders the full CV timeline — every experience entry, with real periods', async () => {
+    await renderWithI18n(<AboutPage />);
+
+    for (const entry of profile.experience) {
+      expect(screen.getAllByText(new RegExp(entry.org.replace('.', '\\.'))).length).toBeGreaterThan(0);
+    }
+    // Dietbox appears twice — the senior-engineer years and the Head of
+    // Technology years are separate rows, not one merged block.
+    expect(profile.experience.filter((e) => e.org === 'Dietbox')).toHaveLength(2);
+    expect(screen.getByText('Oct 2025 – Jul 2026')).toBeInTheDocument();
+  });
+
+  it('links each employer that has a site, and leaves the rest as plain text', async () => {
+    await renderWithI18n(<AboutPage />);
+
+    const linked = profile.experience.filter((e) => e.url);
+    expect(linked.length, 'at least one employer has a verified site').toBeGreaterThan(0);
+
+    for (const entry of linked) {
+      const link = screen.getAllByRole('link', { name: entry.org })[0];
+      expect(link).toHaveAttribute('href', entry.url);
+      expect(link).toHaveAttribute('target', '_blank');
+      expect(link).toHaveAttribute('rel', 'noreferrer');
+    }
+
+    for (const entry of profile.experience.filter((e) => !e.url)) {
+      expect(screen.queryByRole('link', { name: entry.org })).toBeNull();
+    }
+  });
+
+  it('renders education and the spoken-language line', async () => {
+    await renderWithI18n(<AboutPage />);
+
+    expect(screen.getByRole('heading', { level: 2, name: /education/i })).toBeInTheDocument();
+    expect(screen.getByText(/MBA, Business Management/)).toBeInTheDocument();
+    expect(screen.getAllByText('Universidade do Vale do Rio dos Sinos')).toHaveLength(2);
+    expect(screen.getByText(profile.languages.en)).toBeInTheDocument();
+  });
+
   it('renders a Download CV control', async () => {
     await renderWithI18n(<AboutPage />);
 
     expect(screen.getByRole('link', { name: /download cv/i })).toBeInTheDocument();
   });
 
-  it('renders the 4 contact CTAs with correct hrefs when calendly is configured', async () => {
-    const originalCalendly = profile.contact.calendly;
-    profile.contact.calendly = 'https://calendly.com/felipe/30min';
+  it('renders all 4 contact CTAs with the real configured hrefs', async () => {
+    // No longer stubs `calendly`: the booking link is configured for real, so
+    // the assertion that matters is that the shipped value renders. The
+    // blank-calendly branch is covered in `contact-buttons.test.tsx`.
+    expect(profile.contact.calendly, 'the booking link is configured').toMatch(/^https:\/\//);
 
-    try {
-      await renderWithI18n(<AboutPage />);
+    await renderWithI18n(<AboutPage />);
 
-      expect(screen.getAllByRole('link', { name: /book a call/i })).toHaveLength(1);
-      expect(screen.getByRole('link', { name: /book a call/i })).toHaveAttribute(
-        'href',
-        'https://calendly.com/felipe/30min',
-      );
-      expect(screen.getByRole('link', { name: /^email$/i })).toHaveAttribute(
-        'href',
-        `mailto:${profile.contact.email}`,
-      );
-      expect(screen.getByRole('link', { name: /linkedin/i })).toHaveAttribute('href', profile.contact.linkedin);
-      expect(screen.getByRole('link', { name: /whatsapp/i })).toHaveAttribute('href', profile.contact.whatsapp);
-    } finally {
-      profile.contact.calendly = originalCalendly;
-    }
+    expect(screen.getAllByRole('link', { name: /book a call/i })).toHaveLength(1);
+    expect(screen.getByRole('link', { name: /book a call/i })).toHaveAttribute('href', profile.contact.calendly);
+    expect(screen.getByRole('link', { name: /^email$/i })).toHaveAttribute('href', `mailto:${profile.contact.email}`);
+    expect(screen.getByRole('link', { name: /linkedin/i })).toHaveAttribute('href', profile.contact.linkedin);
+    expect(screen.getByRole('link', { name: /whatsapp/i })).toHaveAttribute('href', profile.contact.whatsapp);
   });
 
   it('opens the contact CTAs in a new tab safely', async () => {
@@ -80,6 +111,9 @@ describe('AboutPage', () => {
 
     expect(screen.getByText('Experiência')).toBeInTheDocument();
     expect(screen.getByText('Habilidades')).toBeInTheDocument();
+    expect(screen.getByText('Formação')).toBeInTheDocument();
     expect(screen.getByText('Atual')).toBeInTheDocument();
+    expect(screen.getByText('Out 2025 – Jul 2026')).toBeInTheDocument();
+    expect(screen.getByText(profile.languages['pt-BR'])).toBeInTheDocument();
   });
 });

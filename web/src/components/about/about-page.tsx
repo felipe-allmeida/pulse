@@ -3,6 +3,7 @@ import { AboutHero } from '@/components/about/about-hero';
 import { AboutContact } from '@/components/about/social-links';
 import { FaqSection } from '@/components/about/faq-section';
 import { ExperienceTimeline } from '@/components/about/experience-timeline';
+import { EducationList } from '@/components/about/education-list';
 import { SkillGroups } from '@/components/about/skill-groups';
 import { SectionEyebrow } from '@/components/signal/section-eyebrow';
 import { SubsectionHeading } from '@/components/signal/subsection-heading';
@@ -27,6 +28,11 @@ export function AboutPage() {
         <section className="flex flex-col gap-6">
           <SubsectionHeading>{t('about:skillsHeading')}</SubsectionHeading>
           <SkillGroups />
+        </section>
+
+        <section className="flex flex-col gap-6">
+          <SubsectionHeading>{t('about:educationHeading')}</SubsectionHeading>
+          <EducationList />
         </section>
 
         <FaqSection />
