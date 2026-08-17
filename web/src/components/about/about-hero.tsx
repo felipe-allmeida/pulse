@@ -4,24 +4,34 @@ import { StatusPill } from '@/components/signal/status-pill';
 import { profile } from '@/content/profile';
 import { useLocalized } from '@/i18n/use-localized';
 
-// TODO: swap the initials placeholder for a real photo once web/public/felipe.jpg lands.
 export function AboutHero() {
   const L = useLocalized();
   const { t } = useTranslation('about');
-  const nameParts = profile.name.trim().split(/\s+/);
-  const initials = (nameParts[0][0] + nameParts[nameParts.length - 1][0]).toUpperCase();
 
   return (
     <div className="flex flex-col gap-6">
       <StatusPill detail={t('about:heroStatusDetail')} />
 
       <div className="flex flex-col items-start gap-6 sm:flex-row sm:items-center">
-        <div
-          aria-hidden
-          className="flex size-20 shrink-0 items-center justify-center rounded-2xl border-2 border-signal/50 bg-signal-muted/20 font-mono text-2xl font-semibold text-signal-strong"
-        >
-          {initials}
-        </div>
+        {/*
+          Empty alt on purpose: the <h1> beside this carries the same name, and
+          a screen reader announcing it twice is worse than not announcing the
+          photo at all.
+
+          Explicit width/height, and NOT lazy-loaded: this is above the fold on
+          /about, so a deferred load would reflow the heading beside it. At a
+          240px source for an 80px slot it is ~12 KB, which is cheaper than the
+          shift would be.
+        */}
+        {/* eslint-disable-next-line jsx-a11y/no-img-element -- hosted asset under public/, not a bundled image. */}
+        <img
+          src={profile.photo.avatar}
+          alt=""
+          width={80}
+          height={80}
+          decoding="async"
+          className="size-20 shrink-0 rounded-2xl border-2 border-signal/50 object-cover"
+        />
 
         <div className="flex flex-1 flex-col gap-2">
           <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl">{profile.name}</h1>

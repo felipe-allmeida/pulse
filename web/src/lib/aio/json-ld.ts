@@ -60,6 +60,11 @@ function personNode(base: string, locale: Locale): JsonLdNode {
     // Identity URL stays on the canonical English profile even on the pt page:
     // the `@id` and `url` are what tie the two documents to one person.
     url: `${base}/about`,
+    // Absolute, like every other URL in this graph: a relative `image` is the
+    // single most common reason an entity card renders without one. Points at
+    // the large variant rather than the 80px avatar, because this is read by
+    // search and answer engines and never by a browser laying out the page.
+    image: `${base}${profile.photo.full}`,
     jobTitle: L(profile.title),
     description: L(profile.bio),
     email: `mailto:${profile.contact.email}`,

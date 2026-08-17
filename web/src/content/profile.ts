@@ -8,9 +8,27 @@ export interface ContactConfig {
   whatsapp: string;
 }
 
+export interface PhotoConfig {
+  /**
+   * The author photo in the About hero, displayed at 80px. Deliberately small:
+   * it sits above the fold, and the `full` variant below would be roughly four
+   * times the weight for pixels nobody sees at that size.
+   */
+  avatar: string;
+  /**
+   * The same photo at a size worth citing. Referenced only from the Schema.org
+   * `Person.image`, never fetched by a browser rendering the page, so its
+   * weight costs a visitor nothing and buys a usable image in a search or
+   * answer engine's entity card.
+   */
+  full: string;
+}
+
 export interface Profile {
   name: string;
   title: LocalizedString;
+  /** Author photo, as root-relative paths under `public/`. */
+  photo: PhotoConfig;
   tagline: LocalizedString;
   bio: LocalizedString;
   skills: { group: LocalizedString; items: string[] }[];
@@ -34,6 +52,10 @@ export interface Profile {
 
 export const profile: Profile = {
   name: 'Felipe de Almeida',
+  photo: {
+    avatar: '/felipe.webp',
+    full: '/felipe-1200.webp',
+  },
   title: {
     en: 'Software Engineer & Architect · Engineering Leader',
     'pt-BR': 'Engenheiro & Arquiteto de Software · Líder de Engenharia',

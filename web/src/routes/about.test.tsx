@@ -22,11 +22,20 @@ describe('AboutPage', () => {
     expect(screen.getByText(/open to staff \/ principal/i, { selector: 'span' })).toBeInTheDocument();
   });
 
-  it('renders the initials-avatar placeholder as first + last name initials', async () => {
-    await renderWithI18n(<AboutPage />);
+  it('renders the author photo, sized and eager, without announcing the name twice', async () => {
+    const { container } = await renderWithI18n(<AboutPage />);
 
-    // The avatar is aria-hidden, so it's queried by text rather than by role/name.
-    expect(screen.getByText('FA')).toBeInTheDocument();
+    // Decorative by design — the <h1> beside it carries the same name — so it
+    // has an empty alt and is queried by selector rather than by role/name.
+    const photo = container.querySelector<HTMLImageElement>(`img[src="${profile.photo.avatar}"]`);
+    expect(photo).not.toBeNull();
+    expect(photo!.getAttribute('alt')).toBe('');
+
+    // Above the fold: dimensions reserve the box so the heading beside it does
+    // not reflow, and it must not be deferred.
+    expect(photo!.getAttribute('width')).toBe('80');
+    expect(photo!.getAttribute('height')).toBe('80');
+    expect(photo!.getAttribute('loading')).not.toBe('lazy');
   });
 
   it('renders a localized experience org and a skill chip', async () => {
