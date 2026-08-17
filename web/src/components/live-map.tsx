@@ -6,14 +6,11 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { countryCounts, matchCountryName } from '@/lib/geo';
 import { useVisits } from '@/lib/api';
 import { byNewest, EMPTY_POINTS } from '@/lib/points';
-import { world } from '@/lib/world';
+import { useWorld } from '@/hooks/use-world';
 
 const WIDTH = 800;
 const HEIGHT = 420;
 const RECENT_PING_COUNT = 20;
-
-const projection = geoNaturalEarth1().fitSize([WIDTH, HEIGHT], world);
-const path = geoPath(projection);
 
 export function LiveMap() {
   const { t } = useTranslation('dashboard');
@@ -24,9 +21,23 @@ export function LiveMap() {
   const maxCount = useMemo(() => Math.max(0, ...counts.values()), [counts]);
   const pings = useMemo(() => byNewest(points, RECENT_PING_COUNT), [points]);
 
+  const world = useWorld();
+  /*
+    Undefined until the geometry lands. Do NOT substitute an empty
+    FeatureCollection to keep this non-null: `fitSize` derives its scale from
+    the object's bounds, and empty bounds give an Infinity scale, so every
+    `projection([lon, lat])` call downstream returns NaN and the pings render
+    at NaN coordinates rather than not rendering.
+  */
+  const projected = useMemo(() => {
+    if (!world) return undefined;
+    const projection = geoNaturalEarth1().fitSize([WIDTH, HEIGHT], world);
+    return { projection, path: geoPath(projection) };
+  }, [world]);
+
   const loggedUnmatchedRef = useRef<Set<string>>(new Set());
   useEffect(() => {
-    if (!import.meta.env.DEV) return;
+    if (!import.meta.env.DEV || !world) return;
     const featureKeys = new Set(world.features.map((f) => matchCountryName(f.properties.name)));
     const unmatched = Array.from(counts.keys()).filter(
       (key) => !featureKeys.has(key) && !loggedUnmatchedRef.current.has(key)
@@ -35,7 +46,7 @@ export function LiveMap() {
     for (const key of unmatched) loggedUnmatchedRef.current.add(key);
     // eslint-disable-next-line no-console
     console.warn('[LiveMap] visit countries with no matching map feature:', unmatched);
-  }, [counts]);
+  }, [counts, world]);
 
   return (
     <Card className="border-signal/20 bg-signal-muted/10">
@@ -51,19 +62,21 @@ export function LiveMap() {
         >
           <g>
             {/*
-              Skipped in the build-time render (see src/entry-prerender.tsx).
-              The country outlines are ~200 KB of path data per document and
-              carry no information a crawler can use — the map is decoration
-              around the numbers, and the numbers are live anyway. The client
-              draws it a moment later, from the same data already in the
-              bundle. Everything else on the page prerenders normally.
+              Empty until the geometry lands (see useWorld) — which also
+              means it's empty for the whole build-time render, since effects
+              never run there. The country outlines are ~200 KB of path data
+              per document and carry no information a crawler can use — the
+              map is decoration around the numbers, and the numbers are live
+              anyway. The client draws it a moment later, from the same data
+              already in the bundle. Everything else on the page prerenders
+              normally.
             */}
-            {(import.meta.env.SSR ? [] : world.features).map((geo) => {
+            {(projected ? world!.features : []).map((geo) => {
               const count = counts.get(matchCountryName(geo.properties.name)) ?? 0;
               const ratio = maxCount > 0 ? count / maxCount : 0;
               const fill = `color-mix(in oklch, var(--color-chart-1) ${Math.round(ratio * 100)}%, var(--color-muted))`;
               return (
-                <path key={geo.id ?? geo.properties.name} d={path(geo) ?? undefined} fill={fill} stroke="var(--color-background)" strokeWidth={0.5}>
+                <path key={geo.id ?? geo.properties.name} d={projected!.path(geo) ?? undefined} fill={fill} stroke="var(--color-background)" strokeWidth={0.5}>
                   {/* One interpolated string, not text + value siblings: React
                       cannot collapse an array of children into a <title>, and
                       warns about it on every build-time render. */}
@@ -73,8 +86,8 @@ export function LiveMap() {
             })}
           </g>
           <g>
-            {pings.map((p, i) => {
-              const coords = projection([p.lon, p.lat]);
+            {(projected ? pings : []).map((p, i) => {
+              const coords = projected!.projection([p.lon, p.lat]);
               if (!coords) return null;
               const [x, y] = coords;
               return (
