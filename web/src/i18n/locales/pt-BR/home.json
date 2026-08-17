@@ -50,6 +50,63 @@
   "showcase": {
     "eyebrow": "o que você está vendo · ao vivo"
   },
+  "help": {
+    "eyebrow": "o que eu resolvo",
+    "heading": "Como eu posso te ajudar?",
+    "lede": "Eu não vendo tecnologia. Eu resolvo o processo que hoje só anda quando alguém lembra de fazer na mão.",
+    "examplesLabel": "exemplos",
+    "techLabel": "por trás disso:",
+    "cards": {
+      "repetitive": {
+        "headline": "Seu time gasta o dia em trabalho que a máquina faria.",
+        "body": "Pedido que chega no WhatsApp e alguém redigita no sistema. Relatório montado à mão toda segunda. A conferência que ninguém tem tempo de fazer. Isso vira uma rotina que roda sozinha, no horário, sem esquecer.",
+        "examples": [
+          "O pedido do WhatsApp entrando no sistema sozinho",
+          "O relatório de segunda pronto no domingo à noite",
+          "Uma conferência entre duas bases rodando de madrugada, avisando só o que divergiu"
+        ],
+        "tech": "Filas e workers, agendamento, integrações por API e webhook, testes automatizados de ponta a ponta.",
+        "diagram": { "from": "na mão", "via": "rotina", "to": "pronto" }
+      },
+      "spreadsheet": {
+        "headline": "Alguém da sua equipe passa o dia preenchendo planilha.",
+        "body": "A planilha pode continuar existindo — ela só não precisa ser preenchida na mão. O dado nasce onde ele já acontece e chega lá sozinho. Daí vira um painel que se atualiza sozinho, que dá pra filtrar e cruzar na hora, e que age quando um número cruza o limite que você definiu.",
+        "examples": [
+          "A venda fechada entrando no painel no instante em que acontece",
+          "O caixa se atualizando sozinho, em vez de fechar no dia 5",
+          "Estoque abaixo do mínimo avisando quem compra, sem ninguém olhar"
+        ],
+        "tech": "Ingestão contínua pela API da ferramenta de origem, modelagem e agregação dos dados, painel interativo, e regras de gatilho disparando webhook, fila ou notificação.",
+        "diagram": { "from": "planilha", "via": "painel", "to": "ação" }
+      },
+      "ai": {
+        "headline": "Você quer IA no que a empresa já faz, não numa demo.",
+        "body": "Um assistente que responde em cima dos seus documentos e dos seus dados, respeitando quem pode ver o quê. E, quando faz sentido, sua equipe resolvendo as coisas por dentro do Claude ou do ChatGPT.",
+        "examples": [
+          "“Quanto sobrou do contrato da X?” respondido sem abrir o sistema",
+          "A política interna respondida a partir do documento que já existe, com a fonte citada",
+          "O chamado aberto, classificado e encaminhado direto de um e-mail"
+        ],
+        "tech": "Servidor MCP sobre o sistema, identidade e permissão resolvidas por usuário, base de conhecimento da empresa indexada.",
+        "diagram": { "from": "seus dados", "via": "assistente", "to": "resposta" }
+      },
+      "idea": {
+        "headline": "A ideia ainda não saiu do papel.",
+        "body": "Você sabe o que quer construir e precisa de alguém que construa — e que depois lidere o time que vai continuar. Do primeiro protótipo que dá pra mostrar pra cliente até a equipe que toca sozinha.",
+        "examples": [
+          "Um MVP no ar em semanas, pra validar com cliente de verdade",
+          "O primeiro engenheiro contratado e integrado",
+          "A decisão de arquitetura tomada agora que não trava vocês daqui a um ano"
+        ],
+        "tech": "12+ anos em .NET e React, arquitetura orientada a eventos, Head of Technology de times de 3 a 13 pessoas.",
+        "diagram": { "from": "ideia", "via": "produto", "to": "time" }
+      }
+    },
+    "cta": {
+      "ask": "Me conta o seu caso",
+      "book": "Conversar comigo"
+    }
+  },
   "liveProof": {
     "eyebrow": "prova ao vivo",
     "heading": "Veja acontecendo",

@@ -50,6 +50,63 @@
   "showcase": {
     "eyebrow": "what you're looking at · live"
   },
+  "help": {
+    "eyebrow": "what i solve",
+    "heading": "How can I help you?",
+    "lede": "I don't sell technology. I fix the process that today only moves when someone remembers to do it by hand.",
+    "examplesLabel": "examples",
+    "techLabel": "behind it:",
+    "cards": {
+      "repetitive": {
+        "headline": "Your team spends the day doing work a machine would do.",
+        "body": "An order arrives on WhatsApp and someone retypes it into the system. Monday's report gets assembled by hand. The reconciliation nobody has time for. That becomes a routine that runs on its own, on schedule, without forgetting.",
+        "examples": [
+          "The WhatsApp order entering the system on its own",
+          "Monday's report ready on Sunday night",
+          "A nightly reconciliation across two databases that reports only what disagreed"
+        ],
+        "tech": "Queues and workers, scheduling, API and webhook integrations, end-to-end automated testing.",
+        "diagram": { "from": "by hand", "via": "routine", "to": "done" }
+      },
+      "spreadsheet": {
+        "headline": "Someone on your team spends the day filling in a spreadsheet.",
+        "body": "The spreadsheet can stay — it just doesn't need to be filled in by hand. The data is born where it already happens and arrives there on its own. From there it becomes a dashboard that updates itself, that you can filter and cross on the spot, and that acts when a number crosses a limit you set.",
+        "examples": [
+          "A closed sale landing on the dashboard the moment it happens",
+          "Cash position updating itself instead of closing on the 5th",
+          "Stock below minimum alerting whoever buys, with nobody watching"
+        ],
+        "tech": "Continuous ingestion from the source tool's API, data modelling and aggregation, interactive dashboard, and trigger rules firing a webhook, queue or notification.",
+        "diagram": { "from": "spreadsheet", "via": "dashboard", "to": "action" }
+      },
+      "ai": {
+        "headline": "You want AI in what the company already does, not in a demo.",
+        "body": "An assistant that answers on top of your documents and your data, respecting who is allowed to see what. And, where it makes sense, your team getting things done from inside Claude or ChatGPT.",
+        "examples": [
+          "“How much is left on the X contract?” answered without opening the system",
+          "An internal policy answered from the document that already exists, with the source cited",
+          "A ticket opened, classified and routed straight from an email"
+        ],
+        "tech": "An MCP server over the system, identity and permissions resolved per user, an indexed company knowledge base.",
+        "diagram": { "from": "your data", "via": "assistant", "to": "answer" }
+      },
+      "idea": {
+        "headline": "The idea hasn't left the drawing board yet.",
+        "body": "You know what you want to build and you need someone to build it — and then to lead the team that keeps building. From the first prototype worth showing a customer to the team that runs on its own.",
+        "examples": [
+          "An MVP live in weeks, to validate with real customers",
+          "The first engineer hired and onboarded",
+          "The architecture decision taken now that doesn't trap you a year from now"
+        ],
+        "tech": "12+ years in .NET and React, event-driven architecture, Head of Technology for teams of 3 to 13.",
+        "diagram": { "from": "idea", "via": "product", "to": "team" }
+      }
+    },
+    "cta": {
+      "ask": "Tell me your case",
+      "book": "Talk to me"
+    }
+  },
   "liveProof": {
     "eyebrow": "live proof",
     "heading": "Watch it happen",
