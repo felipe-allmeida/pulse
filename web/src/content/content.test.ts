@@ -474,3 +474,9 @@ it('ulbra-admin explains why it is architecturally the opposite of the service d
   const bodies = decisions.map((d) => d.body.en).join(' ');
   expect(bodies, 'the simplicity decision states its reason').toMatch(/no modules|no ddd|simple/i);
 });
+
+it('the student dashboard says where it is actually installed', () => {
+  const dashboard = projects.find((p) => p.slug === 'ulbra-student-dashboard');
+  expect(dashboard, 'the student dashboard is published').toBeDefined();
+  expect(dashboard!.detail!.overview!.en).toMatch(/medic/i);
+});
