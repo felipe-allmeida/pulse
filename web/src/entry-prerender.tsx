@@ -34,10 +34,21 @@ import { basepathForLocale, pathForLocale } from './i18n/locale-url';
 export async function renderRoute(routePath: string, locale: Locale): Promise<string> {
   await i18n.changeLanguage(locale);
 
+  const basepath = basepathForLocale(locale);
+  const path = pathForLocale(routePath, locale);
+  /*
+    A prefixed locale's home is the one case where the public path and the
+    basepath are the same string (`/pt`). The router strips the basepath from
+    the history entry, which would leave `''` — matching no route, rendering
+    nothing, and shipping a document whose #root is empty. `/pt/` is the form
+    the router itself produces for that link (see web/plugins/aio.ts).
+  */
+  const initialEntry = path === basepath ? `${path}/` : path;
+
   const router = createRouter({
     routeTree,
-    basepath: basepathForLocale(locale),
-    history: createMemoryHistory({ initialEntries: [pathForLocale(routePath, locale)] }),
+    basepath,
+    history: createMemoryHistory({ initialEntries: [initialEntry] }),
   });
 
   await router.load();

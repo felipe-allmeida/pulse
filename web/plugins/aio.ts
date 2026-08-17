@@ -115,6 +115,15 @@ export function aio(options: AioOptions = {}): Plugin {
 
       for (const page of pages) {
         const app = await renderRoute(page.routePath, page.locale);
+        if (app.length < 500) {
+          // Same reasoning as loadPrerenderer's throw: a document with an empty
+          // #root renders fine for every human and is worthless to every
+          // crawler, so nothing downstream would ever surface this.
+          throw new Error(
+            `[pulse-aio] ${page.path} prerendered to ${app.length} characters — expected a full document. ` +
+              `Check renderRoute() for this route/locale pair.`,
+          );
+        }
         const html = renderDocument({
           template,
           page,

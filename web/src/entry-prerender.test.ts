@@ -11,7 +11,9 @@ import { buildPages } from './lib/aio/pages';
 import { faq } from './content/faq';
 import { profile } from './content/profile';
 
-const ROUTES = buildPages('en').map((page) => page.routePath);
+const CASES = (['en', 'pt-BR'] as const).flatMap((locale) =>
+  buildPages(locale).map((page) => ({ locale, routePath: page.routePath })),
+);
 
 /** Visible text of the rendered markup, tags stripped. */
 function textOf(html: string): string {
@@ -28,12 +30,10 @@ describe('prerender', () => {
     expect(typeof document).toBe('undefined');
   });
 
-  it.each(ROUTES)('renders %s without touching the DOM', async (routePath) => {
-    const html = await renderRoute(routePath, 'en');
+  it.each(CASES)('renders $routePath in $locale without touching the DOM', async ({ routePath, locale }) => {
+    const html = await renderRoute(routePath, locale);
 
     expect(html.length).toBeGreaterThan(500);
-    // The shell every page shares — proof the tree actually mounted rather
-    // than erroring into an empty string.
     expect(html).toContain('pulse');
   });
 
