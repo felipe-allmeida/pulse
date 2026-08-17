@@ -32,8 +32,12 @@ function createFakeHub() {
 
 const fakeHub = createFakeHub();
 
+// Overridable per-test so the "unmount before buildHub() resolves" test can
+// control exactly when the promise settles, instead of it auto-resolving.
+let buildHubImpl: () => Promise<ReturnType<typeof createFakeHub>> = () => Promise.resolve(fakeHub);
+
 vi.mock('./hub', () => ({
-  buildHub: () => Promise.resolve(fakeHub),
+  buildHub: () => buildHubImpl(),
 }));
 
 function Probe() {
@@ -55,6 +59,7 @@ describe('PulseHubProvider / usePulseHub', () => {
     fakeHub.stop.mockClear();
     fakeHub.invoke.mockClear();
     useEventStore.setState({ events: [] });
+    buildHubImpl = () => Promise.resolve(fakeHub);
   });
 
   it('tracks presence count from PresenceUpdated', async () => {
@@ -105,6 +110,11 @@ describe('PulseHubProvider / usePulseHub', () => {
     );
 
     await act(async () => {
+      // Let the buildHub() promise settle so handlers are registered on the
+      // hub before we fire an event at it — otherwise the event is dropped
+      // silently and this negative assertion passes vacuously regardless of
+      // what onReactionReceived actually does.
+      await Promise.resolve();
       fakeHub.fire('ReactionReceived', { emoji: '🎉', at: '2026-08-04T10:00:00Z' });
     });
 
@@ -227,6 +237,47 @@ describe('PulseHubProvider / usePulseHub', () => {
       expect(unhandledRejections).toEqual([]);
     } finally {
       window.removeEventListener('unhandledrejection', onUnhandledRejection);
+      vi.useRealTimers();
+    }
+  });
+
+  it('does not register handlers, start, or leak a heartbeat when unmounted before buildHub() resolves', async () => {
+    // React StrictMode double-invokes effects in dev, and any unmount can
+    // race an in-flight dynamic import — this simulates buildHub() arriving
+    // *after* the effect has already been cleaned up.
+    const lateHub = createFakeHub();
+    let resolveBuild!: (hub: ReturnType<typeof createFakeHub>) => void;
+    buildHubImpl = () => new Promise((resolve) => { resolveBuild = resolve; });
+
+    const { unmount } = render(
+      <PulseHubProvider>
+        <Probe />
+      </PulseHubProvider>,
+    );
+
+    // Unmount synchronously, before anything has been awaited — buildHub()'s
+    // promise is still pending and its .then() callback has not run yet.
+    unmount();
+
+    // Now let the build "arrive late" and flush microtasks.
+    await act(async () => {
+      resolveBuild(lateHub);
+      await Promise.resolve();
+      await Promise.resolve();
+    });
+
+    expect(lateHub.on).not.toHaveBeenCalled();
+    expect(lateHub.start).not.toHaveBeenCalled();
+    expect(lateHub.stop).not.toHaveBeenCalled();
+
+    // A heartbeat scheduled from the late callback would never be cleared
+    // (cleanup already ran) — confirm none was scheduled by advancing well
+    // past the interval and checking invoke was never reached.
+    vi.useFakeTimers();
+    try {
+      await vi.advanceTimersByTimeAsync(60_000);
+      expect(lateHub.invoke).not.toHaveBeenCalled();
+    } finally {
       vi.useRealTimers();
     }
   });
