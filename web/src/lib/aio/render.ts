@@ -97,3 +97,106 @@ export function renderHead(page: AioPage, base: string, siteName: string, author
 
   return tags.join('\n    ');
 }
+
+/** Placeholders in index.html that every emitted document fills in. */
+const HEAD_MARKER = '<!--aio:head-->';
+const APP_MARKER = '<!--aio:app-->';
+
+/**
+ * `String.prototype.replace` reads `$&`, `` $` ``, `$'`, `$$` and `$1` in the
+ * *replacement* as substitution patterns rather than literal text — so a
+ * document containing any of them splices the wrong thing in and does it
+ * silently.
+ *
+ * Everything this file substitutes is content: a whole prerendered component
+ * tree, the entire built stylesheet, a head block carrying page descriptions
+ * and JSON-LD, filenames from the bundler. Today's build happens to contain
+ * none of those sequences; nothing stops tomorrow's copy or a hashed filename
+ * from doing so, and the failure would be a corrupted document rather than an
+ * error. Handing `replace` a function makes the replacement literal whatever
+ * it holds, which removes the class of bug instead of the instance.
+ */
+function splice(html: string, marker: string, value: string): string {
+  return html.replace(marker, () => value);
+}
+
+export interface DocumentOptions {
+  /** The built index.html, with both markers still in place. */
+  template: string;
+  page: AioPage;
+  /** Output of `renderHead()`. */
+  head: string;
+  /** Prerendered markup for `#root`. */
+  app: string;
+  /**
+   * Built stylesheet source. Inlined into a <style> and the blocking <link>
+   * removed — 450ms of round trip on the audited profile, for 10 KB gzipped
+   * that these documents cannot cache anyway (they are served no-cache, since
+   * each embeds the hashed asset names).
+   */
+  css?: string;
+  /**
+   * Extra chunks to preload, on top of the entry graph Vite already emits.
+   * Specifically the route component's own chunk: it is a dynamic import, so
+   * Vite cannot know to preload it, and the mount now waits on it (see
+   * mount-when-ready.ts) — without this it is discovered a round trip late.
+   */
+  modulePreloads?: string[];
+}
+
+/**
+ * Assembles one emitted document.
+ *
+ * This exists so there is a single place a document is put together. It used
+ * to be a chain of `.replace()` calls inside the build plugin, which meant
+ * every new thing a document needed — the theme class here, the inlined CSS
+ * and route preload later — added another link to that chain, untested,
+ * inside a Vite hook.
+ *
+ * The `dark` class is stamped in the same substitution as `lang`, rather than
+ * a second one: they both rewrite the opening `<html>` tag, and two
+ * independent replacements over the same tag is how you end up with one of
+ * them silently winning.
+ */
+export function renderDocument({
+  template,
+  page,
+  head,
+  app,
+  css,
+  modulePreloads,
+}: DocumentOptions): string {
+  if (!template.includes(HEAD_MARKER) || !template.includes(APP_MARKER)) {
+    throw new Error(
+      `[pulse-aio] "${HEAD_MARKER}" / "${APP_MARKER}" not found in the built index.html — restore the markers in web/index.html.`,
+    );
+  }
+
+  let html = splice(template, '<html lang="en">', `<html lang="${page.locale}" class="dark">`);
+  html = splice(html, HEAD_MARKER, head);
+  html = splice(html, APP_MARKER, app);
+
+  if (modulePreloads?.length) {
+    const tags = modulePreloads
+      .map((href) => `<link rel="modulepreload" crossorigin href="${escapeHtml(href)}">`)
+      .join('\n    ');
+    html = splice(html, '</head>', `${tags}</head>`);
+  }
+
+  if (css) {
+    // `</style>` inside a string literal in the CSS would close the tag early
+    // and hand the rest of the sheet to the HTML parser — the stylesheet
+    // equivalent of the JSON-LD escape in serialiseJsonLd above.
+    const safe = css.replace(/<\/style/gi, '<\\/style');
+    // The link removal is safe as-is — its replacement is the empty string,
+    // which has no substitution patterns to misread. The stylesheet going into
+    // the <style> very much is not.
+    html = splice(
+      html.replace(/<link[^>]+rel="stylesheet"[^>]*>/g, ''),
+      '</head>',
+      `<style>${safe}</style></head>`,
+    );
+  }
+
+  return html;
+}

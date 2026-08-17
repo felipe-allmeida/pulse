@@ -58,29 +58,62 @@
 	@markdown path *.md
 	header @markdown Content-Type "text/markdown; charset=utf-8"
 
-	# Build assets are public, content-hashed, and — the part that is easy to
-	# miss — fetched cross-origin by anything that re-renders this site outside
-	# a browser tab pointed at it. Microsoft Clarity replays recorded sessions
-	# inside an iframe on its own origin, and Vite stamps `crossorigin` onto the
-	# <link rel="stylesheet"> it emits, which makes that fetch CORS-mode: with
-	# no Access-Control-Allow-Origin the browser blocks the stylesheet outright
-	# and every playback and heatmap renders as bare unstyled HTML. Nothing
-	# under /assets is private or credentialed, so "*" is the whole requirement
-	# — it is also exactly what Clarity asks for ("allow public and cross-origin
-	# access to your site").
-	@assets path /assets/*
-	header @assets Access-Control-Allow-Origin "*"
-
-	# Assets are also served WITHOUT the SPA fallback below, so one that does
-	# not exist 404s. Each deploy publishes a fresh set of hashes and drops the
-	# previous set, so the asset URL baked into an already-recorded session
-	# routinely stops existing — and under the catch-all `try_files` that URL
-	# answered 200 with the `text/html` of /index.html rather than 404. Clarity
-	# then caches an HTML document as this page's stylesheet, which no browser
-	# will apply, so the recording stays unstyled even once the header above is
-	# in place. A truthful 404 also keeps a half-published deploy from looking
-	# like a success to the module loader, and to whoever is debugging it.
+	# Static files get their own `handle` blocks, ABOVE the SPA one, and they
+	# deliberately have no try_files.
+	#
+	# `handle` blocks are mutually exclusive — the first one whose matcher fits
+	# wins and the request never reaches the ones below — which is the whole
+	# point here. A matcher *inside* the SPA handle only labels the request
+	# path: by the time a header was stamped, the SPA's
+	# `try_files … /index.html` had already turned a request for a missing
+	# asset into a 200 carrying index.html.
+	#
+	# Two independent lines of work arrived at this same fix from opposite
+	# ends, which is worth recording because each found a consequence the other
+	# did not:
+	#
+	#   - Clarity replays recorded sessions from its own origin, and the asset
+	#     URLs baked into an old recording stop existing within hours of the
+	#     next deploy. Those requests answered 200 with the text/html of
+	#     index.html, so Clarity cached an HTML document as that page's
+	#     stylesheet and every playback rendered unstyled.
+	#   - Cache-Control made the same 200 far worse: a .js URL came back as
+	#     HTML carrying a year of `immutable`. Content hashing is what normally
+	#     makes a stale asset URL self-correcting (v2 deploys, a tab still on
+	#     v1 lazily fetches a v1 chunk, it 404s, the app recovers); caching a
+	#     document under that URL for a year destroys that, and rolling back to
+	#     v1 then resolves the real chunk out of cache as HTML.
+	#
+	# A truthful 404 also keeps a half-published deploy from looking like a
+	# success to the module loader, and to whoever is debugging it.
+	#
+	# handle_errors below keeps the same poisoning from happening in reverse:
+	# without it these `header` lines apply to the 404 too, and a year-long
+	# immutable 404 breaks the rollback just as thoroughly.
 	handle /assets/* {
+		# Vite content-hashes every name in here, so the bytes behind a given
+		# URL never change — safe to freeze forever.
+		header Cache-Control "public, max-age=31536000, immutable"
+		# Nothing under /assets is private or credentialed, so "*" is the whole
+		# requirement, and it is what Clarity asks for ("allow public and
+		# cross-origin access to your site"). Kept even though the stylesheet
+		# that originally needed it is now inlined into each document rather
+		# than fetched: the header costs nothing, and it still covers whatever
+		# else a foreign origin legitimately pulls from here.
+		header Access-Control-Allow-Origin "*"
+		root * /srv
+		file_server
+	}
+
+	# Same reasoning, same fix: /screenshots/* is an image directory with no SPA
+	# route beneath it, so the fallback could only ever answer an <img> request
+	# with a whole HTML document. Milder — a week rather than a year, and no
+	# `immutable`, so it does expire — but a broken image pinned for a week is
+	# still a week, and there is no reason to prefer a lying 200 to an honest
+	# 404. Files under public/ keep their authored names (no content hash),
+	# which is why the window is short.
+	handle /screenshots/* {
+		header Cache-Control "public, max-age=604800"
 		root * /srv
 		file_server
 	}
@@ -102,8 +135,37 @@
 	# no index.html of its own) and 404 instead of serving projects.html. The
 	# extra stat per asset request is not worth reordering for.
 	handle {
+		# Cache-Control, absent until now — which is why every visit refetched
+		# the whole asset graph. Two non-overlapping matchers rather than a
+		# broad default plus overrides, so the rule for any given request is
+		# readable from one line. /assets/* and /screenshots/* are no longer
+		# named here: they are handled above and never reach this block.
+		#
+		# These few files keep their authored names (they come from public/, so
+		# no content hash), hence a week rather than forever.
+		#
+		# The documents are `no-cache` because each one embeds the hashed asset
+		# names: a cached document pins a released build in place and the next
+		# deploy is invisible until it expires.
+		@public path /favicon.ico /favicon.svg /apple-touch-icon.png /og.png /cv.pdf
+		header @public Cache-Control "public, max-age=604800"
+
+		@documents not path /favicon.ico /favicon.svg /apple-touch-icon.png /og.png /cv.pdf
+		header @documents Cache-Control "no-cache"
+
 		root * /srv
 		try_files {path}.html {path} /index.html
 		file_server
+	}
+
+	# An error response inherits whatever Cache-Control the matching block
+	# already set on it, so without this a missing /assets/* file 404s with a
+	# year of `immutable` — the same rollback poisoning as the 200 fallback,
+	# just inverted (roll back to a build whose chunk really does exist and the
+	# client answers from a cached 404 instead). Nothing that failed is worth
+	# remembering; `no-store` on every error, unconditionally.
+	handle_errors {
+		header Cache-Control "no-store"
+		respond "{err.status_code} {err.status_text}" {err.status_code}
 	}
 }

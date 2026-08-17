@@ -75,3 +75,9 @@ jobs:
 
       - name: Typecheck
         run: pnpm -C web exec tsc --noEmit
+
+      - name: Lint
+        run: pnpm -C web lint
+
+      - name: Test
+        run: pnpm -C web test

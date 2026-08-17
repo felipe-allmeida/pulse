@@ -28,7 +28,7 @@ import type { Plugin } from 'vite';
 import type { Locale } from '../src/content/types';
 import { resolveSiteUrl, site } from '../src/content/site';
 import { buildAllPages, basenameForPath } from '../src/lib/aio/pages';
-import { renderHead } from '../src/lib/aio/render';
+import { renderHead, renderDocument } from '../src/lib/aio/render';
 import {
   renderLlmsFullTxt,
   renderLlmsTxt,
@@ -97,7 +97,7 @@ export function aio(options: AioOptions = {}): Plugin {
     },
 
     /** Runs once the bundle (including `index.html`) is on disk. */
-    async writeBundle(outputOptions) {
+    async writeBundle(outputOptions, bundle) {
       const outDir = outputOptions.dir;
       if (!outDir) return;
 
@@ -108,28 +108,76 @@ export function aio(options: AioOptions = {}): Plugin {
       if (!existsSync(templatePath)) return;
 
       const template = readFileSync(templatePath, 'utf8');
-      if (!template.includes(HEAD_MARKER) || !template.includes(APP_MARKER)) {
-        // The markers are the contract between index.html and this plugin. If
-        // they are gone the build would silently ship un-optimized documents,
-        // which is exactly the failure this plugin exists to prevent.
-        throw new Error(
-          `[pulse-aio] "${HEAD_MARKER}" / "${APP_MARKER}" not found in the built index.html — restore the markers in web/index.html.`,
-        );
-      }
+
+      // The one stylesheet Vite emitted for the client build. Read from the
+      // bundle rather than globbed off disk so it always matches this build's
+      // hash.
+      const cssFile = Object.keys(bundle).find((name) => name.endsWith('.css'));
+      const css = cssFile ? readFileSync(join(outDir, cssFile), 'utf8') : undefined;
 
       const pages = buildAllPages();
       const lastmod = options.lastmod ?? new Date().toISOString().slice(0, 10);
       const { renderRoute } = await loadPrerenderer(process.cwd());
 
+      /**
+       * The chunk holding a route's component.
+       *
+       * The route path is NOT the route filename: `/projects/pulse` is served
+       * by `routes/projects_.$slug.tsx`, and deriving one from the other by
+       * string surgery gets that case wrong and silently emits no preload.
+       * The mapping is small and explicit instead.
+       */
+      const ROUTE_FILES: Record<string, string> = {
+        '/': 'routes/index',
+        '/about': 'routes/about',
+        '/projects': 'routes/projects',
+        '/live': 'routes/live',
+      };
+
+      const chunkForRoute = (routePath: string): string | undefined => {
+        // Every /projects/<slug> shares one dynamic route file.
+        const routeFile = routePath.startsWith('/projects/')
+          ? 'routes/projects_.$slug'
+          : ROUTE_FILES[routePath];
+        if (!routeFile) return undefined;
+
+        for (const [fileName, chunk] of Object.entries(bundle)) {
+          // isDynamicEntry, not just chunk.type: TanStack's autoCodeSplitting
+          // also produces an eager route-registration chunk for the same
+          // source file (needed by every page so the client router can match
+          // URL patterns) — it's already in every document's static graph,
+          // and we must never preload it a second time, let alone let it
+          // shadow the real component chunk we're actually looking for.
+          // isDynamicEntry is true only on the chunk reached solely via
+          // import(), which is exactly the one this preload is for.
+          if (chunk.type !== 'chunk' || !chunk.isDynamicEntry) continue;
+          // facadeModuleId, not the chunk name — rolldown prefixes and dedupes
+          // names, but the facade points at the real source module.
+          if (chunk.facadeModuleId?.includes(routeFile)) return `/${fileName}`;
+        }
+        return undefined;
+      };
+
       for (const page of pages) {
         const app = await renderRoute(page.routePath, page.locale);
-        const html = template
-          // The template is built from `<html lang="en">`; the Portuguese
-          // documents have to say so, or every one of them announces the
-          // wrong language to crawlers and screen readers alike.
-          .replace('<html lang="en">', `<html lang="${page.locale}">`)
-          .replace(HEAD_MARKER, renderHead(page, base, site.name, profile.name))
-          .replace(APP_MARKER, app);
+        if (app.length < 500) {
+          // Same reasoning as loadPrerenderer's throw: a document with an empty
+          // #root renders fine for every human and is worthless to every
+          // crawler, so nothing downstream would ever surface this.
+          throw new Error(
+            `[pulse-aio] ${page.path} prerendered to ${app.length} characters — expected a full document. ` +
+              `Check renderRoute() for this route/locale pair.`,
+          );
+        }
+        const routeChunk = chunkForRoute(page.routePath);
+        const html = renderDocument({
+          template,
+          page,
+          head: renderHead(page, base, site.name, profile.name),
+          app,
+          css,
+          modulePreloads: routeChunk ? [routeChunk] : [],
+        });
         write(outDir, page.file, html);
         write(outDir, `${basenameForPath(page.path)}.md`, renderPageMarkdown(page, base));
 

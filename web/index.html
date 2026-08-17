@@ -6,6 +6,29 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!--
+      Resolves the theme before the first paint. The emitted documents ship
+      with class="dark" already stamped (see src/lib/aio/render.ts), which
+      covers everyone who never touched the toggle without running any
+      JavaScript at all; this only has to correct the visitor who chose
+      light, and to apply the default in `pnpm dev`, where no build step
+      stamped anything.
+
+      Synchronous and ahead of the stylesheet on purpose: async, defer or
+      type="module" would all run after the first paint, which is the exact
+      flash this removes. The try/catch is not decoration — a throw in a
+      blocking head script stops the parser, so a corrupt localStorage entry
+      would cost the whole page rather than a preference.
+    -->
+    <script>
+      try {
+        var stored = localStorage.getItem('pulse-theme');
+        var theme = stored ? JSON.parse(stored).state.theme : null;
+        document.documentElement.classList.toggle('dark', theme !== 'light');
+      } catch (e) {
+        document.documentElement.classList.add('dark');
+      }
+    </script>
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff" />
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0a0a0a" />
     <!--

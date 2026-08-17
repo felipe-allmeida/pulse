@@ -2,7 +2,8 @@ import { useEffect, useMemo, useRef } from 'react';
 import { geoGraticule10, geoInterpolate, geoNaturalEarth1, geoPath, type GeoProjection } from 'd3-geo';
 import { useVisitor, useVisits } from '@/lib/api';
 import { byNewest, EMPTY_POINTS, isSameSpot, selectArcTargets, type Coordinates } from '@/lib/points';
-import { world } from '@/lib/world';
+import type { World } from '@/lib/world';
+import { useWorld } from '@/hooks/use-world';
 import { useReducedMotion } from '@/hooks/use-reduced-motion';
 import { useThemeStore } from '@/stores/theme-store';
 import { cn } from '@/lib/utils';
@@ -45,7 +46,7 @@ function withAlpha(hslTriplet: string, alpha: number): string {
   return `hsl(${hslTriplet} / ${alpha})`;
 }
 
-function buildProjection(width: number, height: number): GeoProjection {
+function buildProjection(world: World, width: number, height: number): GeoProjection {
   const projection = geoNaturalEarth1().fitSize([width, height], world);
   projection.scale(projection.scale() * ZOOM);
   return projection;
@@ -134,6 +135,7 @@ function drawArc(
 }
 
 function drawFrame(
+  world: World,
   ctx: CanvasRenderingContext2D,
   projection: GeoProjection,
   points: VisitPoint[],
@@ -206,6 +208,7 @@ export function HeroMap({ className }: Props) {
   // single static frame) re-runs on toggle even when reduced-motion means
   // there's no per-frame rAF loop that would otherwise pick up the change.
   const theme = useThemeStore((s) => s.theme);
+  const world = useWorld();
 
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -228,7 +231,7 @@ export function HeroMap({ className }: Props) {
   useEffect(() => {
     const canvas = canvasRef.current;
     const container = containerRef.current;
-    if (!canvas || !container) return;
+    if (!canvas || !container || !world) return;
 
     let disposed = false;
     let frameId: number | null = null;
@@ -256,14 +259,14 @@ export function HeroMap({ className }: Props) {
       const projection =
         cached && cached.width === width && cached.height === height
           ? cached.projection
-          : buildProjection(width, height);
+          : buildProjection(world, width, height);
       projectionRef.current = { width, height, projection };
 
       const palette: Palette = {
         signal: readHslTriplet('--signal-strong'),
         foreground: readHslTriplet('--foreground'),
       };
-      drawFrame(ctx, projection, recentPoints, origin, arcTargets, time, palette);
+      drawFrame(world, ctx, projection, recentPoints, origin, arcTargets, time, palette);
     };
 
     render(0);
@@ -284,7 +287,7 @@ export function HeroMap({ className }: Props) {
       window.removeEventListener('resize', handleResize);
       if (frameId !== null) cancelAnimationFrame(frameId);
     };
-  }, [reducedMotion, recentPoints, origin, arcTargets, theme]);
+  }, [reducedMotion, recentPoints, origin, arcTargets, theme, world]);
 
   return (
     <div

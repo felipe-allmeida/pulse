@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRouterState } from '@tanstack/react-router';
 import {
   DEFAULT_LOCALE,
@@ -6,7 +6,6 @@ import {
   pathForLocale,
   routePathFromPathname,
 } from '../../i18n/locale-url';
-import { pageForPath } from './pages';
 
 /**
  * Keeps the document head in step with client-side navigation.
@@ -43,15 +42,58 @@ export function useRouteHead(): void {
     typeof window === 'undefined' ? DEFAULT_LOCALE : localeFromPathname(window.location.pathname),
   );
 
-  useEffect(() => {
-    const page = pageForPath(pathForLocale(routePathFromPathname(routerPath), locale));
-    if (!page) return;
+  // The route this document was *served* for. An effect runs on mount as well
+  // as on every change, so without this the hook fires immediately after the
+  // mount swap and imports `pages` — which drags in `faq`, `profile` and
+  // `projects`: 85,346 B raw, 28,287 B gzipped, measured on a cold load of
+  // /pt — in order to set the document to the title the served head already
+  // carries. Nothing on the first paint needs the model; only an actual
+  // client-side navigation does, and by then a page is already on screen.
+  //
+  // A path, not a boolean: React StrictMode double-invokes effects in dev, so
+  // a plain "have I run once" flag would let the second invocation through
+  // and load the model anyway. Comparing the path skips any run that isn't a
+  // real move.
+  const servedPath = useRef<string | null>(null);
 
-    document.title = page.title;
-    setAttribute('meta[name="description"]', 'content', page.description);
-    setAttribute('meta[property="og:title"]', 'content', page.title);
-    setAttribute('meta[property="og:description"]', 'content', page.description);
-    // Canonical is deliberately left alone: it is stamped at build time with
-    // the deploy's real origin, which the browser cannot know here.
+  useEffect(() => {
+    if (servedPath.current === routerPath) return;
+    const isFirstRoute = servedPath.current === null;
+    servedPath.current = routerPath;
+    if (isFirstRoute) return;
+
+    let cancelled = false;
+
+    async function retitle(): Promise<void> {
+      // Loaded on demand rather than imported statically: `pages.ts` builds
+      // the full `AioPage` model for every route in both locales, which
+      // pulls in `faq`, `profile` and `projects` (~82 KB). The served
+      // document already carries this route's title from the AIO build
+      // step, so nothing about the first paint needs any of that — only a
+      // later client-side navigation does, and by then a rendered page is
+      // already on screen.
+      const { pageForPath } = await import('./pages');
+      if (cancelled) return;
+
+      const page = pageForPath(pathForLocale(routePathFromPathname(routerPath), locale));
+      if (!page) return;
+
+      document.title = page.title;
+      setAttribute('meta[name="description"]', 'content', page.description);
+      setAttribute('meta[property="og:title"]', 'content', page.title);
+      setAttribute('meta[property="og:description"]', 'content', page.description);
+      // Canonical is deliberately left alone: it is stamped at build time with
+      // the deploy's real origin, which the browser cannot know here.
+    }
+
+    // A rejected import — the chunk 404s after a deploy, the visitor is
+    // offline — leaves the served head exactly as it is. That is a stale
+    // title, which is the failure this hook exists to avoid, but it is a far
+    // better one than an unhandled rejection for a cosmetic update.
+    void retitle().catch(() => {});
+
+    return () => {
+      cancelled = true;
+    };
   }, [routerPath, locale]);
 }

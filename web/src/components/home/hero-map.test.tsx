@@ -1,4 +1,4 @@
-import { render } from '@testing-library/react';
+import { render, waitFor } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 const useVisitsMock = vi.fn();
@@ -65,7 +65,7 @@ describe('HeroMap', () => {
     expect(rafSpy).not.toHaveBeenCalled();
   });
 
-  it('schedules the animation loop when motion is not reduced', () => {
+  it('schedules the animation loop when motion is not reduced', async () => {
     useVisitsMock.mockReturnValue({ data: points });
     mockMatchMedia(false);
     const rafSpy = vi.spyOn(window, 'requestAnimationFrame');
@@ -73,6 +73,9 @@ describe('HeroMap', () => {
     const { container } = render(<HeroMap />);
 
     expect(container.firstElementChild).toHaveAttribute('data-motion', 'animated');
-    expect(rafSpy).toHaveBeenCalled();
+    // The drawing effect bails until the map geometry (loaded asynchronously
+    // by useWorld, see src/lib/world.ts) resolves, so the rAF loop only gets
+    // scheduled after that microtask settles.
+    await waitFor(() => expect(rafSpy).toHaveBeenCalled());
   });
 });

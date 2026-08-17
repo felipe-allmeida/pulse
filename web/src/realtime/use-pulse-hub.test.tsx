@@ -32,8 +32,12 @@ function createFakeHub() {
 
 const fakeHub = createFakeHub();
 
+// Overridable per-test so the "unmount before buildHub() resolves" test can
+// control exactly when the promise settles, instead of it auto-resolving.
+let buildHubImpl: () => Promise<ReturnType<typeof createFakeHub>> = () => Promise.resolve(fakeHub);
+
 vi.mock('./hub', () => ({
-  buildHub: () => fakeHub,
+  buildHub: () => buildHubImpl(),
 }));
 
 function Probe() {
@@ -55,6 +59,7 @@ describe('PulseHubProvider / usePulseHub', () => {
     fakeHub.stop.mockClear();
     fakeHub.invoke.mockClear();
     useEventStore.setState({ events: [] });
+    buildHubImpl = () => Promise.resolve(fakeHub);
   });
 
   it('tracks presence count from PresenceUpdated', async () => {
@@ -65,6 +70,9 @@ describe('PulseHubProvider / usePulseHub', () => {
     );
 
     await act(async () => {
+      // Let the buildHub() promise settle so handlers are registered on the
+      // hub before we fire an event at it.
+      await Promise.resolve();
       fakeHub.fire('PresenceUpdated', 3);
     });
 
@@ -79,6 +87,9 @@ describe('PulseHubProvider / usePulseHub', () => {
     );
 
     await act(async () => {
+      // Let the buildHub() promise settle so handlers are registered on the
+      // hub before we fire an event at it.
+      await Promise.resolve();
       fakeHub.fire('ReactionReceived', { emoji: '🎉', at: '2026-08-04T10:00:00Z' });
     });
 
@@ -99,6 +110,11 @@ describe('PulseHubProvider / usePulseHub', () => {
     );
 
     await act(async () => {
+      // Let the buildHub() promise settle so handlers are registered on the
+      // hub before we fire an event at it — otherwise the event is dropped
+      // silently and this negative assertion passes vacuously regardless of
+      // what onReactionReceived actually does.
+      await Promise.resolve();
       fakeHub.fire('ReactionReceived', { emoji: '🎉', at: '2026-08-04T10:00:00Z' });
     });
 
@@ -148,6 +164,9 @@ describe('PulseHubProvider / usePulseHub', () => {
     );
 
     await act(async () => {
+      // Let the buildHub() promise settle so connectionRef is populated
+      // before we invoke react() on it.
+      await Promise.resolve();
       screen.getByText('react').click();
     });
 
@@ -183,11 +202,15 @@ describe('PulseHubProvider / usePulseHub', () => {
 
   it('recovers from a failed initial start by retrying after 5s, without throwing', async () => {
     vi.useFakeTimers();
+    // On `process`, not `window`: jsdom never dispatches the DOM
+    // `unhandledrejection` event for a rejection raised in module code, so the
+    // window listener this used to use recorded nothing and the assertion
+    // below passed no matter what. Node's hook is the one that fires.
     const unhandledRejections: unknown[] = [];
-    const onUnhandledRejection = (event: Event) => {
-      unhandledRejections.push((event as PromiseRejectionEvent).reason);
+    const onUnhandledRejection = (reason: unknown) => {
+      unhandledRejections.push(reason);
     };
-    window.addEventListener('unhandledrejection', onUnhandledRejection);
+    process.on('unhandledRejection', onUnhandledRejection);
 
     try {
       // First start() rejects (handshake failure at page load); subsequent
@@ -217,7 +240,140 @@ describe('PulseHubProvider / usePulseHub', () => {
       expect(screen.getByTestId('connection').textContent).toBe('connected');
       expect(unhandledRejections).toEqual([]);
     } finally {
-      window.removeEventListener('unhandledrejection', onUnhandledRejection);
+      process.off('unhandledRejection', onUnhandledRejection);
+      vi.useRealTimers();
+    }
+  });
+
+  it('recovers from a failed buildHub() by retrying after 5s, without an unhandled rejection', async () => {
+    vi.useFakeTimers();
+    // On `process`, not `window`: jsdom never dispatches the DOM
+    // `unhandledrejection` event for a rejection raised in module code, so the
+    // window listener this used to use recorded nothing and the assertion
+    // below passed no matter what. Node's hook is the one that fires.
+    const unhandledRejections: unknown[] = [];
+    const onUnhandledRejection = (reason: unknown) => {
+      unhandledRejections.push(reason);
+    };
+    process.on('unhandledRejection', onUnhandledRejection);
+
+    try {
+      // buildHub() dynamically imports the SignalR client, so this is what a
+      // failed chunk fetch looks like: offline at mount, or a deploy that
+      // rotated the hash out from under an already-open tab.
+      let attempts = 0;
+      buildHubImpl = () => {
+        attempts += 1;
+        return attempts === 1
+          ? Promise.reject(new Error('Failed to fetch dynamically imported module'))
+          : Promise.resolve(fakeHub);
+      };
+
+      render(
+        <PulseHubProvider>
+          <Probe />
+        </PulseHubProvider>,
+      );
+
+      await act(async () => {
+        await Promise.resolve();
+        await Promise.resolve();
+      });
+
+      // Nothing to connect with yet — but the failure was handled, not thrown
+      // into the void.
+      expect(attempts).toBe(1);
+      expect(fakeHub.start).not.toHaveBeenCalled();
+      expect(screen.getByTestId('connection').textContent).toBe('offline');
+
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(5_000);
+      });
+
+      // The whole point: the same self-heal a failed start() already got. A
+      // chunk that failed once must not pin presence 'offline' for the life of
+      // the page once the network is back.
+      expect(attempts).toBe(2);
+      expect(fakeHub.start).toHaveBeenCalledTimes(1);
+      expect(screen.getByTestId('connection').textContent).toBe('connected');
+      expect(unhandledRejections).toEqual([]);
+    } finally {
+      process.off('unhandledRejection', onUnhandledRejection);
+      vi.useRealTimers();
+    }
+  });
+
+  it('stops retrying a failed buildHub() once unmounted', async () => {
+    vi.useFakeTimers();
+    try {
+      let attempts = 0;
+      buildHubImpl = () => {
+        attempts += 1;
+        return Promise.reject(new Error('still offline'));
+      };
+
+      const { unmount } = render(
+        <PulseHubProvider>
+          <Probe />
+        </PulseHubProvider>,
+      );
+
+      await act(async () => {
+        await Promise.resolve();
+        await Promise.resolve();
+      });
+      expect(attempts).toBe(1);
+
+      unmount();
+
+      // A retry loop that outlives the component is a leak, and would call
+      // setState on an unmounted tree every 5s forever.
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(30_000);
+      });
+      expect(attempts).toBe(1);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('does not register handlers, start, or leak a heartbeat when unmounted before buildHub() resolves', async () => {
+    // React StrictMode double-invokes effects in dev, and any unmount can
+    // race an in-flight dynamic import — this simulates buildHub() arriving
+    // *after* the effect has already been cleaned up.
+    const lateHub = createFakeHub();
+    let resolveBuild!: (hub: ReturnType<typeof createFakeHub>) => void;
+    buildHubImpl = () => new Promise((resolve) => { resolveBuild = resolve; });
+
+    const { unmount } = render(
+      <PulseHubProvider>
+        <Probe />
+      </PulseHubProvider>,
+    );
+
+    // Unmount synchronously, before anything has been awaited — buildHub()'s
+    // promise is still pending and its .then() callback has not run yet.
+    unmount();
+
+    // Now let the build "arrive late" and flush microtasks.
+    await act(async () => {
+      resolveBuild(lateHub);
+      await Promise.resolve();
+      await Promise.resolve();
+    });
+
+    expect(lateHub.on).not.toHaveBeenCalled();
+    expect(lateHub.start).not.toHaveBeenCalled();
+    expect(lateHub.stop).not.toHaveBeenCalled();
+
+    // A heartbeat scheduled from the late callback would never be cleared
+    // (cleanup already ran) — confirm none was scheduled by advancing well
+    // past the interval and checking invoke was never reached.
+    vi.useFakeTimers();
+    try {
+      await vi.advanceTimersByTimeAsync(60_000);
+      expect(lateHub.invoke).not.toHaveBeenCalled();
+    } finally {
       vi.useRealTimers();
     }
   });

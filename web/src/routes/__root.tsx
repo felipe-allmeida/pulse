@@ -13,6 +13,13 @@ function RootLayout() {
     <PulseHubProvider>
       <AppShell>
         <Outlet />
+        {/*
+          The trigger has to be eager: present at first paint, present in
+          prerendered HTML. `AskWidget` (web/src/components/ask/ask-widget.tsx)
+          is the Sheet + trigger shell only — it lazily loads the panel body
+          itself, on first open, so the split lives inside the component and
+          not at this call site. See that file for the reasoning.
+        */}
         <AskWidget />
       </AppShell>
     </PulseHubProvider>
