@@ -65,9 +65,9 @@ export const profile: Profile = {
     'pt-BR': 'Construo sistemas distribuídos, plataformas para desenvolvedores e infraestrutura em cloud.',
   },
   bio: {
-    en: 'Software engineer and architect with 12+ years building and running .NET platforms — distributed systems, event-driven design, and CI/CD. As Head of Technology at Dietbox he led a 13-person engineering, QA, UX and support organization while staying hands-on in architecture and delivery. Most recently Senior Product Engineer at Kota.io, building health-insurance infrastructure for the European market. Currently freelancing through Pampa Devs — his software studio — where he is Head of Technology for ULBRA, leading three engineers across the university\'s internal platform, and open to new roles.',
+    en: 'I am a software engineer and architect with 12+ years building and running .NET platforms — distributed systems, event-driven design, and CI/CD. As Head of Technology at Dietbox I led a 13-person engineering, QA, UX and support organization while staying hands-on in architecture and delivery. Most recently I was Senior Product Engineer at Kota.io, building health-insurance infrastructure for the European market. Today I freelance through Pampa Devs — my software studio — where I am Head of Technology for ULBRA, leading three engineers across the university\'s internal platform, and open to new roles.',
     'pt-BR':
-      'Engenheiro e arquiteto de software com mais de 12 anos construindo e operando plataformas .NET — sistemas distribuídos, arquitetura orientada a eventos e CI/CD. Como Head of Technology na Dietbox, liderou uma organização de 13 pessoas entre engenharia, QA, UX e suporte sem sair da arquitetura e da entrega. Mais recentemente, Senior Product Engineer na Kota.io, construindo infraestrutura de seguro-saúde para o mercado europeu. Atualmente atuando como freelancer pela Pampa Devs — seu estúdio de software —, onde é Head de Tecnologia da ULBRA, liderando três engenheiros na plataforma interna da universidade, e aberto a novas oportunidades.',
+      'Sou engenheiro e arquiteto de software com mais de 12 anos construindo e operando plataformas .NET — sistemas distribuídos, arquitetura orientada a eventos e CI/CD. Como Head of Technology na Dietbox, liderei uma organização de 13 pessoas entre engenharia, QA, UX e suporte sem sair da arquitetura e da entrega. Mais recentemente, fui Senior Product Engineer na Kota.io, construindo infraestrutura de seguro-saúde para o mercado europeu. Hoje atuo como freelancer pela Pampa Devs — meu estúdio de software —, onde sou Head de Tecnologia da ULBRA, liderando três engenheiros na plataforma interna da universidade, e aberto a novas oportunidades.',
   },
   contact: {
     calendly: 'https://calendly.com/pampa-devs/bate-papo-sobre-seu-projeto',
@@ -143,9 +143,9 @@ export const profile: Profile = {
       url: 'https://www.ulbra.br',
       period: { en: 'Apr 2026 – Current', 'pt-BR': 'Abr 2026 – Atual' },
       summary: {
-        en: "Leads a three-engineer team building the university's internal platform from scratch — an IT service desk in production, an ERP replacing the legacy systems, a CRM taken over and rebuilt to full test coverage, administrative dashboards for the board, a student dashboard, and the datacenter automation all of it deploys onto. Introduced a spec-first, AI-assisted delivery model in which the team's time goes to specification and code review.",
+        en: "I lead a three-engineer team building the university's internal platform from scratch — an IT service desk in production, an ERP replacing the legacy systems, a CRM taken over and rebuilt to full test coverage, administrative dashboards for the board, a student dashboard, and the datacenter automation all of it deploys onto. I introduced a spec-first, AI-assisted delivery model in which the team's time goes to specification and code review.",
         'pt-BR':
-          'Lidera um time de três engenheiros construindo do zero a plataforma interna da universidade — um service desk de TI em produção, um ERP substituindo os sistemas legados, um CRM assumido e reconstruído até cobertura total de testes, dashboards administrativos para a diretoria, um painel para os alunos e a automação de datacenter em que tudo isso é publicado. Introduziu um modelo de entrega assistido por IA e guiado por especificação, em que o tempo do time vai para especificar e revisar código.',
+          'Lidero um time de três engenheiros construindo do zero a plataforma interna da universidade — um service desk de TI em produção, um ERP substituindo os sistemas legados, um CRM assumido e reconstruído até cobertura total de testes, dashboards administrativos para a diretoria, um painel para os alunos e a automação de datacenter em que tudo isso é publicado. Introduzi um modelo de entrega assistido por IA e guiado por especificação, em que o tempo do time vai para especificar e revisar código.',
       },
     },
     {
@@ -154,9 +154,9 @@ export const profile: Profile = {
       url: 'https://pampadevs.com',
       period: { en: 'Mar 2026 – Current', 'pt-BR': 'Mar 2026 – Atual' },
       summary: {
-        en: 'His software studio — internal enterprise platforms (support/ticketing + ERP) in .NET & React, and web and e-commerce delivery for small and mid-sized businesses on Azure.',
+        en: 'My software studio — internal enterprise platforms (support/ticketing + ERP) in .NET & React, and web and e-commerce delivery for small and mid-sized businesses on Azure.',
         'pt-BR':
-          'Seu estúdio de software — plataformas internas corporativas (suporte/chamados + ERP) em .NET & React, e entrega de web e e-commerce para pequenas e médias empresas na Azure.',
+          'Meu estúdio de software — plataformas internas corporativas (suporte/chamados + ERP) em .NET & React, e entrega de web e e-commerce para pequenas e médias empresas na Azure.',
       },
     },
     {
@@ -165,9 +165,9 @@ export const profile: Profile = {
       url: 'https://kota.io',
       period: { en: 'Oct 2025 – Jul 2026', 'pt-BR': 'Out 2025 – Jul 2026' },
       summary: {
-        en: 'Health-insurance infrastructure for the European market: shipped the platform’s intent layer (enrollment, policy amendment, dependents, renewal), delivered integrations across nine insurers, moved its webhooks to an event-driven V2, and led the company-wide .NET 10 upgrade.',
+        en: 'Health-insurance infrastructure for the European market: I shipped the platform’s intent layer (enrollment, policy amendment, dependents, renewal), delivered integrations across nine insurers, moved its webhooks to an event-driven V2, and led the company-wide .NET 10 upgrade.',
         'pt-BR':
-          'Infraestrutura de seguro-saúde para o mercado europeu: entregou a camada de intents da plataforma (adesão, alteração de apólice, dependentes, renovação), entregou integrações com nove seguradoras, migrou os webhooks para uma V2 orientada a eventos e liderou a atualização para .NET 10 em toda a empresa.',
+          'Infraestrutura de seguro-saúde para o mercado europeu: entreguei a camada de intents da plataforma (adesão, alteração de apólice, dependentes, renovação), entreguei integrações com nove seguradoras, migrei os webhooks para uma V2 orientada a eventos e liderei a atualização para .NET 10 em toda a empresa.',
       },
     },
     {
@@ -176,9 +176,9 @@ export const profile: Profile = {
       url: 'https://airia.com',
       period: { en: 'Jun 2025 – Oct 2025', 'pt-BR': 'Jun 2025 – Out 2025' },
       summary: {
-        en: 'Built web, console and on-premise applications in .NET 9, integrated multiple AI providers into production workflows, and owned the architecture and CI/CD design for new projects.',
+        en: 'I built web, console and on-premise applications in .NET 9, integrated multiple AI providers into production workflows, and owned the architecture and CI/CD design for new projects.',
         'pt-BR':
-          'Construiu aplicações web, console e on-premise em .NET 9, integrou múltiplos provedores de IA a fluxos em produção e foi responsável pela arquitetura e pelo desenho de CI/CD dos novos projetos.',
+          'Construí aplicações web, console e on-premise em .NET 9, integrei múltiplos provedores de IA a fluxos em produção e fui responsável pela arquitetura e pelo desenho de CI/CD dos novos projetos.',
       },
     },
     {
@@ -187,9 +187,9 @@ export const profile: Profile = {
       url: 'https://www.adp.com',
       period: { en: 'Aug 2024 – Jun 2025', 'pt-BR': 'Ago 2024 – Jun 2025' },
       summary: {
-        en: 'Led architecture and planning for legacy modernization across .NET Framework and .NET Core, taking automated test coverage on legacy projects from 0% to 80%.',
+        en: 'I led architecture and planning for legacy modernization across .NET Framework and .NET Core, taking automated test coverage on legacy projects from 0% to 80%.',
         'pt-BR':
-          'Liderou a arquitetura e o planejamento da modernização de sistemas legados em .NET Framework e .NET Core, levando a cobertura de testes automatizados dos projetos legados de 0% a 80%.',
+          'Liderei a arquitetura e o planejamento da modernização de sistemas legados em .NET Framework e .NET Core, levando a cobertura de testes automatizados dos projetos legados de 0% a 80%.',
       },
     },
     /*
@@ -203,9 +203,9 @@ export const profile: Profile = {
       url: 'https://roleentretenimento.com',
       period: { en: 'Oct 2023 – May 2025', 'pt-BR': 'Out 2023 – Mai 2025' },
       summary: {
-        en: 'Events and nightlife promotion platform — owned the web and mobile architecture and delivery.',
+        en: 'Events and nightlife promotion platform — I owned the web and mobile architecture and delivery.',
         'pt-BR':
-          'Plataforma de divulgação de eventos e vida noturna — responsável pela arquitetura e pela entrega de web e mobile.',
+          'Plataforma de divulgação de eventos e vida noturna — fui responsável pela arquitetura e pela entrega de web e mobile.',
       },
     },
     {
@@ -214,9 +214,9 @@ export const profile: Profile = {
       url: 'https://dietbox.me',
       period: { en: 'Aug 2022 – Aug 2024', 'pt-BR': 'Ago 2022 – Ago 2024' },
       summary: {
-        en: 'Led a 13-person technology and UX organization — engineering, QA, UX and support. Introduced Scrum and trunk-based development, cutting lead time from a month to a week and a half, and cut monthly cloud spend by 21%.',
+        en: 'I led a 13-person technology and UX organization — engineering, QA, UX and support. I introduced Scrum and trunk-based development, cutting lead time from a month to a week and a half, and cut monthly cloud spend by 21%.',
         'pt-BR':
-          'Liderou uma organização de tecnologia e UX de 13 pessoas — engenharia, QA, UX e suporte. Introduziu Scrum e trunk-based development, reduzindo o lead time de um mês para uma semana e meia, e cortou 21% do gasto mensal em cloud.',
+          'Liderei uma organização de tecnologia e UX de 13 pessoas — engenharia, QA, UX e suporte. Introduzi Scrum e trunk-based development, reduzindo o lead time de um mês para uma semana e meia, e cortei 21% do gasto mensal em cloud.',
       },
     },
     {
@@ -225,9 +225,9 @@ export const profile: Profile = {
       url: 'https://dietbox.me',
       period: { en: 'Sep 2020 – Aug 2022', 'pt-BR': 'Set 2020 – Ago 2022' },
       summary: {
-        en: 'Migrated the legacy platform from .NET Framework 4.7 on Windows App Service to .NET 6 on Linux, and established CI/CD pipelines in Azure DevOps.',
+        en: 'I migrated the legacy platform from .NET Framework 4.7 on Windows App Service to .NET 6 on Linux, and established CI/CD pipelines in Azure DevOps.',
         'pt-BR':
-          'Migrou a plataforma legada de .NET Framework 4.7 no App Service Windows para .NET 6 no Linux e estabeleceu os pipelines de CI/CD no Azure DevOps.',
+          'Migrei a plataforma legada de .NET Framework 4.7 no App Service Windows para .NET 6 no Linux e estabeleci os pipelines de CI/CD no Azure DevOps.',
       },
     },
     {
@@ -236,9 +236,9 @@ export const profile: Profile = {
       url: 'https://poatek.com',
       period: { en: 'Jun 2020 – Sep 2020', 'pt-BR': 'Jun 2020 – Set 2020' },
       summary: {
-        en: 'Backend and DevOps work for multiple clients using Azure, AKS, Terraform, Vault, .NET Core and React.',
+        en: 'I did backend and DevOps work for multiple clients using Azure, AKS, Terraform, Vault, .NET Core and React.',
         'pt-BR':
-          'Trabalho de backend e DevOps para múltiplos clientes usando Azure, AKS, Terraform, Vault, .NET Core e React.',
+          'Fiz trabalho de backend e DevOps para múltiplos clientes usando Azure, AKS, Terraform, Vault, .NET Core e React.',
       },
     },
     {
@@ -247,9 +247,9 @@ export const profile: Profile = {
       url: 'https://www.dell.com',
       period: { en: 'Nov 2018 – Jun 2020', 'pt-BR': 'Nov 2018 – Jun 2020' },
       summary: {
-        en: 'Built an automated regression-testing application for Dell’s interactive voice response system, replacing a month of manual testing, and a sales-rep tool that automated customer eligibility checks.',
+        en: 'I built an automated regression-testing application for Dell’s interactive voice response system, replacing a month of manual testing, and a sales-rep tool that automated customer eligibility checks.',
         'pt-BR':
-          'Construiu uma aplicação de testes de regressão automatizados para o sistema de resposta de voz interativa da Dell, substituindo um mês de testes manuais, e uma ferramenta para o time de vendas que automatizou a checagem de elegibilidade de clientes.',
+          'Construí uma aplicação de testes de regressão automatizados para o sistema de resposta de voz interativa da Dell, substituindo um mês de testes manuais, e uma ferramenta para o time de vendas que automatizou a checagem de elegibilidade de clientes.',
       },
     },
     {
@@ -257,9 +257,9 @@ export const profile: Profile = {
       org: 'Vox Game Studio',
       period: { en: 'Dec 2015 – Nov 2018', 'pt-BR': 'Dez 2015 – Nov 2018' },
       summary: {
-        en: 'Promoted from intern to development lead; ran development, code review, testing and releases for a financial-education platform, and designed its core architecture in Unity3D / .NET.',
+        en: 'Promoted from intern to development lead; I ran development, code review, testing and releases for a financial-education platform, and designed its core architecture in Unity3D / .NET.',
         'pt-BR':
-          'Promovido de estagiário a development lead; conduziu desenvolvimento, code review, testes e releases de uma plataforma de educação financeira e desenhou sua arquitetura central em Unity3D / .NET.',
+          'Promovido de estagiário a development lead; conduzi desenvolvimento, code review, testes e releases de uma plataforma de educação financeira e desenhei sua arquitetura central em Unity3D / .NET.',
       },
     },
   ],
