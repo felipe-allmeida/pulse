@@ -33,7 +33,7 @@ export const site: SiteConfig = {
   name: 'Felipe de Almeida — Software Engineer & Architect',
   shortName: 'Felipe de Almeida',
   description:
-    'Felipe de Almeida is a software engineer and architect specialising in distributed systems, event-driven architecture, and cloud infrastructure with .NET and React. Pulse is his portfolio: a live, real-time distributed system you can watch running.',
+    'I am Felipe de Almeida, a software engineer and architect specialising in distributed systems, event-driven architecture, and cloud infrastructure with .NET and React. Pulse is my portfolio: a live, real-time distributed system you can watch running.',
   locale: 'en',
   sameAs: ['https://github.com/felipe-allmeida', 'https://www.linkedin.com/in/felipe-allmeida'],
 };

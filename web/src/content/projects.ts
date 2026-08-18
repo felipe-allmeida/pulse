@@ -245,8 +245,8 @@ export const projects: Project[] = [
             'Um dashboard de operações público expondo métricas reais — conexões ao vivo, visitas ao longo do tempo e o feed de eventos conforme acontece.',
         },
         {
-          en: 'An AI assistant grounded in a maintained profile, streaming answers about the author.',
-          'pt-BR': 'Um assistente de IA baseado em um perfil mantido, respondendo em streaming sobre o autor.',
+          en: 'An AI assistant grounded in a maintained profile, streaming answers about me.',
+          'pt-BR': 'Um assistente de IA baseado em um perfil mantido, respondendo em streaming sobre mim.',
         },
         {
           en: 'Deployed with Docker Compose + Caddy behind Terraform-managed infrastructure.',
@@ -293,9 +293,9 @@ export const projects: Project[] = [
             'pt-BR': 'Um assistente fundamentado num perfil mantido',
           },
           body: {
-            en: 'The assistant answers from a file the author keeps current, and says it does not know rather than inventing. Ungrounded, it would be a demonstration of exactly the wrong thing.',
+            en: 'The assistant answers from a file I keep current, and says it does not know rather than inventing. Ungrounded, it would be a demonstration of exactly the wrong thing.',
             'pt-BR':
-              'O assistente responde a partir de um arquivo que o autor mantém atualizado, e diz que não sabe em vez de inventar. Sem fundamento, ele seria a demonstração exatamente do oposto.',
+              'O assistente responde a partir de um arquivo que eu mantenho atualizado, e diz que não sabe em vez de inventar. Sem fundamento, ele seria a demonstração exatamente do oposto.',
           },
         },
       ],
@@ -825,8 +825,8 @@ export const projects: Project[] = [
           { en: 'The React front end and the Docker Swarm deployment.', 'pt-BR': 'O front-end em React e o deploy em Docker Swarm.' },
         ],
         boundary: {
-          en: 'One engineer now works on this codebase alongside him.',
-          'pt-BR': 'Um engenheiro agora trabalha neste código ao lado dele.',
+          en: 'One engineer now works on this codebase alongside me.',
+          'pt-BR': 'Um engenheiro agora trabalha neste código ao meu lado.',
         },
       },
       problem: {
@@ -1049,9 +1049,9 @@ export const projects: Project[] = [
       },
       contribution: {
         summary: {
-          en: 'Set the architecture and the conventions, and built alongside one engineer who carries the day-to-day of this codebase.',
+          en: 'I set the architecture and the conventions, and built alongside one engineer who carries the day-to-day of this codebase.',
           'pt-BR':
-            'Definiu a arquitetura e as convenções e construiu junto com um engenheiro que toca o dia a dia deste código.',
+            'Defini a arquitetura e as convenções e construí junto com um engenheiro que toca o dia a dia deste código.',
         },
         areas: [
           {
@@ -1132,9 +1132,9 @@ export const projects: Project[] = [
       'pt-BR': 'Um CRM herdado levado de zero testes a cobertura total.',
     },
     description: {
-      en: "The university’s CRM platform, inherited with no automated tests and little structure. Rebuilt under the author’s direction to full test coverage, with a front-end migration that stopped every screen change from throwing away the user’s filters.",
+      en: "The university’s CRM platform, inherited with no automated tests and little structure. Rebuilt under my direction to full test coverage, with a front-end migration that stopped every screen change from throwing away the user’s filters.",
       'pt-BR':
-        'A plataforma de CRM da universidade, herdada sem testes automatizados e com pouca estrutura. Reconstruída sob a direção do autor até cobertura total de testes, com uma migração de front-end que acabou com a perda dos filtros do usuário a cada troca de tela.',
+        'A plataforma de CRM da universidade, herdada sem testes automatizados e com pouca estrutura. Reconstruída sob a minha direção até cobertura total de testes, com uma migração de front-end que acabou com a perda dos filtros do usuário a cada troca de tela.',
     },
     tech: ['React', 'TanStack Router', 'MongoDB', 'Docker Swarm'],
     role: { en: 'Head of Technology — direction & review', 'pt-BR': 'Head de Tecnologia — direção & revisão' },
@@ -1144,14 +1144,14 @@ export const projects: Project[] = [
     links: [],
     detail: {
       overview: {
-        en: "The CRM the university runs on, inherited rather than built: no automated tests, and a codebase whose structure had not kept up with it. It is now fully covered by tests and materially better to use, and the work was done by the team under the author’s direction — he set the direction and reviewed it, and did not write it.",
+        en: "The CRM the university runs on, inherited rather than built: no automated tests, and a codebase whose structure had not kept up with it. It is now fully covered by tests and materially better to use, and the work was done by the team under my direction — I set the direction and reviewed it, and did not write it.",
         'pt-BR':
-          'O CRM em que a universidade opera, herdado e não construído: sem testes automatizados e com uma estrutura que não acompanhou o próprio crescimento. Hoje está totalmente coberto por testes e sensivelmente melhor de usar, e o trabalho foi feito pelo time sob a direção do autor — ele definiu a direção e revisou, não escreveu.',
+          'O CRM em que a universidade opera, herdado e não construído: sem testes automatizados e com uma estrutura que não acompanhou o próprio crescimento. Hoje está totalmente coberto por testes e sensivelmente melhor de usar, e o trabalho foi feito pelo time sob a minha direção — eu defini a direção e revisei, não escrevi.',
       },
       contribution: {
         summary: {
-          en: 'Set the direction and reviewed the work; the engineering was the team’s.',
-          'pt-BR': 'Definiu a direção e revisou o trabalho; a engenharia foi do time.',
+          en: 'I set the direction and reviewed the work; the engineering was the team’s.',
+          'pt-BR': 'Defini a direção e revisei o trabalho; a engenharia foi do time.',
         },
         areas: [
           {
@@ -1165,9 +1165,9 @@ export const projects: Project[] = [
           { en: 'Review of the work as it landed.', 'pt-BR': 'Revisão do trabalho conforme entrava.' },
         ],
         boundary: {
-          en: 'None of this implementation is the author’s. It was built by the engineers on the team; his part was deciding what to do and reviewing what came back.',
+          en: 'None of this implementation is mine. It was built by the engineers on the team; my part was deciding what to do and reviewing what came back.',
           'pt-BR':
-            'Nada desta implementação é do autor. Foi construída pelos engenheiros do time; a parte dele foi decidir o que fazer e revisar o que voltava.',
+            'Nada desta implementação é minha. Foi construída pelos engenheiros do time; a minha parte foi decidir o que fazer e revisar o que voltava.',
         },
       },
       problem: {
@@ -1201,9 +1201,9 @@ export const projects: Project[] = [
         {
           heading: { en: 'Directed, not written', 'pt-BR': 'Dirigido, não escrito' },
           body: {
-            en: 'This is the one system in the group the author did not build. With three engineers and six systems, the lead’s leverage is in deciding what gets done and reviewing what comes back, not in adding a fourth pair of hands to a codebase that already has an owner.',
+            en: 'This is the one system in the group I did not build. With three engineers and six systems, my leverage as lead is in deciding what gets done and reviewing what comes back, not in adding a fourth pair of hands to a codebase that already has an owner.',
             'pt-BR':
-              'Este é o único sistema do grupo que o autor não construiu. Com três engenheiros e seis sistemas, a alavanca da liderança está em decidir o que é feito e revisar o que volta, não em somar um quarto par de mãos a um código que já tem dono.',
+              'Este é o único sistema do grupo que eu não construí. Com três engenheiros e seis sistemas, a minha alavanca como líder está em decidir o que é feito e revisar o que volta, não em somar um quarto par de mãos a um código que já tem dono.',
           },
         },
       ],
@@ -1235,8 +1235,8 @@ export const projects: Project[] = [
       },
       contribution: {
         summary: {
-          en: 'Built it end to end — the API, the integrations, the front end and the deployment.',
-          'pt-BR': 'Construiu de ponta a ponta — a API, as integrações, o front-end e o deploy.',
+          en: 'I built it end to end — the API, the integrations, the front end and the deployment.',
+          'pt-BR': 'Construí de ponta a ponta — a API, as integrações, o front-end e o deploy.',
         },
         areas: [
           { en: 'The read-only integration with the CRM’s datastore.', 'pt-BR': 'A integração somente-leitura com a base do CRM.' },
@@ -1341,8 +1341,8 @@ export const projects: Project[] = [
       },
       contribution: {
         summary: {
-          en: 'Built it end to end — the API, the lakehouse integration, both front ends and the deployment.',
-          'pt-BR': 'Construiu de ponta a ponta — a API, a integração com o lakehouse, os dois front-ends e o deploy.',
+          en: 'I built it end to end — the API, the lakehouse integration, both front ends and the deployment.',
+          'pt-BR': 'Construí de ponta a ponta — a API, a integração com o lakehouse, os dois front-ends e o deploy.',
         },
         areas: [
           { en: 'The lakehouse connection that supplies the schedule.', 'pt-BR': 'A conexão com o lakehouse que alimenta o horário.' },
@@ -1428,8 +1428,8 @@ export const projects: Project[] = [
       },
       contribution: {
         summary: {
-          en: 'Designed and built the platform, and the delivery model that runs on it.',
-          'pt-BR': 'Desenhou e construiu a plataforma e o modelo de entrega que roda sobre ela.',
+          en: 'I designed and built the platform, and the delivery model that runs on it.',
+          'pt-BR': 'Desenhei e construí a plataforma e o modelo de entrega que roda sobre ela.',
         },
         areas: [
           { en: 'The one-run provisioning script and the cluster it produces.', 'pt-BR': 'O script de provisionamento em uma execução e o cluster que ele produz.' },

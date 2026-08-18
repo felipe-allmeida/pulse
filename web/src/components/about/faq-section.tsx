@@ -7,7 +7,7 @@ import { useLocalized } from '@/i18n/use-localized';
  * The About page's FAQ.
  *
  * Plain, always-visible question/answer pairs — no accordion. The point of
- * this section is to be quotable: an answer engine lifting "Is Felipe open to
+ * this section is to be quotable: an answer engine lifting "Are you open to
  * new opportunities?" straight out of the page is the whole reason it exists,
  * and the same text is emitted as `FAQPage` JSON-LD from the same source.
  * Content hidden behind a disclosure widget is weaker on both counts, and the

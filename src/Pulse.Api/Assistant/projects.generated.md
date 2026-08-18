@@ -29,13 +29,13 @@ system Felipe worked on; the "What Felipe did" line is the authoritative stateme
   - Live presence via SignalR — see who else is on the site right now, on a world map.
   - Event-driven .NET backend with a RabbitMQ transactional outbox, Postgres, and OpenTelemetry tracing.
   - A public ops dashboard exposing real metrics — live connections, visits over time, and the event feed as it happens.
-  - An AI assistant grounded in a maintained profile, streaming answers about the author.
+  - An AI assistant grounded in a maintained profile, streaming answers about me.
   - Deployed with Docker Compose + Caddy behind Terraform-managed infrastructure.
 - **Engineering decisions:**
   - **A transactional outbox behind a visit counter** — Nothing about counting visits requires one. The point is not the counter — it is that the pattern is here, wired end to end, in something a reader can watch rather than a diagram they have to trust. On a product this would be over-engineering; on a demonstration it is the deliverable.
   - **Real telemetry, published** — The ops dashboard exposes the system’s actual numbers, which means a reader can catch the site lying about itself. Most portfolios make claims that cannot be checked; this one chose the version that can be.
   - **Prerendered pages over a client-only app** — The site renders its content into HTML at build time, so a first visit does not wait on JavaScript and a crawler sees the same page a person does — and, usefully, a deploy can be verified with a single request rather than a browser.
-  - **An assistant grounded in a maintained profile** — The assistant answers from a file the author keeps current, and says it does not know rather than inventing. Ungrounded, it would be a demonstration of exactly the wrong thing.
+  - **An assistant grounded in a maintained profile** — The assistant answers from a file I keep current, and says it does not know rather than inventing. Ungrounded, it would be a demonstration of exactly the wrong thing.
 
 ### Kota Embed — Health insurance enrollment, embedded inside other companies' platforms.
 
@@ -126,7 +126,7 @@ system Felipe worked on; the "What Felipe did" line is the authoritative stateme
   - The transactional outbox and the notification fan-out it feeds.
   - The OAuth authorization server and the MCP server behind its consent screen.
   - The React front end and the Docker Swarm deployment.
-  - NOT his work: One engineer now works on this codebase alongside him.
+  - NOT his work: One engineer now works on this codebase alongside me.
 - **Problem it solved:** ULBRA’s IT department took requests through GLPI, e-mail, and direct messages at the same time. There was no SLA per team, no audit trail on approvals, and no way to tell whether anyone was satisfied with the outcome. Ulbra Atende replaces GLPI as the single intake channel and makes each of those measurable — three months in, the median ticket closes in about an hour and a half.
 - **Results:** ~2.4k tickets handled (85% closed); 200+ users (across ~30 teams); ~6 min median first response (SLA tracked per team); ~5.0 satisfaction score (400+ responses, 1-5 scale) — in ~3 months of production
 - **Architecture:** A .NET 10 modular monolith: one deployable, separate bounded contexts — Core, Identity, Notifications and MCP — each layered Domain → Application → Infrastructure with its own Postgres schema. Integration events travel over RabbitMQ through an EF transactional outbox. Attachments live in S3/MinIO, caching in Redis, tracing via OpenTelemetry; integration tests run against real Postgres, RabbitMQ and MinIO through Testcontainers.
@@ -160,7 +160,7 @@ system Felipe worked on; the "What Felipe did" line is the authoritative stateme
 - **Source:** closed — professional work described without the code
 - **Stack:** .NET 10, PostgreSQL 17, EF Core, React, Tailwind, shadcn/ui
 - **What it is:** An internal ERP built to take the university off its legacy systems — a modular .NET 10 monolith on PostgreSQL 17 with a React front end, covering core internal business operations. It is in testing, ahead of launch, so this describes what has been built rather than what is running.
-- **What Felipe did:** Set the architecture and the conventions, and built alongside one engineer who carries the day-to-day of this codebase.
+- **What Felipe did:** I set the architecture and the conventions, and built alongside one engineer who carries the day-to-day of this codebase.
   - The module boundaries, and the conventions carried over from the service desk.
   - The PostgreSQL schema and the code-first migration path.
   - Review of every change into the codebase.
@@ -180,18 +180,18 @@ system Felipe worked on; the "What Felipe did" line is the authoritative stateme
 - **Role:** Head of Technology — direction & review (Apr 2026 – Current)
 - **Source:** closed — professional work described without the code
 - **Stack:** React, TanStack Router, MongoDB, Docker Swarm
-- **What it is:** The CRM the university runs on, inherited rather than built: no automated tests, and a codebase whose structure had not kept up with it. It is now fully covered by tests and materially better to use, and the work was done by the team under the author’s direction — he set the direction and reviewed it, and did not write it.
-- **What Felipe did:** Set the direction and reviewed the work; the engineering was the team’s.
+- **What it is:** The CRM the university runs on, inherited rather than built: no automated tests, and a codebase whose structure had not kept up with it. It is now fully covered by tests and materially better to use, and the work was done by the team under my direction — I set the direction and reviewed it, and did not write it.
+- **What Felipe did:** I set the direction and reviewed the work; the engineering was the team’s.
   - The decision to cover the codebase with tests before changing its behaviour.
   - The routing migration that made filter state survive navigation.
   - Review of the work as it landed.
-  - NOT his work: None of this implementation is the author’s. It was built by the engineers on the team; his part was deciding what to do and reviewing what came back.
+  - NOT his work: None of this implementation is mine. It was built by the engineers on the team; my part was deciding what to do and reviewing what came back.
 - **Problem it solved:** The CRM arrived with no automated tests at all, which made every change a gamble, and with usability debt that the people using it every day absorbed silently. The worst of it: changing screens reloaded the application, so the filters someone had just set were gone. Work that goes through the same three or four filters all day pays that cost on every navigation.
 - **Results:** 0% → 100% test coverage
 - **Engineering decisions:**
   - **Tests first, behaviour second** — The codebase was unstructured and untested, and the temptation with both is to restructure first. The order was inverted: cover the existing behaviour, then change it. Coverage on code nobody has changed yet is what makes the later restructuring safe rather than hopeful — and it is the reason the number is worth quoting.
   - **Routing as state, not as navigation** — Moving to a router that holds application state in the route turned filters from something the page owned into something the URL owned. The visible win is that a screen change no longer discards them; the quieter one is that a filtered view became a link somebody can send to a colleague.
-  - **Directed, not written** — This is the one system in the group the author did not build. With three engineers and six systems, the lead’s leverage is in deciding what gets done and reviewing what comes back, not in adding a fourth pair of hands to a codebase that already has an owner.
+  - **Directed, not written** — This is the one system in the group I did not build. With three engineers and six systems, my leverage as lead is in deciding what gets done and reviewing what comes back, not in adding a fourth pair of hands to a codebase that already has an owner.
 
 ### Ulbra Admin — The numbers the board runs the university on.
 
@@ -199,7 +199,7 @@ system Felipe worked on; the "What Felipe did" line is the authoritative stateme
 - **Source:** closed — professional work described without the code
 - **Stack:** .NET 10, React 19, PostgreSQL, MongoDB, TanStack Router, Docker Swarm
 - **What it is:** The dashboards the presidency and the board use to check the university’s numbers. A .NET 10 API and a React 19 front end that read two systems neither of them owns: prospect data from the CRM, and confirmed enrollment from the legacy Oracle platform through a typed HTTP client rather than a database connection.
-- **What Felipe did:** Built it end to end — the API, the integrations, the front end and the deployment.
+- **What Felipe did:** I built it end to end — the API, the integrations, the front end and the deployment.
   - The read-only integration with the CRM’s datastore.
   - The typed client that fronts the legacy enrollment system.
   - The dashboards themselves and the React front end.
@@ -226,7 +226,7 @@ system Felipe worked on; the "What Felipe did" line is the authoritative stateme
 - **Source:** closed — professional work described without the code
 - **Stack:** .NET 10, React 19, PostgreSQL, Microsoft Fabric, ODBC, Docker Swarm
 - **What it is:** A schedule display installed in the university’s first building, the medical school, where it shows students the day’s classes. One system with two faces: an unattended fullscreen kiosk, and a sign-in-protected admin where staff manage the content it rotates. Academic data comes from the university’s analytics lakehouse.
-- **What Felipe did:** Built it end to end — the API, the lakehouse integration, both front ends and the deployment.
+- **What Felipe did:** I built it end to end — the API, the lakehouse integration, both front ends and the deployment.
   - The lakehouse connection that supplies the schedule.
   - The kiosk display, its rotation and its day/night themes.
   - The content admin and its scheduled playlist.
@@ -248,7 +248,7 @@ system Felipe worked on; the "What Felipe did" line is the authoritative stateme
 - **Source:** closed — professional work described without the code
 - **Stack:** Docker Swarm, Traefik, GitHub Actions, OpenTelemetry, SigNoz, Prometheus, Grafana, Metabase
 - **What it is:** The platform underneath every other system in this group. It began as on-premise servers with no automation at all — deployment meant a person on the machine, installing a runtime and starting the application by hand. It is now a provisioning script, a container orchestrator, a reverse proxy, two observability tools with a declared split, and a delivery loop in which an alert can investigate itself and open a pull request.
-- **What Felipe did:** Designed and built the platform, and the delivery model that runs on it.
+- **What Felipe did:** I designed and built the platform, and the delivery model that runs on it.
   - The one-run provisioning script and the cluster it produces.
   - The reverse proxy and the routing convention every application follows.
   - The split between application and host observability.
