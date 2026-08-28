@@ -1228,13 +1228,13 @@ export const projects: Project[] = [
     slug: 'dietbox-portal',
     name: 'Dietbox Portal',
     tagline: {
-      en: 'The back office, and the newest generation of the platform’s architecture.',
-      'pt-BR': 'O back office, e a geração mais nova da arquitetura da plataforma.',
+      en: 'The back office that took daily operations off engineering’s desk.',
+      'pt-BR': 'O back office que tirou a operação do dia a dia da mesa da engenharia.',
     },
     description: {
-      en: 'The internal tool the company runs the product from — subscriptions, vouchers, the food catalogue, marketing — built as a layered service with commands, queries and domain events dispatched at save time, and an admin client that can act as the user it is helping.',
+      en: 'The internal tool the company runs the product from. Cancel a subscription, grant a special one, issue a voucher, import the food catalogue from a file, change a plan’s limits, publish a banner, clear a nutritionist’s cache — forty-four actions across ten areas, every one of which used to be a ticket to an engineer.',
       'pt-BR':
-        'A ferramenta interna com que a empresa opera o produto — assinaturas, vouchers, catálogo de alimentos, marketing — construída como um serviço em camadas com comandos, queries e eventos de domínio despachados no momento da gravação, e um cliente admin capaz de agir como o usuário que está atendendo.',
+        'A ferramenta interna com que a empresa opera o produto. Cancelar uma assinatura, conceder uma especial, emitir um voucher, importar o catálogo de alimentos de um arquivo, mudar os limites de um plano, publicar um banner, limpar o cache de uma nutricionista — quarenta e quatro ações em dez áreas, e cada uma delas antes era um chamado para um engenheiro.',
     },
     tech: ['.NET 6', 'C#', 'CQRS', 'MediatR', 'EF Core', 'SQL Server', 'ASP.NET Identity', 'JWT', 'Vue 3', 'Vuex', 'Azure DevOps'],
     role: {
@@ -1248,21 +1248,21 @@ export const projects: Project[] = [
     venture: 'dietbox',
     detail: {
       overview: {
-        en: 'A back office is where a SaaS company’s real operating procedure lives — the subscriptions, the vouchers, the food catalogue, marketing — and this was the first place the platform’s newer patterns were carried through end to end: layers numbered on disk, commands and queries behind a pipeline behaviour that logs every one of them, and a domain that raises its own events and has them dispatched the moment its changes are saved.',
+        en: 'Before this existed, changing anything in the product was engineering’s job. Adjusting a subscription, correcting a nutritionist’s email, loading a new food table — each one arrived as a request to the technology team and left as someone’s afternoon. The portal turned those into screens, and the work moved to the operations team, who did not have to ask anyone. That is the whole point of it: not that the company got a back office, but that engineering stopped being in the path of the company’s own routine.',
         'pt-BR':
-          'Um back office é onde vive o procedimento real de operação de uma empresa SaaS — as assinaturas, os vouchers, o catálogo de alimentos, o marketing — e este foi o primeiro lugar em que os padrões mais novos da plataforma foram aplicados de ponta a ponta: camadas numeradas em disco, comandos e queries atrás de um pipeline behaviour que registra cada um deles, e um domínio que emite os próprios eventos e os tem despachados no instante em que suas mudanças são gravadas.',
+          'Antes disso existir, mudar qualquer coisa no produto era trabalho da engenharia. Ajustar uma assinatura, corrigir o e-mail de uma nutricionista, carregar uma tabela nova de alimentos — cada um chegava como pedido ao time de tecnologia e ia embora como a tarde de alguém. O portal transformou isso em telas, e o trabalho passou para o time de operações, que não precisava mais pedir para ninguém. É esse o ponto dele: não que a empresa ganhou um back office, mas que a engenharia deixou de estar no caminho da rotina da própria empresa.',
       },
       contribution: {
         summary: {
-          en: 'I set the layered design this service is built on — the numbered directories, the command/query pipeline, and where the domain-event dispatch sits inside it — and I wrote the identity building block and the shared building blocks the platform’s newer services now start from. The eighteen business-domain controllers and the admin client’s views were the team’s to build out.',
+          en: 'I decided what operations should be able to do without us, and built what it takes to let them do it safely: the staff identity and permissions the whole thing runs behind, the command surface under the screens, and the design the rest of the team built the eighteen business areas on top of.',
           'pt-BR':
-            'Defini o design em camadas sobre o qual este serviço é construído — os diretórios numerados, o pipeline de comandos e queries, e o lugar onde o despacho de eventos de domínio se encaixa nele — e escrevi o bloco de identidade e os blocos compartilhados dos quais os serviços mais novos da plataforma partem. Os dezoito controllers de domínio de negócio e as telas do cliente admin foram construídos pelo time.',
+            'Decidi o que a operação deveria conseguir fazer sem a gente, e construí o que era preciso para que fizesse com segurança: a identidade de equipe e as permissões atrás das quais tudo roda, a superfície de comandos por baixo das telas, e o desenho sobre o qual o resto do time construiu as dezoito áreas de negócio.',
         },
         areas: [
           {
-            en: 'The numbered directory layout — building blocks, services, application, domain, infrastructure — and the dependency direction it makes legible before a file is opened.',
+            en: 'Choosing the actions: which requests we were tired of receiving, and which of those were safe to hand over.',
             'pt-BR':
-              'A estrutura de diretórios numerados — building blocks, services, application, domain, infrastructure — e a direção de dependência que ela deixa legível antes de abrir um arquivo.',
+              'A escolha das ações: de quais pedidos a gente estava cansado, e quais deles dava para entregar com segurança.',
           },
           {
             en: 'The identity building block: its own user store, a JWT builder and validator, access and refresh tokens, and claim-based authorization.',
@@ -1270,18 +1270,14 @@ export const projects: Project[] = [
               'O bloco de identidade: base de usuários própria, um builder e validador de JWT, tokens de acesso e refresh, e autorização baseada em claims.',
           },
           {
-            en: 'The message and event base types among the shared building blocks, and the dispatch that publishes what an aggregate raised once the unit of work has saved it.',
+            en: 'Impersonation, in both directions and both ways back out, and the rule that it lives behind a staff account rather than a customer one.',
             'pt-BR':
-              'Os tipos base de mensagem e evento entre os blocos de construção compartilhados, e o despacho que publica o que um agregado emitiu assim que a unidade de trabalho o grava.',
+              'A impersonation, nas duas direções e nos dois caminhos de volta, e a regra de que ela mora atrás de uma conta de equipe, não de cliente.',
           },
           {
-            en: 'The shared building blocks — domain, infrastructure and identity — the platform’s newer services start from instead of each inventing its own.',
+            en: 'The design the team built the eighteen business areas on top of, so a new area was a day rather than an argument.',
             'pt-BR':
-              'Os blocos de construção compartilhados — domínio, infraestrutura e identidade — dos quais os serviços mais novos da plataforma partem, em vez de cada um inventar o próprio.',
-          },
-          {
-            en: 'The client’s persisted token pair and its refresh flow against the accounts endpoint.',
-            'pt-BR': 'O par de tokens persistido no cliente e o fluxo de refresh contra o endpoint de contas.',
+              'O desenho sobre o qual o time construiu as dezoito áreas de negócio, para que uma área nova fosse um dia de trabalho e não uma discussão.',
           },
         ],
         boundary: {
@@ -1291,9 +1287,9 @@ export const projects: Project[] = [
         },
       },
       problem: {
-        en: 'Support and operations were reaching straight into the product database, or into the monolith’s own admin surface, to do what the business runs on day to day — adjusting a subscription, issuing a voucher, updating the food catalogue. A back office with its own domain, its own staff identity and its own command surface was the alternative: the same operations, but as named commands logged on the way through, behind sign-in that isn’t the customer’s.',
+        en: 'Everything the business needed done to its own data went through the technology team. Support could not adjust a subscription, marketing could not publish a banner, nobody could load a new food table — each was a request, a queue, and an engineer running something by hand against the product database or the monolith’s admin surface. That makes engineering the bottleneck on work that is not engineering, and it puts the riskiest operations in the least reviewable place. The alternative was to give operations the actions themselves: named commands, behind a sign-in that is not the customer’s.',
         'pt-BR':
-          'Suporte e operações estavam entrando direto no banco de dados do produto, ou na própria superfície de admin do monolito, para fazer o que o negócio roda no dia a dia — ajustar uma assinatura, emitir um voucher, atualizar o catálogo de alimentos. Um back office com domínio próprio, identidade de equipe própria e superfície de comandos própria foi a alternativa: as mesmas operações, mas como comandos nomeados e registrados em log na passagem, atrás de um login que não é o do cliente.',
+          'Tudo o que o negócio precisava fazer com os próprios dados passava pelo time de tecnologia. Suporte não conseguia ajustar uma assinatura, marketing não conseguia publicar um banner, ninguém conseguia carregar uma tabela nova de alimentos — cada coisa era um pedido, uma fila, e um engenheiro rodando algo na mão contra o banco do produto ou a superfície de admin do monolito. Isso faz da engenharia o gargalo de um trabalho que não é de engenharia, e coloca as operações mais arriscadas no lugar menos revisável. A alternativa foi entregar as ações para a operação: comandos nomeados, atrás de um login que não é o do cliente.',
       },
       metrics: [
         {
@@ -1302,71 +1298,71 @@ export const projects: Project[] = [
           note: { en: 'mine, of ~780 total', 'pt-BR': 'meus, de ~780 no total' },
         },
         {
-          value: { en: '3', 'pt-BR': '3' },
-          label: { en: 'test projects', 'pt-BR': 'projetos de teste' },
-          note: { en: 'domain, application, and integration', 'pt-BR': 'domínio, aplicação e integração' },
+          value: { en: '44', 'pt-BR': '44' },
+          label: { en: 'actions ops could take alone', 'pt-BR': 'ações que ops passou a fazer sozinha' },
+          note: { en: 'across ten areas of the product', 'pt-BR': 'em dez áreas do produto' },
         },
       ],
       metricsNote: {
-        en: 'Both figures come from the two repositories’ own commit history.',
-        'pt-BR': 'Os dois números vêm do próprio histórico de commits dos dois repositórios.',
+        en: 'The commit share comes from the two repositories. The forty-four is a count of the write actions the service exposes — the commands behind the screens ops uses.',
+        'pt-BR': 'A fatia de commits vem dos dois repositórios. O quarenta e quatro é a contagem das ações de escrita que o serviço expõe — os comandos por trás das telas que a operação usa.',
       },
       architecture: {
         summary: {
-          en: 'An admin client in front, a service exposing the eighteen controllers, an application layer of commands and queries behind a logging pipeline behaviour, a domain layer underneath, and infrastructure at the bottom — where saving a change is also what releases the events that change raised.',
+          en: 'Someone on the operations team picks an action on a screen, and it travels as a named command through the product’s own rules before it reaches the product’s data.',
           'pt-BR':
-            'Um cliente admin na frente, um serviço expondo os dezoito controllers, uma camada de aplicação com comandos e queries atrás de um pipeline behaviour de log, uma camada de domínio embaixo dela, e infraestrutura na base — onde gravar uma mudança é também o que libera os eventos que aquela mudança emitiu.',
+            'Alguém do time de operações escolhe uma ação numa tela, e ela viaja como um comando nomeado pelas regras do próprio produto antes de chegar aos dados do produto.',
         },
         steps: [
           {
-            label: 'Admin client',
+            label: 'Ops',
             detail: {
-              en: 'The Vue 3 client — dashboard, charts, and the eighteen controllers’ views — including the impersonate controls in the navbar and the patient view.',
+              en: 'Someone on the operations team, signed in with a staff account, on the Vue screens for the ten areas — including the impersonate controls in the navbar and the patient view.',
               'pt-BR':
-                'O cliente em Vue 3 — dashboard, gráficos e as telas dos dezoito controllers — incluindo os controles de impersonate na navbar e na tela do paciente.',
+                'Alguém do time de operações, logado com uma conta de equipe, nas telas em Vue das dez áreas — incluindo os controles de impersonate na navbar e na tela do paciente.',
             },
           },
           {
-            label: 'Service',
+            label: 'Permissions',
             detail: {
-              en: 'Controllers behind the claim-requirement authorization filter, validating the access token before a request reaches a command or query.',
+              en: 'The token decides which of the actions this person is allowed at all — a claim-requirement filter in front of every controller.',
               'pt-BR':
-                'Controllers atrás do filtro de autorização por claim, validando o token de acesso antes de a requisição chegar a um comando ou query.',
+                'O token decide quais das ações essa pessoa pode executar — um filtro de exigência de claim na frente de cada controller.',
             },
           },
           {
-            label: 'Application',
+            label: 'Command',
             detail: {
-              en: 'Commands and queries behind a pipeline behaviour that logs each one by name, and the handlers that turn a domain event into the integration event other services consume.',
+              en: 'The action runs as one of the forty-four commands, logged by name on the way through, rather than as an edit to a table.',
               'pt-BR':
-                'Comandos e queries atrás de um pipeline behaviour que registra cada um pelo nome, e os handlers que transformam um evento de domínio no evento de integração que outros serviços consomem.',
+                'A ação roda como um dos quarenta e quatro comandos, registrada pelo nome no caminho, em vez de como uma edição numa tabela.',
             },
           },
           {
-            label: 'Domain',
+            label: 'Rules',
             detail: {
-              en: 'The business rules for the eighteen areas administered — nutritionists, patients, subscriptions, vouchers, the food catalogue, and the rest — raising the events the layers above and below both care about.',
+              en: 'The same rules the product itself enforces stand in front of the write — which is the difference between ops doing this and an engineer doing it by hand.',
               'pt-BR':
-                'As regras de negócio das dezoito áreas administradas — nutricionistas, pacientes, assinaturas, vouchers, catálogo de alimentos, e o resto — emitindo os eventos que as camadas acima e abaixo se importam.',
+                'As mesmas regras que o próprio produto aplica ficam na frente da escrita — que é a diferença entre a operação fazer isso e um engenheiro fazer na mão.',
             },
           },
           {
-            label: 'Infrastructure',
+            label: 'Database',
             detail: {
-              en: 'An EF Core context over SQL Server: it writes the aggregate’s current state, then hands the events that aggregate collected while changing to MediatR, once the write has already landed.',
+              en: 'The change lands in the same database the product serves from — which is exactly why it goes through the rules above rather than around them.',
               'pt-BR':
-                'Um contexto EF Core sobre SQL Server: grava o estado atual do agregado e então entrega ao MediatR os eventos que aquele agregado acumulou ao mudar, depois que a escrita já foi feita.',
+                'A mudança cai no mesmo banco de onde o produto serve — que é exatamente por que ela passa pelas regras acima, e não por fora delas.',
             },
           },
         ],
       },
       decisions: [
         {
-          heading: { en: 'Layers numbered on disk', 'pt-BR': 'Camadas numeradas em disco' },
+          heading: { en: 'The measure of success was engineering hearing about it less', 'pt-BR': 'A medida de sucesso foi a engenharia ouvir falar menos disso' },
           body: {
-            en: 'The service’s directories are numbered by layer — building blocks, services, application, domain, infrastructure — so the dependency direction is legible from a directory listing alone, before a single file is open. A layer importing from the wrong direction is a violation visible in the file tree, not just in a code review.',
+            en: 'It would have been cheaper to keep answering the requests. The reason not to is that a request queue makes engineering the slowest part of somebody else’s job, and the work never gets better at it — the tenth time someone asks for a subscription to be corrected costs exactly what the first did. Every screen here was chosen by asking which request we were tired of receiving, and the thing to look at afterwards was not what the portal could do, but what stopped arriving in the queue.',
             'pt-BR':
-              'Os diretórios do serviço são numerados por camada — building blocks, services, application, domain, infrastructure — então a direção de dependência é legível só de olhar a listagem de diretórios, antes de abrir um único arquivo. Uma camada importando na direção errada é uma violação visível na árvore de arquivos, não só numa revisão de código.',
+              'Teria saído mais barato continuar atendendo os pedidos. A razão para não fazer isso é que uma fila de pedidos transforma a engenharia na parte mais lenta do trabalho de outra pessoa, e esse trabalho nunca melhora — a décima vez que alguém pede para corrigir uma assinatura custa exatamente o que custou a primeira. Cada tela daqui foi escolhida perguntando de qual pedido a gente estava cansado de receber, e o que importava olhar depois não era o que o portal conseguia fazer, mas o que parou de chegar na fila.',
           },
         },
         {
@@ -1378,19 +1374,19 @@ export const projects: Project[] = [
           },
         },
         {
-          heading: { en: 'Events dispatched at save time, not stored', 'pt-BR': 'Eventos despachados na gravação, não armazenados' },
+          heading: { en: 'An action, not a database edit', 'pt-BR': 'Uma ação, não uma edição no banco' },
           body: {
-            en: 'An aggregate collects the events it raises while a command changes it; the unit of work writes the row, then publishes those events through MediatR after that write has committed. Nothing is replayed and no state is rebuilt from a log — the table still holds the current row. What this buys is that a consequence of an operation is a subscriber to something the domain said, rather than one more paragraph inside the command that said it.',
+            en: 'What ops does here is not editing rows — it is invoking one of forty-four named actions, each with the product’s own rules in front of it. Cancelling a subscription is a cancel, not an update statement that happens to set a column, and every one of them passes through a pipeline that logs it by name on the way. An engineer running the same change by hand against the database has none of that: no rule, no name, and nothing left behind saying it happened.',
             'pt-BR':
-              'Um agregado acumula os eventos que emite enquanto um comando o altera; a unidade de trabalho grava a linha e então publica esses eventos via MediatR depois que essa escrita foi confirmada. Nada é reproduzido e nenhum estado é reconstruído a partir de um log — a tabela continua guardando a linha atual. O que isso compra é que a consequência de uma operação vira assinante de algo que o domínio disse, em vez de mais um parágrafo dentro do comando que o disse.',
+              'O que a operação faz aqui não é editar linhas — é invocar uma de quarenta e quatro ações nomeadas, cada uma com as regras do próprio produto na frente. Cancelar uma assinatura é um cancelamento, não um update que por acaso mexe numa coluna, e cada uma delas passa por um pipeline que a registra pelo nome no caminho. Um engenheiro rodando a mesma mudança na mão contra o banco não tem nada disso: sem regra, sem nome, e sem deixar nada para trás dizendo que aconteceu.',
           },
         },
         {
-          heading: { en: 'Shared building blocks before shared services', 'pt-BR': 'Blocos de construção compartilhados antes de serviços compartilhados' },
+          heading: { en: 'Support sees the screen, instead of a description of it', 'pt-BR': 'O suporte vê a tela, em vez de uma descrição dela' },
           body: {
-            en: 'The newer services, this one included, start from a common domain, infrastructure and identity layer instead of each inventing its own — the same message and event base types, the same identity building block, the same base entities. That shared foundation is what let a small team add a service without each one arriving in a different style.',
+            en: 'Half of what reached engineering was not a change request at all — it was someone unable to reproduce what a customer was describing. Impersonation answers that directly: support steps into the nutritionist’s or the patient’s own session, sees exactly what they see, and steps back out. It is a deliberate concentration of power in one feature, which is why it lives behind the staff identity below rather than anywhere near a customer account.',
             'pt-BR':
-              'Os serviços mais novos, este incluído, partem de uma camada comum de domínio, infraestrutura e identidade em vez de cada um inventar a própria — os mesmos tipos base de mensagem e evento, o mesmo bloco de identidade, as mesmas entidades base. Essa fundação compartilhada é o que permitiu que um time pequeno acrescentasse um serviço sem cada um chegar num estilo diferente.',
+              'Metade do que chegava na engenharia nem era pedido de mudança — era alguém sem conseguir reproduzir o que o cliente descrevia. A impersonation responde isso direto: o suporte entra na sessão da própria nutricionista ou do próprio paciente, vê exatamente o que a pessoa vê, e sai de volta. É uma concentração deliberada de poder numa funcionalidade só, e é por isso que ela mora atrás da identidade de equipe descrita abaixo, e não perto de uma conta de cliente.',
           },
         },
       ],
@@ -1401,19 +1397,34 @@ export const projects: Project[] = [
             'Impersonation como funcionalidade de primeira classe: o suporte pode agir como a nutricionista ou o paciente que está atendendo, pela navbar do cliente ou pela tela do paciente, e voltar a ser quem é.',
         },
         {
-          en: 'Eighteen controllers spanning the business administered: nutritionists and patients, subscriptions and their configuration, transactions, vouchers, the food catalogue, tags, marketing, materials, events, universities, metrics, accounts.',
+          en: 'Subscriptions: cancel one, grant a special one, change a plan’s limits, and move a nutritionist onto the new payment gateway.',
           'pt-BR':
-            'Dezoito controllers cobrindo o negócio administrado: nutricionistas e pacientes, assinaturas e suas configurações, transações, vouchers, catálogo de alimentos, tags, marketing, materiais, eventos, universidades, métricas, contas.',
+            'Assinaturas: cancelar uma, conceder uma especial, mudar os limites de um plano e migrar uma nutricionista para o novo gateway de pagamento.',
         },
         {
-          en: 'A dashboard with charts mirroring those same domains, so the numbers support looks at come from the same commands that changed them.',
+          en: 'The food catalogue: create, edit, retire and bulk-activate foods and food groups — or import a whole table from a file, which used to be an engineer with a script.',
           'pt-BR':
-            'Um dashboard com gráficos espelhando esses mesmos domínios, então os números que o suporte olha vêm dos mesmos comandos que os alteraram.',
+            'O catálogo de alimentos: criar, editar, desativar e ativar alimentos e grupos em lote — ou importar uma tabela inteira de um arquivo, que antes era um engenheiro com um script.',
         },
         {
-          en: 'Domain events kept separate from integration events, so a change another service needs to hear about is an explicit publication, not a side effect of one that only matters inside this one.',
+          en: 'Vouchers, external vouchers and gift configuration, created and retired by whoever is running the campaign.',
           'pt-BR':
-            'Eventos de domínio mantidos separados dos eventos de integração, então uma mudança que outro serviço precisa saber é uma publicação explícita, não efeito colateral de uma que só importa aqui dentro.',
+            'Vouchers, vouchers externos e configuração de brindes, criados e encerrados por quem está tocando a campanha.',
+        },
+        {
+          en: 'Marketing: featured banners, the customizable cards on the product’s own screens, and the material library.',
+          'pt-BR':
+            'Marketing: banners em destaque, os cards customizáveis nas telas do próprio produto e a biblioteca de materiais.',
+        },
+        {
+          en: 'Nutritionist and patient records: update details, correct an email, and clear a cache that is serving something stale.',
+          'pt-BR':
+            'Cadastros de nutricionista e paciente: atualizar dados, corrigir um e-mail e limpar um cache que está servindo algo desatualizado.',
+        },
+        {
+          en: 'A dashboard whose numbers come from the same commands that changed them, so ops reads its own results.',
+          'pt-BR':
+            'Um dashboard cujos números vêm dos mesmos comandos que os alteraram, então a operação lê os próprios resultados.',
         },
       ],
     },
