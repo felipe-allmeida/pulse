@@ -37,7 +37,7 @@ Safe as written: `.NET 6` (nothing precedes the dot), `net6.0` (digits after the
 - **No invented metrics.** `metrics` is optional; where no real number exists the section is omitted. Every number in this plan is quoted from a `git log`, a line count, or a design document preserved in the source repository, and its origin is named in the task that uses it.
 - **Never read customer data into content.** `C:\Projects\Dietbox\price-adjustment\` holds real subscriber records (`addresses.csv`, `checar-assinantes.csv`, an XLSX of subscriber addresses). `dietbox-iac/terraform.tfstate` and `main.tf` hold a live Azure subscription id. These are read-only context. No row, name, count or identifier derived from them reaches the repository.
 - **The migration wording is the author's, not the repositories'.** The author has confirmed a .NET Framework → .NET 6 migration that these repositories do not show (`Craftbox.Diet` is on 4.8 with a `windows-2019` msbuild pipeline; `dietbox-api` is `net6.0` on Linux App Service). Task 2 therefore **preserves the existing wording verbatim** and adds no framework claim of its own in either direction. Do not "correct" it and do not reinforce it with repository evidence.
-- **Verification before any completion claim.** `cd web && npm test` must pass. Report the actual output.
+- **Verification before any completion claim.** `pnpm -C web test` must pass. Report the actual output.
 
 ### Working directories
 
@@ -107,7 +107,7 @@ it('no project carries a leadership section — it belongs to the venture', () =
 - [ ] **Step 2: Run the tests to verify they fail**
 
 ```bash
-cd web && npx vitest run src/content/ventures.test.ts src/content/content.test.ts
+pnpm -C web exec vitest run src/content/ventures.test.ts src/content/content.test.ts
 ```
 
 Expected: FAIL — `the Dietbox venture exists` (received `undefined`), and `no project carries a leadership section` (received `['dietbox']`).
@@ -172,7 +172,7 @@ This number rises with each of Tasks 3–7 and lands at 12 in Task 7. Each task 
 - [ ] **Step 7: Run the tests**
 
 ```bash
-cd web && npm test
+pnpm -C web test
 ```
 
 Expected: PASS. If `dietbox has a case study` fails, the `leadership` cut took an adjacent field with it — restore and re-cut.
@@ -231,7 +231,7 @@ Then relax `it('dietbox has a case study, localized in every locale', ...)` at l
 - [ ] **Step 2: Run to verify failure**
 
 ```bash
-cd web && npx vitest run src/content/content.test.ts
+pnpm -C web exec vitest run src/content/content.test.ts
 ```
 
 Expected: FAIL — `expected 'Dietbox' to be 'Dietbox Webapp'`.
@@ -283,7 +283,7 @@ In `detail`:
 - [ ] **Step 4: Run the tests**
 
 ```bash
-cd web && npm test
+pnpm -C web test
 ```
 
 Expected: PASS.
@@ -348,7 +348,7 @@ it('dietbox-b2c carries its two real figures and names both audiences', () => {
 - [ ] **Step 2: Run to verify failure**
 
 ```bash
-cd web && npx vitest run src/content/content.test.ts -t dietbox-b2c
+pnpm -C web exec vitest run src/content/content.test.ts -t dietbox-b2c
 ```
 
 Expected: FAIL — `the B2C card is published` (received `undefined`).
@@ -423,7 +423,7 @@ Insert a full `Project` after `dietbox`, before whatever currently follows it:
 - [ ] **Step 5: Run the tests**
 
 ```bash
-cd web && npm test
+pnpm -C web test
 ```
 
 Expected: PASS. If `publishes no hostname, URL or credential` fails on `dietbox-b2c`, a dotted identifier reached `detail` — re-read the Global Constraints table.
@@ -488,7 +488,7 @@ it('dietbox-payment draws its lifecycle from the webhook handlers that exist', (
 - [ ] **Step 2: Run to verify failure**
 
 ```bash
-cd web && npx vitest run src/content/content.test.ts -t dietbox-payment
+pnpm -C web exec vitest run src/content/content.test.ts -t dietbox-payment
 ```
 
 Expected: FAIL — `the payment card is published` (received `undefined`).
@@ -543,7 +543,7 @@ Expected: FAIL — `the payment card is published` (received `undefined`).
 - [ ] **Step 5: Run the tests**
 
 ```bash
-cd web && npm test
+pnpm -C web test
 ```
 
 Expected: PASS.
@@ -601,7 +601,7 @@ it('dietbox-portal separates staff identity from customer identity', () => {
 - [ ] **Step 2: Run to verify failure**
 
 ```bash
-cd web && npx vitest run src/content/content.test.ts -t dietbox-portal
+pnpm -C web exec vitest run src/content/content.test.ts -t dietbox-portal
 ```
 
 Expected: FAIL — `the portal card is published` (received `undefined`).
@@ -670,7 +670,7 @@ Expected: FAIL — `the portal card is published` (received `undefined`).
 - [ ] **Step 5: Run the tests**
 
 ```bash
-cd web && npm test
+pnpm -C web test
 ```
 
 Expected: PASS.
@@ -729,7 +729,7 @@ it('dietbox-notifications carries the figures its design document recorded', () 
 - [ ] **Step 2: Run to verify failure**
 
 ```bash
-cd web && npx vitest run src/content/content.test.ts -t dietbox-notifications
+pnpm -C web exec vitest run src/content/content.test.ts -t dietbox-notifications
 ```
 
 Expected: FAIL — `the notifications card is published` (received `undefined`).
@@ -807,7 +807,7 @@ Expected: FAIL — `the notifications card is published` (received `undefined`).
 - [ ] **Step 5: Run the tests**
 
 ```bash
-cd web && npm test
+pnpm -C web test
 ```
 
 Expected: PASS.
@@ -869,7 +869,7 @@ it('dietbox-socket claims no Redis adapter the repository does not have', () => 
 - [ ] **Step 2: Run to verify failure**
 
 ```bash
-cd web && npx vitest run src/content/content.test.ts -t dietbox-socket
+pnpm -C web exec vitest run src/content/content.test.ts -t dietbox-socket
 ```
 
 Expected: FAIL — `the socket card is published` (received `undefined`). If the second assertion also fails, Task 2 left the Redis step behind; fix that before continuing.
@@ -925,7 +925,7 @@ Note `Socket.IO` appears in `tech` only — it is a forbidden string inside `det
 - [ ] **Step 5: Run the full suite**
 
 ```bash
-cd web && npm test
+pnpm -C web test
 ```
 
 Expected: PASS, including `projects sharing a venture are contiguous in the array` — the Dietbox run must be unbroken and must sit entirely before `ulbra-atende`.
@@ -1000,7 +1000,7 @@ placed where `screenshot` sits on the other cards (after `visibility`, before `l
 Start the dev server and look at `/projects`. Every Dietbox card must show either a real screenshot or the generated diagram, and none must show a broken image.
 
 ```bash
-cd web && npm test
+pnpm -C web test
 ```
 
 Expected: PASS.
@@ -1024,7 +1024,7 @@ The last task exists because three consumers of the project list are asserted in
 - [ ] **Step 1: Regenerate the assistant profile**
 
 ```bash
-cd web && npm run gen:assistant
+pnpm -C web gen:assistant
 ```
 
 - [ ] **Step 2: Inspect the diff**
@@ -1039,7 +1039,7 @@ Expected: the Dietbox venture introduced before its six projects, and one sectio
 - [ ] **Step 3: Verify the downstream consumers pick the new slugs up**
 
 ```bash
-cd web && npm test && npm run build
+pnpm -C web test && pnpm -C web build
 ```
 
 Expected: PASS, and the prerender step emits `/projects/dietbox-b2c`, `/projects/dietbox-payment`, `/projects/dietbox-portal`, `/projects/dietbox-notifications` and `/projects/dietbox-socket` in both locales. Check the prerender output directory for those paths. If any is absent, the route or the sitemap is not deriving from the flat array as this plan assumed — that is a real finding and needs a fix, not a workaround.
@@ -1051,7 +1051,7 @@ Start the dev server and open `/projects` in both locales. Confirm: two venture 
 - [ ] **Step 5: Lint**
 
 ```bash
-cd web && npm run lint
+pnpm -C web lint
 ```
 
 - [ ] **Step 6: Commit**
