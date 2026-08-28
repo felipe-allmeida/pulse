@@ -77,42 +77,203 @@ system Felipe worked on; the "What Felipe did" line is the authoritative stateme
   - **An adapter factory as the only door to a provider** — The platform core resolves an adapter and talks to that. It never learns which insurer it is serving, which is what keeps a tenth integration from touching enrollment logic — and what let provider contracts be introduced behind feature flags and migrated without stopping the product.
   - **Idempotency and duplicate suppression as a requirement, not a repair** — Retries happen, webhooks arrive twice, and consumers run concurrently against the same rows. Intent creation takes an idempotency key, auto-enrollment suppresses the duplicate intent-and-webhook pair, and the eligibility-screening consumer handles serialization conflicts rather than assuming they cannot happen.
 
-### Dietbox — Nutrition software for practitioners and their patients.
+### Dietbox Webapp — The decade-old monolith the product grew on, and still its largest codebase.
 
 - **Role:** Senior Software Engineer, then Head of Technology (2020–2024)
 - **Source:** closed — professional work described without the code (Website: https://dietbox.me)
-- **Stack:** .NET, Azure, Azure AD B2C, PostgreSQL, Redis, Socket.IO, Azure DevOps
-- **What it is:** A Brazilian SaaS used by nutritionists to plan diets and by their patients to follow them. Two audiences with almost nothing in common share one product, one identity system and one platform — and that platform spans a decade-old monolith and a newer generation of services running beside it.
+- **Stack:** C#, ASP.NET MVC, Entity Framework, SQL Server, Azure App Service, Kendo UI, Terraform, Azure DevOps
+- **What it is:** The monolith is the product's centre of gravity: for years it was the only codebase, carrying both the nutritionist and the patient experience through the same release. Everything the product did shipped through this one pipeline, on the one schedule that pipeline allowed.
 - **What Felipe did:** Principal architect for four years — I set the platform’s patterns and configured the Azure estate, including for services other people wrote. Later the whole technology organization reported to me.
-  - The move off .NET Framework on Windows onto .NET 6 on Linux.
-  - Identity end to end: the custom Azure AD B2C policies behind both audiences.
-  - The portal service, and the shared building blocks the newer services start from.
-  - The realtime service, and CI/CD in Azure DevOps.
+  - The build and release pipeline in Azure DevOps, shipping the core project together with its satellites and its gulp-built, Kendo UI front end.
   - Production availability and incident response.
   - NOT his work: The product’s largest codebase was a team effort — about a sixth of that repository’s commits are mine.
 - **Problem it solved:** The nutritionist lives in the tool all day; the patient opens it to read a meal plan. Same product, same identity backbone, opposite expectations. And in 2020 a .NET Framework monolith carried both on Windows App Service, shipping once a day, at night, because that was the only window that felt safe.
-- **Results:** 13 people in the org (engineering, QA, UX and support); ~1.7k commits across six services (mine, of ~5.8k total); 1 month → 1.5 weeks lead time (after Scrum and trunk-based development); −21% monthly cloud spend (after an Azure cost pass) — The commit counts come from the repositories. The rest is my own record of the period.
-- **Architecture:** Two generations of the same product, sharing one identity backbone.
-  - Legacy platform — The .NET Framework monolith the product grew on, and still its largest codebase.
-  - Identity — Azure AD B2C with custom policies, one set per audience, over a single directory.
-  - Portal service — The newer generation: a layered domain over shared building blocks, with event sourcing where the questions are historical.
-  - Realtime — A dedicated socket server, scaled horizontally behind a Redis adapter.
-  - Azure — The estate I configured, with delivery through Azure DevOps.
+- **Results:** ~600 commits in the monolith (mine, of ~3.9k total); 4 years in the same codebase (2020 to 2024) — The commit counts come from the repository. The rest is my own record of the period.
+- **Architecture:** The core project, its data, the jobs beside it, and the Azure estate it deploys onto.
+  - Web application — The core project and its satellites — catalogs, enums, shared infrastructure, resources and reports — behind a gulp-built front end using Kendo UI.
+  - Data layer — Entity Framework over SQL Server, the store the monolith reads and writes through.
+  - Background jobs — The webjobs that run the monolith's scheduled and background work, deployed beside it rather than as a separate service.
+  - Azure estate — The Azure App Service plan, its staging slots, and the VNet integration to SQL Server — declared in Terraform.
 - **What it does:**
   - Diet planning for the practitioner, and the same plan in the patient’s own app.
   - Two sign-up journeys over one identity system — a practitioner subscribing, and a patient invited by the one treating them.
   - Live updates pushed to open clients without a refresh.
   - Subscriptions and recurring billing.
 - **Engineering decisions:**
-  - **Custom identity policies instead of a hosted login** — Two audiences share a product but not a journey: a practitioner signing up for a subscription, a patient invited by the one treating them. Custom B2C policies gave each its own sign-up, sign-in and password flow, branded per audience, over one identity backbone instead of two user stores to keep in sync.
-  - **Shared building blocks before shared services** — The newer services start from a common domain, infrastructure and identity layer rather than each inventing its own. It is what let a small team add a service without each new one arriving in a new style.
-  - **Event sourcing in the portal, not everywhere** — The portal’s questions are historical — what changed, when, and by whom — so its state is derived from events. The rest of the platform is not, because the rest of the platform is not asking that, and event sourcing charges rent on every service that adopts it.
-  - **Realtime as its own service** — Long-lived connections scale on a different axis from request traffic, and behind a Redis adapter any instance can push to a client connected to any other. Keeping it inside the monolith would have tied both to the same deploy — and the monolith deployed once a night.
-- **Leadership on this project:**
-  - **From one nightly deploy to several a day** — I brought in Scrum and trunk-based development. A deploy in daylight stopped being an event.
-  - **A payment migration nobody noticed** — I planned and ran the move of thousands of active subscribers from Iugu to Pagar.me. Revenue never paused — the kind of change whose measure of success is that nothing happened.
-  - **Cloud spend as an engineering problem** — I took a cost pass over the Azure estate — without a feature freeze to pay for it.
-  - **Reporting engineering in the executive’s language** — I started bringing DORA metrics and a roadmap to the executive team, so investment in technology was argued with evidence rather than conviction.
+  - **One core, many satellites** — The core project doesn't carry catalogs, enums, shared infrastructure, resources and reports itself — each lives in its own satellite project, and the scheduled and background work lives in its own webjobs. A change to reference data doesn't touch the same project as a change to the request path.
+  - **Background work ships with the core** — The webjobs that run the monolith's scheduled and background work ship in the same deploy as the core project, rather than as services of their own. One pipeline, one release, one thing to roll back if it goes wrong.
+  - **The estate as code** — The Azure estate is declared in Terraform: the resource groups, the Linux app service plans, the production staging slots, and the VNet integration to SQL Server. The environment a service lands in is reviewable in a diff, not clicked into existence.
+  - **A monolith you strangle, not rewrite** — New capability went into the services beside the monolith, not into the monolith itself. It kept the surface it already served, without a rewrite competing for the same hours as the features shipping everywhere else.
+
+### Dietbox B2C — One identity backbone, two audiences, custom sign-in journeys.
+
+- **Role:** Senior Software Engineer, then Head of Technology (2021–2024)
+- **Source:** closed — professional work described without the code (Website: https://dietbox.me)
+- **Stack:** Azure AD B2C, Identity Experience Framework, XML, OpenID Connect, OAuth 2.0, .NET 6, HTML, CSS, Azure DevOps
+- **What it is:** One Azure AD B2C identity system carrying two audiences that share nothing but the account: a nutritionist subscribing and paying, and a patient arriving by invitation from the one treating them. Four years of custom sign-in journeys, federated providers, silent migration off the legacy store, and session revocation that reaches every open browser.
+- **What Felipe did:** This is the author’s largest personal ownership in the Dietbox estate: half the commits over four years, across both audiences’ sign-in journeys.
+  - The two policy sets — one for the practitioner, one for the patient — each its own sign-up, sign-in and password-reset journey.
+  - Federation with Google, Facebook and Apple, each mapped through its own exchange profile into a common subject claim.
+  - The first-sign-in migration that moves a legacy-store user into the directory during the same journey they log in with.
+  - Session revocation: a stamp on the user compared against the token’s issue time, so a password change or an admin revoke signs the account out everywhere.
+  - The custom sign-in pages, one set per audience, served and filled in at runtime.
+- **Problem it solved:** A hosted login gives a product one journey. This one needed several: a subscriber signing up and paying, a patient arriving by invitation with no password to set, an academy student, and a receptionist acting on someone else’s behalf — all over one directory, without four separate user stores to keep in sync.
+- **Results:** ~7.2k lines of policy XML (across two policy sets); ~730 commits (mine, of ~1.5k total) — The line count is a plain line count over the committed policy files; the commit share comes from the repository.
+- **Architecture:** Two independent policy sets sit above one directory, and everything downstream trusts the tokens they issue.
+  - Practitioner policies — Sign-up, sign-in, subscriber and academy journeys for the nutritionist audience.
+  - Patient policies — Sign-up and sign-in for the patient audience, invited rather than self-registering.
+  - Directory — One user store beneath both policy sets, holding local and federated accounts alike.
+  - Auth service — Validates the tokens this system issues; the rest of the platform never talks to the directory directly.
+  - Custom UI pages — Static markup, one set per audience, served by the identity platform and filled in at runtime.
+- **The sign-in journey:** Every step below corresponds to a technical profile that exists in the policy — this is the orchestration as written, not a simplification of it.
+  - Sign-in — Local credentials, or a federated provider — Google, Facebook or Apple — exchanged into a common subject claim.
+  - Legacy check — Is this a legacy-store user who has not yet been migrated?
+  - Migration — If so, the account is written into the directory with an alternative security identifier linking it back to the legacy credential — in the same journey as the sign-in, not a separate step.
+  - Entitlement — Is the account enabled, and does it belong to a gated journey — subscriber, academy — that requires an active entitlement?
+  - Token — A token is issued, stamped with the time the user’s security record was last valid from.
+- **What it does:**
+  - Federated sign-in with three providers, each exchanged into a common subject claim.
+  - Silent migration off the legacy store during the user’s own sign-in journey.
+  - Per-audience branded pages, one set for the practitioner and one for the patient.
+  - Entitlement gates for subscriber and academy journeys, enforced inside the sign-in flow rather than after it.
+- **Engineering decisions:**
+  - **Custom policies instead of a hosted login** — A hosted login gives one journey. This product needed a subscriber signing up and paying, a patient arriving by invitation, an academy student, and a receptionist — over one directory, without four user stores to keep in sync. Writing the policy directly was the only way to get gated journeys and a first-sign-in migration without forking the user base.
+  - **Migration as a side effect of signing in** — Nobody was asked to reset a password or re-register. The user experiences a login; the system experiences a migration, writing the account into the directory and linking it back to the legacy credential in the same journey.
+  - **Revocation that reaches open sessions** — A token that is merely unrenewable is not revoked. Comparing the token’s issue time against a stamp on the user record is what makes "sign this account out everywhere" actually mean it, rather than "stop this account from getting a new token next time."
+  - **One directory, several journeys** — Separate policies per audience over one shared user store, rather than one policy branching on audience or several stores that would have to be reconciled. The audiences share an identity, not a form.
+
+### Dietbox Payment — Subscriptions and recurring billing, behind a checkout of its own.
+
+- **Role:** Senior Software Engineer, then Head of Technology (2023–2024)
+- **Source:** closed — professional work described without the code (Website: https://dietbox.me)
+- **Stack:** .NET 6, C#, CQRS, Vue 3, Vite, PrimeVue, Pinia, Cypress, Azure DevOps
+- **What it is:** The service responsible for the money: subscription commands on one side, a webhook handler for every event a payment gateway raises on the other, and three gateway integrations behind a common boundary in between. It is kept separate because money has a different failure mode from everything else in the product — its own release train, in a repository it shares with the platform’s other services.
+- **What Felipe did:** As principal architect across the estate, I set the patterns this service is built on: the path-filtered release pipeline that lets it ship on its own train, and the package boundary that keeps a gateway change from becoming a domain change. The commands, the webhook handlers and the checkout itself were the team’s to write.
+  - The release pipeline’s path filter, so a payment hotfix ships on its own branch without redeploying the other three services.
+  - The package boundary each gateway integration sits behind, carried over from the same pattern used across the platform.
+  - The Azure estate this service deploys onto, configured the same way as its neighbours.
+  - NOT his work: The subscription commands, the webhook handlers and the checkout client are a team’s work: across February 2023 to July 2024, the author holds roughly a tenth of the client’s commits and about a fifth of the service’s — the bulk of both belongs to other engineers.
+- **Problem it solved:** A subscription doesn’t live only in the product’s own database — it also lives in whichever gateway is processing it, and that gateway’s opinion of the subscription’s state arrives asynchronously, by webhook, on its own schedule. Which gateway processes it is a vendor decision, not a domain one: swapping providers should not mean touching what a subscription command does. And every one of those webhook deliveries has to be reconciled with what the product already believes happened, not simply trusted.
+- **Architecture:** A Vue checkout out front, CQRS commands and controllers in the middle, and three gateway integrations behind one package boundary — with the gateway’s own webhooks closing the loop asynchronously.
+  - Checkout client — The Vue checkout — subscription, renewal and thank-you views — calls the service’s commands: subscribe, create an invoice, generate a payment link.
+  - Payment service — Subscription, transaction, voucher, extension and webhook controllers sit in front of the CQRS commands that do the work.
+  - Gateway package — A shared package boundary hides which of the three gateway integrations is handling a given call.
+  - Gateway webhooks — The gateway posts its own opinion of the subscription back asynchronously, one webhook handler directory per event.
+- **The subscription lifecycle:** Every step below is a directory in the webhook handler tree, named for the gateway event it answers.
+  - Created — The gateway has created the subscription on its side; the service records it before the first invoice exists.
+  - Activated — The subscription’s first payment cleared; the service marks it active and the customer’s access follows.
+  - Changed — A plan, a price or a payment method changed on the gateway’s side; the service updates its own record to match.
+  - Payment failed — An invoice on the subscription failed to charge on the gateway’s side; the service records the failure.
+  - Suspended — The gateway has suspended the subscription; the service mirrors the state, and access follows it.
+  - Expired — The subscription has run its course and the gateway has closed it; the service marks the record accordingly.
+  - Invoice paid — A marketplace invoice has been paid; the service records the payment against the subaccount it belongs to.
+  - Invoice released — The marketplace has released the funds from a paid invoice to the subaccount holder.
+  - Invoice refunded — A marketplace invoice has been refunded; the service reverses what it recorded against the subaccount.
+- **What it does:**
+  - Subscribing and renewing, with a suspend path when a payment lapses.
+  - Vouchers and plan extensions, adjusting a subscription without cancelling and re-creating it.
+  - Payment links generated on demand, for a charge outside the regular checkout flow.
+  - Marketplace subaccounts, with their own invoice-paid, released and refunded events.
+- **Engineering decisions:**
+  - **One repository, four release trains** — The payment service shares its repository with the auth, foods and jobs services, but each ships on its own release train: its own branch trigger, and a path filter that excludes the other three services’ directories. A payment hotfix does not redeploy auth. A monorepo without a shared deploy.
+  - **The gateway behind a package boundary** — Three gateway integrations — Iugu, Ebanx and TSPay — implement the same interface behind a shared package. Which one processes a given call is an implementation detail the rest of the service does not see, which is what lets a gateway change be an implementation change rather than a domain one.
+  - **The webhook tree is the state machine** — There is one handler per gateway event, named for the event itself — subscription created, invoice paid, invoice refunded — rather than one endpoint switching on a payload field. The directory structure is the lifecycle, readable without opening a single file.
+  - **A checkout that is not the app** — The purchase funnel ships as its own client — its own Vue app, its own Cypress suite reporting through Allure — separately from the rest of the product, on its own cadence.
+
+### Dietbox Portal — The back office, and the newest generation of the platform’s architecture.
+
+- **Role:** Senior Software Engineer, then Head of Technology (2023–2024)
+- **Source:** closed — professional work described without the code (Website: https://dietbox.me)
+- **Stack:** .NET 6, C#, CQRS, MediatR, Event sourcing, ASP.NET Identity, JWT, Vue 3, Vuex, Azure DevOps
+- **What it is:** A back office is where a SaaS company’s real operating procedure lives — the subscriptions, the vouchers, the food catalogue, marketing — and this was the first place the platform’s newer patterns were carried through end to end: layers numbered on disk, commands and queries behind pipeline behaviours, and a core whose state is derived from events rather than only from a current row.
+- **What Felipe did:** The layered design this service is built on — the numbered directories, the command/query pipeline, and where the event-sourced core sits inside it — the identity building block, and the shared building blocks the platform’s newer services now start from, are the author’s. The eighteen business-domain controllers and the admin client’s views were the team’s to build out.
+  - The numbered directory layout — building blocks, services, application, domain, infrastructure — and the dependency direction it makes legible before a file is opened.
+  - The identity building block: its own user store, a JWT builder and validator, access and refresh tokens, and claim-based authorization.
+  - The event-sourcing package among the shared building blocks, and where it sits in the layers below the domain.
+  - The shared building blocks — domain, infrastructure and identity — the platform’s newer services start from instead of each inventing its own.
+  - The client’s persisted token pair and its refresh flow against the accounts endpoint.
+  - NOT his work: Across the service and the admin client together, roughly a third of the commits are the author’s — the rest, including most of the eighteen business-domain controllers and the client’s views, is the team’s.
+- **Problem it solved:** Support and operations were reaching straight into the product database, or into the monolith’s own admin surface, to do what the business runs on day to day — adjusting a subscription, issuing a voucher, updating the food catalogue. A back office with its own domain, its own audit trail and its own identity was the alternative: the same operations, but through commands that record what happened and who did it, behind sign-in that isn’t the customer’s.
+- **Results:** ~276 commits across both repositories (mine, of ~780 total); 3 test projects (domain, application, and integration) — Both figures come from the two repositories’ own commit history.
+- **Architecture:** An admin client in front, a service exposing the eighteen controllers, an application layer of commands and queries behind pipeline behaviours, a domain layer underneath, and infrastructure at the bottom — where the event store from the shared building blocks persists what the domain raises.
+  - Admin client — The Vue 3 client — dashboard, charts, and the eighteen controllers’ views — including the impersonate controls in the navbar and the patient view.
+  - Service — Controllers behind the claim-requirement authorization filter, validating the access token before a request reaches a command or query.
+  - Application — Commands and queries with pipeline behaviours, keeping domain events separate from the integration events other services consume.
+  - Domain — The business rules for the eighteen areas administered — nutritionists, patients, subscriptions, vouchers, the food catalogue, and the rest — raising the events the layers above and below both care about.
+  - Infrastructure — Persistence at the bottom, including the event store from the shared building blocks — the domain’s events land here, not just its current state.
+- **What it does:**
+  - Impersonation as a first-class feature: support can act as the nutritionist or patient they’re helping, from the client’s navbar or the patient view, and step back out.
+  - Eighteen controllers spanning the business administered: nutritionists and patients, subscriptions and their configuration, transactions, vouchers, the food catalogue, tags, marketing, materials, events, universities, metrics, accounts.
+  - A dashboard with charts mirroring those same domains, so the numbers support looks at come from the same commands that changed them.
+  - Domain events kept separate from integration events, so a change another service needs to hear about is an explicit publication, not a side effect of one that only matters inside this one.
+- **Engineering decisions:**
+  - **Layers numbered on disk** — The service’s directories are numbered by layer — building blocks, services, application, domain, infrastructure — so the dependency direction is legible from a directory listing alone, before a single file is open. A layer importing from the wrong direction is a violation visible in the file tree, not just in a code review.
+  - **Staff identity is not customer identity** — The back office authenticates against its own store — an identity building block with its own user database, a JWT builder and validator, access and refresh tokens, and claim-based authorization — not the customer directory. Giving support staff accounts in the customer identity system would have meant handing customer-grade identities administrative scopes; keeping the two separate keeps a back-office session a different thing from a customer session, by construction.
+  - **Event sourcing here, not everywhere** — The portal’s questions are historical — what changed, when, and by whom — so its state is derived from a stream of domain events rather than only from the current row in a table. The rest of the platform isn’t asking that question the same way, so the rest of the platform isn’t built that way; event sourcing earns its place here because the back office’s job is auditability, not because it is the newer pattern.
+  - **Shared building blocks before shared services** — The newer services, this one included, start from a common domain, infrastructure and identity layer instead of each inventing its own — the same event-sourcing package, the same identity building block, the same base entities. That shared foundation is what let a small team add a service without each one arriving in a different style.
+
+### Dietbox Notifications — A messaging bill turned into a product constraint.
+
+- **Role:** Head of Technology (2023–2024)
+- **Source:** closed — professional work described without the code (Website: https://dietbox.me)
+- **Stack:** .NET 6, C#, CQRS, Redis, SQL Server, WhatsApp Business API, Azure DevOps
+- **What it is:** This service exists because of a number on an invoice: the official WhatsApp messaging bill in May 2023. The answer was not a rate limit bolted onto the existing product, but a small domain of its own — a quota, a log of who changed it, and a record of every send.
+- **What Felipe did:** The design document, the domain and the service are the author’s: nineteen of the twenty commits, from the first estimate to the running service.
+  - The capacity-planning document itself — the volume, query-rate and storage estimates the service was built to meet.
+  - The domain model: a notification limit per practitioner, a log of every change to it, and a record of every notification sent.
+  - The two controllers and their commands and queries — adding a limit, sending a notification, and querying both limits and sent records.
+  - The crosscutting packages behind the layers: the WhatsApp provider integration, Redis, and dependency injection.
+- **Problem it solved:** The official WhatsApp Business API bill arrived in May 2023, and the product had no way to meter what it was spending on it. The obvious place to add a limit was the main product itself — but the main product was already too complex to extend safely, and a cost control that risks the product it is protecting is not a cost control. The alternative was a service with zero impact on the product, able to serve other notification channels later.
+- **Results:** ~51k messages a month (the volume being paid for); ~30k queries a day (0.3 QPS average); 5 peak QPS planned for; ~1.4 GB storage over ten years (214 bytes per notification) — These four figures come from the service’s own design document, written before a line of it existed — a capacity plan, not a production measurement taken afterward.
+- **Architecture:** A calling service reaches the notify endpoint, which checks the practitioner’s quota before anything is sent, hands the message to the provider, and records the result either way.
+  - Calling service — Another service in the platform requests a notification on a practitioner’s behalf.
+  - Notify endpoint — The notify controller receives the request and dispatches the send command.
+  - Quota check — The practitioner’s limit is read before the send proceeds — no quota, no message.
+  - Provider — The WhatsApp integration sends the message through the official API, behind the crosscutting provider package.
+  - Sent record — The outcome — sent or refused — is written to the record every notification leaves behind.
+- **A notification, from request to record:**
+  - Requested — A calling service asks for a notification to be sent to a practitioner.
+  - Quota checked — The practitioner’s remaining limit is read against the request.
+  - Dispatched or refused — Within quota, the message goes to the WhatsApp provider; over quota, the send is refused before it costs anything.
+  - Recorded — Either outcome is written to the log of notifications sent, so the answer to "why was this blocked" already exists.
+- **What it does:**
+  - A notify controller and commands to send a notification and to add a practitioner’s limit.
+  - A nutritionist controller and queries over that practitioner’s current limit and history of sent notifications.
+  - Three domain models: the notification limit itself, a log of every change to it, and a record of every notification sent.
+  - A layered service with crosscutting packages for the WhatsApp provider, Redis and dependency injection, kept separate from the domain they support.
+- **Engineering decisions:**
+  - **A separate service specifically to be ignorable** — The stated goal was zero impact on the main product. Isolating the notification service meant it could be switched off, redeployed or rewritten without taking the product down with it — the opposite of bolting a limiter onto code that was already too complex to touch safely.
+  - **A quota is a domain model, not a rate limit** — A bare counter would have answered "can this send happen." Instead, the limit, a log of every change to it, and a record of every send together answer a harder question: why was this one blocked, and who changed the limit that blocked it.
+  - **Capacity planned before the first line** — The monthly volume, the query rate and the ten-year storage footprint were estimated in the design document before the service was built, which is why the storage decision — how much space this would ever need — was a boring, already-answered question rather than a surprise.
+  - **One provider first, the interface for more** — WhatsApp was the bill that started this, so it is the only provider that sends today — but email, SMS and push were the shape the domain and the API were designed to accept later, without the quota model or the sent record needing to change.
+
+### Dietbox Socket — Live updates as a service of its own, so they ship on their own clock.
+
+- **Role:** Senior Software Engineer (2022)
+- **Source:** closed — professional work described without the code (Website: https://dietbox.me)
+- **Stack:** Node, Express, Socket.IO, Application Insights, Azure App Service, Azure DevOps
+- **What it is:** Thirty-four commits over two months in 2022, for a service that has outlived both: a socket server that holds every open connection, joins each client to a room named for its user id, and exposes one endpoint the rest of the platform posts to when something needs pushing out. It sits outside the product because a long-lived connection and a request are not the same kind of traffic.
+- **What Felipe did:** Effectively a solo build: thirty-three of the thirty-four commits, from the handshake to the load-test harness that proved it held up.
+  - The socket server itself: the shared-secret handshake, room assignment by user id, and an immediate disconnect for a client that ends up joined to no room.
+  - The notify endpoint the rest of the platform posts to, and the info and health endpoints used to watch the service itself.
+  - The handler-loading convention: an event handler is a file, picked up automatically from a directory.
+  - The load-test harness, built to deliberately hold a share of clients on long-polling instead of letting all of them upgrade.
+- **Problem it solved:** The monolith deployed once a night, and anything sharing its pipeline shared its cadence — a realtime channel that can only change at three in the morning is a realtime channel nobody changes. Separately, open connections and request traffic do not want the same instance count: one scales with how many people are online, the other with how many requests arrive.
+- **Architecture:** The platform posts a room, an event name and a payload to the notify endpoint; the server resolves who is in that room right now and pushes the event straight to them.
+  - Platform — Another service in the platform posts a room, an event name and a payload to the notify endpoint.
+  - Room resolved — The server looks up which connections are actually joined to that room right now.
+  - Fan-out — The event is pushed to every client currently joined to the room.
+  - Browser — The client receives the event and updates without a refresh.
+- **What it does:**
+  - The notify endpoint the rest of the platform posts to when something needs pushing out.
+  - An info endpoint reporting the live connection count, for monitoring.
+  - A health endpoint reporting its own latency.
+  - A shared-secret handshake that disconnects a client immediately if it ends up joined to no room.
+- **Engineering decisions:**
+  - **Realtime as its own deployable** — Two reasons, both real: open connections and request traffic scale on different axes, and the product deployed once a night — a channel that can only change at three in the morning is one nobody changes. Splitting it into its own service let each axis scale on its own terms and let this one ship on its own clock.
+  - **A room per user id** — Addressing is by identity, not by connection, so the platform can push to a person without knowing how many tabs, devices or reconnects that person currently has open.
+  - **Handlers auto-loaded from a directory** — Adding an event is adding a file — there is no registry to remember to update, and no handler that exists in the code but was never wired in.
+  - **A load test that keeps clients on long-polling** — Not every client upgrades to a websocket. A load test where all of them do measures a population that does not exist, so the harness deliberately holds a share of clients on HTTP long-polling instead.
 
 ### Ulbra Atende — IT service desk for a university, replacing GLPI.
 
