@@ -327,8 +327,8 @@ describe('ProjectDetail', () => {
     await screen.findAllByRole('heading', { level: 1 });
     expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
     expect(screen.getByText(/lives in the tool all day/i)).toBeInTheDocument();
-    expect(screen.getByText('~1.7k')).toBeInTheDocument();
-    expect(screen.getByText(/its own sign-up, sign-in and password flow/i)).toBeInTheDocument();
+    expect(screen.getByText('~600')).toBeInTheDocument();
+    expect(screen.getByText(/reviewable in a diff/i)).toBeInTheDocument();
 
     const websiteLink = screen.getByRole('link', { name: /website/i });
     expect(websiteLink).toHaveAttribute('href', 'https://dietbox.me');

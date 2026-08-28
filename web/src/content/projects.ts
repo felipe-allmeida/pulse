@@ -535,31 +535,31 @@ export const projects: Project[] = [
   },
   {
     slug: 'dietbox',
-    name: 'Dietbox',
+    name: 'Dietbox Webapp',
     tagline: {
-      en: 'Nutrition software for practitioners and their patients.',
-      'pt-BR': 'Software de nutrição para profissionais e seus pacientes.',
+      en: 'The decade-old monolith the product grew on, and still its largest codebase.',
+      'pt-BR': 'O monolito de dez anos em que o produto cresceu, e ainda sua maior base de código.',
     },
     description: {
-      en: 'A Brazilian SaaS where nutritionists build diet plans and their patients follow them — two audiences over one identity backbone and one platform.',
+      en: 'The monolith that carried both the nutritionist and the patient experience before any other service existed, deploying once a night because that was the only window that felt safe — and the codebase a newer generation of services has since grown up beside.',
       'pt-BR':
-        'Um SaaS brasileiro em que nutricionistas montam planos alimentares e seus pacientes os seguem — dois públicos sobre uma única base de identidade e uma única plataforma.',
+        'O monolito que atendeu nutricionistas e pacientes antes de existir qualquer outro serviço, com deploy uma vez por noite porque essa era a única janela que parecia segura — e a base de código ao lado da qual uma geração mais nova de serviços cresceu desde então.',
     },
-    tech: ['.NET', 'Azure', 'Azure AD B2C', 'PostgreSQL', 'Redis', 'Socket.IO', 'Azure DevOps'],
+    tech: ['C#', 'ASP.NET MVC', 'Entity Framework', 'SQL Server', 'Azure App Service', 'Kendo UI', 'Terraform', 'Azure DevOps'],
     role: {
       en: 'Senior Software Engineer, then Head of Technology',
       'pt-BR': 'Engenheiro de Software Sênior, depois Head de Tecnologia',
     },
     period: { en: '2020–2024', 'pt-BR': '2020–2024' },
+    venture: 'dietbox',
     visibility: 'private',
     screenshot: '/screenshots/dietbox.webp',
     links: [{ label: 'Website', href: 'https://dietbox.me' }],
-    venture: 'dietbox',
     detail: {
       overview: {
-        en: 'A Brazilian SaaS used by nutritionists to plan diets and by their patients to follow them. Two audiences with almost nothing in common share one product, one identity system and one platform — and that platform spans a decade-old monolith and a newer generation of services running beside it.',
+        en: "The monolith is the product's centre of gravity: for years it was the only codebase, carrying both the nutritionist and the patient experience through the same release. Everything the product did shipped through this one pipeline, on the one schedule that pipeline allowed.",
         'pt-BR':
-          'Um SaaS brasileiro usado por nutricionistas para montar dietas e por seus pacientes para segui-las. Dois públicos com quase nada em comum dividem um produto, um sistema de identidade e uma plataforma — e essa plataforma vai de um monolito de dez anos a uma geração mais nova de serviços rodando ao lado dele.',
+          'O monolito é o centro de gravidade do produto: por anos foi a única base de código, levando tanto a experiência da nutricionista quanto a do paciente na mesma entrega. Tudo que o produto fazia passava por esse único pipeline, na única janela que esse pipeline permitia.',
       },
       contribution: {
         summary: {
@@ -569,21 +569,9 @@ export const projects: Project[] = [
         },
         areas: [
           {
-            en: 'The move off .NET Framework on Windows onto .NET 6 on Linux.',
-            'pt-BR': 'A saída do .NET Framework no Windows para .NET 6 no Linux.',
-          },
-          {
-            en: 'Identity end to end: the custom Azure AD B2C policies behind both audiences.',
+            en: 'The build and release pipeline in Azure DevOps, shipping the core project together with its satellites and its gulp-built, Kendo UI front end.',
             'pt-BR':
-              'Identidade de ponta a ponta: as políticas customizadas de Azure AD B2C por trás dos dois públicos.',
-          },
-          {
-            en: 'The portal service, and the shared building blocks the newer services start from.',
-            'pt-BR': 'O serviço de portal e os blocos compartilhados dos quais os serviços mais novos partem.',
-          },
-          {
-            en: 'The realtime service, and CI/CD in Azure DevOps.',
-            'pt-BR': 'O serviço de tempo real e o CI/CD no Azure DevOps.',
+              'O pipeline de build e release no Azure DevOps, entregando o projeto principal junto com seus satélites e seu front end construído em gulp com Kendo UI.',
           },
           {
             en: 'Production availability and incident response.',
@@ -603,77 +591,55 @@ export const projects: Project[] = [
       },
       metrics: [
         {
-          value: { en: '13', 'pt-BR': '13' },
-          label: { en: 'people in the org', 'pt-BR': 'pessoas na área' },
-          note: { en: 'engineering, QA, UX and support', 'pt-BR': 'engenharia, QA, UX e suporte' },
+          value: { en: '~600', 'pt-BR': '~600' },
+          label: { en: 'commits in the monolith', 'pt-BR': 'commits no monolito' },
+          note: { en: 'mine, of ~3.9k total', 'pt-BR': 'meus, de ~3,9 mil no total' },
         },
         {
-          value: { en: '~1.7k', 'pt-BR': '~1,7 mil' },
-          label: { en: 'commits across six services', 'pt-BR': 'commits em seis serviços' },
-          note: { en: 'mine, of ~5.8k total', 'pt-BR': 'meus, de ~5,8 mil no total' },
-        },
-        {
-          value: { en: '1 month → 1.5 weeks', 'pt-BR': '1 mês → 1,5 semanas' },
-          label: { en: 'lead time', 'pt-BR': 'lead time' },
-          note: {
-            en: 'after Scrum and trunk-based development',
-            'pt-BR': 'depois de Scrum e trunk-based development',
-          },
-        },
-        {
-          value: { en: '−21%', 'pt-BR': '−21%' },
-          label: { en: 'monthly cloud spend', 'pt-BR': 'custo mensal de nuvem' },
-          note: { en: 'after an Azure cost pass', 'pt-BR': 'depois de uma revisão de custos no Azure' },
+          value: { en: '4 years', 'pt-BR': '4 anos' },
+          label: { en: 'in the same codebase', 'pt-BR': 'na mesma base de código' },
+          note: { en: '2020 to 2024', 'pt-BR': 'de 2020 a 2024' },
         },
       ],
       metricsNote: {
-        en: 'The commit counts come from the repositories. The rest is my own record of the period.',
-        'pt-BR':
-          'Os números de commit vêm dos repositórios. O resto é meu próprio registro do período.',
+        en: 'The commit counts come from the repository. The rest is my own record of the period.',
+        'pt-BR': 'Os números de commit vêm do repositório. O resto é meu próprio registro do período.',
       },
       architecture: {
         summary: {
-          en: 'Two generations of the same product, sharing one identity backbone.',
-          'pt-BR': 'Duas gerações do mesmo produto, dividindo uma única base de identidade.',
+          en: "The core project, its data, the jobs beside it, and the Azure estate it deploys onto.",
+          'pt-BR': 'O projeto principal, seus dados, os jobs ao lado dele, e o ambiente Azure onde é publicado.',
         },
         steps: [
           {
-            label: 'Legacy platform',
+            label: 'Web application',
             detail: {
-              en: 'The .NET Framework monolith the product grew on, and still its largest codebase.',
+              en: 'The core project and its satellites — catalogs, enums, shared infrastructure, resources and reports — behind a gulp-built front end using Kendo UI.',
               'pt-BR':
-                'O monolito .NET Framework em que o produto cresceu, e ainda sua maior base de código.',
+                'O projeto principal e seus satélites — catálogos, enums, infraestrutura compartilhada, recursos e relatórios — atrás de um front end construído em gulp com Kendo UI.',
             },
           },
           {
-            label: 'Identity',
+            label: 'Data layer',
             detail: {
-              en: 'Azure AD B2C with custom policies, one set per audience, over a single directory.',
-              'pt-BR':
-                'Azure AD B2C com políticas customizadas, um conjunto por público, sobre um único diretório.',
+              en: 'Entity Framework over SQL Server, the store the monolith reads and writes through.',
+              'pt-BR': 'Entity Framework sobre SQL Server, a base que o monolito lê e grava.',
             },
           },
           {
-            label: 'Portal service',
+            label: 'Background jobs',
             detail: {
-              en: 'The newer generation: a layered domain over shared building blocks, with event sourcing where the questions are historical.',
+              en: "The webjobs that run the monolith's scheduled and background work, deployed beside it rather than as a separate service.",
               'pt-BR':
-                'A geração mais nova: um domínio em camadas sobre blocos compartilhados, com event sourcing onde as perguntas são históricas.',
+                'Os webjobs que executam o trabalho agendado e em segundo plano do monolito, publicados ao lado dele em vez de como um serviço separado.',
             },
           },
           {
-            label: 'Realtime',
+            label: 'Azure estate',
             detail: {
-              en: 'A dedicated socket server, scaled horizontally behind a Redis adapter.',
+              en: 'The Azure App Service plan, its staging slots, and the VNet integration to SQL Server — declared in Terraform.',
               'pt-BR':
-                'Um servidor de sockets dedicado, escalado horizontalmente atrás de um adaptador Redis.',
-            },
-          },
-          {
-            label: 'Azure',
-            detail: {
-              en: 'The estate I configured, with delivery through Azure DevOps.',
-              'pt-BR': 'O ambiente que configurei, com entrega via Azure DevOps.',
+                'O plano do Azure App Service, seus slots de staging e a integração de VNet com o SQL Server — declarados em Terraform.',
             },
           },
         ],
@@ -700,43 +666,46 @@ export const projects: Project[] = [
       decisions: [
         {
           heading: {
-            en: 'Custom identity policies instead of a hosted login',
-            'pt-BR': 'Políticas de identidade customizadas em vez de um login pronto',
+            en: 'One core, many satellites',
+            'pt-BR': 'Um núcleo, vários satélites',
           },
           body: {
-            en: 'Two audiences share a product but not a journey: a practitioner signing up for a subscription, a patient invited by the one treating them. Custom B2C policies gave each its own sign-up, sign-in and password flow, branded per audience, over one identity backbone instead of two user stores to keep in sync.',
+            en: "The core project doesn't carry catalogs, enums, shared infrastructure, resources and reports itself — each lives in its own satellite project, and the scheduled and background work lives in its own webjobs. A change to reference data doesn't touch the same project as a change to the request path.",
             'pt-BR':
-              'Dois públicos dividem um produto, mas não um caminho: a profissional que assina, o paciente convidado por ela. Políticas customizadas de B2C deram a cada um seu próprio fluxo de cadastro, login e senha, com marca própria, sobre uma única base de identidade em vez de duas bases de usuários para manter sincronizadas.',
+              'O projeto principal não carrega catálogos, enums, infraestrutura compartilhada, recursos e relatórios sozinho — cada um vive em seu próprio projeto satélite, e o trabalho agendado e em segundo plano vive em seus próprios webjobs. Uma mudança em dado de referência não toca o mesmo projeto que uma mudança no caminho de requisição.',
           },
         },
         {
           heading: {
-            en: 'Shared building blocks before shared services',
-            'pt-BR': 'Blocos compartilhados antes de serviços compartilhados',
+            en: 'Background work ships with the core',
+            'pt-BR': 'O trabalho em segundo plano sobe junto com o núcleo',
           },
           body: {
-            en: 'The newer services start from a common domain, infrastructure and identity layer rather than each inventing its own. It is what let a small team add a service without each new one arriving in a new style.',
+            en: "The webjobs that run the monolith's scheduled and background work ship in the same deploy as the core project, rather than as services of their own. One pipeline, one release, one thing to roll back if it goes wrong.",
             'pt-BR':
-              'Os serviços mais novos partem de uma camada comum de domínio, infraestrutura e identidade em vez de cada um inventar a sua. É o que permitiu a um time pequeno adicionar um serviço sem que cada novo chegasse num estilo novo.',
+              'Os webjobs que executam o trabalho agendado e em segundo plano do monolito sobem no mesmo deploy do projeto principal, em vez de existirem como serviços à parte. Um pipeline, uma release, uma coisa só para reverter se der errado.',
           },
         },
         {
           heading: {
-            en: 'Event sourcing in the portal, not everywhere',
-            'pt-BR': 'Event sourcing no portal, não em tudo',
+            en: 'The estate as code',
+            'pt-BR': 'O ambiente como código',
           },
           body: {
-            en: 'The portal’s questions are historical — what changed, when, and by whom — so its state is derived from events. The rest of the platform is not, because the rest of the platform is not asking that, and event sourcing charges rent on every service that adopts it.',
+            en: 'The Azure estate is declared in Terraform: the resource groups, the Linux app service plans, the production staging slots, and the VNet integration to SQL Server. The environment a service lands in is reviewable in a diff, not clicked into existence.',
             'pt-BR':
-              'As perguntas do portal são históricas — o que mudou, quando e por quem —, então seu estado é derivado de eventos. O resto da plataforma não é, porque o resto da plataforma não faz essa pergunta, e event sourcing tem um custo de manutenção em todo serviço que o adota.',
+              'O ambiente Azure é declarado em Terraform: os grupos de recursos, os planos de Linux App Service, os slots de staging de produção e a integração de VNet com o SQL Server. O ambiente em que um serviço é publicado fica revisável em um diff, não configurado manualmente na tela.',
           },
         },
         {
-          heading: { en: 'Realtime as its own service', 'pt-BR': 'Tempo real como serviço próprio' },
+          heading: {
+            en: 'A monolith you strangle, not rewrite',
+            'pt-BR': 'Um monolito que se estrangula, não se reescreve',
+          },
           body: {
-            en: 'Long-lived connections scale on a different axis from request traffic, and behind a Redis adapter any instance can push to a client connected to any other. Keeping it inside the monolith would have tied both to the same deploy — and the monolith deployed once a night.',
+            en: 'New capability went into the services beside the monolith, not into the monolith itself. It kept the surface it already served, without a rewrite competing for the same hours as the features shipping everywhere else.',
             'pt-BR':
-              'Conexões de longa duração escalam num eixo diferente do tráfego de requisições, e atrás de um adaptador Redis qualquer instância consegue enviar a um cliente conectado em outra. Mantê-lo dentro do monolito teria amarrado os dois ao mesmo deploy — e o monolito subia uma vez por madrugada.',
+              'Nova capacidade foi para os serviços ao lado do monolito, não para dentro dele. Ele manteve a superfície que já atendia, sem uma reescrita disputando as mesmas horas com as funcionalidades entregues no resto da plataforma.',
           },
         },
       ],

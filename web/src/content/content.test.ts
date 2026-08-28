@@ -524,7 +524,7 @@ it('dietbox has a case study, localized in every locale', () => {
   expectBothLocales(detail!.problem!, 'problem');
   expectBothLocales(detail!.metricsNote!, 'metricsNote');
 
-  expect(detail!.metrics).toHaveLength(4);
+  expect(detail!.metrics).toHaveLength(2);
   for (const metric of detail!.metrics!) {
     expectBothLocales(metric.value, 'metric.value');
     expectBothLocales(metric.label, 'metric.label');
@@ -532,7 +532,7 @@ it('dietbox has a case study, localized in every locale', () => {
   }
 
   expectBothLocales(detail!.architecture!.summary!, 'architecture.summary');
-  expect(detail!.architecture!.steps).toHaveLength(5);
+  expect(detail!.architecture!.steps).toHaveLength(4);
   for (const step of detail!.architecture!.steps) {
     expect(step.label.trim()).not.toBe('');
     expectBothLocales(step.detail, 'architecture.step.detail');
@@ -556,10 +556,20 @@ it('dietbox names the shared work — its largest codebase was a team effort', (
   expectBothLocales(boundary!, 'dietbox contribution.boundary');
 });
 
-it('dietbox sits between kota-embed and the ulbra projects', () => {
+it('the Dietbox run sits between kota-embed and the ULBRA run', () => {
   const slugs = projects.map((p) => p.slug);
+  const dietbox = projects.filter((p) => p.venture === 'dietbox').map((p) => p.slug);
+  expect(dietbox[0], 'the webapp card leads the run').toBe('dietbox');
   expect(slugs.indexOf('dietbox')).toBeGreaterThan(slugs.indexOf('kota-embed'));
-  expect(slugs.indexOf('dietbox')).toBeLessThan(slugs.indexOf('ulbra-atende'));
+  expect(slugs.indexOf(dietbox.at(-1)!)).toBeLessThan(slugs.indexOf('ulbra-atende'));
+});
+
+it('the webapp card is about the monolith, not about the company', () => {
+  const webapp = projects.find((p) => p.slug === 'dietbox')!;
+  expect(webapp.name, 'a card named "Dietbox" under a header named "Dietbox" reads as a duplicate').toBe(
+    'Dietbox Webapp',
+  );
+  expect(webapp.detail!.metrics, 'org-level numbers belong to the venture').toHaveLength(2);
 });
 
 it('dietbox links to its product, not its source', () => {
