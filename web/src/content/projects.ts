@@ -165,9 +165,9 @@ export const projects: Project[] = [
       },
       contribution: {
         summary: {
-          en: 'Solo project — the design, the event-driven backend, the front end, and the infrastructure it runs on.',
+          en: 'I built this one alone — the design, the event-driven backend, the front end, and the infrastructure it runs on.',
           'pt-BR':
-            'Projeto solo — o design, o backend orientado a eventos, o front-end e a infraestrutura em que roda.',
+            'Construí este sozinho — o design, o backend orientado a eventos, o front-end e a infraestrutura em que roda.',
         },
         areas: [
           { en: 'The realtime presence pipeline and its world map.', 'pt-BR': 'O pipeline de presença em tempo real e seu mapa-múndi.' },
@@ -735,15 +735,15 @@ export const projects: Project[] = [
     venture: 'dietbox',
     detail: {
       overview: {
-        en: 'One Azure AD B2C identity system carrying two audiences that share nothing but the account: a nutritionist subscribing and paying, and a patient arriving by invitation from the one treating them. Three years of custom sign-in journeys, federated providers, silent migration off the legacy store, and session revocation that reaches every open browser.',
+        en: 'One Azure AD B2C identity system carrying two audiences that share nothing but the account: a nutritionist subscribing and paying, and a patient arriving by invitation from the one treating them. Five clients sign in through it — the nutritionist’s mobile app, the patient’s Android app, the patient’s iOS app, the web product both audiences use, and the checkout — across three platforms and two tenants. Three years of custom sign-in journeys, federated providers, silent migration off the legacy store, and session revocation that reaches every open browser.',
         'pt-BR':
-          'Um único sistema de identidade em Azure AD B2C carregando dois públicos que não dividem nada além da conta: a nutricionista que assina e paga, e o paciente que chega por convite de quem o atende. Três anos de jornadas de login customizadas, provedores federados, migração silenciosa da base legada e revogação de sessão que alcança todo navegador aberto.',
+          'Um único sistema de identidade em Azure AD B2C carregando dois públicos que não dividem nada além da conta: a nutricionista que assina e paga, e o paciente que chega por convite de quem o atende. Cinco clientes fazem login por ele — o app da nutricionista, o app Android do paciente, o app iOS do paciente, o produto web que os dois públicos usam e o checkout — em três plataformas e dois tenants. Três anos de jornadas de login customizadas, provedores federados, migração silenciosa da base legada e revogação de sessão que alcança todo navegador aberto.',
       },
       contribution: {
         summary: {
-          en: 'This is the author’s largest personal ownership in the Dietbox estate: half the commits over three years, across both audiences’ sign-in journeys.',
+          en: 'This is the most of me there is anywhere in the Dietbox estate: I wrote half the commits over three years, across both audiences’ sign-in journeys.',
           'pt-BR':
-            'Esta é a maior propriedade pessoal do autor no conjunto Dietbox: metade dos commits ao longo de três anos, cobrindo as jornadas de login dos dois públicos.',
+            'É o que mais tem de mim em toda a Dietbox: escrevi metade dos commits ao longo de três anos, cobrindo as jornadas de login dos dois públicos.',
         },
         areas: [
           {
@@ -852,6 +852,13 @@ export const projects: Project[] = [
         },
         steps: [
           {
+            label: 'Clients',
+            detail: {
+              en: 'Two patient apps, the nutritionist’s app, the web product and the checkout — every one of them starts here.',
+              'pt-BR': 'Dois apps do paciente, o app da nutricionista, o produto web e o checkout — todos começam por aqui.',
+            },
+          },
+          {
             label: 'Practitioner policies',
             detail: {
               en: 'Sign-up, sign-in, subscriber and academy journeys for the nutritionist audience.',
@@ -925,6 +932,17 @@ export const projects: Project[] = [
         },
         {
           heading: {
+            en: 'Two ways in, because a phone cannot open a redirect',
+            'pt-BR': 'Duas formas de entrar, porque um celular não abre um redirect',
+          },
+          body: {
+            en: 'Three of the five clients are native apps, and a native app signing a user in through a browser redirect is a bad experience and a worse one to recover from. So the same directory answers two shapes of request: the redirect journey the web product and the checkout use, and a direct credential exchange the apps use, each with its own refresh-token redemption. The entitlement checks and the migration behaviour live in the policy, not in the client, so the two shapes cannot drift into two different sets of rules.',
+            'pt-BR':
+              'Três dos cinco clientes são apps nativos, e um app nativo que loga o usuário por redirect de navegador é uma experiência ruim e pior ainda de recuperar. Então o mesmo diretório responde a dois formatos de requisição: a jornada de redirect que o produto web e o checkout usam, e uma troca direta de credenciais que os apps usam, cada uma com sua própria renovação de refresh token. Os bloqueios de acesso e o comportamento de migração ficam na política, não no cliente, para que os dois formatos não derivem para dois conjuntos de regras diferentes.',
+          },
+        },
+        {
+          heading: {
             en: 'One directory, several journeys',
             'pt-BR': 'Um diretório, várias jornadas',
           },
@@ -936,6 +954,26 @@ export const projects: Project[] = [
         },
       ],
       highlights: [
+        {
+          en: 'Sign-up and sign-in for each audience, on its own policy and its own branded pages.',
+          'pt-BR': 'Cadastro e login para cada público, na própria política e nas próprias páginas com marca.',
+        },
+        {
+          en: 'Two further gated sign-ins for the nutritionist on top of the ordinary one — subscribers, and academy students — each a policy of its own.',
+          'pt-BR': 'Mais dois logins com bloqueio de acesso para a nutricionista além do comum — assinantes e alunos da academy —, cada um com política própria.',
+        },
+        {
+          en: 'Password reset, password change and profile edit, each an entry point of its own, per audience.',
+          'pt-BR': 'Recuperação de senha, troca de senha e edição de perfil, cada um um ponto de entrada próprio, por público.',
+        },
+        {
+          en: 'A direct credential exchange for the native apps, alongside the browser redirect the web clients use — same directory, same rules, two shapes.',
+          'pt-BR': 'Uma troca direta de credenciais para os apps nativos, ao lado do redirect de navegador que os clientes web usam — mesmo diretório, mesmas regras, dois formatos.',
+        },
+        {
+          en: 'Refresh-token redemption as a journey of its own, one per entitlement, so a renewed token is re-checked rather than assumed still valid.',
+          'pt-BR': 'Renovação de refresh token como jornada própria, uma por tipo de acesso, para que um token renovado seja reconferido em vez de presumido válido.',
+        },
         {
           en: 'Federated sign-in with three providers, each exchanged into a common subject claim.',
           'pt-BR': 'Login federado com três provedores, cada um trocado por uma claim de subject comum.',
@@ -1007,9 +1045,9 @@ export const projects: Project[] = [
           },
         ],
         boundary: {
-          en: 'The subscription commands, the webhook handlers and the checkout client are a team’s work: the author holds roughly a tenth of the checkout client’s commits, across February 2023 to July 2024, and about a fifth of the service’s, whose repository does not begin until October 2023 — the bulk of both belongs to other engineers.',
+          en: 'The subscription commands, the webhook handlers and the checkout client were a team’s work: I hold roughly a tenth of the checkout client’s commits, across February 2023 to July 2024, and about a fifth of the service’s, whose repository does not begin until October 2023 — the bulk of both belongs to other engineers.',
           'pt-BR':
-            'Os comandos de assinatura, os handlers de webhook e o cliente de checkout foram trabalho de um time: o autor tem aproximadamente um décimo dos commits do cliente de checkout, entre fevereiro de 2023 e julho de 2024, e cerca de um quinto dos do serviço, cujo repositório só começa em outubro de 2023 — a maior parte dos dois pertence a outros engenheiros.',
+            'Os comandos de assinatura, os handlers de webhook e o cliente de checkout foram trabalho de um time: tenho aproximadamente um décimo dos commits do cliente de checkout, entre fevereiro de 2023 e julho de 2024, e cerca de um quinto dos do serviço, cujo repositório só começa em outubro de 2023 — a maior parte dos dois pertence a outros engenheiros.',
         },
       },
       problem: {
@@ -1205,6 +1243,7 @@ export const projects: Project[] = [
     },
     period: { en: '2023–2024', 'pt-BR': '2023–2024' },
     visibility: 'private',
+    screenshot: '/screenshots/dietbox-portal.webp',
     links: [{ label: 'Website', href: 'https://dietbox.me' }],
     venture: 'dietbox',
     detail: {
@@ -1215,9 +1254,9 @@ export const projects: Project[] = [
       },
       contribution: {
         summary: {
-          en: 'The layered design this service is built on — the numbered directories, the command/query pipeline, and where the domain-event dispatch sits inside it — the identity building block, and the shared building blocks the platform’s newer services now start from, are the author’s. The eighteen business-domain controllers and the admin client’s views were the team’s to build out.',
+          en: 'I set the layered design this service is built on — the numbered directories, the command/query pipeline, and where the domain-event dispatch sits inside it — and I wrote the identity building block and the shared building blocks the platform’s newer services now start from. The eighteen business-domain controllers and the admin client’s views were the team’s to build out.',
           'pt-BR':
-            'O design em camadas sobre o qual este serviço é construído — os diretórios numerados, o pipeline de comandos e queries, e o lugar onde o despacho de eventos de domínio se encaixa nele — o bloco de identidade e os blocos de construção compartilhados dos quais os serviços mais novos da plataforma partem, são do autor. Os dezoito controllers de domínio de negócio e as telas do cliente admin foram construídos pelo time.',
+            'Defini o design em camadas sobre o qual este serviço é construído — os diretórios numerados, o pipeline de comandos e queries, e o lugar onde o despacho de eventos de domínio se encaixa nele — e escrevi o bloco de identidade e os blocos compartilhados dos quais os serviços mais novos da plataforma partem. Os dezoito controllers de domínio de negócio e as telas do cliente admin foram construídos pelo time.',
         },
         areas: [
           {
@@ -1246,9 +1285,9 @@ export const projects: Project[] = [
           },
         ],
         boundary: {
-          en: 'Across the service and the admin client together, roughly a third of the commits are the author’s — the rest, including most of the eighteen business-domain controllers and the client’s views, is the team’s.',
+          en: 'Across the service and the admin client together, roughly a third of the commits are mine — the rest, including most of the eighteen business-domain controllers and the client’s views, is the team’s.',
           'pt-BR':
-            'Entre o serviço e o cliente admin juntos, cerca de um terço dos commits são do autor — o restante, incluindo a maior parte dos dezoito controllers de domínio de negócio e das telas do cliente, é do time.',
+            'Entre o serviço e o cliente admin juntos, cerca de um terço dos commits são meus — o restante, incluindo a maior parte dos dezoito controllers de domínio de negócio e das telas do cliente, é do time.',
         },
       },
       problem: {
@@ -1383,13 +1422,13 @@ export const projects: Project[] = [
     slug: 'dietbox-notifications',
     name: 'Dietbox Notifications',
     tagline: {
-      en: 'A messaging bill turned into a product constraint.',
-      'pt-BR': 'Uma conta de mensageria transformada em restrição de produto.',
+      en: 'Everything the product sends out, moved into a service of its own.',
+      'pt-BR': 'Tudo o que o produto envia para fora, movido para um serviço próprio.',
     },
     description: {
-      en: 'An isolated service that meters outbound messaging: a pre-paid send quota per practitioner, a log of every quota change, and a record of every notification sent. Built beside the product rather than inside it, so a cost problem did not become a platform problem.',
+      en: 'An isolated service that owns outbound messaging: it sends the practitioner’s WhatsApp notifications and keeps a record of every one. Built beside the product rather than inside it, so a cost problem did not have to be solved inside code that was already too complex to touch safely.',
       'pt-BR':
-        'Um serviço isolado que mede a mensageria de saída: uma cota pré-paga de envios por profissional, um log de cada mudança de cota e um registro de cada notificação enviada. Construído ao lado do produto, e não dentro dele, para que um problema de custo não virasse um problema de plataforma.',
+        'Um serviço isolado que passa a ser o dono da mensageria de saída: envia as notificações de WhatsApp da profissional e guarda o registro de cada uma. Construído ao lado do produto, e não dentro dele, para que um problema de custo não precisasse ser resolvido dentro de um código que já era complexo demais para tocar com segurança.',
     },
     tech: ['.NET 6', 'C#', 'CQRS', 'SQL Server', 'WhatsApp Business API', 'Azure DevOps'],
     role: {
@@ -1402,15 +1441,15 @@ export const projects: Project[] = [
     venture: 'dietbox',
     detail: {
       overview: {
-        en: 'This service exists because of a number on an invoice: the official WhatsApp messaging bill in May 2023. The answer was not a rate limit bolted onto the existing product, but a small domain of its own — a quota, a log of who changed it, and a record of every send.',
+        en: 'This service exists because of a number on an invoice: the official WhatsApp messaging bill in May 2023. The answer was not a rate limit bolted onto the existing product, but a small service of its own that took over sending — and, because it owned every send, could account for them.',
         'pt-BR':
-          'Este serviço existe por causa de um número numa fatura: a conta de mensageria oficial do WhatsApp em maio de 2023. A resposta não foi um limite de taxa colado no produto existente, mas um pequeno domínio próprio — uma cota, um log de quem a alterou, e um registro de cada envio.',
+          'Este serviço existe por causa de um número numa fatura: a conta de mensageria oficial do WhatsApp em maio de 2023. A resposta não foi um limite de taxa colado no produto existente, mas um serviço pequeno e próprio que assumiu o envio — e, por ser dono de cada envio, conseguia prestar contas deles.',
       },
       contribution: {
         summary: {
-          en: 'The design document, the domain and the service are the author’s: nineteen of the twenty commits, from the first estimate to the running service.',
+          en: 'I wrote the design document, the domain and the service: nineteen of the twenty commits, from the first estimate to the running service.',
           'pt-BR':
-            'O documento de design, o domínio e o serviço são do autor: dezenove dos vinte commits, da primeira estimativa ao serviço em produção.',
+            'Escrevi o documento de design, o domínio e o serviço: dezenove dos vinte commits, da primeira estimativa ao serviço em produção.',
         },
         areas: [
           {
@@ -1419,14 +1458,14 @@ export const projects: Project[] = [
               'O próprio documento de planejamento de capacidade — as estimativas de volume, taxa de consultas e armazenamento que o serviço foi construído para atender.',
           },
           {
-            en: 'The domain model: a notification limit per practitioner, a log of every change to it, and a record of every notification sent.',
+            en: 'The domain model, and the record of every notification sent that sits at the middle of it.',
             'pt-BR':
-              'O modelo de domínio: um limite de notificações por profissional, um log de cada mudança nele, e um registro de cada notificação enviada.',
+              'O modelo de domínio, e o registro de cada notificação enviada que fica no centro dele.',
           },
           {
-            en: 'The two controllers and their commands and queries — adding a limit, sending a notification, and querying both limits and sent records.',
+            en: 'The two controllers and their commands and queries — sending a notification, and reading back what was sent.',
             'pt-BR':
-              'Os dois controllers e seus comandos e queries — adicionar um limite, enviar uma notificação, e consultar tanto limites quanto registros enviados.',
+              'Os dois controllers e seus comandos e queries — enviar uma notificação e ler de volta o que foi enviado.',
           },
           {
             en: 'The crosscutting packages behind the layers: the WhatsApp provider integration and dependency injection.',
@@ -1436,9 +1475,9 @@ export const projects: Project[] = [
         ],
       },
       problem: {
-        en: 'The official WhatsApp Business API bill arrived in May 2023, and the product had no way to meter what it was spending on it. The obvious place to add a limit was the main product itself — but the main product was already too complex to extend safely, and a cost control that risks the product it is protecting is not a cost control. The alternative was a service with zero impact on the product, able to serve other notification channels later.',
+        en: 'The official WhatsApp Business API bill arrived in May 2023, and nothing in the product could say what it was spending it on — sends went out from several places and were recorded in none. The obvious place to fix that was the main product itself, but the main product was already too complex to extend safely. The alternative was to move sending out entirely: one service that owns the channel, records every message, and can be changed without risking the product it serves.',
         'pt-BR':
-          'A conta oficial da API do WhatsApp Business chegou em maio de 2023, e o produto não tinha como medir o que estava gastando com ela. O lugar óbvio para adicionar um limite era o próprio produto principal — mas o produto principal já era complexo demais para ser estendido com segurança, e um controle de custo que arrisca o produto que está protegendo não é um controle de custo. A alternativa foi um serviço com zero impacto no produto, capaz de atender outros canais de notificação depois.',
+          'A conta oficial da API do WhatsApp Business chegou em maio de 2023, e nada no produto sabia dizer com o que aquilo estava sendo gasto — os envios saíam de vários lugares e não eram registrados em nenhum. O lugar óbvio para resolver isso era o próprio produto principal, mas ele já era complexo demais para ser estendido com segurança. A alternativa foi tirar o envio de lá por completo: um serviço que é dono do canal, registra cada mensagem e pode mudar sem colocar em risco o produto que atende.',
       },
       metrics: [
         {
@@ -1468,9 +1507,9 @@ export const projects: Project[] = [
       },
       architecture: {
         summary: {
-          en: 'A calling service reaches the notify endpoint, which checks the practitioner’s quota before anything is sent, hands the message to the provider, and records the result either way.',
+          en: 'A calling service reaches the notify endpoint, which hands the message to the WhatsApp provider and records the result either way — so every message the product sends leaves a row behind it.',
           'pt-BR':
-            'Um serviço chamador chega ao endpoint de notificação, que verifica a cota do profissional antes de qualquer envio, entrega a mensagem ao provedor, e registra o resultado de qualquer forma.',
+            'Um serviço chamador chega ao endpoint de notificação, que entrega a mensagem ao provedor do WhatsApp e registra o resultado de qualquer forma — então toda mensagem que o produto envia deixa uma linha para trás.',
         },
         steps: [
           {
@@ -1488,10 +1527,10 @@ export const projects: Project[] = [
             },
           },
           {
-            label: 'Quota check',
+            label: 'Send command',
             detail: {
-              en: 'The practitioner’s limit is read before the send proceeds — no quota, no message.',
-              'pt-BR': 'O limite do profissional é lido antes de o envio prosseguir — sem cota, sem mensagem.',
+              en: 'The send is handled as a named command, so the request and the record of it are the same story.',
+              'pt-BR': 'O envio é tratado como um comando nomeado, então o pedido e o registro dele são a mesma história.',
             },
           },
           {
@@ -1524,24 +1563,24 @@ export const projects: Project[] = [
             },
           },
           {
-            label: 'Quota checked',
+            label: 'Accepted',
             detail: {
-              en: 'The practitioner’s remaining limit is read against the request.',
-              'pt-BR': 'O limite restante do profissional é verificado contra o pedido.',
+              en: 'The request is validated and turned into a send command against that practitioner.',
+              'pt-BR': 'O pedido é validado e vira um comando de envio para aquela profissional.',
             },
           },
           {
-            label: 'Dispatched or refused',
+            label: 'Dispatched',
             detail: {
-              en: 'Within quota, the message goes to the WhatsApp provider; over quota, the send is refused before it costs anything.',
-              'pt-BR': 'Dentro da cota, a mensagem segue para o provedor do WhatsApp; fora da cota, o envio é recusado antes de custar algo.',
+              en: 'The message goes to the WhatsApp provider, behind the crosscutting package that wraps it.',
+              'pt-BR': 'A mensagem segue para o provedor do WhatsApp, atrás do pacote transversal que o encapsula.',
             },
           },
           {
             label: 'Recorded',
             detail: {
-              en: 'Either outcome is written to the log of notifications sent, so the answer to "why was this blocked" already exists.',
-              'pt-BR': 'Qualquer resultado é gravado no log de notificações enviadas, então a resposta para "por que isso foi bloqueado" já existe.',
+              en: 'Either outcome is written to the record of notifications sent, so "did this message actually go out" has an answer that does not depend on asking the provider.',
+              'pt-BR': 'Qualquer resultado é gravado no registro de notificações enviadas, então "essa mensagem saiu mesmo?" tem resposta sem depender de perguntar ao provedor.',
             },
           },
         ],
@@ -1556,11 +1595,11 @@ export const projects: Project[] = [
           },
         },
         {
-          heading: { en: 'A quota is a domain model, not a rate limit', 'pt-BR': 'Uma cota é um modelo de domínio, não um rate limit' },
+          heading: { en: 'The metering was built and never switched on', 'pt-BR': 'A medição foi construída e nunca foi ligada' },
           body: {
-            en: 'A bare counter would have answered "can this send happen." Instead, the limit, a log of every change to it, and a record of every send together answer a harder question: why was this one blocked, and who changed the limit that blocked it.',
+            en: 'The design went further than the deployment did. A per-practitioner limit and a log of who changed it are in the domain, built so the cost could eventually be charged back to whoever generated it — and that part was never put to use. What the service actually did, every day, was send and record. I am keeping the decision here rather than quietly deleting it: the useful half shipped, the ambitious half did not, and a case study that only lists the half that worked is not a case study.',
             'pt-BR':
-              'Um contador simples responderia apenas "esse envio pode acontecer". Em vez disso, o limite, um log de cada mudança nele, e um registro de cada envio respondem juntos uma pergunta mais difícil: por que este foi bloqueado, e quem alterou o limite que o bloqueou.',
+              'O desenho foi mais longe que o uso. Existe no domínio um limite por profissional e um log de quem o alterou, construídos para que o custo pudesse um dia ser cobrado de quem o gerou — e essa parte nunca foi usada. O que o serviço fez, todo dia, foi enviar e registrar. Mantenho a decisão aqui em vez de apagá-la em silêncio: a metade útil entrou em produção, a metade ambiciosa não, e um estudo de caso que só lista a metade que deu certo não é um estudo de caso.',
           },
         },
         {
@@ -1574,24 +1613,24 @@ export const projects: Project[] = [
         {
           heading: { en: 'One provider first, the interface for more', 'pt-BR': 'Um provedor primeiro, a interface para mais' },
           body: {
-            en: 'WhatsApp was the bill that started this, so it is the only provider that sends today — but email, SMS and push were the shape the domain and the API were designed to accept later, without the quota model or the sent record needing to change.',
+            en: 'WhatsApp was the bill that started this, so it is the only provider that sends today — but email, SMS and push were the shape the domain and the API were designed to accept later, without the sent record needing to change.',
             'pt-BR':
-              'O WhatsApp foi a conta que originou tudo isso, então é o único provedor que envia hoje — mas email, SMS e push foram o formato que o domínio e a API foram desenhados para aceitar depois, sem que o modelo de cota ou o registro de envio precisassem mudar.',
+              'O WhatsApp foi a conta que originou tudo isso, então é o único provedor que envia hoje — mas email, SMS e push foram o formato que o domínio e a API foram desenhados para aceitar depois, sem que o registro de envio precisasse mudar.',
           },
         },
       ],
       highlights: [
         {
-          en: 'A notify controller and commands to send a notification and to add a practitioner’s limit.',
-          'pt-BR': 'Um controller de notificação e comandos para enviar uma notificação e para adicionar o limite de um profissional.',
+          en: 'A notify controller and the command that sends a practitioner’s notification.',
+          'pt-BR': 'Um controller de notificação e o comando que envia a notificação de uma profissional.',
         },
         {
-          en: 'A nutritionist controller and queries over that practitioner’s current limit and history of sent notifications.',
-          'pt-BR': 'Um controller de nutricionista e queries sobre o limite atual e o histórico de notificações enviadas desse profissional.',
+          en: 'A nutritionist controller and queries over that practitioner’s history of sent notifications.',
+          'pt-BR': 'Um controller de nutricionista e queries sobre o histórico de notificações enviadas dessa profissional.',
         },
         {
-          en: 'Three domain models: the notification limit itself, a log of every change to it, and a record of every notification sent.',
-          'pt-BR': 'Três modelos de domínio: o próprio limite de notificações, um log de cada mudança nele, e um registro de cada notificação enviada.',
+          en: 'A record of every notification sent, which is what makes the spend answerable after the fact.',
+          'pt-BR': 'Um registro de cada notificação enviada, que é o que torna o gasto explicável depois do fato.',
         },
         {
           en: 'A layered service with crosscutting packages for the WhatsApp provider and dependency injection, kept separate from the domain they support.',
@@ -1601,8 +1640,8 @@ export const projects: Project[] = [
     },
   },
   {
-    slug: 'dietbox-socket',
-    name: 'Dietbox Socket',
+    slug: 'dietbox-realtime',
+    name: 'Dietbox Realtime',
     tagline: {
       en: 'Live updates as a service of its own, so they ship on their own clock.',
       'pt-BR': 'Atualizações ao vivo como serviço próprio, para subirem no próprio relógio.',
@@ -1626,9 +1665,9 @@ export const projects: Project[] = [
       },
       contribution: {
         summary: {
-          en: 'Effectively a solo build: thirty-three of the thirty-four commits, from the handshake to the load-test harness that proved it held up.',
+          en: 'I built this one effectively alone: thirty-three of the thirty-four commits, from the handshake to the load-test harness that proved it held up.',
           'pt-BR':
-            'Praticamente uma construção solo: trinta e três dos trinta e quatro commits, do handshake ao harness de carga que comprovou que ele aguentava.',
+            'Construí este praticamente sozinho: trinta e três dos trinta e quatro commits, do handshake ao harness de carga que comprovou que ele aguentava.',
         },
         areas: [
           {
@@ -1785,9 +1824,9 @@ export const projects: Project[] = [
       },
       contribution: {
         summary: {
-          en: 'Principal author, from scratch — the architecture, the backend, the front end, and the deployment.',
+          en: 'I built it from scratch — the architecture, the backend, the front end, and the deployment.',
           'pt-BR':
-            'Autor principal, do zero — a arquitetura, o backend, o front-end e o deploy.',
+            'Construí do zero — a arquitetura, o backend, o front-end e o deploy.',
         },
         areas: [
           { en: 'The modular monolith and the boundaries between its contexts.', 'pt-BR': 'O monólito modular e as fronteiras entre seus contextos.' },

@@ -808,8 +808,8 @@ it('dietbox-notifications carries the figures its design document recorded', () 
   expect(detail.metricsNote!.en).toMatch(/design|plan|estimate/i);
 });
 
-it('dietbox-socket claims no Redis adapter the repository does not have', () => {
-  const socket = projects.find((p) => p.slug === 'dietbox-socket');
+it('dietbox-realtime claims no Redis adapter the repository does not have', () => {
+  const socket = projects.find((p) => p.slug === 'dietbox-realtime');
   expect(socket, 'the socket card is published').toBeDefined();
   expect(socket!.venture).toBe('dietbox');
 

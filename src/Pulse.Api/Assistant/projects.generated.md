@@ -12,7 +12,7 @@ system Felipe worked on; the "What Felipe did" line is the authoritative stateme
 - **Source:** public — Live site: https://felipealmeida.tech · GitHub: https://github.com/felipe-allmeida/pulse
 - **Stack:** .NET 10, SignalR, RabbitMQ, Redis, Postgres, React 19, Docker, Terraform
 - **What it is:** A self-hosted portfolio that doubles as a live systems demo: presence, visits, and metrics travel through a real event-driven backend in real time, not canned data.
-- **What Felipe did:** Solo project — the design, the event-driven backend, the front end, and the infrastructure it runs on.
+- **What Felipe did:** I built this one alone — the design, the event-driven backend, the front end, and the infrastructure it runs on.
   - The realtime presence pipeline and its world map.
   - The transactional outbox and the event-driven backend behind it.
   - The public ops dashboard and the metrics it exposes.
@@ -110,8 +110,8 @@ system Felipe worked on; the "What Felipe did" line is the authoritative stateme
 - **Role:** Senior Software Engineer, then Head of Technology (2021–2024)
 - **Source:** closed — professional work described without the code (Website: https://dietbox.me)
 - **Stack:** Azure AD B2C, Identity Experience Framework, XML, OpenID Connect, OAuth 2.0, .NET 6, HTML, CSS, Azure DevOps
-- **What it is:** One Azure AD B2C identity system carrying two audiences that share nothing but the account: a nutritionist subscribing and paying, and a patient arriving by invitation from the one treating them. Three years of custom sign-in journeys, federated providers, silent migration off the legacy store, and session revocation that reaches every open browser.
-- **What Felipe did:** This is the author’s largest personal ownership in the Dietbox estate: half the commits over three years, across both audiences’ sign-in journeys.
+- **What it is:** One Azure AD B2C identity system carrying two audiences that share nothing but the account: a nutritionist subscribing and paying, and a patient arriving by invitation from the one treating them. Five clients sign in through it — the nutritionist’s mobile app, the patient’s Android app, the patient’s iOS app, the web product both audiences use, and the checkout — across three platforms and two tenants. Three years of custom sign-in journeys, federated providers, silent migration off the legacy store, and session revocation that reaches every open browser.
+- **What Felipe did:** This is the most of me there is anywhere in the Dietbox estate: I wrote half the commits over three years, across both audiences’ sign-in journeys.
   - The two policy sets — one for the practitioner, one for the patient — each its own sign-up, sign-in and password-reset journey.
   - Federation with Google, Facebook and Apple, each mapped through its own exchange profile into a common subject claim.
   - The first-sign-in migration that moves a legacy-store user into the directory during the same journey they log in with.
@@ -120,6 +120,7 @@ system Felipe worked on; the "What Felipe did" line is the authoritative stateme
 - **Problem it solved:** A hosted login gives a product one journey. This one needed several: a subscriber signing up and paying, a patient arriving by invitation with no password to set, an academy student, and a receptionist acting on someone else’s behalf — all over one directory, without four separate user stores to keep in sync.
 - **Results:** ~7.2k lines of policy XML (across two policy sets); ~730 commits (mine, of ~1.5k total) — The line count is a plain line count over the committed policy files; the commit share comes from the repository.
 - **Architecture:** Two independent policy sets sit above one directory, and everything downstream trusts the tokens they issue.
+  - Clients — Two patient apps, the nutritionist’s app, the web product and the checkout — every one of them starts here.
   - Practitioner policies — Sign-up, sign-in, subscriber and academy journeys for the nutritionist audience.
   - Patient policies — Sign-up and sign-in for the patient audience, invited rather than self-registering.
   - Directory — One user store beneath both policy sets, holding local and federated accounts alike.
@@ -132,6 +133,11 @@ system Felipe worked on; the "What Felipe did" line is the authoritative stateme
   - Entitlement — Is the account enabled, and does it belong to a gated journey — subscriber, academy — that requires an active entitlement?
   - Token — A token is issued, stamped with the time the user’s security record was last valid from.
 - **What it does:**
+  - Sign-up and sign-in for each audience, on its own policy and its own branded pages.
+  - Two further gated sign-ins for the nutritionist on top of the ordinary one — subscribers, and academy students — each a policy of its own.
+  - Password reset, password change and profile edit, each an entry point of its own, per audience.
+  - A direct credential exchange for the native apps, alongside the browser redirect the web clients use — same directory, same rules, two shapes.
+  - Refresh-token redemption as a journey of its own, one per entitlement, so a renewed token is re-checked rather than assumed still valid.
   - Federated sign-in with three providers, each exchanged into a common subject claim.
   - Silent migration off the legacy store during the user’s own sign-in journey.
   - Per-audience branded pages, one set for the practitioner and one for the patient.
@@ -140,6 +146,7 @@ system Felipe worked on; the "What Felipe did" line is the authoritative stateme
   - **Custom policies instead of a hosted login** — A hosted login gives one journey. This product needed a subscriber signing up and paying, a patient arriving by invitation, an academy student, and a receptionist — over one directory, without four user stores to keep in sync. Writing the policy directly was the only way to get gated journeys and a first-sign-in migration without forking the user base.
   - **Migration as a side effect of signing in** — Nobody was asked to reset a password or re-register. The user experiences a login; the system experiences a migration, writing the account into the directory and linking it back to the legacy credential in the same journey.
   - **Revocation that reaches open sessions** — A token that is merely unrenewable is not revoked. Comparing the token’s issue time against a stamp on the user record is what makes "sign this account out everywhere" actually mean it, rather than "stop this account from getting a new token next time."
+  - **Two ways in, because a phone cannot open a redirect** — Three of the five clients are native apps, and a native app signing a user in through a browser redirect is a bad experience and a worse one to recover from. So the same directory answers two shapes of request: the redirect journey the web product and the checkout use, and a direct credential exchange the apps use, each with its own refresh-token redemption. The entitlement checks and the migration behaviour live in the policy, not in the client, so the two shapes cannot drift into two different sets of rules.
   - **One directory, several journeys** — Separate policies per audience over one shared user store, rather than one policy branching on audience or several stores that would have to be reconciled. The audiences share an identity, not a form.
 
 ### Dietbox Payment — Subscriptions and recurring billing, behind a checkout of its own.
@@ -152,7 +159,7 @@ system Felipe worked on; the "What Felipe did" line is the authoritative stateme
   - The release pipeline’s path filter, so a payment hotfix ships on its own branch without redeploying the other four services.
   - The crosscutting package each gateway integration lives in, and the one shared project that pulls them in for whichever service needs them.
   - The Azure estate this service deploys onto, configured the same way as its neighbours.
-  - NOT his work: The subscription commands, the webhook handlers and the checkout client are a team’s work: the author holds roughly a tenth of the checkout client’s commits, across February 2023 to July 2024, and about a fifth of the service’s, whose repository does not begin until October 2023 — the bulk of both belongs to other engineers.
+  - NOT his work: The subscription commands, the webhook handlers and the checkout client were a team’s work: I hold roughly a tenth of the checkout client’s commits, across February 2023 to July 2024, and about a fifth of the service’s, whose repository does not begin until October 2023 — the bulk of both belongs to other engineers.
 - **Problem it solved:** A subscription doesn’t live only in the product’s own database — it also lives in whichever gateway is processing it, and that gateway’s opinion of the subscription’s state arrives asynchronously, by webhook, on its own schedule. Two gateways were live at once while subscribers were being moved between them, each with its own event names, its own payload shape and its own idea of what a subscription is. And every one of those webhook deliveries has to be reconciled with what the product already believes happened, not simply trusted.
 - **Architecture:** A Vue checkout out front, CQRS commands and controllers in the middle, and two gateway integrations each in a package of its own — with each gateway closing the loop asynchronously through a webhook endpoint of its own.
   - Checkout client — The Vue checkout — subscription, renewal and thank-you views — calls the service’s commands: subscribe, create an invoice, generate a payment link.
@@ -186,13 +193,13 @@ system Felipe worked on; the "What Felipe did" line is the authoritative stateme
 - **Source:** closed — professional work described without the code (Website: https://dietbox.me)
 - **Stack:** .NET 6, C#, CQRS, MediatR, EF Core, SQL Server, ASP.NET Identity, JWT, Vue 3, Vuex, Azure DevOps
 - **What it is:** A back office is where a SaaS company’s real operating procedure lives — the subscriptions, the vouchers, the food catalogue, marketing — and this was the first place the platform’s newer patterns were carried through end to end: layers numbered on disk, commands and queries behind a pipeline behaviour that logs every one of them, and a domain that raises its own events and has them dispatched the moment its changes are saved.
-- **What Felipe did:** The layered design this service is built on — the numbered directories, the command/query pipeline, and where the domain-event dispatch sits inside it — the identity building block, and the shared building blocks the platform’s newer services now start from, are the author’s. The eighteen business-domain controllers and the admin client’s views were the team’s to build out.
+- **What Felipe did:** I set the layered design this service is built on — the numbered directories, the command/query pipeline, and where the domain-event dispatch sits inside it — and I wrote the identity building block and the shared building blocks the platform’s newer services now start from. The eighteen business-domain controllers and the admin client’s views were the team’s to build out.
   - The numbered directory layout — building blocks, services, application, domain, infrastructure — and the dependency direction it makes legible before a file is opened.
   - The identity building block: its own user store, a JWT builder and validator, access and refresh tokens, and claim-based authorization.
   - The message and event base types among the shared building blocks, and the dispatch that publishes what an aggregate raised once the unit of work has saved it.
   - The shared building blocks — domain, infrastructure and identity — the platform’s newer services start from instead of each inventing its own.
   - The client’s persisted token pair and its refresh flow against the accounts endpoint.
-  - NOT his work: Across the service and the admin client together, roughly a third of the commits are the author’s — the rest, including most of the eighteen business-domain controllers and the client’s views, is the team’s.
+  - NOT his work: Across the service and the admin client together, roughly a third of the commits are mine — the rest, including most of the eighteen business-domain controllers and the client’s views, is the team’s.
 - **Problem it solved:** Support and operations were reaching straight into the product database, or into the monolith’s own admin surface, to do what the business runs on day to day — adjusting a subscription, issuing a voucher, updating the food catalogue. A back office with its own domain, its own staff identity and its own command surface was the alternative: the same operations, but as named commands logged on the way through, behind sign-in that isn’t the customer’s.
 - **Results:** ~276 commits across both repositories (mine, of ~780 total); 3 test projects (domain, application, and integration) — Both figures come from the two repositories’ own commit history.
 - **Architecture:** An admin client in front, a service exposing the eighteen controllers, an application layer of commands and queries behind a logging pipeline behaviour, a domain layer underneath, and infrastructure at the bottom — where saving a change is also what releases the events that change raised.
@@ -212,48 +219,48 @@ system Felipe worked on; the "What Felipe did" line is the authoritative stateme
   - **Events dispatched at save time, not stored** — An aggregate collects the events it raises while a command changes it; the unit of work writes the row, then publishes those events through MediatR after that write has committed. Nothing is replayed and no state is rebuilt from a log — the table still holds the current row. What this buys is that a consequence of an operation is a subscriber to something the domain said, rather than one more paragraph inside the command that said it.
   - **Shared building blocks before shared services** — The newer services, this one included, start from a common domain, infrastructure and identity layer instead of each inventing its own — the same message and event base types, the same identity building block, the same base entities. That shared foundation is what let a small team add a service without each one arriving in a different style.
 
-### Dietbox Notifications — A messaging bill turned into a product constraint.
+### Dietbox Notifications — Everything the product sends out, moved into a service of its own.
 
 - **Role:** Head of Technology (2023–2024)
 - **Source:** closed — professional work described without the code (Website: https://dietbox.me)
 - **Stack:** .NET 6, C#, CQRS, SQL Server, WhatsApp Business API, Azure DevOps
-- **What it is:** This service exists because of a number on an invoice: the official WhatsApp messaging bill in May 2023. The answer was not a rate limit bolted onto the existing product, but a small domain of its own — a quota, a log of who changed it, and a record of every send.
-- **What Felipe did:** The design document, the domain and the service are the author’s: nineteen of the twenty commits, from the first estimate to the running service.
+- **What it is:** This service exists because of a number on an invoice: the official WhatsApp messaging bill in May 2023. The answer was not a rate limit bolted onto the existing product, but a small service of its own that took over sending — and, because it owned every send, could account for them.
+- **What Felipe did:** I wrote the design document, the domain and the service: nineteen of the twenty commits, from the first estimate to the running service.
   - The capacity-planning document itself — the volume, query-rate and storage estimates the service was built to meet.
-  - The domain model: a notification limit per practitioner, a log of every change to it, and a record of every notification sent.
-  - The two controllers and their commands and queries — adding a limit, sending a notification, and querying both limits and sent records.
+  - The domain model, and the record of every notification sent that sits at the middle of it.
+  - The two controllers and their commands and queries — sending a notification, and reading back what was sent.
   - The crosscutting packages behind the layers: the WhatsApp provider integration and dependency injection.
-- **Problem it solved:** The official WhatsApp Business API bill arrived in May 2023, and the product had no way to meter what it was spending on it. The obvious place to add a limit was the main product itself — but the main product was already too complex to extend safely, and a cost control that risks the product it is protecting is not a cost control. The alternative was a service with zero impact on the product, able to serve other notification channels later.
+- **Problem it solved:** The official WhatsApp Business API bill arrived in May 2023, and nothing in the product could say what it was spending it on — sends went out from several places and were recorded in none. The obvious place to fix that was the main product itself, but the main product was already too complex to extend safely. The alternative was to move sending out entirely: one service that owns the channel, records every message, and can be changed without risking the product it serves.
 - **Results:** ~51k messages a month (the volume being paid for); ~30k queries a day (0.3 QPS average); 5 peak QPS planned for; ~1.4 GB storage over ten years (214 bytes per notification) — These four figures come from the service’s own design document, written before a line of it existed — a capacity plan, not a production measurement taken afterward.
-- **Architecture:** A calling service reaches the notify endpoint, which checks the practitioner’s quota before anything is sent, hands the message to the provider, and records the result either way.
+- **Architecture:** A calling service reaches the notify endpoint, which hands the message to the WhatsApp provider and records the result either way — so every message the product sends leaves a row behind it.
   - Calling service — Another service in the platform requests a notification on a practitioner’s behalf.
   - Notify endpoint — The notify controller receives the request and dispatches the send command.
-  - Quota check — The practitioner’s limit is read before the send proceeds — no quota, no message.
+  - Send command — The send is handled as a named command, so the request and the record of it are the same story.
   - Provider — The WhatsApp integration sends the message through the official API, behind the crosscutting provider package.
   - Sent record — The outcome — sent or refused — is written to the record every notification leaves behind.
 - **A notification, from request to record:**
   - Requested — A calling service asks for a notification to be sent to a practitioner.
-  - Quota checked — The practitioner’s remaining limit is read against the request.
-  - Dispatched or refused — Within quota, the message goes to the WhatsApp provider; over quota, the send is refused before it costs anything.
-  - Recorded — Either outcome is written to the log of notifications sent, so the answer to "why was this blocked" already exists.
+  - Accepted — The request is validated and turned into a send command against that practitioner.
+  - Dispatched — The message goes to the WhatsApp provider, behind the crosscutting package that wraps it.
+  - Recorded — Either outcome is written to the record of notifications sent, so "did this message actually go out" has an answer that does not depend on asking the provider.
 - **What it does:**
-  - A notify controller and commands to send a notification and to add a practitioner’s limit.
-  - A nutritionist controller and queries over that practitioner’s current limit and history of sent notifications.
-  - Three domain models: the notification limit itself, a log of every change to it, and a record of every notification sent.
+  - A notify controller and the command that sends a practitioner’s notification.
+  - A nutritionist controller and queries over that practitioner’s history of sent notifications.
+  - A record of every notification sent, which is what makes the spend answerable after the fact.
   - A layered service with crosscutting packages for the WhatsApp provider and dependency injection, kept separate from the domain they support.
 - **Engineering decisions:**
   - **A separate service specifically to be ignorable** — The stated goal was zero impact on the main product. Isolating the notification service meant it could be switched off, redeployed or rewritten without taking the product down with it — the opposite of bolting a limiter onto code that was already too complex to touch safely.
-  - **A quota is a domain model, not a rate limit** — A bare counter would have answered "can this send happen." Instead, the limit, a log of every change to it, and a record of every send together answer a harder question: why was this one blocked, and who changed the limit that blocked it.
+  - **The metering was built and never switched on** — The design went further than the deployment did. A per-practitioner limit and a log of who changed it are in the domain, built so the cost could eventually be charged back to whoever generated it — and that part was never put to use. What the service actually did, every day, was send and record. I am keeping the decision here rather than quietly deleting it: the useful half shipped, the ambitious half did not, and a case study that only lists the half that worked is not a case study.
   - **Capacity planned before the first line** — The monthly volume, the query rate and the ten-year storage footprint were estimated in the design document before the service was built, which is why the storage decision — how much space this would ever need — was a boring, already-answered question rather than a surprise.
-  - **One provider first, the interface for more** — WhatsApp was the bill that started this, so it is the only provider that sends today — but email, SMS and push were the shape the domain and the API were designed to accept later, without the quota model or the sent record needing to change.
+  - **One provider first, the interface for more** — WhatsApp was the bill that started this, so it is the only provider that sends today — but email, SMS and push were the shape the domain and the API were designed to accept later, without the sent record needing to change.
 
-### Dietbox Socket — Live updates as a service of its own, so they ship on their own clock.
+### Dietbox Realtime — Live updates as a service of its own, so they ship on their own clock.
 
 - **Role:** Senior Software Engineer (2022)
 - **Source:** closed — professional work described without the code (Website: https://dietbox.me)
 - **Stack:** Node, Express, Socket.IO, Application Insights, Azure App Service, Azure DevOps
 - **What it is:** Thirty-four commits over two months in 2022, for a service that has outlived both: a socket server that holds every open connection, joins each client to a room named for its user id, and exposes one endpoint the rest of the platform posts to when something needs pushing out. It sits outside the product because a long-lived connection and a request are not the same kind of traffic.
-- **What Felipe did:** Effectively a solo build: thirty-three of the thirty-four commits, from the handshake to the load-test harness that proved it held up.
+- **What Felipe did:** I built this one effectively alone: thirty-three of the thirty-four commits, from the handshake to the load-test harness that proved it held up.
   - The socket server itself: the shared-secret handshake, room assignment by user id, and an immediate disconnect for a client that ends up joined to no room.
   - The notify endpoint the rest of the platform posts to, and the info and health endpoints used to watch the service itself.
   - The handler-loading convention: an event handler is a file, picked up automatically from a directory.
@@ -281,7 +288,7 @@ system Felipe worked on; the "What Felipe did" line is the authoritative stateme
 - **Source:** closed — professional work described without the code
 - **Stack:** .NET 10, PostgreSQL 17, RabbitMQ, React 19, OpenIddict, MCP, OpenTelemetry, Docker Swarm
 - **What it is:** The IT service desk for ULBRA — a .NET 10 modular monolith that replaced GLPI as the single intake channel for the university’s IT department, carrying a request from ticket to SLA to satisfaction survey.
-- **What Felipe did:** Principal author, from scratch — the architecture, the backend, the front end, and the deployment.
+- **What Felipe did:** I built it from scratch — the architecture, the backend, the front end, and the deployment.
   - The modular monolith and the boundaries between its contexts.
   - The SLA engine, including pauses that record who stopped the clock and why.
   - The transactional outbox and the notification fan-out it feeds.
