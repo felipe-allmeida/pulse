@@ -1184,6 +1184,199 @@ export const projects: Project[] = [
     },
   },
   {
+    slug: 'dietbox-portal',
+    name: 'Dietbox Portal',
+    tagline: {
+      en: 'The back office, and the newest generation of the platform’s architecture.',
+      'pt-BR': 'O back office, e a geração mais nova da arquitetura da plataforma.',
+    },
+    description: {
+      en: 'The internal tool the company runs the product from — subscriptions, vouchers, the food catalogue, marketing — built as a layered service with commands, queries and event sourcing, and an admin client that can act as the user it is helping.',
+      'pt-BR':
+        'A ferramenta interna com que a empresa opera o produto — assinaturas, vouchers, catálogo de alimentos, marketing — construída como um serviço em camadas com comandos, queries e event sourcing, e um cliente admin capaz de agir como o usuário que está atendendo.',
+    },
+    tech: ['.NET 6', 'C#', 'CQRS', 'MediatR', 'Event sourcing', 'ASP.NET Identity', 'JWT', 'Vue 3', 'Vuex', 'Azure DevOps'],
+    role: {
+      en: 'Senior Software Engineer, then Head of Technology',
+      'pt-BR': 'Engenheiro de Software Sênior, depois Head de Tecnologia',
+    },
+    period: { en: '2023–2024', 'pt-BR': '2023–2024' },
+    visibility: 'private',
+    links: [{ label: 'Website', href: 'https://dietbox.me' }],
+    venture: 'dietbox',
+    detail: {
+      overview: {
+        en: 'A back office is where a SaaS company’s real operating procedure lives — the subscriptions, the vouchers, the food catalogue, marketing — and this was the first place the platform’s newer patterns were carried through end to end: layers numbered on disk, commands and queries behind pipeline behaviours, and a core whose state is derived from events rather than only from a current row.',
+        'pt-BR':
+          'Um back office é onde vive o procedimento real de operação de uma empresa SaaS — as assinaturas, os vouchers, o catálogo de alimentos, o marketing — e este foi o primeiro lugar em que os padrões mais novos da plataforma foram aplicados de ponta a ponta: camadas numeradas em disco, comandos e queries atrás de pipeline behaviours, e um núcleo cujo estado é derivado de eventos, não apenas da linha atual de uma tabela.',
+      },
+      contribution: {
+        summary: {
+          en: 'The layered design this service is built on — the numbered directories, the command/query pipeline, and where the event-sourced core sits inside it — the identity building block, and the shared building blocks the platform’s newer services now start from, are the author’s. The eighteen business-domain controllers and the admin client’s views were the team’s to build out.',
+          'pt-BR':
+            'O design em camadas sobre o qual este serviço é construído — os diretórios numerados, o pipeline de comandos e queries, e o lugar onde o núcleo com event sourcing se encaixa nele — o bloco de identidade e os blocos de construção compartilhados dos quais os serviços mais novos da plataforma partem, são do autor. Os dezoito controllers de domínio de negócio e as telas do cliente admin foram construídos pelo time.',
+        },
+        areas: [
+          {
+            en: 'The numbered directory layout — building blocks, services, application, domain, infrastructure — and the dependency direction it makes legible before a file is opened.',
+            'pt-BR':
+              'A estrutura de diretórios numerados — building blocks, services, application, domain, infrastructure — e a direção de dependência que ela deixa legível antes de abrir um arquivo.',
+          },
+          {
+            en: 'The identity building block: its own user store, a JWT builder and validator, access and refresh tokens, and claim-based authorization.',
+            'pt-BR':
+              'O bloco de identidade: base de usuários própria, um builder e validador de JWT, tokens de acesso e refresh, e autorização baseada em claims.',
+          },
+          {
+            en: 'The event-sourcing package among the shared building blocks, and where it sits in the layers below the domain.',
+            'pt-BR':
+              'O pacote de event sourcing entre os blocos de construção compartilhados, e o lugar onde ele fica nas camadas abaixo do domínio.',
+          },
+          {
+            en: 'The shared building blocks — domain, infrastructure and identity — the platform’s newer services start from instead of each inventing its own.',
+            'pt-BR':
+              'Os blocos de construção compartilhados — domínio, infraestrutura e identidade — dos quais os serviços mais novos da plataforma partem, em vez de cada um inventar o próprio.',
+          },
+          {
+            en: 'The client’s persisted token pair and its refresh flow against the accounts endpoint.',
+            'pt-BR': 'O par de tokens persistido no cliente e o fluxo de refresh contra o endpoint de contas.',
+          },
+        ],
+        boundary: {
+          en: 'Across the service and the admin client together, roughly a third of the commits are the author’s — the rest, including most of the eighteen business-domain controllers and the client’s views, is the team’s.',
+          'pt-BR':
+            'Entre o serviço e o cliente admin juntos, cerca de um terço dos commits são do autor — o restante, incluindo a maior parte dos dezoito controllers de domínio de negócio e das telas do cliente, é do time.',
+        },
+      },
+      problem: {
+        en: 'Support and operations were reaching straight into the product database, or into the monolith’s own admin surface, to do what the business runs on day to day — adjusting a subscription, issuing a voucher, updating the food catalogue. A back office with its own domain, its own audit trail and its own identity was the alternative: the same operations, but through commands that record what happened and who did it, behind sign-in that isn’t the customer’s.',
+        'pt-BR':
+          'Suporte e operações estavam entrando direto no banco de dados do produto, ou na própria superfície de admin do monolito, para fazer o que o negócio roda no dia a dia — ajustar uma assinatura, emitir um voucher, atualizar o catálogo de alimentos. Um back office com domínio próprio, trilha de auditoria própria e identidade própria foi a alternativa: as mesmas operações, mas por comandos que registram o que aconteceu e quem fez, atrás de um login que não é o do cliente.',
+      },
+      metrics: [
+        {
+          value: { en: '~276', 'pt-BR': '~276' },
+          label: { en: 'commits across both repositories', 'pt-BR': 'commits nos dois repositórios' },
+          note: { en: 'mine, of ~780 total', 'pt-BR': 'meus, de ~780 no total' },
+        },
+        {
+          value: { en: '3', 'pt-BR': '3' },
+          label: { en: 'test projects', 'pt-BR': 'projetos de teste' },
+          note: { en: 'domain, application, and integration', 'pt-BR': 'domínio, aplicação e integração' },
+        },
+      ],
+      metricsNote: {
+        en: 'Both figures come from the two repositories’ own commit history.',
+        'pt-BR': 'Os dois números vêm do próprio histórico de commits dos dois repositórios.',
+      },
+      architecture: {
+        summary: {
+          en: 'An admin client in front, a service exposing the eighteen controllers, an application layer of commands and queries behind pipeline behaviours, a domain layer underneath, and infrastructure at the bottom — where the event store from the shared building blocks persists what the domain raises.',
+          'pt-BR':
+            'Um cliente admin na frente, um serviço expondo os dezoito controllers, uma camada de aplicação com comandos e queries atrás de pipeline behaviours, uma camada de domínio embaixo dela, e infraestrutura na base — onde o event store dos blocos de construção compartilhados persiste o que o domínio emite.',
+        },
+        steps: [
+          {
+            label: 'Admin client',
+            detail: {
+              en: 'The Vue 3 client — dashboard, charts, and the eighteen controllers’ views — including the impersonate controls in the navbar and the patient view.',
+              'pt-BR':
+                'O cliente em Vue 3 — dashboard, gráficos e as telas dos dezoito controllers — incluindo os controles de impersonate na navbar e na tela do paciente.',
+            },
+          },
+          {
+            label: 'Service',
+            detail: {
+              en: 'Controllers behind the claim-requirement authorization filter, validating the access token before a request reaches a command or query.',
+              'pt-BR':
+                'Controllers atrás do filtro de autorização por claim, validando o token de acesso antes de a requisição chegar a um comando ou query.',
+            },
+          },
+          {
+            label: 'Application',
+            detail: {
+              en: 'Commands and queries with pipeline behaviours, keeping domain events separate from the integration events other services consume.',
+              'pt-BR':
+                'Comandos e queries com pipeline behaviours, mantendo os eventos de domínio separados dos eventos de integração que outros serviços consomem.',
+            },
+          },
+          {
+            label: 'Domain',
+            detail: {
+              en: 'The business rules for the eighteen areas administered — nutritionists, patients, subscriptions, vouchers, the food catalogue, and the rest — raising the events the layers above and below both care about.',
+              'pt-BR':
+                'As regras de negócio das dezoito áreas administradas — nutricionistas, pacientes, assinaturas, vouchers, catálogo de alimentos, e o resto — emitindo os eventos que as camadas acima e abaixo se importam.',
+            },
+          },
+          {
+            label: 'Infrastructure',
+            detail: {
+              en: 'Persistence at the bottom, including the event store from the shared building blocks — the domain’s events land here, not just its current state.',
+              'pt-BR':
+                'Persistência na base, incluindo o event store dos blocos de construção compartilhados — os eventos do domínio pousam aqui, não só o estado atual dele.',
+            },
+          },
+        ],
+      },
+      decisions: [
+        {
+          heading: { en: 'Layers numbered on disk', 'pt-BR': 'Camadas numeradas em disco' },
+          body: {
+            en: 'The service’s directories are numbered by layer — building blocks, services, application, domain, infrastructure — so the dependency direction is legible from a directory listing alone, before a single file is open. A layer importing from the wrong direction is a violation visible in the file tree, not just in a code review.',
+            'pt-BR':
+              'Os diretórios do serviço são numerados por camada — building blocks, services, application, domain, infrastructure — então a direção de dependência é legível só de olhar a listagem de diretórios, antes de abrir um único arquivo. Uma camada importando na direção errada é uma violação visível na árvore de arquivos, não só numa revisão de código.',
+          },
+        },
+        {
+          heading: { en: 'Staff identity is not customer identity', 'pt-BR': 'Identidade de equipe não é identidade de cliente' },
+          body: {
+            en: 'The back office authenticates against its own store — an identity building block with its own user database, a JWT builder and validator, access and refresh tokens, and claim-based authorization — not the customer directory. Giving support staff accounts in the customer identity system would have meant handing customer-grade identities administrative scopes; keeping the two separate keeps a back-office session a different thing from a customer session, by construction.',
+            'pt-BR':
+              'O back office se autentica contra a própria base — um bloco de identidade com base de usuários própria, um builder e validador de JWT, tokens de acesso e refresh, e autorização baseada em claims — não o diretório do cliente. Dar contas de equipe de suporte no sistema de identidade do cliente teria significado conceder escopos administrativos a identidades de grau cliente; manter os dois separados faz de uma sessão do back office algo diferente de uma sessão de cliente, por construção.',
+          },
+        },
+        {
+          heading: { en: 'Event sourcing here, not everywhere', 'pt-BR': 'Event sourcing aqui, não em todo lugar' },
+          body: {
+            en: 'The portal’s questions are historical — what changed, when, and by whom — so its state is derived from a stream of domain events rather than only from the current row in a table. The rest of the platform isn’t asking that question the same way, so the rest of the platform isn’t built that way; event sourcing earns its place here because the back office’s job is auditability, not because it is the newer pattern.',
+            'pt-BR':
+              'As perguntas do portal são históricas — o que mudou, quando, e por quem — então o estado dele é derivado de um stream de eventos de domínio, não só da linha atual de uma tabela. O resto da plataforma não faz essa pergunta do mesmo jeito, então o resto da plataforma não é construído desse jeito; event sourcing ganha seu lugar aqui porque o trabalho do back office é auditabilidade, não porque é o padrão mais novo.',
+          },
+        },
+        {
+          heading: { en: 'Shared building blocks before shared services', 'pt-BR': 'Blocos de construção compartilhados antes de serviços compartilhados' },
+          body: {
+            en: 'The newer services, this one included, start from a common domain, infrastructure and identity layer instead of each inventing its own — the same event-sourcing package, the same identity building block, the same base entities. That shared foundation is what let a small team add a service without each one arriving in a different style.',
+            'pt-BR':
+              'Os serviços mais novos, este incluído, partem de uma camada comum de domínio, infraestrutura e identidade em vez de cada um inventar a própria — o mesmo pacote de event sourcing, o mesmo bloco de identidade, as mesmas entidades base. Essa fundação compartilhada é o que permitiu que um time pequeno acrescentasse um serviço sem cada um chegar num estilo diferente.',
+          },
+        },
+      ],
+      highlights: [
+        {
+          en: 'Impersonation as a first-class feature: support can act as the nutritionist or patient they’re helping, from the client’s navbar or the patient view, and step back out.',
+          'pt-BR':
+            'Impersonation como funcionalidade de primeira classe: o suporte pode agir como a nutricionista ou o paciente que está atendendo, pela navbar do cliente ou pela tela do paciente, e voltar a ser quem é.',
+        },
+        {
+          en: 'Eighteen controllers spanning the business administered: nutritionists and patients, subscriptions and their configuration, transactions, vouchers, the food catalogue, tags, marketing, materials, events, universities, metrics, accounts.',
+          'pt-BR':
+            'Dezoito controllers cobrindo o negócio administrado: nutricionistas e pacientes, assinaturas e suas configurações, transações, vouchers, catálogo de alimentos, tags, marketing, materiais, eventos, universidades, métricas, contas.',
+        },
+        {
+          en: 'A dashboard with charts mirroring those same domains, so the numbers support looks at come from the same commands that changed them.',
+          'pt-BR':
+            'Um dashboard com gráficos espelhando esses mesmos domínios, então os números que o suporte olha vêm dos mesmos comandos que os alteraram.',
+        },
+        {
+          en: 'Domain events kept separate from integration events, so a change another service needs to hear about is an explicit publication, not a side effect of one that only matters inside this one.',
+          'pt-BR':
+            'Eventos de domínio mantidos separados dos eventos de integração, então uma mudança que outro serviço precisa saber é uma publicação explícita, não efeito colateral de uma que só importa aqui dentro.',
+        },
+      ],
+    },
+  },
+  {
     slug: 'ulbra-atende',
     name: 'Ulbra Atende',
     tagline: {

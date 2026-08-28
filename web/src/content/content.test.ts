@@ -134,7 +134,7 @@ it('projects sharing a venture are contiguous in the array', () => {
 */
 it('every venture project is private with no repository link', () => {
   const inVentures = projects.filter((p) => p.venture !== undefined);
-  expect(inVentures, 'six ULBRA projects and three Dietbox cards so far').toHaveLength(9);
+  expect(inVentures, 'six ULBRA projects and four Dietbox cards so far').toHaveLength(10);
   for (const project of inVentures) {
     expect(project.visibility, `${project.slug} visibility`).toBe('private');
     expect(
@@ -618,6 +618,20 @@ it('dietbox-payment draws its lifecycle from the webhook handlers that exist', (
     expect(step.label.trim()).not.toBe('');
     expectBothLocales(step.detail, 'dietbox-payment state detail');
   }
+});
+
+it('dietbox-portal separates staff identity from customer identity', () => {
+  const portal = projects.find((p) => p.slug === 'dietbox-portal');
+  expect(portal, 'the portal card is published').toBeDefined();
+  expect(portal!.venture).toBe('dietbox');
+
+  // The decision the code actually supports: the back office authenticates
+  // against its own store with its own tokens, not against the customer
+  // directory. Asserted because an earlier reading of an unused dependency
+  // in the client's manifest suggested Azure AD, which is not what runs.
+  const decisions = JSON.stringify(portal!.detail!.decisions);
+  expect(decisions, 'staff and customers are different populations').toMatch(/staff|back office|internal/i);
+  expect(decisions).not.toMatch(/Azure AD(?! B2C)/);
 });
 
 it('no project carries a leadership section — it belongs to the venture', () => {
