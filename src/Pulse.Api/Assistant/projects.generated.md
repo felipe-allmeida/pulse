@@ -278,6 +278,100 @@ system Felipe worked on; the "What Felipe did" line is the authoritative stateme
   - **An orchestrator sized for the team** — Kubernetes was the default answer and was not taken. The cluster is small, on-premise, and operated by three engineers who are also writing six applications. Swarm gives multi-node scheduling, rolling updates and overlay networking with a fraction of the operational surface — and the cost of the ceiling it imposes is far below the cost of a control plane nobody has time to run.
   - **The team measures itself with its own pipeline** — A dashboard reads the team’s task tracker through an ETL sidecar, so delivery is visible in the same place the systems’ numbers are. It is a small piece of plumbing carrying a large claim: a working model that is measured can be argued about with evidence, and one that is only asserted cannot.
 
+### Airia Cloud Connector — A reverse tunnel that reaches into a private network without opening it.
+
+- **Role:** R&D Engineer — security, routing and command surface (Jun 2025 – Oct 2025)
+- **Source:** closed — professional work described without the code
+- **Stack:** .NET 9, SignalR, Redis, JWT, MCP, xUnit, Testcontainers, Helm
+- **What it is:** A trimmed, single-file executable that runs inside a customer network and holds an outbound channel open to the cloud platform. Everything the platform needs on the other side of the firewall — an HTTP call, a database query, an MCP tool invocation — travels back down that one channel as a typed command.
+- **What Felipe did:** I owned how the connector authenticates, how a request finds the right one, and what it is able to do once it gets there.
+  - Mutual TLS between connector and hub — built, and switched off a week later.
+  - Routing — resolving which connector in which customer group answers a given request.
+  - The database command type, for both relational engines and document stores.
+  - MCP support: listing an internal server’s tools and executing them through the tunnel.
+  - Per-environment release packaging, and installation as a native Windows service.
+  - NOT his work: The repository predates me by three months and several engineers shared it; the hub’s browser-agent surface is someone else’s work.
+- **Problem it solved:** An enterprise buys a cloud AI platform, and then the agents it builds there need the systems that actually hold its data — a database, an internal API, an MCP server — all of which sit behind its firewall. The standard answers are a VPN, a site-to-site tunnel, or an inbound rule for the vendor’s address range, and each one asks a security team to open the perimeter for software it does not run. The connector inverts the direction instead: nothing dials in, so there is nothing to open.
+- **Architecture:** The connector opens a SignalR connection outward and registers itself under a customer group. The hub keeps that registry in Redis rather than in memory, so any hub instance can find any connector and correlate the reply — which is what lets the hub scale horizontally behind a load balancer. A platform request becomes a typed command envelope, is pushed down the connector’s channel, executed against whatever is on the private side, and the response is tracked back to the instance still holding the caller.
+  - Airia platform — Issues an ordinary HTTP request, addressed to a customer group rather than to a host.
+  - Cloud Hub — Wraps it as a typed command and looks up which connector should answer.
+  - Redis registry — Holds the connector-to-instance map and the pending responses, so the hub can run as more than one replica.
+  - Connector — Receives the command on the channel it already opened, from inside the customer network.
+  - Internal service — The API, database or MCP server that never became reachable from outside.
+- **What it does:**
+  - Outbound-only: the connector dials the cloud, never the other way round.
+  - Integration tests run against a real Redis through Testcontainers, not a fake.
+  - Queries relational engines and document stores on the private side, schema included.
+  - Exposes an internal MCP server’s tools to the platform through the same tunnel.
+  - Ships as one trimmed, self-contained executable, installable as a Windows service.
+- **Engineering decisions:**
+  - **Invert the direction rather than open the perimeter** — A persistent outbound connection does everything an inbound rule would, and asks the customer for nothing their egress policy does not already allow. The security review this avoids is not a small one: it is the difference between a deployment a network team approves in an afternoon and one that spends a quarter in committee.
+  - **Mutual TLS, built and then switched off** — A bearer token proves the connector to the hub and does nothing to prove the hub to the connector, so client certificates went on both ends, with an explicit clock-skew allowance and a readable error in place of a raw handshake failure. It lasted a week. I merged the change that disabled it myself, the certificate requirement was dropped the next day, and the wiring is still commented out on both sides — the reason is not recorded anywhere I can point to, and I am not going to reconstruct one. What ships is bearer tokens over TLS. The honest lesson is not about the cryptography: a security control that a customer’s ops team has to hold up their end of is only as real as the certificate distribution nobody had built yet.
+  - **The connector registry lives in Redis, not in the hub’s memory** — A connector is attached to exactly one hub instance, but a platform request can land on any of them. Keeping the registry and the pending responses in Redis means the instance that receives a request can route it to the instance holding the connection, and the reply finds its way back. Without that, the hub is pinned to a single replica — a strange thing to accept in the one component every customer’s traffic passes through.
+  - **One command envelope instead of a proxy per capability** — HTTP came first, and databases and MCP could each have been a second tunnel with its own lifecycle. Making them command types on the existing channel meant authentication, routing, reconnection and response correlation were solved once. When MCP support was added, none of that had to be rebuilt — it was a new command type and a handler.
+  - **A trimmed single file, and the serializer that requires** — The connector is installed by someone else’s ops team on a machine nobody on the vendor side can log into, so it ships self-contained: no runtime to install, one file to copy, and later a native Windows service so it survives a reboot without a human. Trimming that binary breaks reflection-based JSON, which is why the command envelope is serialized through a source-generated context — an unglamorous constraint that follows directly from choosing a deployment the customer can actually operate.
+
+### Airia.DataStores.Common — One query surface over six database engines, shipped as a package.
+
+- **Role:** R&D Engineer — author, from the first commit (Jul 2025 – Oct 2025)
+- **Source:** closed — professional work described without the code
+- **Stack:** .NET 9, PostgreSQL, SQL Server, MySQL, Snowflake, Databricks, MongoDB, xUnit
+- **What it is:** A shared library that answers one question for every database an enterprise might point at an AI agent: how do you run a query and read a schema without the caller knowing which engine it is talking to.
+- **What Felipe did:** I started this repository and wrote its first version — the interfaces, the providers, the pooling and the package pipeline that publishes it.
+  - The provider interface, and the relational implementations behind it.
+  - Schema metadata retrieval, as part of the contract rather than an extra.
+  - Connection pooling and the factory that hands out pooled stores.
+  - The document-store provider and its client wrapper.
+  - Unit tests and the publish workflow that versions the package.
+  - NOT his work: Other engineers added providers and fixes on top of it after the first release.
+- **Problem it solved:** The connector needed to query whatever database a customer happened to run, and the platform needed exactly the same thing from its own side. Written twice, that is two provider matrices, two sets of connection-string quirks and two places for a TLS default to be wrong — and they drift, because nobody fixes a bug in the copy they are not looking at.
+- **Architecture:** A caller asks a factory for a store of a given type and hands it connection parameters as a dictionary rather than a pre-built connection string, so nothing upstream has to know each engine’s spelling. The factory returns a pooled store; the store exposes the same two operations — execute a query, describe the tables — whatever driver is underneath. Document stores get a sibling interface, because pretending a collection is a table would be a lie the caller eventually pays for.
+  - Caller — The connector or the platform, holding connection parameters and a query.
+  - Factory — Resolves the engine type to an implementation.
+  - Connection pool — Hands back a live store and reclaims it after use, capped per configuration.
+  - Store — Two operations only: execute a query, describe the tables.
+  - Engine driver — The vendor client, and the only place an engine’s quirks are allowed to live.
+- **What it does:**
+  - Six engines behind one interface, with the document store kept honestly separate.
+  - Schema description is part of the contract, not something bolted on later.
+  - Connection pooling behind the factory, so no caller manages a lifetime it did not open.
+  - Connection parameters as a dictionary — the library, not the caller, knows each engine’s spelling.
+  - Published as a versioned package, consumed by both the connector and the platform.
+- **Engineering decisions:**
+  - **Reading the schema is part of the interface** — A human writing SQL already knows the tables. A model does not, and asking it to guess produces queries that fail in ways that look like the database is broken. Making schema description a first-class operation alongside query execution is what turns the library from a connection helper into something an agent can actually be pointed at.
+  - **Parameters as a dictionary, never a connection string** — Every engine spells the same idea differently — host versus server, the port that is implied, how encryption is requested. Accepting a built string would push that trivia into every caller and, worse, make each caller responsible for the security defaults. Taking a dictionary keeps one place where a wrong default can be fixed for everybody.
+  - **A published package, not shared source** — The connector and the platform are separate repositories on separate release cadences. Copying the source would have been faster on day one and would have guaranteed divergence by month two. A versioned package makes the shared thing an actual dependency: an upgrade is a deliberate act with a number attached, and a fix reaches both consumers or neither.
+  - **Pooling belongs to the library, and its ceiling is configuration** — Callers that open connections directly leak them under load, and the leak surfaces as an unrelated timeout somewhere else. Putting the pool behind the factory makes the correct thing the default thing. The maximum is a setting rather than a constant because the right ceiling for a connector on one customer machine is not the right ceiling for the platform — and the first default shipped turned out to be too low, and was raised five-fold.
+
+### Secure Posture Management — An inventory of every AI agent an enterprise is already running.
+
+- **Role:** R&D Engineer — domain model, persistence and a provider (Jul 2025 – Oct 2025)
+- **Source:** closed — professional work described without the code
+- **Stack:** .NET 9, Entity Framework Core, PostgreSQL, Azure AI Foundry, AWS Bedrock, xUnit
+- **What it is:** Posture management inside the platform: a set of provider connections that are refreshed on a schedule, the agents and components they discover, and the violations feed that says which of them did something a policy forbids.
+- **What Felipe did:** I built the domain model and the persistence under this feature, and added one of the cloud providers it discovers through.
+  - The entities — connection, agent, component, settings — and their database context.
+  - A repository layer over that context, so query logic stopped living in services.
+  - The Azure model-service provider, alongside the ones already supported.
+  - An execution identifier on the violations feed, tying a violation to the run behind it.
+  - NOT his work: This was a large feature owned across several teams — the discovery scanners, the risk scoring and the interface were other people’s work. Mine is the layer they read and write through.
+- **Problem it solved:** An enterprise does not adopt AI in one place. It arrives through a workflow automation tool one team installed, a cloud model service another team already pays for, an assistant builder bundled into software it licenses, and personal subscriptions nobody approved. Governing that starts with a list, and before this feature there was no list — only the parts each team happened to know about.
+- **Architecture:** A tenant configures a connection per provider, each with its own typed configuration rather than a shared bag of settings. A scheduled job refreshes those connections and writes back what it found as components and agents, so the inventory has an age rather than being whatever the last person clicked. The violations feed sits on top and, since this work, carries the execution identifier that links a violation to the run that produced it.
+  - Provider connection — One per platform an enterprise runs AI on, each with a typed configuration of its own.
+  - Scheduled refresh — Re-reads every connection on a timer, so the inventory ages instead of going stale silently.
+  - Components and agents — What was discovered, persisted through a repository layer rather than ad-hoc queries.
+  - Violations feed — What broke a policy, each row traceable to the execution that caused it.
+- **What it does:**
+  - Discovery across several agent platforms, each behind its own typed connection.
+  - A scheduled refresh, so the inventory has a known age.
+  - A repository layer over the database context, keeping query logic out of services.
+  - Violations traceable to the execution that produced them.
+- **Engineering decisions:**
+  - **A typed configuration per provider, not one settings blob** — Every provider authenticates differently and exposes a different shape of thing to discover. A single loosely-typed settings object would have made every consumer guess which keys apply to which provider, and made adding one a matter of hoping nothing downstream cared. A closed set of typed configurations means the compiler names the work required to support a new platform.
+  - **A repository layer, added after the fact and on purpose** — The first version queried the database context straight from the services, which is fine until three teams are writing services against the same entities and each invents its own idea of what "the agents for this tenant" means. Moving those queries behind repositories gave the feature one definition of each read, and gave the unit tests something to stand on that is not a database.
+  - **A scheduled refresh instead of a webhook per provider** — Webhooks would be fresher, and would require every provider to support them, every customer to configure them, and the platform to be reachable from each one — which is the same perimeter problem the connector exists to avoid. Polling on a schedule is less elegant and works everywhere, and an inventory whose age is known is more useful than one that is silently missing whatever event was dropped.
+  - **A violation you can trace to a run** — A feed saying a policy was broken is an alert; a feed saying which execution broke it is an investigation. Carrying the execution identifier through to the violation row is a one-column change that moves the feed from something a security team watches to something they can act on.
+
 ### Dell Automated Caller — Automated end-to-end testing for a phone system.
 
 - **Role:** Conception, architecture and implementation (2020)

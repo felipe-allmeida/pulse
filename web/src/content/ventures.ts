@@ -90,6 +90,25 @@ export const ventures: Venture[] = [
       },
     ],
   },
+  {
+    slug: 'airia',
+    name: 'Airia',
+    url: 'https://airia.com',
+    /*
+      No `team` and no `practices`. Both are present on ULBRA because the
+      author led the team and set how it works; here he was one contractor
+      inside somebody else's product org, and neither field could be filled
+      without inventing an answer.
+    */
+    role: { en: 'R&D Engineer', 'pt-BR': 'Engenheiro de P&D' },
+    period: { en: 'Jun 2025 – Oct 2025', 'pt-BR': 'Jun 2025 – Out 2025' },
+    engagement: { en: 'Contract, part-time', 'pt-BR': 'Contrato, meio período' },
+    summary: {
+      en: 'An enterprise AI security and governance platform. My work was on the side of it that has to reach outside the cloud: the on-premise connector that lets the platform call systems inside a customer network, the multi-engine data-store library underneath it, and the posture management that inventories the AI an enterprise is already running.',
+      'pt-BR':
+        'Uma plataforma corporativa de segurança e governança de IA. Meu trabalho ficou no lado dela que precisa alcançar o mundo fora da nuvem: o conector on-premise que deixa a plataforma chamar sistemas dentro da rede do cliente, a biblioteca multi-engine de acesso a dados por baixo dele e a gestão de postura que inventaria a IA que a empresa já roda.',
+    },
+  },
 ];
 
 export function ventureBySlug(slug: string): Venture | undefined {

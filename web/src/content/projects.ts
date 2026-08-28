@@ -1555,6 +1555,590 @@ export const projects: Project[] = [
     },
   },
   {
+    slug: 'airia-cloud-connector',
+    name: 'Airia Cloud Connector',
+    tagline: {
+      en: 'A reverse tunnel that reaches into a private network without opening it.',
+      'pt-BR': 'Um túnel reverso que alcança uma rede privada sem precisar abri-la.',
+    },
+    description: {
+      en: 'A self-contained agent a customer installs inside its own network. It dials out to the cloud platform and holds the connection open, so the platform can call internal APIs, query internal databases and reach internal MCP servers — without a single inbound firewall rule.',
+      'pt-BR':
+        'Um agente autocontido que o cliente instala dentro da própria rede. Ele disca para fora, até a plataforma na nuvem, e mantém a conexão aberta — assim a plataforma consegue chamar APIs internas, consultar bancos internos e alcançar servidores MCP internos sem uma única regra de firewall de entrada.',
+    },
+    tech: ['.NET 9', 'SignalR', 'Redis', 'JWT', 'MCP', 'xUnit', 'Testcontainers', 'Helm'],
+    role: {
+      en: 'R&D Engineer — security, routing and command surface',
+      'pt-BR': 'Engenheiro de P&D — segurança, roteamento e superfície de comandos',
+    },
+    period: { en: 'Jun 2025 – Oct 2025', 'pt-BR': 'Jun 2025 – Out 2025' },
+    venture: 'airia',
+    visibility: 'private',
+    links: [],
+    screenshot: '/screenshots/airia-cloud-connector.webp',
+    detail: {
+      overview: {
+        en: 'A trimmed, single-file executable that runs inside a customer network and holds an outbound channel open to the cloud platform. Everything the platform needs on the other side of the firewall — an HTTP call, a database query, an MCP tool invocation — travels back down that one channel as a typed command.',
+        'pt-BR':
+          'Um executável único e trimado que roda dentro da rede do cliente e mantém um canal de saída aberto até a plataforma na nuvem. Tudo que a plataforma precisa do outro lado do firewall — uma chamada HTTP, uma consulta a banco, a execução de uma ferramenta MCP — volta por esse mesmo canal como um comando tipado.',
+      },
+      contribution: {
+        summary: {
+          en: 'I owned how the connector authenticates, how a request finds the right one, and what it is able to do once it gets there.',
+          'pt-BR':
+            'Fui responsável por como o conector se autentica, como uma requisição encontra o conector certo e o que ele consegue fazer depois que chega lá.',
+        },
+        areas: [
+          {
+            en: 'Mutual TLS between connector and hub — built, and switched off a week later.',
+            'pt-BR': 'TLS mútuo entre conector e hub — construído, e desligado uma semana depois.',
+          },
+          {
+            en: 'Routing — resolving which connector in which customer group answers a given request.',
+            'pt-BR': 'Roteamento — resolver qual conector, em qual grupo de cliente, responde a uma dada requisição.',
+          },
+          {
+            en: 'The database command type, for both relational engines and document stores.',
+            'pt-BR': 'O tipo de comando de banco de dados, tanto para engines relacionais quanto para bancos de documentos.',
+          },
+          {
+            en: 'MCP support: listing an internal server’s tools and executing them through the tunnel.',
+            'pt-BR': 'Suporte a MCP: listar as ferramentas de um servidor interno e executá-las pelo túnel.',
+          },
+          {
+            en: 'Per-environment release packaging, and installation as a native Windows service.',
+            'pt-BR': 'Empacotamento de release por ambiente e instalação como serviço nativo do Windows.',
+          },
+        ],
+        boundary: {
+          en: 'The repository predates me by three months and several engineers shared it; the hub’s browser-agent surface is someone else’s work.',
+          'pt-BR':
+            'O repositório é três meses mais velho que minha entrada e vários engenheiros dividiam ele; a superfície de browser agent do hub é trabalho de outra pessoa.',
+        },
+      },
+      problem: {
+        en: 'An enterprise buys a cloud AI platform, and then the agents it builds there need the systems that actually hold its data — a database, an internal API, an MCP server — all of which sit behind its firewall. The standard answers are a VPN, a site-to-site tunnel, or an inbound rule for the vendor’s address range, and each one asks a security team to open the perimeter for software it does not run. The connector inverts the direction instead: nothing dials in, so there is nothing to open.',
+        'pt-BR':
+          'Uma empresa contrata uma plataforma de IA na nuvem, e aí os agentes que ela constrói lá precisam dos sistemas que de fato guardam seus dados — um banco, uma API interna, um servidor MCP — todos atrás do firewall dela. As respostas padrão são VPN, túnel site-to-site ou uma regra de entrada para a faixa de endereços do fornecedor, e cada uma pede que o time de segurança abra o perímetro para um software que não é dele. O conector inverte o sentido: nada disca para dentro, então não há o que abrir.',
+      },
+      architecture: {
+        summary: {
+          en: 'The connector opens a SignalR connection outward and registers itself under a customer group. The hub keeps that registry in Redis rather than in memory, so any hub instance can find any connector and correlate the reply — which is what lets the hub scale horizontally behind a load balancer. A platform request becomes a typed command envelope, is pushed down the connector’s channel, executed against whatever is on the private side, and the response is tracked back to the instance still holding the caller.',
+          'pt-BR':
+            'O conector abre uma conexão SignalR para fora e se registra sob um grupo de cliente. O hub guarda esse registro no Redis em vez de em memória, então qualquer instância do hub encontra qualquer conector e correlaciona a resposta — que é o que permite escalar o hub horizontalmente atrás de um balanceador. Uma requisição da plataforma vira um envelope de comando tipado, é empurrada pelo canal do conector, executada contra o que existe do lado privado, e a resposta é rastreada de volta até a instância que ainda segura quem chamou.',
+        },
+        steps: [
+          {
+            label: 'Airia platform',
+            detail: {
+              en: 'Issues an ordinary HTTP request, addressed to a customer group rather than to a host.',
+              'pt-BR': 'Emite uma requisição HTTP comum, endereçada a um grupo de cliente e não a um host.',
+            },
+          },
+          {
+            label: 'Cloud Hub',
+            detail: {
+              en: 'Wraps it as a typed command and looks up which connector should answer.',
+              'pt-BR': 'Empacota como comando tipado e descobre qual conector deve responder.',
+            },
+          },
+          {
+            label: 'Redis registry',
+            detail: {
+              en: 'Holds the connector-to-instance map and the pending responses, so the hub can run as more than one replica.',
+              'pt-BR':
+                'Guarda o mapa conector-instância e as respostas pendentes, então o hub pode rodar com mais de uma réplica.',
+            },
+          },
+          {
+            label: 'Connector',
+            detail: {
+              en: 'Receives the command on the channel it already opened, from inside the customer network.',
+              'pt-BR': 'Recebe o comando no canal que ele mesmo já abriu, de dentro da rede do cliente.',
+            },
+          },
+          {
+            label: 'Internal service',
+            detail: {
+              en: 'The API, database or MCP server that never became reachable from outside.',
+              'pt-BR': 'A API, o banco ou o servidor MCP que nunca se tornou alcançável de fora.',
+            },
+          },
+        ],
+      },
+      table: {
+        caption: { en: 'What travels down the channel', 'pt-BR': 'O que trafega pelo canal' },
+        columns: [
+          { en: 'Command', 'pt-BR': 'Comando' },
+          { en: 'What the platform asks for', 'pt-BR': 'O que a plataforma pede' },
+        ],
+        rows: [
+          ['Http', 'Call an internal API and return the response'],
+          ['Database', 'Run a query, or read the schema first'],
+          ['McpServerInfo', 'List the tools an internal MCP server exposes'],
+          ['McpToolExecution', 'Invoke one of those tools by name'],
+          ['SystemInfo', 'Report the connector’s own health and version'],
+        ],
+        note: {
+          en: 'Adding a capability means adding a command type, not another proxy.',
+          'pt-BR': 'Somar uma capacidade é somar um tipo de comando, não outro proxy.',
+        },
+      },
+      highlights: [
+        {
+          en: 'Outbound-only: the connector dials the cloud, never the other way round.',
+          'pt-BR': 'Só saída: o conector disca para a nuvem, nunca o contrário.',
+        },
+        {
+          en: 'Integration tests run against a real Redis through Testcontainers, not a fake.',
+          'pt-BR': 'Os testes de integração rodam contra um Redis real via Testcontainers, não contra um fake.',
+        },
+        {
+          en: 'Queries relational engines and document stores on the private side, schema included.',
+          'pt-BR': 'Consulta engines relacionais e bancos de documentos do lado privado, schema incluído.',
+        },
+        {
+          en: 'Exposes an internal MCP server’s tools to the platform through the same tunnel.',
+          'pt-BR': 'Expõe as ferramentas de um servidor MCP interno para a plataforma pelo mesmo túnel.',
+        },
+        {
+          en: 'Ships as one trimmed, self-contained executable, installable as a Windows service.',
+          'pt-BR': 'Distribuído como um executável único, trimado e autocontido, instalável como serviço do Windows.',
+        },
+      ],
+      decisions: [
+        {
+          heading: {
+            en: 'Invert the direction rather than open the perimeter',
+            'pt-BR': 'Inverter o sentido em vez de abrir o perímetro',
+          },
+          body: {
+            en: 'A persistent outbound connection does everything an inbound rule would, and asks the customer for nothing their egress policy does not already allow. The security review this avoids is not a small one: it is the difference between a deployment a network team approves in an afternoon and one that spends a quarter in committee.',
+            'pt-BR':
+              'Uma conexão de saída persistente faz tudo o que uma regra de entrada faria, e não pede ao cliente nada que a política de egresso dele já não permita. A revisão de segurança que isso evita não é pequena: é a diferença entre um deploy que o time de rede aprova numa tarde e um que passa um trimestre em comitê.',
+          },
+        },
+        {
+          heading: {
+            en: 'Mutual TLS, built and then switched off',
+            'pt-BR': 'TLS mútuo, construído e depois desligado',
+          },
+          body: {
+            en: 'A bearer token proves the connector to the hub and does nothing to prove the hub to the connector, so client certificates went on both ends, with an explicit clock-skew allowance and a readable error in place of a raw handshake failure. It lasted a week. I merged the change that disabled it myself, the certificate requirement was dropped the next day, and the wiring is still commented out on both sides — the reason is not recorded anywhere I can point to, and I am not going to reconstruct one. What ships is bearer tokens over TLS. The honest lesson is not about the cryptography: a security control that a customer’s ops team has to hold up their end of is only as real as the certificate distribution nobody had built yet.',
+            'pt-BR':
+              'Um bearer token prova o conector para o hub e não prova nada do hub para o conector, então certificados de cliente entraram nas duas pontas, com uma tolerância explícita de desvio de relógio e um erro legível no lugar de uma falha crua de handshake. Durou uma semana. Fui eu mesmo que mergeei a mudança que desligou isso, a exigência de certificado caiu no dia seguinte, e o wiring segue comentado dos dois lados — o motivo não está registrado em lugar nenhum que eu possa apontar, e não vou reconstruir um. O que vai para produção é bearer token sobre TLS. A lição honesta não é sobre criptografia: um controle de segurança que depende do time de operações do cliente segurar a outra ponta só é tão real quanto a distribuição de certificados que ninguém tinha construído ainda.',
+          },
+        },
+        {
+          heading: {
+            en: 'The connector registry lives in Redis, not in the hub’s memory',
+            'pt-BR': 'O registro de conectores vive no Redis, não na memória do hub',
+          },
+          body: {
+            en: 'A connector is attached to exactly one hub instance, but a platform request can land on any of them. Keeping the registry and the pending responses in Redis means the instance that receives a request can route it to the instance holding the connection, and the reply finds its way back. Without that, the hub is pinned to a single replica — a strange thing to accept in the one component every customer’s traffic passes through.',
+            'pt-BR':
+              'Um conector está preso a exatamente uma instância do hub, mas uma requisição da plataforma pode cair em qualquer uma. Manter o registro e as respostas pendentes no Redis faz com que a instância que recebe a requisição consiga roteá-la até a instância que segura a conexão, e a resposta encontra o caminho de volta. Sem isso, o hub fica preso a uma réplica só — coisa estranha de aceitar no único componente por onde passa o tráfego de todo cliente.',
+          },
+        },
+        {
+          heading: {
+            en: 'One command envelope instead of a proxy per capability',
+            'pt-BR': 'Um envelope de comando único em vez de um proxy por capacidade',
+          },
+          body: {
+            en: 'HTTP came first, and databases and MCP could each have been a second tunnel with its own lifecycle. Making them command types on the existing channel meant authentication, routing, reconnection and response correlation were solved once. When MCP support was added, none of that had to be rebuilt — it was a new command type and a handler.',
+            'pt-BR':
+              'HTTP veio primeiro, e banco e MCP poderiam cada um ter virado um segundo túnel com ciclo de vida próprio. Torná-los tipos de comando no canal já existente fez com que autenticação, roteamento, reconexão e correlação de resposta fossem resolvidos uma vez só. Quando o suporte a MCP entrou, nada disso precisou ser refeito — foi um novo tipo de comando e um handler.',
+          },
+        },
+        {
+          heading: {
+            en: 'A trimmed single file, and the serializer that requires',
+            'pt-BR': 'Um arquivo único trimado, e o serializador que isso exige',
+          },
+          body: {
+            en: 'The connector is installed by someone else’s ops team on a machine nobody on the vendor side can log into, so it ships self-contained: no runtime to install, one file to copy, and later a native Windows service so it survives a reboot without a human. Trimming that binary breaks reflection-based JSON, which is why the command envelope is serialized through a source-generated context — an unglamorous constraint that follows directly from choosing a deployment the customer can actually operate.',
+            'pt-BR':
+              'O conector é instalado pelo time de operações de outra empresa, numa máquina em que ninguém do lado do fornecedor consegue entrar, então ele é distribuído autocontido: sem runtime para instalar, um arquivo para copiar e, depois, um serviço nativo do Windows para sobreviver a um reboot sem humano. Trimar esse binário quebra JSON baseado em reflexão, e é por isso que o envelope de comando é serializado por um contexto gerado em tempo de compilação — uma restrição sem glamour que decorre direto de escolher um deploy que o cliente consiga de fato operar.',
+          },
+        },
+      ],
+    },
+  },
+  {
+    slug: 'airia-datastores',
+    name: 'Airia.DataStores.Common',
+    tagline: {
+      en: 'One query surface over six database engines, shipped as a package.',
+      'pt-BR': 'Uma superfície de consulta única sobre seis engines de banco, entregue como pacote.',
+    },
+    description: {
+      en: 'A .NET library that puts relational engines and a document store behind one interface: run a query, read the schema, pool the connections. Written so the cloud connector and the platform consume the same build instead of maintaining two drifting copies of the same provider matrix.',
+      'pt-BR':
+        'Uma biblioteca .NET que coloca engines relacionais e um banco de documentos atrás de uma interface só: executar consulta, ler schema, gerenciar pool de conexões. Escrita para que o conector de nuvem e a plataforma consumam o mesmo build, em vez de manter duas cópias divergentes da mesma matriz de provedores.',
+    },
+    tech: ['.NET 9', 'PostgreSQL', 'SQL Server', 'MySQL', 'Snowflake', 'Databricks', 'MongoDB', 'xUnit'],
+    role: {
+      en: 'R&D Engineer — author, from the first commit',
+      'pt-BR': 'Engenheiro de P&D — autor, desde o primeiro commit',
+    },
+    period: { en: 'Jul 2025 – Oct 2025', 'pt-BR': 'Jul 2025 – Out 2025' },
+    venture: 'airia',
+    visibility: 'private',
+    links: [],
+    screenshot: '/screenshots/airia-datastores.webp',
+    detail: {
+      overview: {
+        en: 'A shared library that answers one question for every database an enterprise might point at an AI agent: how do you run a query and read a schema without the caller knowing which engine it is talking to.',
+        'pt-BR':
+          'Uma biblioteca compartilhada que responde a uma única pergunta para cada banco que uma empresa possa apontar para um agente de IA: como executar uma consulta e ler um schema sem que quem chama saiba com qual engine está falando.',
+      },
+      contribution: {
+        summary: {
+          en: 'I started this repository and wrote its first version — the interfaces, the providers, the pooling and the package pipeline that publishes it.',
+          'pt-BR':
+            'Eu abri este repositório e escrevi sua primeira versão — as interfaces, os provedores, o pooling e o pipeline de pacote que publica tudo.',
+        },
+        areas: [
+          {
+            en: 'The provider interface, and the relational implementations behind it.',
+            'pt-BR': 'A interface de provedor e as implementações relacionais atrás dela.',
+          },
+          {
+            en: 'Schema metadata retrieval, as part of the contract rather than an extra.',
+            'pt-BR': 'A leitura de metadados de schema, como parte do contrato e não como extra.',
+          },
+          {
+            en: 'Connection pooling and the factory that hands out pooled stores.',
+            'pt-BR': 'O pooling de conexões e a factory que entrega stores do pool.',
+          },
+          {
+            en: 'The document-store provider and its client wrapper.',
+            'pt-BR': 'O provedor de banco de documentos e o wrapper de cliente dele.',
+          },
+          {
+            en: 'Unit tests and the publish workflow that versions the package.',
+            'pt-BR': 'Testes unitários e o workflow de publicação que versiona o pacote.',
+          },
+        ],
+        boundary: {
+          en: 'Other engineers added providers and fixes on top of it after the first release.',
+          'pt-BR': 'Outros engenheiros somaram provedores e correções em cima disso depois do primeiro release.',
+        },
+      },
+      problem: {
+        en: 'The connector needed to query whatever database a customer happened to run, and the platform needed exactly the same thing from its own side. Written twice, that is two provider matrices, two sets of connection-string quirks and two places for a TLS default to be wrong — and they drift, because nobody fixes a bug in the copy they are not looking at.',
+        'pt-BR':
+          'O conector precisava consultar qualquer banco que o cliente por acaso rodasse, e a plataforma precisava exatamente do mesmo do lado dela. Escrito duas vezes, isso são duas matrizes de provedores, dois conjuntos de manias de connection string e dois lugares para um default de TLS estar errado — e eles divergem, porque ninguém corrige um bug na cópia que não está olhando.',
+      },
+      architecture: {
+        summary: {
+          en: 'A caller asks a factory for a store of a given type and hands it connection parameters as a dictionary rather than a pre-built connection string, so nothing upstream has to know each engine’s spelling. The factory returns a pooled store; the store exposes the same two operations — execute a query, describe the tables — whatever driver is underneath. Document stores get a sibling interface, because pretending a collection is a table would be a lie the caller eventually pays for.',
+          'pt-BR':
+            'Quem chama pede à factory um store de um tipo, entregando os parâmetros de conexão como um dicionário em vez de uma connection string pronta, então nada acima precisa conhecer a grafia de cada engine. A factory devolve um store do pool; o store expõe as mesmas duas operações — executar consulta, descrever tabelas — seja qual for o driver embaixo. Bancos de documentos ganham uma interface irmã, porque fingir que uma coleção é uma tabela seria uma mentira que quem chama acaba pagando.',
+        },
+        steps: [
+          {
+            label: 'Caller',
+            detail: {
+              en: 'The connector or the platform, holding connection parameters and a query.',
+              'pt-BR': 'O conector ou a plataforma, com os parâmetros de conexão e uma consulta.',
+            },
+          },
+          {
+            label: 'Factory',
+            detail: {
+              en: 'Resolves the engine type to an implementation.',
+              'pt-BR': 'Resolve o tipo de engine para uma implementação.',
+            },
+          },
+          {
+            label: 'Connection pool',
+            detail: {
+              en: 'Hands back a live store and reclaims it after use, capped per configuration.',
+              'pt-BR': 'Devolve um store vivo e o recolhe depois do uso, com teto por configuração.',
+            },
+          },
+          {
+            label: 'Store',
+            detail: {
+              en: 'Two operations only: execute a query, describe the tables.',
+              'pt-BR': 'Só duas operações: executar consulta, descrever tabelas.',
+            },
+          },
+          {
+            label: 'Engine driver',
+            detail: {
+              en: 'The vendor client, and the only place an engine’s quirks are allowed to live.',
+              'pt-BR': 'O cliente do fornecedor, e o único lugar onde as manias de cada engine podem morar.',
+            },
+          },
+        ],
+      },
+      table: {
+        caption: { en: 'Engines behind the one interface', 'pt-BR': 'Engines atrás da interface única' },
+        columns: [
+          { en: 'Engine', 'pt-BR': 'Engine' },
+          { en: 'Family', 'pt-BR': 'Família' },
+        ],
+        rows: [
+          ['PostgreSQL', 'Relational'],
+          ['SQL Server', 'Relational'],
+          ['MySQL', 'Relational'],
+          ['Snowflake', 'Warehouse'],
+          ['Databricks', 'Warehouse'],
+          ['MongoDB', 'Document'],
+        ],
+        note: {
+          en: 'Warehouses answer the same interface as the relational engines; the document store has its own.',
+          'pt-BR':
+            'Os warehouses respondem à mesma interface das engines relacionais; o banco de documentos tem a sua.',
+        },
+      },
+      highlights: [
+        {
+          en: 'Six engines behind one interface, with the document store kept honestly separate.',
+          'pt-BR': 'Seis engines atrás de uma interface, com o banco de documentos honestamente separado.',
+        },
+        {
+          en: 'Schema description is part of the contract, not something bolted on later.',
+          'pt-BR': 'Descrever o schema faz parte do contrato, não é algo pregado depois.',
+        },
+        {
+          en: 'Connection pooling behind the factory, so no caller manages a lifetime it did not open.',
+          'pt-BR':
+            'Pooling de conexões atrás da factory, então quem chama não gerencia um ciclo de vida que não abriu.',
+        },
+        {
+          en: 'Connection parameters as a dictionary — the library, not the caller, knows each engine’s spelling.',
+          'pt-BR':
+            'Parâmetros de conexão como dicionário — a biblioteca, não quem chama, conhece a grafia de cada engine.',
+        },
+        {
+          en: 'Published as a versioned package, consumed by both the connector and the platform.',
+          'pt-BR': 'Publicada como pacote versionado, consumida tanto pelo conector quanto pela plataforma.',
+        },
+      ],
+      decisions: [
+        {
+          heading: {
+            en: 'Reading the schema is part of the interface',
+            'pt-BR': 'Ler o schema faz parte da interface',
+          },
+          body: {
+            en: 'A human writing SQL already knows the tables. A model does not, and asking it to guess produces queries that fail in ways that look like the database is broken. Making schema description a first-class operation alongside query execution is what turns the library from a connection helper into something an agent can actually be pointed at.',
+            'pt-BR':
+              'Uma pessoa escrevendo SQL já conhece as tabelas. Um modelo não, e pedir que ele adivinhe produz consultas que falham de um jeito que parece banco quebrado. Tornar a descrição de schema uma operação de primeira classe ao lado da execução de consulta é o que transforma a biblioteca de um utilitário de conexão em algo para o qual um agente pode de fato ser apontado.',
+          },
+        },
+        {
+          heading: {
+            en: 'Parameters as a dictionary, never a connection string',
+            'pt-BR': 'Parâmetros como dicionário, nunca connection string',
+          },
+          body: {
+            en: 'Every engine spells the same idea differently — host versus server, the port that is implied, how encryption is requested. Accepting a built string would push that trivia into every caller and, worse, make each caller responsible for the security defaults. Taking a dictionary keeps one place where a wrong default can be fixed for everybody.',
+            'pt-BR':
+              'Cada engine escreve a mesma ideia de um jeito — host ou server, a porta que fica implícita, como a criptografia é pedida. Aceitar uma string pronta empurraria essa trivialidade para dentro de cada chamador e, pior, tornaria cada chamador responsável pelos defaults de segurança. Receber um dicionário mantém um lugar só onde um default errado pode ser corrigido para todo mundo.',
+          },
+        },
+        {
+          heading: {
+            en: 'A published package, not shared source',
+            'pt-BR': 'Um pacote publicado, não código compartilhado',
+          },
+          body: {
+            en: 'The connector and the platform are separate repositories on separate release cadences. Copying the source would have been faster on day one and would have guaranteed divergence by month two. A versioned package makes the shared thing an actual dependency: an upgrade is a deliberate act with a number attached, and a fix reaches both consumers or neither.',
+            'pt-BR':
+              'O conector e a plataforma são repositórios separados, com cadências de release separadas. Copiar o código teria sido mais rápido no primeiro dia e teria garantido divergência no segundo mês. Um pacote versionado torna a coisa compartilhada uma dependência de verdade: atualizar é um ato deliberado com um número junto, e uma correção chega aos dois consumidores ou a nenhum.',
+          },
+        },
+        {
+          heading: {
+            en: 'Pooling belongs to the library, and its ceiling is configuration',
+            'pt-BR': 'O pooling pertence à biblioteca, e seu teto é configuração',
+          },
+          body: {
+            en: 'Callers that open connections directly leak them under load, and the leak surfaces as an unrelated timeout somewhere else. Putting the pool behind the factory makes the correct thing the default thing. The maximum is a setting rather than a constant because the right ceiling for a connector on one customer machine is not the right ceiling for the platform — and the first default shipped turned out to be too low, and was raised five-fold.',
+            'pt-BR':
+              'Quem abre conexão direto vaza conexão sob carga, e o vazamento aparece como um timeout sem relação em outro lugar. Colocar o pool atrás da factory faz da coisa certa a coisa padrão. O máximo é configuração e não constante porque o teto certo para um conector numa máquina de cliente não é o teto certo para a plataforma — e o primeiro default entregue se mostrou baixo demais, e foi multiplicado por cinco.',
+          },
+        },
+      ],
+    },
+  },
+  {
+    slug: 'airia-spm',
+    name: 'Secure Posture Management',
+    tagline: {
+      en: 'An inventory of every AI agent an enterprise is already running.',
+      'pt-BR': 'Um inventário de cada agente de IA que a empresa já está rodando.',
+    },
+    description: {
+      en: 'The part of the platform that connects to the places AI actually runs — workflow automation tools, cloud model services, assistant builders — and turns what it finds into an inventory of agents and components, each carrying its own risk and a feed of policy violations.',
+      'pt-BR':
+        'A parte da plataforma que se conecta aos lugares onde a IA de fato roda — ferramentas de automação de workflow, serviços de modelo em nuvem, construtores de assistente — e transforma o que encontra num inventário de agentes e componentes, cada um carregando seu risco e um feed de violações de política.',
+    },
+    tech: ['.NET 9', 'Entity Framework Core', 'PostgreSQL', 'Azure AI Foundry', 'AWS Bedrock', 'xUnit'],
+    role: {
+      en: 'R&D Engineer — domain model, persistence and a provider',
+      'pt-BR': 'Engenheiro de P&D — modelo de domínio, persistência e um provedor',
+    },
+    period: { en: 'Jul 2025 – Oct 2025', 'pt-BR': 'Jul 2025 – Out 2025' },
+    venture: 'airia',
+    visibility: 'private',
+    links: [],
+    screenshot: '/screenshots/airia-spm.webp',
+    detail: {
+      overview: {
+        en: 'Posture management inside the platform: a set of provider connections that are refreshed on a schedule, the agents and components they discover, and the violations feed that says which of them did something a policy forbids.',
+        'pt-BR':
+          'Gestão de postura dentro da plataforma: um conjunto de conexões com provedores que são atualizadas em um agendamento, os agentes e componentes que elas descobrem e o feed de violações que diz qual deles fez algo que uma política proíbe.',
+      },
+      contribution: {
+        summary: {
+          en: 'I built the domain model and the persistence under this feature, and added one of the cloud providers it discovers through.',
+          'pt-BR':
+            'Construí o modelo de domínio e a persistência sob esta funcionalidade, e adicionei um dos provedores de nuvem por onde ela descobre.',
+        },
+        areas: [
+          {
+            en: 'The entities — connection, agent, component, settings — and their database context.',
+            'pt-BR': 'As entidades — conexão, agente, componente, configurações — e seu contexto de banco.',
+          },
+          {
+            en: 'A repository layer over that context, so query logic stopped living in services.',
+            'pt-BR':
+              'Uma camada de repositório sobre esse contexto, para que a lógica de consulta parasse de morar nos serviços.',
+          },
+          {
+            en: 'The Azure model-service provider, alongside the ones already supported.',
+            'pt-BR': 'O provedor de serviço de modelos da Azure, ao lado dos que já eram suportados.',
+          },
+          {
+            en: 'An execution identifier on the violations feed, tying a violation to the run behind it.',
+            'pt-BR':
+              'Um identificador de execução no feed de violações, ligando uma violação à execução por trás dela.',
+          },
+        ],
+        boundary: {
+          en: 'This was a large feature owned across several teams — the discovery scanners, the risk scoring and the interface were other people’s work. Mine is the layer they read and write through.',
+          'pt-BR':
+            'Esta era uma funcionalidade grande, dividida entre vários times — os scanners de descoberta, a pontuação de risco e a interface eram trabalho de outras pessoas. O meu é a camada por onde elas leem e escrevem.',
+        },
+      },
+      problem: {
+        en: 'An enterprise does not adopt AI in one place. It arrives through a workflow automation tool one team installed, a cloud model service another team already pays for, an assistant builder bundled into software it licenses, and personal subscriptions nobody approved. Governing that starts with a list, and before this feature there was no list — only the parts each team happened to know about.',
+        'pt-BR':
+          'Uma empresa não adota IA num lugar só. Ela chega por uma ferramenta de automação de workflow que um time instalou, por um serviço de modelos em nuvem que outro time já paga, por um construtor de assistentes embutido num software licenciado e por assinaturas pessoais que ninguém aprovou. Governar isso começa por uma lista, e antes desta funcionalidade não havia lista — só as partes que cada time por acaso conhecia.',
+      },
+      architecture: {
+        summary: {
+          en: 'A tenant configures a connection per provider, each with its own typed configuration rather than a shared bag of settings. A scheduled job refreshes those connections and writes back what it found as components and agents, so the inventory has an age rather than being whatever the last person clicked. The violations feed sits on top and, since this work, carries the execution identifier that links a violation to the run that produced it.',
+          'pt-BR':
+            'Um tenant configura uma conexão por provedor, cada uma com sua configuração tipada em vez de um saco compartilhado de opções. Um job agendado atualiza essas conexões e grava o que encontrou como componentes e agentes, então o inventário tem uma idade em vez de ser o que a última pessoa clicou. O feed de violações fica por cima e, desde este trabalho, carrega o identificador de execução que liga uma violação à execução que a produziu.',
+        },
+        steps: [
+          {
+            label: 'Provider connection',
+            detail: {
+              en: 'One per platform an enterprise runs AI on, each with a typed configuration of its own.',
+              'pt-BR': 'Uma por plataforma em que a empresa roda IA, cada uma com uma configuração tipada própria.',
+            },
+          },
+          {
+            label: 'Scheduled refresh',
+            detail: {
+              en: 'Re-reads every connection on a timer, so the inventory ages instead of going stale silently.',
+              'pt-BR':
+                'Relê cada conexão num temporizador, então o inventário envelhece em vez de ficar obsoleto em silêncio.',
+            },
+          },
+          {
+            label: 'Components and agents',
+            detail: {
+              en: 'What was discovered, persisted through a repository layer rather than ad-hoc queries.',
+              'pt-BR':
+                'O que foi descoberto, persistido por uma camada de repositório em vez de consultas ad-hoc.',
+            },
+          },
+          {
+            label: 'Violations feed',
+            detail: {
+              en: 'What broke a policy, each row traceable to the execution that caused it.',
+              'pt-BR': 'O que quebrou uma política, cada linha rastreável até a execução que a causou.',
+            },
+          },
+        ],
+      },
+      highlights: [
+        {
+          en: 'Discovery across several agent platforms, each behind its own typed connection.',
+          'pt-BR': 'Descoberta em várias plataformas de agentes, cada uma atrás de uma conexão tipada própria.',
+        },
+        {
+          en: 'A scheduled refresh, so the inventory has a known age.',
+          'pt-BR': 'Uma atualização agendada, para que o inventário tenha uma idade conhecida.',
+        },
+        {
+          en: 'A repository layer over the database context, keeping query logic out of services.',
+          'pt-BR':
+            'Uma camada de repositório sobre o contexto de banco, mantendo a lógica de consulta fora dos serviços.',
+        },
+        {
+          en: 'Violations traceable to the execution that produced them.',
+          'pt-BR': 'Violações rastreáveis até a execução que as produziu.',
+        },
+      ],
+      decisions: [
+        {
+          heading: {
+            en: 'A typed configuration per provider, not one settings blob',
+            'pt-BR': 'Uma configuração tipada por provedor, não um blob de configurações',
+          },
+          body: {
+            en: 'Every provider authenticates differently and exposes a different shape of thing to discover. A single loosely-typed settings object would have made every consumer guess which keys apply to which provider, and made adding one a matter of hoping nothing downstream cared. A closed set of typed configurations means the compiler names the work required to support a new platform.',
+            'pt-BR':
+              'Cada provedor autentica de um jeito e expõe um formato diferente de coisa a descobrir. Um único objeto de configuração fracamente tipado faria cada consumidor adivinhar quais chaves valem para qual provedor, e somar um provedor viraria torcer para nada lá na frente se importar. Um conjunto fechado de configurações tipadas faz o compilador nomear o trabalho necessário para suportar uma plataforma nova.',
+          },
+        },
+        {
+          heading: {
+            en: 'A repository layer, added after the fact and on purpose',
+            'pt-BR': 'Uma camada de repositório, acrescentada depois e de propósito',
+          },
+          body: {
+            en: 'The first version queried the database context straight from the services, which is fine until three teams are writing services against the same entities and each invents its own idea of what "the agents for this tenant" means. Moving those queries behind repositories gave the feature one definition of each read, and gave the unit tests something to stand on that is not a database.',
+            'pt-BR':
+              'A primeira versão consultava o contexto de banco direto dos serviços, o que funciona até três times estarem escrevendo serviços sobre as mesmas entidades e cada um inventar sua própria ideia do que significa "os agentes deste tenant". Mover essas consultas para trás de repositórios deu à funcionalidade uma definição única de cada leitura, e deu aos testes unitários algo em que se apoiar que não é um banco.',
+          },
+        },
+        {
+          heading: {
+            en: 'A scheduled refresh instead of a webhook per provider',
+            'pt-BR': 'Atualização agendada em vez de um webhook por provedor',
+          },
+          body: {
+            en: 'Webhooks would be fresher, and would require every provider to support them, every customer to configure them, and the platform to be reachable from each one — which is the same perimeter problem the connector exists to avoid. Polling on a schedule is less elegant and works everywhere, and an inventory whose age is known is more useful than one that is silently missing whatever event was dropped.',
+            'pt-BR':
+              'Webhooks seriam mais frescos, e exigiriam que todo provedor os suportasse, que todo cliente os configurasse e que a plataforma fosse alcançável a partir de cada um — que é o mesmo problema de perímetro que o conector existe para evitar. Consultar num agendamento é menos elegante e funciona em todo lugar, e um inventário cuja idade se conhece é mais útil que um a que falta, em silêncio, o evento que se perdeu.',
+          },
+        },
+        {
+          heading: {
+            en: 'A violation you can trace to a run',
+            'pt-BR': 'Uma violação que dá para rastrear até uma execução',
+          },
+          body: {
+            en: 'A feed saying a policy was broken is an alert; a feed saying which execution broke it is an investigation. Carrying the execution identifier through to the violation row is a one-column change that moves the feed from something a security team watches to something they can act on.',
+            'pt-BR':
+              'Um feed dizendo que uma política foi quebrada é um alerta; um feed dizendo qual execução quebrou é uma investigação. Levar o identificador de execução até a linha da violação é uma mudança de uma coluna que tira o feed do lugar de algo que o time de segurança observa e o coloca no de algo sobre o que consegue agir.',
+          },
+        },
+      ],
+    },
+  },
+  {
     slug: 'dell-automated-caller',
     name: 'Dell Automated Caller',
     tagline: {
