@@ -1643,13 +1643,13 @@ export const projects: Project[] = [
     slug: 'dietbox-realtime',
     name: 'Dietbox Realtime',
     tagline: {
-      en: 'Live updates as a service of its own, so they ship on their own clock.',
-      'pt-BR': 'Atualizações ao vivo como serviço próprio, para subirem no próprio relógio.',
+      en: 'Chat between a nutritionist and her patient, and anything else that has to arrive now.',
+      'pt-BR': 'Chat entre a nutricionista e o paciente, e qualquer outra coisa que precise chegar agora.',
     },
     description: {
-      en: 'A small realtime server that holds the open connections: a room per user, a shared-secret handshake, and one endpoint the platform posts to when something needs pushing. Separate from the product because long-lived connections and request traffic do not scale on the same axis — and because the monolith deployed once a night.',
+      en: 'The socket server behind two features: the chat a nutritionist and her patient hold inside the product, and the notifications the platform needs to land on a screen that is already open. A room per user, a shared-secret handshake, and one endpoint the rest of the platform posts to.',
       'pt-BR':
-        'Um servidor de tempo real pequeno que mantém as conexões abertas: uma sala por usuário, um handshake com segredo compartilhado e um endpoint para onde a plataforma posta quando algo precisa ser empurrado. Separado do produto porque conexões de longa duração e tráfego de requisição não escalam no mesmo eixo — e porque o monolito subia uma vez por madrugada.',
+        'O servidor de sockets por trás de duas funcionalidades: o chat que a nutricionista e o paciente mantêm dentro do produto, e as notificações que a plataforma precisa entregar numa tela que já está aberta. Uma sala por usuário, um handshake com segredo compartilhado e um endpoint para onde o resto da plataforma posta.',
     },
     tech: ['Node', 'Express', 'Socket.IO', 'Application Insights', 'Azure App Service', 'Azure DevOps'],
     role: { en: 'Senior Software Engineer', 'pt-BR': 'Engenheiro de Software Sênior' },
@@ -1659,26 +1659,26 @@ export const projects: Project[] = [
     venture: 'dietbox',
     detail: {
       overview: {
-        en: 'Thirty-four commits over two months in 2022, for a service that has outlived both: a socket server that holds every open connection, joins each client to a room named for its user id, and exposes one endpoint the rest of the platform posts to when something needs pushing out. It sits outside the product because a long-lived connection and a request are not the same kind of traffic.',
+        en: 'This exists so two people can talk inside the product. A nutritionist and her patient each hold an open connection, and a message sent from one lands on the other’s screen without either of them reloading anything. The same channel carries the platform’s own notifications — anything that has to reach someone now rather than at their next page load. Thirty-four commits over two months in 2022, for a service that outlived both.',
         'pt-BR':
-          'Trinta e quatro commits em dois meses de 2022, para um serviço que sobreviveu a ambos: um servidor de tempo real que mantém cada conexão aberta, junta cada cliente a uma sala com o nome do seu id de usuário, e expõe um único endpoint para onde o resto da plataforma posta quando algo precisa ser empurrado. Ele fica fora do produto porque uma conexão de longa duração e uma requisição não são o mesmo tipo de tráfego.',
+          'Isto existe para que duas pessoas possam conversar dentro do produto. A nutricionista e o paciente mantêm cada um uma conexão aberta, e uma mensagem enviada por um aparece na tela do outro sem que nenhum dos dois recarregue nada. O mesmo canal carrega as notificações da própria plataforma — qualquer coisa que precise alcançar alguém agora, e não no próximo carregamento de página. Trinta e quatro commits em dois meses de 2022, para um serviço que sobreviveu a ambos.',
       },
       contribution: {
         summary: {
-          en: 'I built this one effectively alone: thirty-three of the thirty-four commits, from the handshake to the load-test harness that proved it held up.',
+          en: 'I built this one effectively alone: thirty-three of the thirty-four commits, from the chat relay to the load-test harness that proved it held up.',
           'pt-BR':
-            'Construí este praticamente sozinho: trinta e três dos trinta e quatro commits, do handshake ao harness de carga que comprovou que ele aguentava.',
+            'Construí este praticamente sozinho: trinta e três dos trinta e quatro commits, do relay de chat ao harness de carga que comprovou que ele aguentava.',
         },
         areas: [
           {
-            en: 'The socket server itself: the shared-secret handshake, room assignment by user id, and an immediate disconnect for a client that ends up joined to no room.',
+            en: 'The chat relay: a message emitted by one client is pushed straight into the recipient’s room, so it reaches an open screen rather than waiting for a reload.',
             'pt-BR':
-              'O próprio servidor de tempo real: o handshake com segredo compartilhado, a atribuição de sala por id de usuário, e a desconexão imediata de um cliente que acaba sem entrar em nenhuma sala.',
+              'O relay de chat: uma mensagem emitida por um cliente é empurrada direto para a sala do destinatário, chegando a uma tela aberta em vez de esperar um recarregamento.',
           },
           {
-            en: 'The notify endpoint the rest of the platform posts to, and the info and health endpoints used to watch the service itself.',
+            en: 'The socket server underneath both: the shared-secret handshake, room assignment by user id, the notify endpoint the platform posts to, and the info and health endpoints used to watch it.',
             'pt-BR':
-              'O endpoint de notificação para onde o resto da plataforma posta, e os endpoints de info e de saúde usados para observar o próprio serviço.',
+              'O servidor de sockets embaixo dos dois: o handshake com segredo compartilhado, a atribuição de sala por id de usuário, o endpoint de notificação para onde a plataforma posta, e os endpoints de info e de saúde usados para observá-lo.',
           },
           {
             en: 'The handler-loading convention: an event handler is a file, picked up automatically from a directory.',
@@ -1693,22 +1693,22 @@ export const projects: Project[] = [
         ],
       },
       problem: {
-        en: 'The monolith deployed once a night, and anything sharing its pipeline shared its cadence — a realtime channel that can only change at three in the morning is a realtime channel nobody changes. Separately, open connections and request traffic do not want the same instance count: one scales with how many people are online, the other with how many requests arrive.',
+        en: 'A nutritionist and her patient had no way to talk inside the product, and anything the platform needed to tell someone waited until that person reloaded the page. Putting the open connections inside the monolith was not an option: it deployed once a night, and a channel that can only change at three in the morning is a channel nobody changes. Open connections also scale with how many people are online, while requests scale with how many arrive — a different problem, and so a different service.',
         'pt-BR':
-          'O monolito subia uma vez por madrugada, e qualquer coisa que compartilhasse seu pipeline compartilhava seu ritmo — um canal de tempo real que só pode mudar às três da manhã é um canal de tempo real que ninguém muda. Separadamente, conexões abertas e tráfego de requisição não querem a mesma quantidade de instâncias: uma escala com quantas pessoas estão online, a outra com quantas requisições chegam.',
+          'A nutricionista e o paciente não tinham como conversar dentro do produto, e qualquer coisa que a plataforma precisasse avisar ficava esperando a pessoa recarregar a página. Colocar as conexões abertas dentro do monolito não era opção: ele subia uma vez por madrugada, e um canal que só pode mudar às três da manhã é um canal que ninguém muda. Conexões abertas também escalam com quantas pessoas estão online, enquanto requisições escalam com quantas chegam — problema diferente, e por isso serviço diferente.',
       },
       architecture: {
         summary: {
-          en: 'The platform posts a room, an event name and a payload to the notify endpoint; the server resolves who is in that room right now and pushes the event straight to them.',
+          en: 'Two things arrive the same way: a chat message emitted by one of the two people talking, or a push from another service in the platform. Either resolves to a room, and whoever is in that room right now gets it.',
           'pt-BR':
-            'A plataforma posta uma sala, um nome de evento e um payload para o endpoint de notificação; o servidor resolve quem está naquela sala agora e empurra o evento diretamente para eles.',
+            'Duas coisas chegam pelo mesmo caminho: uma mensagem de chat emitida por uma das duas pessoas conversando, ou um push de outro serviço da plataforma. Qualquer uma resolve para uma sala, e quem estiver naquela sala agora recebe.',
         },
         steps: [
           {
-            label: 'Platform',
+            label: 'Origin',
             detail: {
-              en: 'Another service in the platform posts a room, an event name and a payload to the notify endpoint.',
-              'pt-BR': 'Outro serviço da plataforma posta uma sala, um nome de evento e um payload para o endpoint de notificação.',
+              en: 'Either one of the two people talking emits a chat message, or another service in the platform posts a room, an event name and a payload to the notify endpoint.',
+              'pt-BR': 'Ou uma das duas pessoas conversando emite uma mensagem de chat, ou outro serviço da plataforma posta uma sala, um nome de evento e um payload para o endpoint de notificação.',
             },
           },
           {
@@ -1770,16 +1770,16 @@ export const projects: Project[] = [
       ],
       highlights: [
         {
-          en: 'The notify endpoint the rest of the platform posts to when something needs pushing out.',
-          'pt-BR': 'O endpoint de notificação para onde o resto da plataforma posta quando algo precisa ser empurrado.',
+          en: 'Chat between a nutritionist and her patient, carried over the connection both of them already hold open.',
+          'pt-BR': 'Chat entre a nutricionista e o paciente, carregado pela conexão que os dois já mantêm aberta.',
         },
         {
-          en: 'An info endpoint reporting the live connection count, for monitoring.',
-          'pt-BR': 'Um endpoint de info que reporta a contagem de conexões ao vivo, para monitoramento.',
+          en: 'Notifications the platform pushes to a person, landing on whatever screen they already have open.',
+          'pt-BR': 'Notificações que a plataforma empurra para uma pessoa, chegando na tela que ela já tem aberta.',
         },
         {
-          en: 'A health endpoint reporting its own latency.',
-          'pt-BR': 'Um endpoint de saúde que reporta a própria latência.',
+          en: 'An info endpoint reporting the live connection count, and a health endpoint reporting its own latency.',
+          'pt-BR': 'Um endpoint de info reportando a contagem de conexões ao vivo, e um endpoint de saúde reportando a própria latência.',
         },
         {
           en: 'A shared-secret handshake that disconnects a client immediately if it ends up joined to no room.',

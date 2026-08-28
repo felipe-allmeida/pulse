@@ -254,27 +254,27 @@ system Felipe worked on; the "What Felipe did" line is the authoritative stateme
   - **Capacity planned before the first line** — The monthly volume, the query rate and the ten-year storage footprint were estimated in the design document before the service was built, which is why the storage decision — how much space this would ever need — was a boring, already-answered question rather than a surprise.
   - **One provider first, the interface for more** — WhatsApp was the bill that started this, so it is the only provider that sends today — but email, SMS and push were the shape the domain and the API were designed to accept later, without the sent record needing to change.
 
-### Dietbox Realtime — Live updates as a service of its own, so they ship on their own clock.
+### Dietbox Realtime — Chat between a nutritionist and her patient, and anything else that has to arrive now.
 
 - **Role:** Senior Software Engineer (2022)
 - **Source:** closed — professional work described without the code (Website: https://dietbox.me)
 - **Stack:** Node, Express, Socket.IO, Application Insights, Azure App Service, Azure DevOps
-- **What it is:** Thirty-four commits over two months in 2022, for a service that has outlived both: a socket server that holds every open connection, joins each client to a room named for its user id, and exposes one endpoint the rest of the platform posts to when something needs pushing out. It sits outside the product because a long-lived connection and a request are not the same kind of traffic.
-- **What Felipe did:** I built this one effectively alone: thirty-three of the thirty-four commits, from the handshake to the load-test harness that proved it held up.
-  - The socket server itself: the shared-secret handshake, room assignment by user id, and an immediate disconnect for a client that ends up joined to no room.
-  - The notify endpoint the rest of the platform posts to, and the info and health endpoints used to watch the service itself.
+- **What it is:** This exists so two people can talk inside the product. A nutritionist and her patient each hold an open connection, and a message sent from one lands on the other’s screen without either of them reloading anything. The same channel carries the platform’s own notifications — anything that has to reach someone now rather than at their next page load. Thirty-four commits over two months in 2022, for a service that outlived both.
+- **What Felipe did:** I built this one effectively alone: thirty-three of the thirty-four commits, from the chat relay to the load-test harness that proved it held up.
+  - The chat relay: a message emitted by one client is pushed straight into the recipient’s room, so it reaches an open screen rather than waiting for a reload.
+  - The socket server underneath both: the shared-secret handshake, room assignment by user id, the notify endpoint the platform posts to, and the info and health endpoints used to watch it.
   - The handler-loading convention: an event handler is a file, picked up automatically from a directory.
   - The load-test harness, built to deliberately hold a share of clients on long-polling instead of letting all of them upgrade.
-- **Problem it solved:** The monolith deployed once a night, and anything sharing its pipeline shared its cadence — a realtime channel that can only change at three in the morning is a realtime channel nobody changes. Separately, open connections and request traffic do not want the same instance count: one scales with how many people are online, the other with how many requests arrive.
-- **Architecture:** The platform posts a room, an event name and a payload to the notify endpoint; the server resolves who is in that room right now and pushes the event straight to them.
-  - Platform — Another service in the platform posts a room, an event name and a payload to the notify endpoint.
+- **Problem it solved:** A nutritionist and her patient had no way to talk inside the product, and anything the platform needed to tell someone waited until that person reloaded the page. Putting the open connections inside the monolith was not an option: it deployed once a night, and a channel that can only change at three in the morning is a channel nobody changes. Open connections also scale with how many people are online, while requests scale with how many arrive — a different problem, and so a different service.
+- **Architecture:** Two things arrive the same way: a chat message emitted by one of the two people talking, or a push from another service in the platform. Either resolves to a room, and whoever is in that room right now gets it.
+  - Origin — Either one of the two people talking emits a chat message, or another service in the platform posts a room, an event name and a payload to the notify endpoint.
   - Room resolved — The server looks up which connections are actually joined to that room right now.
   - Fan-out — The event is pushed to every client currently joined to the room.
   - Browser — The client receives the event and updates without a refresh.
 - **What it does:**
-  - The notify endpoint the rest of the platform posts to when something needs pushing out.
-  - An info endpoint reporting the live connection count, for monitoring.
-  - A health endpoint reporting its own latency.
+  - Chat between a nutritionist and her patient, carried over the connection both of them already hold open.
+  - Notifications the platform pushes to a person, landing on whatever screen they already have open.
+  - An info endpoint reporting the live connection count, and a health endpoint reporting its own latency.
   - A shared-secret handshake that disconnects a client immediately if it ends up joined to no room.
 - **Engineering decisions:**
   - **Realtime as its own deployable** — Two reasons, both real: open connections and request traffic scale on different axes, and the product deployed once a night — a channel that can only change at three in the morning is one nobody changes. Splitting it into its own service let each axis scale on its own terms and let this one ship on its own clock.
