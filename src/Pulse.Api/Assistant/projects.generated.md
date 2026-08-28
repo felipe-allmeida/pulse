@@ -81,7 +81,7 @@ system Felipe worked on; the "What Felipe did" line is the authoritative stateme
 
 - **Role:** Senior Software Engineer, then Head of Technology (2020–2024)
 - **Source:** closed — professional work described without the code (Website: https://dietbox.me)
-- **Stack:** C#, ASP.NET MVC, Entity Framework, SQL Server, Azure App Service, Kendo UI, Terraform, Azure DevOps
+- **Stack:** C#, ASP.NET MVC, Entity Framework, SQL Server, Azure App Service, Kendo UI, Azure DevOps
 - **What it is:** The monolith is the product's centre of gravity: for years it was the only codebase, carrying both the nutritionist and the patient experience through the same release. Everything the product did shipped through this one pipeline, on the one schedule that pipeline allowed.
 - **What Felipe did:** Principal architect for four years — I set the platform’s patterns and configured the Azure estate, including for services other people wrote. Later the whole technology organization reported to me.
   - The build and release pipeline in Azure DevOps, shipping the core project together with its satellites and its gulp-built, Kendo UI front end.
@@ -200,7 +200,7 @@ system Felipe worked on; the "What Felipe did" line is the authoritative stateme
   - Service — Controllers behind the claim-requirement authorization filter, validating the access token before a request reaches a command or query.
   - Application — Commands and queries behind a pipeline behaviour that logs each one by name, and the handlers that turn a domain event into the integration event other services consume.
   - Domain — The business rules for the eighteen areas administered — nutritionists, patients, subscriptions, vouchers, the food catalogue, and the rest — raising the events the layers above and below both care about.
-  - Infrastructure — An EF Core context over SQL Server: it writes the aggregate’s current state, then hands the events that aggregate collected while changing to MediatR, before the transaction closes.
+  - Infrastructure — An EF Core context over SQL Server: it writes the aggregate’s current state, then hands the events that aggregate collected while changing to MediatR, once the write has already landed.
 - **What it does:**
   - Impersonation as a first-class feature: support can act as the nutritionist or patient they’re helping, from the client’s navbar or the patient view, and step back out.
   - Eighteen controllers spanning the business administered: nutritionists and patients, subscriptions and their configuration, transactions, vouchers, the food catalogue, tags, marketing, materials, events, universities, metrics, accounts.
@@ -209,7 +209,7 @@ system Felipe worked on; the "What Felipe did" line is the authoritative stateme
 - **Engineering decisions:**
   - **Layers numbered on disk** — The service’s directories are numbered by layer — building blocks, services, application, domain, infrastructure — so the dependency direction is legible from a directory listing alone, before a single file is open. A layer importing from the wrong direction is a violation visible in the file tree, not just in a code review.
   - **Staff identity is not customer identity** — The back office authenticates against its own store — an identity building block with its own user database, a JWT builder and validator, access and refresh tokens, and claim-based authorization — not the customer directory. Giving support staff accounts in the customer identity system would have meant handing customer-grade identities administrative scopes; keeping the two separate keeps a back-office session a different thing from a customer session, by construction.
-  - **Events dispatched at save time, not stored** — An aggregate collects the events it raises while a command changes it; the unit of work writes the row, then publishes those events through MediatR before the transaction closes. Nothing is replayed and no state is rebuilt from a log — the table still holds the current row. What this buys is that a consequence of an operation is a subscriber to something the domain said, rather than one more paragraph inside the command that said it.
+  - **Events dispatched at save time, not stored** — An aggregate collects the events it raises while a command changes it; the unit of work writes the row, then publishes those events through MediatR after that write has committed. Nothing is replayed and no state is rebuilt from a log — the table still holds the current row. What this buys is that a consequence of an operation is a subscriber to something the domain said, rather than one more paragraph inside the command that said it.
   - **Shared building blocks before shared services** — The newer services, this one included, start from a common domain, infrastructure and identity layer instead of each inventing its own — the same message and event base types, the same identity building block, the same base entities. That shared foundation is what let a small team add a service without each one arriving in a different style.
 
 ### Dietbox Notifications — A messaging bill turned into a product constraint.

@@ -545,7 +545,7 @@ export const projects: Project[] = [
       'pt-BR':
         'O monolito que atendeu nutricionistas e pacientes antes de existir qualquer outro serviço, com deploy uma vez por noite porque essa era a única janela que parecia segura — e a base de código ao lado da qual uma geração mais nova de serviços cresceu desde então.',
     },
-    tech: ['C#', 'ASP.NET MVC', 'Entity Framework', 'SQL Server', 'Azure App Service', 'Kendo UI', 'Terraform', 'Azure DevOps'],
+    tech: ['C#', 'ASP.NET MVC', 'Entity Framework', 'SQL Server', 'Azure App Service', 'Kendo UI', 'Azure DevOps'],
     role: {
       en: 'Senior Software Engineer, then Head of Technology',
       'pt-BR': 'Engenheiro de Software Sênior, depois Head de Tecnologia',
@@ -1314,9 +1314,9 @@ export const projects: Project[] = [
           {
             label: 'Infrastructure',
             detail: {
-              en: 'An EF Core context over SQL Server: it writes the aggregate’s current state, then hands the events that aggregate collected while changing to MediatR, before the transaction closes.',
+              en: 'An EF Core context over SQL Server: it writes the aggregate’s current state, then hands the events that aggregate collected while changing to MediatR, once the write has already landed.',
               'pt-BR':
-                'Um contexto EF Core sobre SQL Server: grava o estado atual do agregado e então entrega ao MediatR os eventos que aquele agregado acumulou ao mudar, antes de a transação fechar.',
+                'Um contexto EF Core sobre SQL Server: grava o estado atual do agregado e então entrega ao MediatR os eventos que aquele agregado acumulou ao mudar, depois que a escrita já foi feita.',
             },
           },
         ],
@@ -1341,9 +1341,9 @@ export const projects: Project[] = [
         {
           heading: { en: 'Events dispatched at save time, not stored', 'pt-BR': 'Eventos despachados na gravação, não armazenados' },
           body: {
-            en: 'An aggregate collects the events it raises while a command changes it; the unit of work writes the row, then publishes those events through MediatR before the transaction closes. Nothing is replayed and no state is rebuilt from a log — the table still holds the current row. What this buys is that a consequence of an operation is a subscriber to something the domain said, rather than one more paragraph inside the command that said it.',
+            en: 'An aggregate collects the events it raises while a command changes it; the unit of work writes the row, then publishes those events through MediatR after that write has committed. Nothing is replayed and no state is rebuilt from a log — the table still holds the current row. What this buys is that a consequence of an operation is a subscriber to something the domain said, rather than one more paragraph inside the command that said it.',
             'pt-BR':
-              'Um agregado acumula os eventos que emite enquanto um comando o altera; a unidade de trabalho grava a linha e então publica esses eventos via MediatR antes de a transação fechar. Nada é reproduzido e nenhum estado é reconstruído a partir de um log — a tabela continua guardando a linha atual. O que isso compra é que a consequência de uma operação vira assinante de algo que o domínio disse, em vez de mais um parágrafo dentro do comando que o disse.',
+              'Um agregado acumula os eventos que emite enquanto um comando o altera; a unidade de trabalho grava a linha e então publica esses eventos via MediatR depois que essa escrita foi confirmada. Nada é reproduzido e nenhum estado é reconstruído a partir de um log — a tabela continua guardando a linha atual. O que isso compra é que a consequência de uma operação vira assinante de algo que o domínio disse, em vez de mais um parágrafo dentro do comando que o disse.',
           },
         },
         {
