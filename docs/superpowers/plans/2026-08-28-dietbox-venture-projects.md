@@ -27,7 +27,7 @@
 | `chart.js`, `Vue.js` | "a charting library", "Vue" |
 | `dietbox.me` and every other hostname | omit entirely |
 
-Safe as written: `.NET 6` (nothing precedes the dot), `net6.0` (digits after the dot), `Iugu`, `Ebanx`, `TSPay`, `Azure AD B2C`, `PrimeVue`, `Pinia`, `Cypress`, `MediatR`, `Vue 3`, `C4`. `Pagar.me` is sanctioned by literal name in `withoutSanctionedPlaceholders` and is the **only** dotted vendor allowed.
+Safe as written: `.NET 6` and `net6.0` (nothing alphabetic precedes the dot in the first, digits follow it in the second), `Iugu`, `Ebanx`, `TSPay`, `Azure AD B2C`, `PrimeVue`, `Pinia`, `Cypress`, `MediatR`, `Vue 3`, `WhatsApp Business API`, `C4`. **`ASP.NET` is NOT safe** — `ASP` precedes the dot, so it trips the guard exactly like `Socket.IO` does; it belongs in `tech[]` only, and `detail` says "the identity building block" or "its own user store". `Pagar.me` is sanctioned by literal name in `withoutSanctionedPlaceholders` and is the **only** dotted vendor allowed.
 
 `tech[]`, `name`, `tagline`, `description` and `links` are **not** scanned. `Socket.IO` belongs in `tech`, never in a `decisions` body.
 
