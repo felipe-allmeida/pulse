@@ -134,7 +134,7 @@ it('projects sharing a venture are contiguous in the array', () => {
 */
 it('every venture project is private with no repository link', () => {
   const inVentures = projects.filter((p) => p.venture !== undefined);
-  expect(inVentures, 'all six ULBRA projects').toHaveLength(6);
+  expect(inVentures, 'six ULBRA projects and three Airia ones').toHaveLength(9);
   for (const project of inVentures) {
     expect(project.visibility, `${project.slug} visibility`).toBe('private');
     expect(
@@ -151,6 +151,85 @@ it('every ulbra project is led as Head of Technology, not as a nameless engineer
     expect(project.role.en, `${project.slug} role`).toMatch(/head of technology/i);
     expect(project.period, `${project.slug} has no period`).toBeDefined();
     expect(project.period!.en, `${project.slug} period is a non-answer`).not.toMatch(/professional work/i);
+  }
+});
+
+/*
+  The mirror of the ULBRA rule above, and deliberately its opposite. ULBRA is
+  led; Airia was contracted into. A role claiming leadership on either one
+  would misdescribe the engagement, so each venture asserts its own shape
+  rather than sharing a loosened rule that would let both drift.
+*/
+it('the Airia projects are contract work, not a lead role', () => {
+  const airia = projects.filter((p) => p.venture === 'airia');
+  expect(airia, 'all three Airia projects').toHaveLength(3);
+  for (const project of airia) {
+    expect(project.role.en, `${project.slug} role`).toMatch(/r&d engineer/i);
+    expect(project.role.en, `${project.slug} overclaims a lead role`).not.toMatch(/head of|lead\b/i);
+    expect(project.period, `${project.slug} has no period`).toBeDefined();
+    expect(project.period!.en, `${project.slug} period`).toMatch(/2025/);
+  }
+});
+
+/*
+  Every Airia repository was shared with engineers who are not the author, and
+  two of the three predate him. `boundary` is where a case study says so. It is
+  optional on the type — omitted where the author built the whole thing — which
+  is exactly why the venture whose work was *not* solo needs it asserted.
+*/
+it('every Airia project names what was someone else’s', () => {
+  for (const project of projects.filter((p) => p.venture === 'airia')) {
+    const boundary = project.detail?.contribution?.boundary;
+    expect(boundary, `${project.slug} claims a shared repository without a boundary`).toBeDefined();
+    expectBothLocales(boundary!, `${project.slug} boundary`);
+  }
+});
+
+/*
+  No production numbers came out of a four-month contract, and `metrics` is
+  optional precisely so a case study can decline to have any. Asserting the
+  absence keeps a later edit from filling the grid with something plausible.
+*/
+it('no Airia project publishes a metric', () => {
+  for (const project of projects.filter((p) => p.venture === 'airia')) {
+    expect(project.detail?.metrics, `${project.slug} metrics`).toBeUndefined();
+    expect(project.detail?.metricsNote, `${project.slug} metricsNote`).toBeUndefined();
+  }
+});
+
+it('the Airia group sits between the ULBRA group and Dell', () => {
+  const slugs = projects.map((p) => p.slug);
+  expect(slugs.indexOf('airia-cloud-connector')).toBeGreaterThan(slugs.indexOf('ulbra-infra'));
+  expect(slugs.indexOf('airia-spm')).toBeLessThan(slugs.indexOf('dell-automated-caller'));
+});
+
+it('airia-cloud-connector has a full case study, localized in every locale', () => {
+  const project = projects.find((p) => p.slug === 'airia-cloud-connector');
+  expect(project).toBeDefined();
+  expect(project!.visibility).toBe('private');
+  expect(project!.links).toHaveLength(0);
+
+  const detail = project!.detail!;
+  expectBothLocales(detail.overview!, 'overview');
+  expectBothLocales(detail.problem!, 'problem');
+
+  expectBothLocales(detail.architecture!.summary!, 'architecture.summary');
+  expect(detail.architecture!.steps).toHaveLength(5);
+  for (const step of detail.architecture!.steps) {
+    expect(step.label.trim()).not.toBe('');
+    expectBothLocales(step.detail, 'architecture.step.detail');
+  }
+
+  expectBothLocales(detail.table!.caption, 'table.caption');
+  for (const column of detail.table!.columns) expectBothLocales(column, 'table.column');
+  for (const row of detail.table!.rows) {
+    expect(row, 'table row width matches the columns').toHaveLength(detail.table!.columns.length);
+  }
+
+  expect(detail.decisions).toHaveLength(5);
+  for (const decision of detail.decisions!) {
+    expectBothLocales(decision.heading, 'decision.heading');
+    expectBothLocales(decision.body, 'decision.body');
   }
 });
 
