@@ -712,6 +712,250 @@ export const projects: Project[] = [
     },
   },
   {
+    slug: 'dietbox-b2c',
+    name: 'Dietbox B2C',
+    tagline: {
+      en: 'One identity backbone, two audiences, custom sign-in journeys.',
+      'pt-BR': 'Uma base de identidade, dois públicos, jornadas de login customizadas.',
+    },
+    description: {
+      en: 'Custom Azure AD B2C policies for a product whose two audiences share nothing but an account: a practitioner subscribing, and a patient invited by the one treating them. Federated sign-in, silent migration off the legacy store, and revocation that actually signs a session out everywhere.',
+      'pt-BR':
+        'Políticas customizadas de Azure AD B2C para um produto cujos dois públicos não dividem nada além da conta: a profissional que assina e o paciente convidado por ela. Login federado, migração silenciosa da base legada e revogação que de fato encerra a sessão em todo lugar.',
+    },
+    tech: ['Azure AD B2C', 'Identity Experience Framework', 'XML', 'OpenID Connect', 'OAuth 2.0', '.NET 6', 'HTML', 'CSS', 'Azure DevOps'],
+    role: {
+      en: 'Senior Software Engineer, then Head of Technology',
+      'pt-BR': 'Engenheiro de Software Sênior, depois Head de Tecnologia',
+    },
+    period: { en: '2021–2024', 'pt-BR': '2021–2024' },
+    visibility: 'private',
+    links: [{ label: 'Website', href: 'https://dietbox.me' }],
+    venture: 'dietbox',
+    detail: {
+      overview: {
+        en: 'One Azure AD B2C identity system carrying two audiences that share nothing but the account: a nutritionist subscribing and paying, and a patient arriving by invitation from the one treating them. Four years of custom sign-in journeys, federated providers, silent migration off the legacy store, and session revocation that reaches every open browser.',
+        'pt-BR':
+          'Um único sistema de identidade em Azure AD B2C carregando dois públicos que não dividem nada além da conta: a nutricionista que assina e paga, e o paciente que chega por convite de quem o atende. Quatro anos de jornadas de login customizadas, provedores federados, migração silenciosa da base legada e revogação de sessão que alcança todo navegador aberto.',
+      },
+      contribution: {
+        summary: {
+          en: 'This is the author’s largest personal ownership in the Dietbox estate: half the commits over four years, across both audiences’ sign-in journeys.',
+          'pt-BR':
+            'Esta é a maior propriedade pessoal do autor no conjunto Dietbox: metade dos commits ao longo de quatro anos, cobrindo as jornadas de login dos dois públicos.',
+        },
+        areas: [
+          {
+            en: 'The two policy sets — one for the practitioner, one for the patient — each its own sign-up, sign-in and password-reset journey.',
+            'pt-BR':
+              'Os dois conjuntos de políticas — um para a profissional, um para o paciente — cada um com sua própria jornada de cadastro, login e redefinição de senha.',
+          },
+          {
+            en: 'Federation with Google, Facebook and Apple, each mapped through its own exchange profile into a common subject claim.',
+            'pt-BR':
+              'Federação com Google, Facebook e Apple, cada uma mapeada por seu próprio exchange profile para uma claim de subject comum.',
+          },
+          {
+            en: 'The first-sign-in migration that moves a legacy-store user into the directory during the same journey they log in with.',
+            'pt-BR':
+              'A migração no primeiro login, que move um usuário da base legada para o diretório na própria jornada em que ele entra.',
+          },
+          {
+            en: 'Session revocation: a stamp on the user compared against the token’s issue time, so a password change or an admin revoke signs the account out everywhere.',
+            'pt-BR':
+              'Revogação de sessão: um carimbo no usuário comparado com o momento de emissão do token, para que uma troca de senha ou uma revogação administrativa encerre a conta em todo lugar.',
+          },
+          {
+            en: 'The custom sign-in pages, one set per audience, served and filled in at runtime.',
+            'pt-BR':
+              'As páginas de login customizadas, um conjunto por público, servidas e preenchidas em tempo de execução.',
+          },
+        ],
+      },
+      problem: {
+        en: 'A hosted login gives a product one journey. This one needed several: a subscriber signing up and paying, a patient arriving by invitation with no password to set, an academy student, and a receptionist acting on someone else’s behalf — all over one directory, without four separate user stores to keep in sync.',
+        'pt-BR':
+          'Um login hospedado dá a um produto uma única jornada. Este precisava de várias: uma assinante se cadastrando e pagando, um paciente chegando por convite sem senha para definir, uma aluna de academy, e uma recepcionista agindo em nome de outra pessoa — tudo sobre um único diretório, sem quatro bases de usuário separadas para manter sincronizadas.',
+      },
+      metrics: [
+        {
+          value: { en: '~7.2k', 'pt-BR': '~7,2 mil' },
+          label: { en: 'lines of policy XML', 'pt-BR': 'linhas de XML de política' },
+          note: { en: 'across two policy sets', 'pt-BR': 'em dois conjuntos de políticas' },
+        },
+        {
+          value: { en: '~730', 'pt-BR': '~730' },
+          label: { en: 'commits', 'pt-BR': 'commits' },
+          note: { en: 'mine, of ~1.5k total', 'pt-BR': 'meus, de ~1,5 mil no total' },
+        },
+      ],
+      metricsNote: {
+        en: 'The line count is a plain line count over the committed policy files; the commit share comes from the repository.',
+        'pt-BR':
+          'A contagem de linhas é uma contagem simples sobre os arquivos de política versionados; a proporção de commits vem do repositório.',
+      },
+      states: {
+        caption: { en: 'The sign-in journey', 'pt-BR': 'A jornada de login' },
+        summary: {
+          en: 'Every step below corresponds to a technical profile that exists in the policy — this is the orchestration as written, not a simplification of it.',
+          'pt-BR':
+            'Cada etapa abaixo corresponde a um technical profile que existe na política — é a orquestração como está escrita, não uma simplificação dela.',
+        },
+        steps: [
+          {
+            label: 'Sign-in',
+            detail: {
+              en: 'Local credentials, or a federated provider — Google, Facebook or Apple — exchanged into a common subject claim.',
+              'pt-BR':
+                'Credenciais locais, ou um provedor federado — Google, Facebook ou Apple — trocado por uma claim de subject comum.',
+            },
+          },
+          {
+            label: 'Legacy check',
+            detail: {
+              en: 'Is this a legacy-store user who has not yet been migrated?',
+              'pt-BR': 'É um usuário da base legada que ainda não foi migrado?',
+            },
+          },
+          {
+            label: 'Migration',
+            detail: {
+              en: 'If so, the account is written into the directory with an alternative security identifier linking it back to the legacy credential — in the same journey as the sign-in, not a separate step.',
+              'pt-BR':
+                'Se sim, a conta é escrita no diretório com um identificador de segurança alternativo que a liga de volta à credencial legada — na mesma jornada do login, não numa etapa separada.',
+            },
+          },
+          {
+            label: 'Entitlement',
+            detail: {
+              en: 'Is the account enabled, and does it belong to a gated journey — subscriber, academy — that requires an active entitlement?',
+              'pt-BR':
+                'A conta está habilitada, e ela pertence a uma jornada com restrição — assinante, academy — que exige um direito de acesso ativo?',
+            },
+          },
+          {
+            label: 'Token',
+            detail: {
+              en: 'A token is issued, stamped with the time the user’s security record was last valid from.',
+              'pt-BR':
+                'Um token é emitido, carimbado com o momento a partir do qual o registro de segurança do usuário é válido.',
+            },
+          },
+        ],
+      },
+      architecture: {
+        summary: {
+          en: 'Two independent policy sets sit above one directory, and everything downstream trusts the tokens they issue.',
+          'pt-BR':
+            'Dois conjuntos de políticas independentes ficam acima de um diretório único, e tudo a jusante confia nos tokens que eles emitem.',
+        },
+        steps: [
+          {
+            label: 'Practitioner policies',
+            detail: {
+              en: 'Sign-up, sign-in, subscriber and academy journeys for the nutritionist audience.',
+              'pt-BR': 'Jornadas de cadastro, login, assinante e academy para o público de nutricionistas.',
+            },
+          },
+          {
+            label: 'Patient policies',
+            detail: {
+              en: 'Sign-up and sign-in for the patient audience, invited rather than self-registering.',
+              'pt-BR': 'Cadastro e login para o público de pacientes, convidados em vez de autocadastrados.',
+            },
+          },
+          {
+            label: 'Directory',
+            detail: {
+              en: 'One user store beneath both policy sets, holding local and federated accounts alike.',
+              'pt-BR': 'Uma única base de usuários abaixo dos dois conjuntos de políticas, com contas locais e federadas.',
+            },
+          },
+          {
+            label: 'Auth service',
+            detail: {
+              en: 'Validates the tokens this system issues; the rest of the platform never talks to the directory directly.',
+              'pt-BR':
+                'Valida os tokens que este sistema emite; o resto da plataforma nunca fala com o diretório diretamente.',
+            },
+          },
+          {
+            label: 'Custom UI pages',
+            detail: {
+              en: 'Static markup, one set per audience, served by the identity platform and filled in at runtime.',
+              'pt-BR': 'Marcação estática, um conjunto por público, servida pela plataforma de identidade e preenchida em tempo de execução.',
+            },
+          },
+        ],
+      },
+      decisions: [
+        {
+          heading: {
+            en: 'Custom policies instead of a hosted login',
+            'pt-BR': 'Políticas customizadas em vez de um login hospedado',
+          },
+          body: {
+            en: 'A hosted login gives one journey. This product needed a subscriber signing up and paying, a patient arriving by invitation, an academy student, and a receptionist — over one directory, without four user stores to keep in sync. Writing the policy directly was the only way to get gated journeys and a first-sign-in migration without forking the user base.',
+            'pt-BR':
+              'Um login hospedado dá uma única jornada. Este produto precisava de uma assinante se cadastrando e pagando, um paciente chegando por convite, uma aluna de academy e uma recepcionista — sobre um único diretório, sem quatro bases de usuário para manter sincronizadas. Escrever a política diretamente foi a única forma de ter jornadas com restrição e migração no primeiro login sem bifurcar a base de usuários.',
+          },
+        },
+        {
+          heading: {
+            en: 'Migration as a side effect of signing in',
+            'pt-BR': 'Migração como efeito colateral do login',
+          },
+          body: {
+            en: 'Nobody was asked to reset a password or re-register. The user experiences a login; the system experiences a migration, writing the account into the directory and linking it back to the legacy credential in the same journey.',
+            'pt-BR':
+              'Ninguém foi solicitado a redefinir senha ou se recadastrar. O usuário vive um login; o sistema vive uma migração, escrevendo a conta no diretório e ligando-a de volta à credencial legada na mesma jornada.',
+          },
+        },
+        {
+          heading: {
+            en: 'Revocation that reaches open sessions',
+            'pt-BR': 'Revogação que alcança sessões abertas',
+          },
+          body: {
+            en: 'A token that is merely unrenewable is not revoked. Comparing the token’s issue time against a stamp on the user record is what makes "sign this account out everywhere" actually mean it, rather than "stop this account from getting a new token next time."',
+            'pt-BR':
+              'Um token apenas não renovável não está revogado. Comparar o momento de emissão do token com um carimbo no registro do usuário é o que faz "encerrar a conta em todo lugar" significar isso de fato, e não "impedir que a conta consiga um novo token da próxima vez".',
+          },
+        },
+        {
+          heading: {
+            en: 'One directory, several journeys',
+            'pt-BR': 'Um diretório, várias jornadas',
+          },
+          body: {
+            en: 'Separate policies per audience over one shared user store, rather than one policy branching on audience or several stores that would have to be reconciled. The audiences share an identity, not a form.',
+            'pt-BR':
+              'Políticas separadas por público sobre uma única base de usuários compartilhada, em vez de uma política com ramificação por público ou várias bases para reconciliar. Os públicos compartilham uma identidade, não um formulário.',
+          },
+        },
+      ],
+      highlights: [
+        {
+          en: 'Federated sign-in with three providers, each exchanged into a common subject claim.',
+          'pt-BR': 'Login federado com três provedores, cada um trocado por uma claim de subject comum.',
+        },
+        {
+          en: 'Silent migration off the legacy store during the user’s own sign-in journey.',
+          'pt-BR': 'Migração silenciosa da base legada durante a própria jornada de login do usuário.',
+        },
+        {
+          en: 'Per-audience branded pages, one set for the practitioner and one for the patient.',
+          'pt-BR': 'Páginas com marca por público, um conjunto para a profissional e um para o paciente.',
+        },
+        {
+          en: 'Entitlement gates for subscriber and academy journeys, enforced inside the sign-in flow rather than after it.',
+          'pt-BR':
+            'Bloqueios de direito de acesso para jornadas de assinante e academy, aplicados dentro do fluxo de login em vez de depois dele.',
+        },
+      ],
+    },
+  },
+  {
     slug: 'ulbra-atende',
     name: 'Ulbra Atende',
     tagline: {

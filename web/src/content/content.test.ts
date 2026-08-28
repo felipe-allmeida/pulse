@@ -134,7 +134,7 @@ it('projects sharing a venture are contiguous in the array', () => {
 */
 it('every venture project is private with no repository link', () => {
   const inVentures = projects.filter((p) => p.venture !== undefined);
-  expect(inVentures, 'six ULBRA projects and one Dietbox card so far').toHaveLength(7);
+  expect(inVentures, 'six ULBRA projects and two Dietbox cards so far').toHaveLength(8);
   for (const project of inVentures) {
     expect(project.visibility, `${project.slug} visibility`).toBe('private');
     expect(
@@ -576,6 +576,26 @@ it('dietbox links to its product, not its source', () => {
   const dietbox = projects.find((p) => p.slug === 'dietbox')!;
   expect(dietbox.visibility).toBe('private');
   expect(dietbox.links).toEqual([{ label: 'Website', href: 'https://dietbox.me' }]);
+});
+
+it('dietbox-b2c carries its two real figures and names both audiences', () => {
+  const b2c = projects.find((p) => p.slug === 'dietbox-b2c');
+  expect(b2c, 'the B2C card is published').toBeDefined();
+  expect(b2c!.venture).toBe('dietbox');
+
+  const detail = b2c!.detail!;
+  expectBothLocales(detail.overview!, 'dietbox-b2c overview');
+  expectBothLocales(detail.problem!, 'dietbox-b2c problem');
+
+  // Both audiences, because one identity system serving two unrelated
+  // journeys is the whole reason this was custom rather than hosted.
+  expect(detail.overview!.en).toMatch(/practitioner|nutritionist/i);
+  expect(detail.overview!.en).toMatch(/patient/i);
+
+  // The two numbers that exist: the XML line count and the commit share.
+  const values = detail.metrics!.map((m) => m.value.en).join(' ');
+  expect(values, 'the policy line count').toMatch(/7[.,]?2k|7,216/);
+  expect(values, 'the commit share').toMatch(/730|731/);
 });
 
 it('no project carries a leadership section — it belongs to the venture', () => {
