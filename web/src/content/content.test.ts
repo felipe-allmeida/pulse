@@ -134,7 +134,7 @@ it('projects sharing a venture are contiguous in the array', () => {
 */
 it('every venture project is private with no repository link', () => {
   const inVentures = projects.filter((p) => p.venture !== undefined);
-  expect(inVentures, 'six ULBRA projects and four Dietbox cards so far').toHaveLength(10);
+  expect(inVentures, 'six ULBRA projects and five Dietbox cards so far').toHaveLength(11);
   for (const project of inVentures) {
     expect(project.visibility, `${project.slug} visibility`).toBe('private');
     expect(
@@ -632,6 +632,22 @@ it('dietbox-portal separates staff identity from customer identity', () => {
   const decisions = JSON.stringify(portal!.detail!.decisions);
   expect(decisions, 'staff and customers are different populations').toMatch(/staff|back office|internal/i);
   expect(decisions).not.toMatch(/Azure AD(?! B2C)/);
+});
+
+it('dietbox-notifications carries the figures its design document recorded', () => {
+  const notif = projects.find((p) => p.slug === 'dietbox-notifications');
+  expect(notif, 'the notifications card is published').toBeDefined();
+  expect(notif!.venture).toBe('dietbox');
+
+  const detail = notif!.detail!;
+  const values = detail.metrics!.map((m) => m.value.en).join(' ');
+  expect(values, 'the May 2023 volume').toMatch(/51k|51 ?000|~51/);
+  expect(values, 'the peak QPS the design planned for').toMatch(/\b5\b/);
+
+  // The numbers predate the system, so the note must say where they came
+  // from — they are a capacity plan, not a production measurement.
+  expectBothLocales(detail.metricsNote!, 'dietbox-notifications metricsNote');
+  expect(detail.metricsNote!.en).toMatch(/design|plan|estimate/i);
 });
 
 it('no project carries a leadership section — it belongs to the venture', () => {

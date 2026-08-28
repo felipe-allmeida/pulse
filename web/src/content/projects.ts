@@ -1377,6 +1377,227 @@ export const projects: Project[] = [
     },
   },
   {
+    slug: 'dietbox-notifications',
+    name: 'Dietbox Notifications',
+    tagline: {
+      en: 'A messaging bill turned into a product constraint.',
+      'pt-BR': 'Uma conta de mensageria transformada em restrição de produto.',
+    },
+    description: {
+      en: 'An isolated service that meters outbound messaging: a pre-paid send quota per practitioner, a log of every quota change, and a record of every notification sent. Built beside the product rather than inside it, so a cost problem did not become a platform problem.',
+      'pt-BR':
+        'Um serviço isolado que mede a mensageria de saída: uma cota pré-paga de envios por profissional, um log de cada mudança de cota e um registro de cada notificação enviada. Construído ao lado do produto, e não dentro dele, para que um problema de custo não virasse um problema de plataforma.',
+    },
+    tech: ['.NET 6', 'C#', 'CQRS', 'Redis', 'SQL Server', 'WhatsApp Business API', 'Azure DevOps'],
+    role: {
+      en: 'Head of Technology',
+      'pt-BR': 'Head de Tecnologia',
+    },
+    period: { en: '2023–2024', 'pt-BR': '2023–2024' },
+    visibility: 'private',
+    links: [{ label: 'Website', href: 'https://dietbox.me' }],
+    venture: 'dietbox',
+    detail: {
+      overview: {
+        en: 'This service exists because of a number on an invoice: the official WhatsApp messaging bill in May 2023. The answer was not a rate limit bolted onto the existing product, but a small domain of its own — a quota, a log of who changed it, and a record of every send.',
+        'pt-BR':
+          'Este serviço existe por causa de um número numa fatura: a conta de mensageria oficial do WhatsApp em maio de 2023. A resposta não foi um limite de taxa colado no produto existente, mas um pequeno domínio próprio — uma cota, um log de quem a alterou, e um registro de cada envio.',
+      },
+      contribution: {
+        summary: {
+          en: 'The design document, the domain and the service are the author’s: nineteen of the twenty commits, from the first estimate to the running service.',
+          'pt-BR':
+            'O documento de design, o domínio e o serviço são do autor: dezenove dos vinte commits, da primeira estimativa ao serviço em produção.',
+        },
+        areas: [
+          {
+            en: 'The capacity-planning document itself — the volume, query-rate and storage estimates the service was built to meet.',
+            'pt-BR':
+              'O próprio documento de planejamento de capacidade — as estimativas de volume, taxa de consultas e armazenamento que o serviço foi construído para atender.',
+          },
+          {
+            en: 'The domain model: a notification limit per practitioner, a log of every change to it, and a record of every notification sent.',
+            'pt-BR':
+              'O modelo de domínio: um limite de notificações por profissional, um log de cada mudança nele, e um registro de cada notificação enviada.',
+          },
+          {
+            en: 'The two controllers and their commands and queries — adding a limit, sending a notification, and querying both limits and sent records.',
+            'pt-BR':
+              'Os dois controllers e seus comandos e queries — adicionar um limite, enviar uma notificação, e consultar tanto limites quanto registros enviados.',
+          },
+          {
+            en: 'The crosscutting packages behind the layers: the WhatsApp provider integration, Redis, and dependency injection.',
+            'pt-BR':
+              'Os pacotes transversais atrás das camadas: a integração com o provedor do WhatsApp, Redis e injeção de dependência.',
+          },
+        ],
+      },
+      problem: {
+        en: 'The official WhatsApp Business API bill arrived in May 2023, and the product had no way to meter what it was spending on it. The obvious place to add a limit was the main product itself — but the main product was already too complex to extend safely, and a cost control that risks the product it is protecting is not a cost control. The alternative was a service with zero impact on the product, able to serve other notification channels later.',
+        'pt-BR':
+          'A conta oficial da API do WhatsApp Business chegou em maio de 2023, e o produto não tinha como medir o que estava gastando com ela. O lugar óbvio para adicionar um limite era o próprio produto principal — mas o produto principal já era complexo demais para ser estendido com segurança, e um controle de custo que arrisca o produto que está protegendo não é um controle de custo. A alternativa foi um serviço com zero impacto no produto, capaz de atender outros canais de notificação depois.',
+      },
+      metrics: [
+        {
+          value: { en: '~51k', 'pt-BR': '~51 mil' },
+          label: { en: 'messages a month', 'pt-BR': 'mensagens por mês' },
+          note: { en: 'the volume being paid for', 'pt-BR': 'o volume que estava sendo pago' },
+        },
+        {
+          value: { en: '~30k', 'pt-BR': '~30 mil' },
+          label: { en: 'queries a day', 'pt-BR': 'consultas por dia' },
+          note: { en: '0.3 QPS average', 'pt-BR': '0,3 QPS em média' },
+        },
+        {
+          value: { en: '5', 'pt-BR': '5' },
+          label: { en: 'peak QPS planned for', 'pt-BR': 'QPS de pico previsto' },
+        },
+        {
+          value: { en: '~1.4 GB', 'pt-BR': '~1,4 GB' },
+          label: { en: 'storage over ten years', 'pt-BR': 'armazenamento em dez anos' },
+          note: { en: '214 bytes per notification', 'pt-BR': '214 bytes por notificação' },
+        },
+      ],
+      metricsNote: {
+        en: 'These four figures come from the service’s own design document, written before a line of it existed — a capacity plan, not a production measurement taken afterward.',
+        'pt-BR':
+          'Esses quatro números vêm do próprio documento de design do serviço, escrito antes de existir uma linha dele — um plano de capacidade, não uma medição de produção feita depois.',
+      },
+      architecture: {
+        summary: {
+          en: 'A calling service reaches the notify endpoint, which checks the practitioner’s quota before anything is sent, hands the message to the provider, and records the result either way.',
+          'pt-BR':
+            'Um serviço chamador chega ao endpoint de notificação, que verifica a cota do profissional antes de qualquer envio, entrega a mensagem ao provedor, e registra o resultado de qualquer forma.',
+        },
+        steps: [
+          {
+            label: 'Calling service',
+            detail: {
+              en: 'Another service in the platform requests a notification on a practitioner’s behalf.',
+              'pt-BR': 'Outro serviço da plataforma solicita uma notificação em nome de um profissional.',
+            },
+          },
+          {
+            label: 'Notify endpoint',
+            detail: {
+              en: 'The notify controller receives the request and dispatches the send command.',
+              'pt-BR': 'O controller de notificação recebe a requisição e dispara o comando de envio.',
+            },
+          },
+          {
+            label: 'Quota check',
+            detail: {
+              en: 'The practitioner’s limit is read before the send proceeds — no quota, no message.',
+              'pt-BR': 'O limite do profissional é lido antes de o envio prosseguir — sem cota, sem mensagem.',
+            },
+          },
+          {
+            label: 'Provider',
+            detail: {
+              en: 'The WhatsApp integration sends the message through the official API, behind the crosscutting provider package.',
+              'pt-BR': 'A integração com o WhatsApp envia a mensagem pela API oficial, atrás do pacote transversal do provedor.',
+            },
+          },
+          {
+            label: 'Sent record',
+            detail: {
+              en: 'The outcome — sent or refused — is written to the record every notification leaves behind.',
+              'pt-BR': 'O resultado — enviado ou recusado — é gravado no registro que toda notificação deixa.',
+            },
+          },
+        ],
+      },
+      states: {
+        caption: {
+          en: 'A notification, from request to record',
+          'pt-BR': 'Uma notificação, do pedido ao registro',
+        },
+        steps: [
+          {
+            label: 'Requested',
+            detail: {
+              en: 'A calling service asks for a notification to be sent to a practitioner.',
+              'pt-BR': 'Um serviço chamador pede o envio de uma notificação a um profissional.',
+            },
+          },
+          {
+            label: 'Quota checked',
+            detail: {
+              en: 'The practitioner’s remaining limit is read against the request.',
+              'pt-BR': 'O limite restante do profissional é verificado contra o pedido.',
+            },
+          },
+          {
+            label: 'Dispatched or refused',
+            detail: {
+              en: 'Within quota, the message goes to the WhatsApp provider; over quota, the send is refused before it costs anything.',
+              'pt-BR': 'Dentro da cota, a mensagem segue para o provedor do WhatsApp; fora da cota, o envio é recusado antes de custar algo.',
+            },
+          },
+          {
+            label: 'Recorded',
+            detail: {
+              en: 'Either outcome is written to the log of notifications sent, so the answer to "why was this blocked" already exists.',
+              'pt-BR': 'Qualquer resultado é gravado no log de notificações enviadas, então a resposta para "por que isso foi bloqueado" já existe.',
+            },
+          },
+        ],
+      },
+      decisions: [
+        {
+          heading: { en: 'A separate service specifically to be ignorable', 'pt-BR': 'Um serviço separado especificamente para ser ignorável' },
+          body: {
+            en: 'The stated goal was zero impact on the main product. Isolating the notification service meant it could be switched off, redeployed or rewritten without taking the product down with it — the opposite of bolting a limiter onto code that was already too complex to touch safely.',
+            'pt-BR':
+              'O objetivo declarado era zero impacto no produto principal. Isolar o serviço de notificações significou que ele podia ser desligado, reimplantado ou reescrito sem derrubar o produto junto — o oposto de colar um limitador num código que já era complexo demais para tocar com segurança.',
+          },
+        },
+        {
+          heading: { en: 'A quota is a domain model, not a rate limit', 'pt-BR': 'Uma cota é um modelo de domínio, não um rate limit' },
+          body: {
+            en: 'A bare counter would have answered "can this send happen." Instead, the limit, a log of every change to it, and a record of every send together answer a harder question: why was this one blocked, and who changed the limit that blocked it.',
+            'pt-BR':
+              'Um contador simples responderia apenas "esse envio pode acontecer". Em vez disso, o limite, um log de cada mudança nele, e um registro de cada envio respondem juntos uma pergunta mais difícil: por que este foi bloqueado, e quem alterou o limite que o bloqueou.',
+          },
+        },
+        {
+          heading: { en: 'Capacity planned before the first line', 'pt-BR': 'Capacidade planejada antes da primeira linha' },
+          body: {
+            en: 'The monthly volume, the query rate and the ten-year storage footprint were estimated in the design document before the service was built, which is why the storage decision — how much space this would ever need — was a boring, already-answered question rather than a surprise.',
+            'pt-BR':
+              'O volume mensal, a taxa de consultas e o espaço ocupado em dez anos foram estimados no documento de design antes de o serviço ser construído, e é por isso que a decisão de armazenamento — quanto espaço isso jamais precisaria — foi uma pergunta entediante e já respondida, não uma surpresa.',
+          },
+        },
+        {
+          heading: { en: 'One provider first, the interface for more', 'pt-BR': 'Um provedor primeiro, a interface para mais' },
+          body: {
+            en: 'WhatsApp was the bill that started this, so it is the only provider that sends today — but email, SMS and push were the shape the domain and the API were designed to accept later, without the quota model or the sent record needing to change.',
+            'pt-BR':
+              'O WhatsApp foi a conta que originou tudo isso, então é o único provedor que envia hoje — mas email, SMS e push foram o formato que o domínio e a API foram desenhados para aceitar depois, sem que o modelo de cota ou o registro de envio precisassem mudar.',
+          },
+        },
+      ],
+      highlights: [
+        {
+          en: 'A notify controller and commands to send a notification and to add a practitioner’s limit.',
+          'pt-BR': 'Um controller de notificação e comandos para enviar uma notificação e para adicionar o limite de um profissional.',
+        },
+        {
+          en: 'A nutritionist controller and queries over that practitioner’s current limit and history of sent notifications.',
+          'pt-BR': 'Um controller de nutricionista e queries sobre o limite atual e o histórico de notificações enviadas desse profissional.',
+        },
+        {
+          en: 'Three domain models: the notification limit itself, a log of every change to it, and a record of every notification sent.',
+          'pt-BR': 'Três modelos de domínio: o próprio limite de notificações, um log de cada mudança nele, e um registro de cada notificação enviada.',
+        },
+        {
+          en: 'A layered service with crosscutting packages for the WhatsApp provider, Redis and dependency injection, kept separate from the domain they support.',
+          'pt-BR': 'Um serviço em camadas com pacotes transversais para o provedor do WhatsApp, Redis e injeção de dependência, mantidos separados do domínio que sustentam.',
+        },
+      ],
+    },
+  },
+  {
     slug: 'ulbra-atende',
     name: 'Ulbra Atende',
     tagline: {
