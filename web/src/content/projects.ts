@@ -1598,6 +1598,155 @@ export const projects: Project[] = [
     },
   },
   {
+    slug: 'dietbox-socket',
+    name: 'Dietbox Socket',
+    tagline: {
+      en: 'Live updates as a service of its own, so they ship on their own clock.',
+      'pt-BR': 'Atualizações ao vivo como serviço próprio, para subirem no próprio relógio.',
+    },
+    description: {
+      en: 'A small realtime server that holds the open connections: a room per user, a shared-secret handshake, and one endpoint the platform posts to when something needs pushing. Separate from the product because long-lived connections and request traffic do not scale on the same axis — and because the monolith deployed once a night.',
+      'pt-BR':
+        'Um servidor de tempo real pequeno que mantém as conexões abertas: uma sala por usuário, um handshake com segredo compartilhado e um endpoint para onde a plataforma posta quando algo precisa ser empurrado. Separado do produto porque conexões de longa duração e tráfego de requisição não escalam no mesmo eixo — e porque o monolito subia uma vez por madrugada.',
+    },
+    tech: ['Node', 'Express', 'Socket.IO', 'Application Insights', 'Azure App Service', 'Azure DevOps'],
+    role: { en: 'Senior Software Engineer', 'pt-BR': 'Engenheiro de Software Sênior' },
+    period: { en: '2022', 'pt-BR': '2022' },
+    visibility: 'private',
+    links: [{ label: 'Website', href: 'https://dietbox.me' }],
+    venture: 'dietbox',
+    detail: {
+      overview: {
+        en: 'Thirty-four commits over two months in 2022, for a service that has outlived both: a socket server that holds every open connection, joins each client to a room named for its user id, and exposes one endpoint the rest of the platform posts to when something needs pushing out. It sits outside the product because a long-lived connection and a request are not the same kind of traffic.',
+        'pt-BR':
+          'Trinta e quatro commits em dois meses de 2022, para um serviço que sobreviveu a ambos: um servidor de tempo real que mantém cada conexão aberta, junta cada cliente a uma sala com o nome do seu id de usuário, e expõe um único endpoint para onde o resto da plataforma posta quando algo precisa ser empurrado. Ele fica fora do produto porque uma conexão de longa duração e uma requisição não são o mesmo tipo de tráfego.',
+      },
+      contribution: {
+        summary: {
+          en: 'Effectively a solo build: thirty-three of the thirty-four commits, from the handshake to the load-test harness that proved it held up.',
+          'pt-BR':
+            'Praticamente uma construção solo: trinta e três dos trinta e quatro commits, do handshake ao harness de carga que comprovou que ele aguentava.',
+        },
+        areas: [
+          {
+            en: 'The socket server itself: the shared-secret handshake, room assignment by user id, and an immediate disconnect for a client that ends up joined to no room.',
+            'pt-BR':
+              'O próprio servidor de tempo real: o handshake com segredo compartilhado, a atribuição de sala por id de usuário, e a desconexão imediata de um cliente que acaba sem entrar em nenhuma sala.',
+          },
+          {
+            en: 'The notify endpoint the rest of the platform posts to, and the info and health endpoints used to watch the service itself.',
+            'pt-BR':
+              'O endpoint de notificação para onde o resto da plataforma posta, e os endpoints de info e de saúde usados para observar o próprio serviço.',
+          },
+          {
+            en: 'The handler-loading convention: an event handler is a file, picked up automatically from a directory.',
+            'pt-BR':
+              'A convenção de carregamento de handlers: um handler de evento é um arquivo, carregado automaticamente a partir de um diretório.',
+          },
+          {
+            en: 'The load-test harness, built to deliberately hold a share of clients on long-polling instead of letting all of them upgrade.',
+            'pt-BR':
+              'O harness de teste de carga, construído para manter deliberadamente uma parte dos clientes em long-polling em vez de deixar todos fazerem upgrade.',
+          },
+        ],
+      },
+      problem: {
+        en: 'The monolith deployed once a night, and anything sharing its pipeline shared its cadence — a realtime channel that can only change at three in the morning is a realtime channel nobody changes. Separately, open connections and request traffic do not want the same instance count: one scales with how many people are online, the other with how many requests arrive.',
+        'pt-BR':
+          'O monolito subia uma vez por madrugada, e qualquer coisa que compartilhasse seu pipeline compartilhava seu ritmo — um canal de tempo real que só pode mudar às três da manhã é um canal de tempo real que ninguém muda. Separadamente, conexões abertas e tráfego de requisição não querem a mesma quantidade de instâncias: uma escala com quantas pessoas estão online, a outra com quantas requisições chegam.',
+      },
+      architecture: {
+        summary: {
+          en: 'The platform posts a room, an event name and a payload to the notify endpoint; the server resolves who is in that room right now and pushes the event straight to them.',
+          'pt-BR':
+            'A plataforma posta uma sala, um nome de evento e um payload para o endpoint de notificação; o servidor resolve quem está naquela sala agora e empurra o evento diretamente para eles.',
+        },
+        steps: [
+          {
+            label: 'Platform',
+            detail: {
+              en: 'Another service in the platform posts a room, an event name and a payload to the notify endpoint.',
+              'pt-BR': 'Outro serviço da plataforma posta uma sala, um nome de evento e um payload para o endpoint de notificação.',
+            },
+          },
+          {
+            label: 'Room resolved',
+            detail: {
+              en: 'The server looks up which connections are actually joined to that room right now.',
+              'pt-BR': 'O servidor verifica quais conexões estão de fato naquela sala agora.',
+            },
+          },
+          {
+            label: 'Fan-out',
+            detail: {
+              en: 'The event is pushed to every client currently joined to the room.',
+              'pt-BR': 'O evento é empurrado para cada cliente atualmente na sala.',
+            },
+          },
+          {
+            label: 'Browser',
+            detail: {
+              en: 'The client receives the event and updates without a refresh.',
+              'pt-BR': 'O cliente recebe o evento e atualiza sem um refresh.',
+            },
+          },
+        ],
+      },
+      decisions: [
+        {
+          heading: { en: 'Realtime as its own deployable', 'pt-BR': 'Tempo real como implantação própria' },
+          body: {
+            en: 'Two reasons, both real: open connections and request traffic scale on different axes, and the product deployed once a night — a channel that can only change at three in the morning is one nobody changes. Splitting it into its own service let each axis scale on its own terms and let this one ship on its own clock.',
+            'pt-BR':
+              'Dois motivos, ambos reais: conexões abertas e tráfego de requisição escalam em eixos diferentes, e o produto subia uma vez por madrugada — um canal que só pode mudar às três da manhã é um canal que ninguém muda. Separá-lo em um serviço próprio deixou cada eixo escalar nos seus próprios termos, e deixou este subir no próprio relógio.',
+          },
+        },
+        {
+          heading: { en: 'A room per user id', 'pt-BR': 'Uma sala por id de usuário' },
+          body: {
+            en: 'Addressing is by identity, not by connection, so the platform can push to a person without knowing how many tabs, devices or reconnects that person currently has open.',
+            'pt-BR':
+              'O endereçamento é por identidade, não por conexão, então a plataforma consegue empurrar para uma pessoa sem saber quantas abas, dispositivos ou reconexões essa pessoa tem abertos no momento.',
+          },
+        },
+        {
+          heading: { en: 'Handlers auto-loaded from a directory', 'pt-BR': 'Handlers carregados automaticamente de um diretório' },
+          body: {
+            en: 'Adding an event is adding a file — there is no registry to remember to update, and no handler that exists in the code but was never wired in.',
+            'pt-BR':
+              'Adicionar um evento é adicionar um arquivo — não existe registro para lembrar de atualizar, nem handler que existe no código mas nunca foi ligado.',
+          },
+        },
+        {
+          heading: { en: 'A load test that keeps clients on long-polling', 'pt-BR': 'Um teste de carga que mantém clientes em long-polling' },
+          body: {
+            en: 'Not every client upgrades to a websocket. A load test where all of them do measures a population that does not exist, so the harness deliberately holds a share of clients on HTTP long-polling instead.',
+            'pt-BR':
+              'Nem todo cliente faz upgrade para um websocket. Um teste de carga em que todos fazem mede uma população que não existe, então o harness mantém deliberadamente uma parte dos clientes em long-polling via HTTP.',
+          },
+        },
+      ],
+      highlights: [
+        {
+          en: 'The notify endpoint the rest of the platform posts to when something needs pushing out.',
+          'pt-BR': 'O endpoint de notificação para onde o resto da plataforma posta quando algo precisa ser empurrado.',
+        },
+        {
+          en: 'An info endpoint reporting the live connection count, for monitoring.',
+          'pt-BR': 'Um endpoint de info que reporta a contagem de conexões ao vivo, para monitoramento.',
+        },
+        {
+          en: 'A health endpoint reporting its own latency.',
+          'pt-BR': 'Um endpoint de saúde que reporta a própria latência.',
+        },
+        {
+          en: 'A shared-secret handshake that disconnects a client immediately if it ends up joined to no room.',
+          'pt-BR': 'Um handshake com segredo compartilhado que desconecta um cliente imediatamente se ele acabar sem entrar em nenhuma sala.',
+        },
+      ],
+    },
+  },
+  {
     slug: 'ulbra-atende',
     name: 'Ulbra Atende',
     tagline: {

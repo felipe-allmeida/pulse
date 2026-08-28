@@ -134,7 +134,7 @@ it('projects sharing a venture are contiguous in the array', () => {
 */
 it('every venture project is private with no repository link', () => {
   const inVentures = projects.filter((p) => p.venture !== undefined);
-  expect(inVentures, 'six ULBRA projects and five Dietbox cards so far').toHaveLength(11);
+  expect(inVentures, 'six ULBRA projects and six Dietbox projects').toHaveLength(12);
   for (const project of inVentures) {
     expect(project.visibility, `${project.slug} visibility`).toBe('private');
     expect(
@@ -648,6 +648,20 @@ it('dietbox-notifications carries the figures its design document recorded', () 
   // from — they are a capacity plan, not a production measurement.
   expectBothLocales(detail.metricsNote!, 'dietbox-notifications metricsNote');
   expect(detail.metricsNote!.en).toMatch(/design|plan|estimate/i);
+});
+
+it('dietbox-socket claims no Redis adapter the repository does not have', () => {
+  const socket = projects.find((p) => p.slug === 'dietbox-socket');
+  expect(socket, 'the socket card is published').toBeDefined();
+  expect(socket!.venture).toBe('dietbox');
+
+  // A regression test for a specific inaccuracy this change removed: the
+  // site asserted a Redis-backed horizontal scale-out that the source does
+  // not contain. The site's whole premise is being checkable.
+  const everything = JSON.stringify(projects.map((p) => p.detail));
+  expect(everything, 'no project claims a Redis-backed socket adapter').not.toMatch(
+    /redis[^"]{0,40}(adapter|socket)|socket[^"]{0,40}redis/i,
+  );
 });
 
 it('no project carries a leadership section — it belongs to the venture', () => {
