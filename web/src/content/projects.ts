@@ -956,6 +956,234 @@ export const projects: Project[] = [
     },
   },
   {
+    slug: 'dietbox-payment',
+    name: 'Dietbox Payment',
+    tagline: {
+      en: 'Subscriptions and recurring billing, behind a checkout of its own.',
+      'pt-BR': 'Assinaturas e cobrança recorrente, atrás de um checkout próprio.',
+    },
+    description: {
+      en: 'The service that carries the revenue: subscription commands on one side, a webhook handler per gateway event on the other, and three payment providers behind a common interface — with a Vue checkout in front of it.',
+      'pt-BR':
+        'O serviço que carrega a receita: comandos de assinatura de um lado, um handler de webhook por evento do gateway do outro, e três provedores de pagamento atrás de uma interface comum — com um checkout em Vue na frente.',
+    },
+    tech: ['.NET 6', 'C#', 'CQRS', 'Vue 3', 'Vite', 'PrimeVue', 'Pinia', 'Cypress', 'Azure DevOps'],
+    role: {
+      en: 'Senior Software Engineer, then Head of Technology',
+      'pt-BR': 'Engenheiro de Software Sênior, depois Head de Tecnologia',
+    },
+    period: { en: '2023–2024', 'pt-BR': '2023–2024' },
+    visibility: 'private',
+    links: [{ label: 'Website', href: 'https://dietbox.me' }],
+    venture: 'dietbox',
+    detail: {
+      overview: {
+        en: 'The service responsible for the money: subscription commands on one side, a webhook handler for every event a payment gateway raises on the other, and three gateway integrations behind a common boundary in between. It is kept separate because money has a different failure mode from everything else in the product — its own release train, in a repository it shares with the platform’s other services.',
+        'pt-BR':
+          'O serviço responsável pelo dinheiro: comandos de assinatura de um lado, um handler de webhook para cada evento que um gateway de pagamento emite do outro, e três integrações de gateway atrás de uma fronteira comum no meio. Ele é mantido separado porque dinheiro tem um modo de falha diferente do resto do produto — trem de release próprio, num repositório que compartilha com os outros serviços da plataforma.',
+      },
+      contribution: {
+        summary: {
+          en: 'As principal architect across the estate, I set the patterns this service is built on: the path-filtered release pipeline that lets it ship on its own train, and the package boundary that keeps a gateway change from becoming a domain change. The commands, the webhook handlers and the checkout itself were the team’s to write.',
+          'pt-BR':
+            'Como arquiteto principal do conjunto, defini os padrões sobre os quais este serviço é construído: o pipeline de release com filtro de caminho que permite que ele suba no próprio trem, e a fronteira de pacote que impede que uma troca de gateway vire uma troca de domínio. Os comandos, os handlers de webhook e o próprio checkout foram escritos pelo time.',
+        },
+        areas: [
+          {
+            en: 'The release pipeline’s path filter, so a payment hotfix ships on its own branch without redeploying the other three services.',
+            'pt-BR':
+              'O filtro de caminho do pipeline de release, para que um hotfix de pagamento suba pelo próprio branch sem redeployar os outros três serviços.',
+          },
+          {
+            en: 'The package boundary each gateway integration sits behind, carried over from the same pattern used across the platform.',
+            'pt-BR':
+              'A fronteira de pacote atrás da qual cada integração de gateway fica, herdada do mesmo padrão usado no resto da plataforma.',
+          },
+          {
+            en: 'The Azure estate this service deploys onto, configured the same way as its neighbours.',
+            'pt-BR': 'O ambiente Azure onde este serviço é publicado, configurado da mesma forma que seus vizinhos.',
+          },
+        ],
+        boundary: {
+          en: 'The subscription commands, the webhook handlers and the checkout client are a team’s work: across February 2023 to July 2024, the author holds roughly a tenth of the client’s commits and about a fifth of the service’s — the bulk of both belongs to other engineers.',
+          'pt-BR':
+            'Os comandos de assinatura, os handlers de webhook e o cliente de checkout foram trabalho de um time: entre fevereiro de 2023 e julho de 2024, o autor tem aproximadamente um décimo dos commits do cliente e cerca de um quinto dos do serviço — a maior parte dos dois pertence a outros engenheiros.',
+        },
+      },
+      problem: {
+        en: 'A subscription doesn’t live only in the product’s own database — it also lives in whichever gateway is processing it, and that gateway’s opinion of the subscription’s state arrives asynchronously, by webhook, on its own schedule. Which gateway processes it is a vendor decision, not a domain one: swapping providers should not mean touching what a subscription command does. And every one of those webhook deliveries has to be reconciled with what the product already believes happened, not simply trusted.',
+        'pt-BR':
+          'Uma assinatura não mora só no banco de dados do próprio produto — ela também mora em qualquer gateway que esteja processando, e a opinião desse gateway sobre o estado da assinatura chega de forma assíncrona, por webhook, no tempo dele. Qual gateway processa é uma decisão de fornecedor, não de domínio: trocar de provedor não deveria significar mexer no que um comando de assinatura faz. E cada entrega de webhook precisa ser reconciliada com o que o produto já acredita ter acontecido, não simplesmente aceita como verdade.',
+      },
+      states: {
+        caption: { en: 'The subscription lifecycle', 'pt-BR': 'O ciclo de vida da assinatura' },
+        summary: {
+          en: 'Every step below is a directory in the webhook handler tree, named for the gateway event it answers.',
+          'pt-BR':
+            'Cada etapa abaixo é um diretório na árvore de handlers de webhook, nomeado pelo evento do gateway que ela responde.',
+        },
+        steps: [
+          {
+            label: 'Created',
+            detail: {
+              en: 'The gateway has created the subscription on its side; the service records it before the first invoice exists.',
+              'pt-BR': 'O gateway criou a assinatura do lado dele; o serviço a registra antes de existir a primeira fatura.',
+            },
+          },
+          {
+            label: 'Activated',
+            detail: {
+              en: 'The subscription’s first payment cleared; the service marks it active and the customer’s access follows.',
+              'pt-BR':
+                'O primeiro pagamento da assinatura foi confirmado; o serviço marca como ativa e o acesso do cliente segue essa marcação.',
+            },
+          },
+          {
+            label: 'Changed',
+            detail: {
+              en: 'A plan, a price or a payment method changed on the gateway’s side; the service updates its own record to match.',
+              'pt-BR':
+                'Um plano, um preço ou uma forma de pagamento mudou do lado do gateway; o serviço atualiza seu próprio registro para acompanhar.',
+            },
+          },
+          {
+            label: 'Payment failed',
+            detail: {
+              en: 'An invoice on the subscription failed to charge on the gateway’s side; the service records the failure.',
+              'pt-BR': 'Uma fatura da assinatura falhou ao cobrar do lado do gateway; o serviço registra a falha.',
+            },
+          },
+          {
+            label: 'Suspended',
+            detail: {
+              en: 'The gateway has suspended the subscription; the service mirrors the state, and access follows it.',
+              'pt-BR': 'O gateway suspendeu a assinatura; o serviço espelha o estado, e o acesso segue essa marcação.',
+            },
+          },
+          {
+            label: 'Expired',
+            detail: {
+              en: 'The subscription has run its course and the gateway has closed it; the service marks the record accordingly.',
+              'pt-BR': 'A assinatura completou seu ciclo e o gateway a encerrou; o serviço marca o registro de acordo.',
+            },
+          },
+          {
+            label: 'Invoice paid',
+            detail: {
+              en: 'A marketplace invoice has been paid; the service records the payment against the subaccount it belongs to.',
+              'pt-BR': 'Uma fatura do marketplace foi paga; o serviço registra o pagamento na subconta a que ela pertence.',
+            },
+          },
+          {
+            label: 'Invoice released',
+            detail: {
+              en: 'The marketplace has released the funds from a paid invoice to the subaccount holder.',
+              'pt-BR': 'O marketplace liberou os valores de uma fatura paga para quem detém a subconta.',
+            },
+          },
+          {
+            label: 'Invoice refunded',
+            detail: {
+              en: 'A marketplace invoice has been refunded; the service reverses what it recorded against the subaccount.',
+              'pt-BR': 'Uma fatura do marketplace foi reembolsada; o serviço reverte o que havia registrado na subconta.',
+            },
+          },
+        ],
+      },
+      architecture: {
+        summary: {
+          en: 'A Vue checkout out front, CQRS commands and controllers in the middle, and three gateway integrations behind one package boundary — with the gateway’s own webhooks closing the loop asynchronously.',
+          'pt-BR':
+            'Um checkout em Vue na frente, comandos e controllers CQRS no meio, e três integrações de gateway atrás de uma única fronteira de pacote — com os próprios webhooks do gateway fechando o ciclo de forma assíncrona.',
+        },
+        steps: [
+          {
+            label: 'Checkout client',
+            detail: {
+              en: 'The Vue checkout — subscription, renewal and thank-you views — calls the service’s commands: subscribe, create an invoice, generate a payment link.',
+              'pt-BR':
+                'O checkout em Vue — telas de assinatura, renovação e páginas de agradecimento — chama os comandos do serviço: assinar, criar fatura, gerar link de pagamento.',
+            },
+          },
+          {
+            label: 'Payment service',
+            detail: {
+              en: 'Subscription, transaction, voucher, extension and webhook controllers sit in front of the CQRS commands that do the work.',
+              'pt-BR': 'Controllers de assinatura, transação, voucher, extensão e webhook ficam na frente dos comandos CQRS que fazem o trabalho.',
+            },
+          },
+          {
+            label: 'Gateway package',
+            detail: {
+              en: 'A shared package boundary hides which of the three gateway integrations is handling a given call.',
+              'pt-BR': 'Uma fronteira de pacote compartilhada esconde qual das três integrações de gateway está atendendo uma chamada específica.',
+            },
+          },
+          {
+            label: 'Gateway webhooks',
+            detail: {
+              en: 'The gateway posts its own opinion of the subscription back asynchronously, one webhook handler directory per event.',
+              'pt-BR':
+                'O gateway publica de volta, de forma assíncrona, a própria opinião sobre a assinatura — um diretório de handler de webhook por evento.',
+            },
+          },
+        ],
+      },
+      decisions: [
+        {
+          heading: { en: 'One repository, four release trains', 'pt-BR': 'Um repositório, quatro trens de release' },
+          body: {
+            en: 'The payment service shares its repository with the auth, foods and jobs services, but each ships on its own release train: its own branch trigger, and a path filter that excludes the other three services’ directories. A payment hotfix does not redeploy auth. A monorepo without a shared deploy.',
+            'pt-BR':
+              'O serviço de pagamento compartilha o repositório com os serviços de autenticação, alimentos e jobs, mas cada um sobe no próprio trem de release: gatilho de branch próprio, e um filtro de caminho que exclui os diretórios dos outros três serviços. Um hotfix de pagamento não redeploya a autenticação. Um monorepo sem deploy compartilhado.',
+          },
+        },
+        {
+          heading: { en: 'The gateway behind a package boundary', 'pt-BR': 'O gateway atrás de uma fronteira de pacote' },
+          body: {
+            en: 'Three gateway integrations — Iugu, Ebanx and TSPay — implement the same interface behind a shared package. Which one processes a given call is an implementation detail the rest of the service does not see, which is what lets a gateway change be an implementation change rather than a domain one.',
+            'pt-BR':
+              'Três integrações de gateway — Iugu, Ebanx e TSPay — implementam a mesma interface atrás de um pacote compartilhado. Qual delas processa uma chamada é um detalhe de implementação que o resto do serviço não enxerga, e é isso que permite que uma troca de gateway seja uma mudança de implementação, não de domínio.',
+          },
+        },
+        {
+          heading: { en: 'The webhook tree is the state machine', 'pt-BR': 'A árvore de webhooks é a máquina de estados' },
+          body: {
+            en: 'There is one handler per gateway event, named for the event itself — subscription created, invoice paid, invoice refunded — rather than one endpoint switching on a payload field. The directory structure is the lifecycle, readable without opening a single file.',
+            'pt-BR':
+              'Existe um handler por evento do gateway, nomeado pelo próprio evento — assinatura criada, fatura paga, fatura reembolsada — em vez de um único endpoint que decide com base num campo do payload. A estrutura de diretórios é o ciclo de vida, legível sem abrir um único arquivo.',
+          },
+        },
+        {
+          heading: { en: 'A checkout that is not the app', 'pt-BR': 'Um checkout que não é o aplicativo' },
+          body: {
+            en: 'The purchase funnel ships as its own client — its own Vue app, its own Cypress suite reporting through Allure — separately from the rest of the product, on its own cadence.',
+            'pt-BR':
+              'O funil de compra sobe como um cliente próprio — seu próprio app em Vue, sua própria suíte de Cypress reportando via Allure — separado do resto do produto, no próprio ritmo.',
+          },
+        },
+      ],
+      highlights: [
+        {
+          en: 'Subscribing and renewing, with a suspend path when a payment lapses.',
+          'pt-BR': 'Assinatura e renovação, com um caminho de suspensão quando um pagamento falha.',
+        },
+        {
+          en: 'Vouchers and plan extensions, adjusting a subscription without cancelling and re-creating it.',
+          'pt-BR': 'Vouchers e extensões de plano, ajustando uma assinatura sem cancelar e recriar.',
+        },
+        {
+          en: 'Payment links generated on demand, for a charge outside the regular checkout flow.',
+          'pt-BR': 'Links de pagamento gerados sob demanda, para uma cobrança fora do fluxo normal de checkout.',
+        },
+        {
+          en: 'Marketplace subaccounts, with their own invoice-paid, released and refunded events.',
+          'pt-BR': 'Subcontas de marketplace, com seus próprios eventos de fatura paga, liberada e reembolsada.',
+        },
+      ],
+    },
+  },
+  {
     slug: 'ulbra-atende',
     name: 'Ulbra Atende',
     tagline: {

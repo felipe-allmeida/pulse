@@ -134,7 +134,7 @@ it('projects sharing a venture are contiguous in the array', () => {
 */
 it('every venture project is private with no repository link', () => {
   const inVentures = projects.filter((p) => p.venture !== undefined);
-  expect(inVentures, 'six ULBRA projects and two Dietbox cards so far').toHaveLength(8);
+  expect(inVentures, 'six ULBRA projects and three Dietbox cards so far').toHaveLength(9);
   for (const project of inVentures) {
     expect(project.visibility, `${project.slug} visibility`).toBe('private');
     expect(
@@ -596,6 +596,28 @@ it('dietbox-b2c carries its two real figures and names both audiences', () => {
   const values = detail.metrics!.map((m) => m.value.en).join(' ');
   expect(values, 'the policy line count').toMatch(/7[.,]?2k|7,216/);
   expect(values, 'the commit share').toMatch(/730|731/);
+});
+
+it('dietbox-payment names the work as a team’s, not the author’s', () => {
+  const payment = projects.find((p) => p.slug === 'dietbox-payment');
+  expect(payment, 'the payment card is published').toBeDefined();
+  expect(payment!.venture).toBe('dietbox');
+
+  const boundary = payment!.detail!.contribution!.boundary;
+  expect(boundary, 'a card about a team’s codebase must say so').toBeDefined();
+  expectBothLocales(boundary!, 'dietbox-payment boundary');
+  expect(boundary!.en).toMatch(/team|others|someone else/i);
+  expect(boundary!['pt-BR']).toMatch(/time|outros|outra pessoa/i);
+});
+
+it('dietbox-payment draws its lifecycle from the webhook handlers that exist', () => {
+  const states = projects.find((p) => p.slug === 'dietbox-payment')!.detail!.states!;
+  expectBothLocales(states.caption!, 'dietbox-payment states caption');
+  expect(states.steps.length).toBeGreaterThanOrEqual(5);
+  for (const step of states.steps) {
+    expect(step.label.trim()).not.toBe('');
+    expectBothLocales(step.detail, 'dietbox-payment state detail');
+  }
 });
 
 it('no project carries a leadership section — it belongs to the venture', () => {
