@@ -1228,8 +1228,8 @@ export const projects: Project[] = [
     slug: 'dietbox-portal',
     name: 'Dietbox Portal',
     tagline: {
-      en: 'The back office that took daily operations off engineering’s desk.',
-      'pt-BR': 'O back office que tirou a operação do dia a dia da mesa da engenharia.',
+      en: 'The back office that handed the product’s daily operations to the operations team.',
+      'pt-BR': 'O back office que passou a operação do produto para o time de operações.',
     },
     description: {
       en: 'The internal tool the company runs the product from. Cancel a subscription, grant a special one, issue a voucher, import the food catalogue from a file, change a plan’s limits, publish a banner, clear a nutritionist’s cache — forty-four actions across ten areas, every one of which used to be a ticket to an engineer.',
@@ -1248,9 +1248,9 @@ export const projects: Project[] = [
     venture: 'dietbox',
     detail: {
       overview: {
-        en: 'Before this existed, changing anything in the product was engineering’s job. Adjusting a subscription, correcting a nutritionist’s email, loading a new food table — each one arrived as a request to the technology team and left as someone’s afternoon. The portal turned those into screens, and the work moved to the operations team, who did not have to ask anyone. That is the whole point of it: not that the company got a back office, but that engineering stopped being in the path of the company’s own routine.',
+        en: 'Until 2023, any change to the product’s data went through the technology team: adjusting a subscription, correcting a record, loading a food table. The portal put those actions on screens, with the product’s own rules in front of them and a sign-in separate from the customer’s. The operations team started doing them directly — forty-four actions across ten areas.',
         'pt-BR':
-          'Antes disso existir, mudar qualquer coisa no produto era trabalho da engenharia. Ajustar uma assinatura, corrigir o e-mail de uma nutricionista, carregar uma tabela nova de alimentos — cada um chegava como pedido ao time de tecnologia e ia embora como a tarde de alguém. O portal transformou isso em telas, e o trabalho passou para o time de operações, que não precisava mais pedir para ninguém. É esse o ponto dele: não que a empresa ganhou um back office, mas que a engenharia deixou de estar no caminho da rotina da própria empresa.',
+          'Até 2023, qualquer alteração nos dados do produto passava pelo time de tecnologia: ajustar uma assinatura, corrigir um cadastro, carregar uma tabela de alimentos. O portal colocou essas ações em telas, com as regras do produto na frente e um login separado do login do cliente. O time de operações passou a fazê-las direto — quarenta e quatro ações em dez áreas.',
       },
       contribution: {
         summary: {
@@ -1287,9 +1287,9 @@ export const projects: Project[] = [
         },
       },
       problem: {
-        en: 'Everything the business needed done to its own data went through the technology team. Support could not adjust a subscription, marketing could not publish a banner, nobody could load a new food table — each was a request, a queue, and an engineer running something by hand against the product database or the monolith’s admin surface. That makes engineering the bottleneck on work that is not engineering, and it puts the riskiest operations in the least reviewable place. The alternative was to give operations the actions themselves: named commands, behind a sign-in that is not the customer’s.',
+        en: 'Support could not adjust a subscription, marketing could not publish a banner, and nobody outside engineering could load a new food table. Each was a request to the technology team, and an engineer running the change by hand against the product database or the monolith’s admin surface — no rules in front of it and no name on it afterwards.',
         'pt-BR':
-          'Tudo o que o negócio precisava fazer com os próprios dados passava pelo time de tecnologia. Suporte não conseguia ajustar uma assinatura, marketing não conseguia publicar um banner, ninguém conseguia carregar uma tabela nova de alimentos — cada coisa era um pedido, uma fila, e um engenheiro rodando algo na mão contra o banco do produto ou a superfície de admin do monolito. Isso faz da engenharia o gargalo de um trabalho que não é de engenharia, e coloca as operações mais arriscadas no lugar menos revisável. A alternativa foi entregar as ações para a operação: comandos nomeados, atrás de um login que não é o do cliente.',
+          'O suporte não conseguia ajustar uma assinatura, o marketing não conseguia publicar um banner, e ninguém fora da engenharia conseguia carregar uma tabela nova de alimentos. Cada coisa era um pedido ao time de tecnologia, e um engenheiro rodando a mudança na mão contra o banco do produto ou a superfície de admin do monolito — sem regra na frente e sem nome depois.',
       },
       metrics: [
         {
@@ -1358,11 +1358,11 @@ export const projects: Project[] = [
       },
       decisions: [
         {
-          heading: { en: 'The measure of success was engineering hearing about it less', 'pt-BR': 'A medida de sucesso foi a engenharia ouvir falar menos disso' },
+          heading: { en: 'Handing over the actions instead of answering the requests', 'pt-BR': 'Entregar as ações em vez de atender os pedidos' },
           body: {
-            en: 'It would have been cheaper to keep answering the requests. The reason not to is that a request queue makes engineering the slowest part of somebody else’s job, and the work never gets better at it — the tenth time someone asks for a subscription to be corrected costs exactly what the first did. Every screen here was chosen by asking which request we were tired of receiving, and the thing to look at afterwards was not what the portal could do, but what stopped arriving in the queue.',
+            en: 'The cheaper option was to keep answering the requests as they came. Answering does not get faster with repetition, though, and each request costs engineering time on work that is not engineering. The screens built here are the requests that arrived often enough to be worth replacing.',
             'pt-BR':
-              'Teria saído mais barato continuar atendendo os pedidos. A razão para não fazer isso é que uma fila de pedidos transforma a engenharia na parte mais lenta do trabalho de outra pessoa, e esse trabalho nunca melhora — a décima vez que alguém pede para corrigir uma assinatura custa exatamente o que custou a primeira. Cada tela daqui foi escolhida perguntando de qual pedido a gente estava cansado de receber, e o que importava olhar depois não era o que o portal conseguia fazer, mas o que parou de chegar na fila.',
+              'A opção mais barata era continuar atendendo os pedidos conforme chegavam. Só que atender não fica mais rápido com a repetição, e cada pedido custa tempo de engenharia num trabalho que não é de engenharia. As telas construídas aqui são os pedidos que chegavam com frequência suficiente para valer a substituição.',
           },
         },
         {
@@ -1384,9 +1384,9 @@ export const projects: Project[] = [
         {
           heading: { en: 'Support sees the screen, instead of a description of it', 'pt-BR': 'O suporte vê a tela, em vez de uma descrição dela' },
           body: {
-            en: 'Half of what reached engineering was not a change request at all — it was someone unable to reproduce what a customer was describing. Impersonation answers that directly: support steps into the nutritionist’s or the patient’s own session, sees exactly what they see, and steps back out. It is a deliberate concentration of power in one feature, which is why it lives behind the staff identity below rather than anywhere near a customer account.',
+            en: 'Part of what reached engineering was not a change request but a reproduction problem — someone unable to see what a customer was describing. Impersonation answers that directly: support steps into the nutritionist’s or the patient’s own session, sees what they see, and steps back out. It concentrates a lot of access in one feature, which is why it sits behind the staff identity rather than anywhere near a customer account.',
             'pt-BR':
-              'Metade do que chegava na engenharia nem era pedido de mudança — era alguém sem conseguir reproduzir o que o cliente descrevia. A impersonation responde isso direto: o suporte entra na sessão da própria nutricionista ou do próprio paciente, vê exatamente o que a pessoa vê, e sai de volta. É uma concentração deliberada de poder numa funcionalidade só, e é por isso que ela mora atrás da identidade de equipe descrita abaixo, e não perto de uma conta de cliente.',
+              'Parte do que chegava na engenharia não era pedido de mudança, e sim problema de reprodução — alguém sem conseguir ver o que o cliente descrevia. A impersonation responde isso direto: o suporte entra na sessão da própria nutricionista ou do próprio paciente, vê o que a pessoa vê, e sai de volta. É muito acesso concentrado numa funcionalidade só, e por isso ela fica atrás da identidade de equipe, não perto de uma conta de cliente.',
           },
         },
       ],
