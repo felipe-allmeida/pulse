@@ -197,6 +197,33 @@ it('no Airia project publishes a metric', () => {
   }
 });
 
+/*
+  The sibling of `ulbra-one is described as pre-launch, not as delivered`.
+
+  Mutual TLS was implemented on this connector and disabled a week later; the
+  wiring is commented out on both sides to this day and was never restored.
+  Having *built* it is a real contribution and the case study says so — but the
+  shipped system does not do it, and a highlight or a stack tag claiming
+  otherwise would be describing a security property the connector does not
+  have. That is the one class of overstatement a portfolio cannot afford, so it
+  is pinned here rather than left to memory.
+*/
+it('airia-cloud-connector does not claim mutual TLS as a shipped property', () => {
+  const connector = projects.find((p) => p.slug === 'airia-cloud-connector')!;
+
+  expect(connector.tech, 'mTLS is not part of the shipped stack').not.toContain('mTLS');
+
+  for (const highlight of connector.detail!.highlights!) {
+    expect(highlight.en, 'highlights describe what the system does today').not.toMatch(/mutual tls|mtls/i);
+  }
+
+  // Where it is named, it is named together with the fact that it was undone.
+  const decision = connector.detail!.decisions!.find((d) => /mutual tls/i.test(d.heading.en));
+  expect(decision, 'the mutual TLS decision is still told').toBeDefined();
+  expect(decision!.heading.en).toMatch(/switched off|disabled|removed/i);
+  expect(decision!.body.en).toMatch(/bearer token/i);
+});
+
 it('the Airia group sits between the ULBRA group and Dell', () => {
   const slugs = projects.map((p) => p.slug);
   expect(slugs.indexOf('airia-cloud-connector')).toBeGreaterThan(slugs.indexOf('ulbra-infra'));

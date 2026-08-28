@@ -1566,7 +1566,7 @@ export const projects: Project[] = [
       'pt-BR':
         'Um agente autocontido que o cliente instala dentro da própria rede. Ele disca para fora, até a plataforma na nuvem, e mantém a conexão aberta — assim a plataforma consegue chamar APIs internas, consultar bancos internos e alcançar servidores MCP internos sem uma única regra de firewall de entrada.',
     },
-    tech: ['.NET 9', 'SignalR', 'Redis', 'mTLS', 'MCP', 'xUnit', 'Testcontainers', 'Helm'],
+    tech: ['.NET 9', 'SignalR', 'Redis', 'JWT', 'MCP', 'xUnit', 'Testcontainers', 'Helm'],
     role: {
       en: 'R&D Engineer — security, routing and command surface',
       'pt-BR': 'Engenheiro de P&D — segurança, roteamento e superfície de comandos',
@@ -1590,8 +1590,8 @@ export const projects: Project[] = [
         },
         areas: [
           {
-            en: 'Mutual TLS between connector and hub, and the certificate handling around it.',
-            'pt-BR': 'TLS mútuo entre conector e hub, e o tratamento de certificados em volta disso.',
+            en: 'Mutual TLS between connector and hub — built, and switched off a week later.',
+            'pt-BR': 'TLS mútuo entre conector e hub — construído, e desligado uma semana depois.',
           },
           {
             en: 'Routing — resolving which connector in which customer group answers a given request.',
@@ -1690,8 +1690,8 @@ export const projects: Project[] = [
           'pt-BR': 'Só saída: o conector disca para a nuvem, nunca o contrário.',
         },
         {
-          en: 'Mutual TLS on top of bearer tokens — the channel proves both ends, not just one.',
-          'pt-BR': 'TLS mútuo por cima dos bearer tokens — o canal prova as duas pontas, não só uma.',
+          en: 'Integration tests run against a real Redis through Testcontainers, not a fake.',
+          'pt-BR': 'Os testes de integração rodam contra um Redis real via Testcontainers, não contra um fake.',
         },
         {
           en: 'Queries relational engines and document stores on the private side, schema included.',
@@ -1720,13 +1720,13 @@ export const projects: Project[] = [
         },
         {
           heading: {
-            en: 'Mutual TLS, even though a token was already required',
-            'pt-BR': 'TLS mútuo, mesmo já exigindo um token',
+            en: 'Mutual TLS, built and then switched off',
+            'pt-BR': 'TLS mútuo, construído e depois desligado',
           },
           body: {
-            en: 'A bearer token proves the connector to the hub; it does nothing to prove the hub to the connector. Client certificates on both ends close that half, so a stolen token alone cannot register an impostor connector. The cost is real — certificates expire, clocks drift — so the connector was given an explicit clock-skew allowance and a readable error when a certificate is wrong, instead of the TLS handshake failure a customer’s ops team would otherwise have to decode.',
+            en: 'A bearer token proves the connector to the hub and does nothing to prove the hub to the connector, so client certificates went on both ends, with an explicit clock-skew allowance and a readable error in place of a raw handshake failure. It lasted a week. I merged the change that disabled it myself, the certificate requirement was dropped the next day, and the wiring is still commented out on both sides — the reason is not recorded anywhere I can point to, and I am not going to reconstruct one. What ships is bearer tokens over TLS. The honest lesson is not about the cryptography: a security control that a customer’s ops team has to hold up their end of is only as real as the certificate distribution nobody had built yet.',
             'pt-BR':
-              'Um bearer token prova o conector para o hub; não prova nada do hub para o conector. Certificados de cliente nas duas pontas fecham essa metade, então um token roubado sozinho não registra um conector impostor. O custo é real — certificado expira, relógio desalinha — então o conector ganhou uma tolerância explícita de desvio de relógio e uma mensagem de erro legível quando o certificado está errado, no lugar da falha de handshake TLS que o time de operações do cliente teria que decifrar.',
+              'Um bearer token prova o conector para o hub e não prova nada do hub para o conector, então certificados de cliente entraram nas duas pontas, com uma tolerância explícita de desvio de relógio e um erro legível no lugar de uma falha crua de handshake. Durou uma semana. Fui eu mesmo que mergeei a mudança que desligou isso, a exigência de certificado caiu no dia seguinte, e o wiring segue comentado dos dois lados — o motivo não está registrado em lugar nenhum que eu possa apontar, e não vou reconstruir um. O que vai para produção é bearer token sobre TLS. A lição honesta não é sobre criptografia: um controle de segurança que depende do time de operações do cliente segurar a outra ponta só é tão real quanto a distribuição de certificados que ninguém tinha construído ainda.',
           },
         },
         {
@@ -1959,9 +1959,9 @@ export const projects: Project[] = [
             'pt-BR': 'O pooling pertence à biblioteca, e seu teto é configuração',
           },
           body: {
-            en: 'Callers that open connections directly leak them under load, and the leak surfaces as an unrelated timeout somewhere else. Putting the pool behind the factory makes the correct thing the default thing. The maximum is a setting rather than a constant precisely because the right ceiling for a connector on one customer machine is not the right ceiling for the platform — the first value shipped turned out to be too low for the second case.',
+            en: 'Callers that open connections directly leak them under load, and the leak surfaces as an unrelated timeout somewhere else. Putting the pool behind the factory makes the correct thing the default thing. The maximum is a setting rather than a constant because the right ceiling for a connector on one customer machine is not the right ceiling for the platform — and the first default shipped turned out to be too low, and was raised five-fold.',
             'pt-BR':
-              'Quem abre conexão direto vaza conexão sob carga, e o vazamento aparece como um timeout sem relação em outro lugar. Colocar o pool atrás da factory faz da coisa certa a coisa padrão. O máximo é configuração e não constante justamente porque o teto certo para um conector numa máquina de cliente não é o teto certo para a plataforma — o primeiro valor entregue se mostrou baixo demais para o segundo caso.',
+              'Quem abre conexão direto vaza conexão sob carga, e o vazamento aparece como um timeout sem relação em outro lugar. Colocar o pool atrás da factory faz da coisa certa a coisa padrão. O máximo é configuração e não constante porque o teto certo para um conector numa máquina de cliente não é o teto certo para a plataforma — e o primeiro default entregue se mostrou baixo demais, e foi multiplicado por cinco.',
           },
         },
       ],
