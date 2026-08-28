@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { profile } from './profile';
 import { projects } from './projects';
-import { ventures } from './ventures';
+import { ventureBySlug, ventures } from './ventures';
 import { expectBothLocales } from '@/test/expect-both-locales';
 
 it('profile has bio, skills and experience', () => {
@@ -134,7 +134,7 @@ it('projects sharing a venture are contiguous in the array', () => {
 */
 it('every venture project is private with no repository link', () => {
   const inVentures = projects.filter((p) => p.venture !== undefined);
-  expect(inVentures, 'six ULBRA projects and three Airia ones').toHaveLength(9);
+  expect(inVentures, 'six ULBRA projects, three Airia ones and six Dietbox projects').toHaveLength(15);
   for (const project of inVentures) {
     expect(project.visibility, `${project.slug} visibility`).toBe('private');
     expect(
@@ -257,6 +257,42 @@ it('airia-cloud-connector has a full case study, localized in every locale', () 
   for (const decision of detail.decisions!) {
     expectBothLocales(decision.heading, 'decision.heading');
     expectBothLocales(decision.body, 'decision.body');
+  }
+});
+
+/*
+  Two Dietbox cards once read "Senior Software Engineer, then Head of
+  Technology" over a `2023–2024` period, but `profile.experience` puts Senior
+  Software Engineer at Sep 2020 – Aug 2022 and Head of Technology at Aug 2022 –
+  Aug 2024: there is no transition inside 2023–2024 for a card to claim. A
+  card's role has to be one the CV supports for the whole period the card
+  shows, so a project that starts after the promotion cannot claim the title
+  that preceded it.
+*/
+it('no dietbox project claims a role the CV does not support for its period', () => {
+  // Read off `profile.experience` rather than hard-coded blind: if either CV
+  // row moves, this assertion is what notices before the rule below is wrong.
+  const dietboxRoles = profile.experience.filter((entry) => entry.org === 'Dietbox');
+  expect(dietboxRoles.map((entry) => `${entry.role.en} (${entry.period.en})`)).toEqual([
+    'Head of Technology (Aug 2022 – Aug 2024)',
+    'Senior Software Engineer (Sep 2020 – Aug 2022)',
+  ]);
+  const seniorEngineerEndedIn = 2022;
+
+  const dietbox = projects.filter((p) => p.venture === 'dietbox');
+  expect(dietbox, 'all six Dietbox projects').toHaveLength(6);
+  for (const project of dietbox) {
+    expect(project.period, `${project.slug} has no period`).toBeDefined();
+    // '2023–2024' and '2022' alike: the first four digits are the start year.
+    const startYear = Number.parseInt(project.period!.en.slice(0, 4), 10);
+    expect(startYear, `${project.slug} period does not start with a year`).not.toBeNaN();
+    if (startYear <= seniorEngineerEndedIn) continue;
+
+    expect(
+      project.role.en,
+      `${project.slug} (${project.period!.en}) begins after the promotion, so it cannot claim the earlier title`,
+    ).toBe('Head of Technology');
+    expect(project.role['pt-BR'], `${project.slug} role (pt-BR)`).toBe('Head de Tecnologia');
   }
 });
 
@@ -547,6 +583,22 @@ it('publishes no hostname, URL or credential in any project narrative', () => {
   }
 });
 
+it('publishes no hostname, URL or credential in any venture narrative', () => {
+  // `ventures.ts` is the second body of user-facing prose — summary, team and
+  // the practices blocks — and until this guard existed it was unscanned, so
+  // the rule the project guard above enforces stopped at the file boundary.
+  // Same patterns, same neutraliser, same reasoning; `url` is excluded for
+  // exactly the reason `links` is over there: an organization's own public
+  // site is the one URL that belongs in content.
+  for (const venture of ventures) {
+    const { url: _publicSite, ...prose } = venture;
+    const narrative = withoutSanctionedPlaceholders(JSON.stringify(prose));
+    expect(narrative, `${venture.slug} contains a URL`).not.toMatch(/https?:\/\//);
+    expect(narrative, `${venture.slug} contains a hostname`).not.toMatch(/\b[a-z0-9-]+\.[a-z]{2,}\b/i);
+    expect(narrative, `${venture.slug} contains a token-like string`).not.toMatch(/\b[a-f0-9]{32,}\b/i);
+  }
+});
+
 it('every project states what the author did', () => {
   for (const project of projects) {
     const contribution = project.detail?.contribution;
@@ -630,7 +682,7 @@ it('dietbox has a case study, localized in every locale', () => {
   expectBothLocales(detail!.problem!, 'problem');
   expectBothLocales(detail!.metricsNote!, 'metricsNote');
 
-  expect(detail!.metrics).toHaveLength(4);
+  expect(detail!.metrics).toHaveLength(2);
   for (const metric of detail!.metrics!) {
     expectBothLocales(metric.value, 'metric.value');
     expectBothLocales(metric.label, 'metric.label');
@@ -638,7 +690,7 @@ it('dietbox has a case study, localized in every locale', () => {
   }
 
   expectBothLocales(detail!.architecture!.summary!, 'architecture.summary');
-  expect(detail!.architecture!.steps).toHaveLength(5);
+  expect(detail!.architecture!.steps).toHaveLength(4);
   for (const step of detail!.architecture!.steps) {
     expect(step.label.trim()).not.toBe('');
     expectBothLocales(step.detail, 'architecture.step.detail');
@@ -662,10 +714,20 @@ it('dietbox names the shared work — its largest codebase was a team effort', (
   expectBothLocales(boundary!, 'dietbox contribution.boundary');
 });
 
-it('dietbox sits between kota-embed and the ulbra projects', () => {
+it('the Dietbox run sits between kota-embed and the ULBRA run', () => {
   const slugs = projects.map((p) => p.slug);
+  const dietbox = projects.filter((p) => p.venture === 'dietbox').map((p) => p.slug);
+  expect(dietbox[0], 'the webapp card leads the run').toBe('dietbox');
   expect(slugs.indexOf('dietbox')).toBeGreaterThan(slugs.indexOf('kota-embed'));
-  expect(slugs.indexOf('dietbox')).toBeLessThan(slugs.indexOf('ulbra-atende'));
+  expect(slugs.indexOf(dietbox.at(-1)!)).toBeLessThan(slugs.indexOf('ulbra-atende'));
+});
+
+it('the webapp card is about the monolith, not about the company', () => {
+  const webapp = projects.find((p) => p.slug === 'dietbox')!;
+  expect(webapp.name, 'a card named "Dietbox" under a header named "Dietbox" reads as a duplicate').toBe(
+    'Dietbox Webapp',
+  );
+  expect(webapp.detail!.metrics, 'org-level numbers belong to the venture').toHaveLength(2);
 });
 
 it('dietbox links to its product, not its source', () => {
@@ -674,15 +736,103 @@ it('dietbox links to its product, not its source', () => {
   expect(dietbox.links).toEqual([{ label: 'Website', href: 'https://dietbox.me' }]);
 });
 
-it('dietbox is the only project with a leadership section, localized and non-empty', () => {
-  const withLeadership = projects.filter((p) => p.detail?.leadership);
-  expect(withLeadership.map((p) => p.slug)).toEqual(['dietbox']);
+it('dietbox-b2c carries its two real figures and names both audiences', () => {
+  const b2c = projects.find((p) => p.slug === 'dietbox-b2c');
+  expect(b2c, 'the B2C card is published').toBeDefined();
+  expect(b2c!.venture).toBe('dietbox');
 
-  const leadership = withLeadership[0]!.detail!.leadership!;
-  expect(leadership).toHaveLength(4);
-  for (const section of leadership) {
-    expectBothLocales(section.heading, 'dietbox leadership heading');
-    expectBothLocales(section.body, 'dietbox leadership body');
+  const detail = b2c!.detail!;
+  expectBothLocales(detail.overview!, 'dietbox-b2c overview');
+  expectBothLocales(detail.problem!, 'dietbox-b2c problem');
+
+  // Both audiences, because one identity system serving two unrelated
+  // journeys is the whole reason this was custom rather than hosted.
+  expect(detail.overview!.en).toMatch(/practitioner|nutritionist/i);
+  expect(detail.overview!.en).toMatch(/patient/i);
+
+  // The two numbers that exist: the XML line count and the commit share.
+  const values = detail.metrics!.map((m) => m.value.en).join(' ');
+  expect(values, 'the policy line count').toMatch(/7[.,]?2k|7,216/);
+  expect(values, 'the commit share').toMatch(/730|731/);
+});
+
+it('dietbox-payment names the work as a team’s, not the author’s', () => {
+  const payment = projects.find((p) => p.slug === 'dietbox-payment');
+  expect(payment, 'the payment card is published').toBeDefined();
+  expect(payment!.venture).toBe('dietbox');
+
+  const boundary = payment!.detail!.contribution!.boundary;
+  expect(boundary, 'a card about a team’s codebase must say so').toBeDefined();
+  expectBothLocales(boundary!, 'dietbox-payment boundary');
+  expect(boundary!.en).toMatch(/team|others|someone else/i);
+  expect(boundary!['pt-BR']).toMatch(/time|outros|outra pessoa/i);
+});
+
+it('dietbox-payment draws its lifecycle from the webhook handlers that exist', () => {
+  const states = projects.find((p) => p.slug === 'dietbox-payment')!.detail!.states!;
+  expectBothLocales(states.caption!, 'dietbox-payment states caption');
+  expect(states.steps.length).toBeGreaterThanOrEqual(5);
+  for (const step of states.steps) {
+    expect(step.label.trim()).not.toBe('');
+    expectBothLocales(step.detail, 'dietbox-payment state detail');
+  }
+});
+
+it('dietbox-portal separates staff identity from customer identity', () => {
+  const portal = projects.find((p) => p.slug === 'dietbox-portal');
+  expect(portal, 'the portal card is published').toBeDefined();
+  expect(portal!.venture).toBe('dietbox');
+
+  // The decision the code actually supports: the back office authenticates
+  // against its own store with its own tokens, not against the customer
+  // directory. Asserted because an earlier reading of an unused dependency
+  // in the client's manifest suggested Azure AD, which is not what runs.
+  const decisions = JSON.stringify(portal!.detail!.decisions);
+  expect(decisions, 'staff and customers are different populations').toMatch(/staff|back office|internal/i);
+  expect(decisions).not.toMatch(/Azure AD(?! B2C)/);
+});
+
+it('dietbox-notifications carries the figures its design document recorded', () => {
+  const notif = projects.find((p) => p.slug === 'dietbox-notifications');
+  expect(notif, 'the notifications card is published').toBeDefined();
+  expect(notif!.venture).toBe('dietbox');
+
+  const detail = notif!.detail!;
+  const values = detail.metrics!.map((m) => m.value.en).join(' ');
+  expect(values, 'the May 2023 volume').toMatch(/51k|51 ?000|~51/);
+  expect(values, 'the peak QPS the design planned for').toMatch(/\b5\b/);
+
+  // The numbers predate the system, so the note must say where they came
+  // from — they are a capacity plan, not a production measurement.
+  expectBothLocales(detail.metricsNote!, 'dietbox-notifications metricsNote');
+  expect(detail.metricsNote!.en).toMatch(/design|plan|estimate/i);
+});
+
+it('dietbox-socket claims no Redis adapter the repository does not have', () => {
+  const socket = projects.find((p) => p.slug === 'dietbox-socket');
+  expect(socket, 'the socket card is published').toBeDefined();
+  expect(socket!.venture).toBe('dietbox');
+
+  // A regression test for a specific inaccuracy this change removed: the
+  // site asserted a Redis-backed horizontal scale-out that the source does
+  // not contain. The site's whole premise is being checkable.
+  const everything = JSON.stringify(projects.map((p) => p.detail));
+  expect(everything, 'no project claims a Redis-backed socket adapter').not.toMatch(
+    /redis[^"]{0,40}(adapter|socket)|socket[^"]{0,40}redis/i,
+  );
+});
+
+it('no project carries a leadership section — it belongs to the venture', () => {
+  // It moved rather than duplicated: the venture header renders `practices`
+  // directly above the cards, so a project repeating it would put the same
+  // four claims on screen twice, three inches apart.
+  expect(projects.filter((p) => p.detail?.leadership).map((p) => p.slug)).toEqual([]);
+
+  const practices = ventureBySlug('dietbox')!.practices!;
+  expect(practices).toHaveLength(4);
+  for (const section of practices) {
+    expectBothLocales(section.heading, 'dietbox practices heading');
+    expectBothLocales(section.body, 'dietbox practices body');
   }
 });
 

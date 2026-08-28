@@ -109,6 +109,64 @@ export const ventures: Venture[] = [
         'Uma plataforma corporativa de segurança e governança de IA. Meu trabalho ficou no lado dela que precisa alcançar o mundo fora da nuvem: o conector on-premise que deixa a plataforma chamar sistemas dentro da rede do cliente, a biblioteca multi-engine de acesso a dados por baixo dele e a gestão de postura que inventaria a IA que a empresa já roda.',
     },
   },
+  {
+    slug: 'dietbox',
+    name: 'Dietbox',
+    url: 'https://dietbox.me',
+    role: {
+      en: 'Senior Software Engineer → Head of Technology',
+      'pt-BR': 'Engenheiro de Software Sênior → Head de Tecnologia',
+    },
+    period: { en: 'Sep 2020 – Aug 2024', 'pt-BR': 'Set 2020 – Ago 2024' },
+    // `engagement` is deliberately absent. It exists to say "client of Pampa
+    // Devs" about ULBRA; Dietbox was a job, and a badge reading "Employment"
+    // is noise on a page where every other entry is one too.
+    summary: {
+      en: 'A Brazilian nutrition SaaS: nutritionists build diet plans, their patients follow them, and both audiences share one identity backbone. The platform spans a decade-old monolith and a newer generation of services standing beside it.',
+      'pt-BR':
+        'Um SaaS brasileiro de nutrição: nutricionistas montam planos alimentares, seus pacientes os seguem, e os dois públicos dividem uma única base de identidade. A plataforma vai de um monolito de dez anos a uma geração mais nova de serviços erguida ao lado dele.',
+    },
+    team: {
+      en: 'Thirteen people — engineering, QA, UX and support.',
+      'pt-BR': 'Treze pessoas — engenharia, QA, UX e suporte.',
+    },
+    practices: [
+      {
+        heading: { en: 'From one nightly deploy to several a day', 'pt-BR': 'De um deploy noturno a vários por dia' },
+        body: {
+          en: 'I brought in Scrum and trunk-based development. A deploy in daylight stopped being an event.',
+          'pt-BR':
+            'Trouxe Scrum e trunk-based development. Deploy em horário comercial deixou de ser evento.',
+        },
+      },
+      {
+        heading: { en: 'A payment migration nobody noticed', 'pt-BR': 'Uma migração de pagamentos que ninguém notou' },
+        body: {
+          en: 'I planned and ran the move of thousands of active subscribers from Iugu to Pagar.me. Revenue never paused — the kind of change whose measure of success is that nothing happened.',
+          'pt-BR':
+            'Planejei e conduzi a migração de milhares de assinantes ativos de Iugu para Pagar.me. A receita não parou em momento nenhum — o tipo de mudança cuja medida de sucesso é não ter acontecido nada.',
+        },
+      },
+      {
+        heading: { en: 'Cloud spend as an engineering problem', 'pt-BR': 'Custo de nuvem como problema de engenharia' },
+        body: {
+          en: 'I took a cost pass over the Azure estate — without a feature freeze to pay for it.',
+          'pt-BR': 'Fiz uma revisão de custos no ambiente Azure — sem congelar entregas para bancar a economia.',
+        },
+      },
+      {
+        heading: {
+          en: 'Reporting engineering in the executive’s language',
+          'pt-BR': 'Reportar engenharia na língua da diretoria',
+        },
+        body: {
+          en: 'I started bringing DORA metrics and a roadmap to the executive team, so investment in technology was argued with evidence rather than conviction.',
+          'pt-BR':
+            'Passei a levar métricas DORA e um roadmap à diretoria, para que o investimento em tecnologia fosse defendido com evidências, não com convicção.',
+        },
+      },
+    ],
+  },
 ];
 
 export function ventureBySlug(slug: string): Venture | undefined {

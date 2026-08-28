@@ -535,30 +535,31 @@ export const projects: Project[] = [
   },
   {
     slug: 'dietbox',
-    name: 'Dietbox',
+    name: 'Dietbox Webapp',
     tagline: {
-      en: 'Nutrition software for practitioners and their patients.',
-      'pt-BR': 'Software de nutrição para profissionais e seus pacientes.',
+      en: 'The decade-old monolith the product grew on, and still its largest codebase.',
+      'pt-BR': 'O monolito de dez anos em que o produto cresceu, e ainda sua maior base de código.',
     },
     description: {
-      en: 'A Brazilian SaaS where nutritionists build diet plans and their patients follow them — two audiences over one identity backbone and one platform.',
+      en: 'The monolith that carried both the nutritionist and the patient experience before any other service existed, deploying once a night because that was the only window that felt safe — and the codebase a newer generation of services has since grown up beside.',
       'pt-BR':
-        'Um SaaS brasileiro em que nutricionistas montam planos alimentares e seus pacientes os seguem — dois públicos sobre uma única base de identidade e uma única plataforma.',
+        'O monolito que atendeu nutricionistas e pacientes antes de existir qualquer outro serviço, com deploy uma vez por noite porque essa era a única janela que parecia segura — e a base de código ao lado da qual uma geração mais nova de serviços cresceu desde então.',
     },
-    tech: ['.NET', 'Azure', 'Azure AD B2C', 'PostgreSQL', 'Redis', 'Socket.IO', 'Azure DevOps'],
+    tech: ['C#', 'ASP.NET MVC', 'Entity Framework', 'SQL Server', 'Azure App Service', 'Kendo UI', 'Azure DevOps'],
     role: {
       en: 'Senior Software Engineer, then Head of Technology',
       'pt-BR': 'Engenheiro de Software Sênior, depois Head de Tecnologia',
     },
     period: { en: '2020–2024', 'pt-BR': '2020–2024' },
+    venture: 'dietbox',
     visibility: 'private',
     screenshot: '/screenshots/dietbox.webp',
     links: [{ label: 'Website', href: 'https://dietbox.me' }],
     detail: {
       overview: {
-        en: 'A Brazilian SaaS used by nutritionists to plan diets and by their patients to follow them. Two audiences with almost nothing in common share one product, one identity system and one platform — and that platform spans a decade-old monolith and a newer generation of services running beside it.',
+        en: "The monolith is the product's centre of gravity: for years it was the only codebase, carrying both the nutritionist and the patient experience through the same release. Everything the product did shipped through this one pipeline, on the one schedule that pipeline allowed.",
         'pt-BR':
-          'Um SaaS brasileiro usado por nutricionistas para montar dietas e por seus pacientes para segui-las. Dois públicos com quase nada em comum dividem um produto, um sistema de identidade e uma plataforma — e essa plataforma vai de um monolito de dez anos a uma geração mais nova de serviços rodando ao lado dele.',
+          'O monolito é o centro de gravidade do produto: por anos foi a única base de código, levando tanto a experiência da nutricionista quanto a do paciente na mesma entrega. Tudo que o produto fazia passava por esse único pipeline, na única janela que esse pipeline permitia.',
       },
       contribution: {
         summary: {
@@ -568,21 +569,9 @@ export const projects: Project[] = [
         },
         areas: [
           {
-            en: 'The move off .NET Framework on Windows onto .NET 6 on Linux.',
-            'pt-BR': 'A saída do .NET Framework no Windows para .NET 6 no Linux.',
-          },
-          {
-            en: 'Identity end to end: the custom Azure AD B2C policies behind both audiences.',
+            en: 'The build and release pipeline in Azure DevOps, shipping the core project together with its satellites and its gulp-built, Kendo UI front end.',
             'pt-BR':
-              'Identidade de ponta a ponta: as políticas customizadas de Azure AD B2C por trás dos dois públicos.',
-          },
-          {
-            en: 'The portal service, and the shared building blocks the newer services start from.',
-            'pt-BR': 'O serviço de portal e os blocos compartilhados dos quais os serviços mais novos partem.',
-          },
-          {
-            en: 'The realtime service, and CI/CD in Azure DevOps.',
-            'pt-BR': 'O serviço de tempo real e o CI/CD no Azure DevOps.',
+              'O pipeline de build e release no Azure DevOps, entregando o projeto principal junto com seus satélites e seu front end construído em gulp com Kendo UI.',
           },
           {
             en: 'Production availability and incident response.',
@@ -602,77 +591,55 @@ export const projects: Project[] = [
       },
       metrics: [
         {
-          value: { en: '13', 'pt-BR': '13' },
-          label: { en: 'people in the org', 'pt-BR': 'pessoas na área' },
-          note: { en: 'engineering, QA, UX and support', 'pt-BR': 'engenharia, QA, UX e suporte' },
+          value: { en: '~600', 'pt-BR': '~600' },
+          label: { en: 'commits in the monolith', 'pt-BR': 'commits no monolito' },
+          note: { en: 'mine, of ~3.9k total', 'pt-BR': 'meus, de ~3,9 mil no total' },
         },
         {
-          value: { en: '~1.7k', 'pt-BR': '~1,7 mil' },
-          label: { en: 'commits across six services', 'pt-BR': 'commits em seis serviços' },
-          note: { en: 'mine, of ~5.8k total', 'pt-BR': 'meus, de ~5,8 mil no total' },
-        },
-        {
-          value: { en: '1 month → 1.5 weeks', 'pt-BR': '1 mês → 1,5 semanas' },
-          label: { en: 'lead time', 'pt-BR': 'lead time' },
-          note: {
-            en: 'after Scrum and trunk-based development',
-            'pt-BR': 'depois de Scrum e trunk-based development',
-          },
-        },
-        {
-          value: { en: '−21%', 'pt-BR': '−21%' },
-          label: { en: 'monthly cloud spend', 'pt-BR': 'custo mensal de nuvem' },
-          note: { en: 'after an Azure cost pass', 'pt-BR': 'depois de uma revisão de custos no Azure' },
+          value: { en: '4 years', 'pt-BR': '4 anos' },
+          label: { en: 'in the same codebase', 'pt-BR': 'na mesma base de código' },
+          note: { en: '2020 to 2024', 'pt-BR': 'de 2020 a 2024' },
         },
       ],
       metricsNote: {
-        en: 'The commit counts come from the repositories. The rest is my own record of the period.',
-        'pt-BR':
-          'Os números de commit vêm dos repositórios. O resto é meu próprio registro do período.',
+        en: 'The commit counts come from the repository. The rest is my own record of the period.',
+        'pt-BR': 'Os números de commit vêm do repositório. O resto é meu próprio registro do período.',
       },
       architecture: {
         summary: {
-          en: 'Two generations of the same product, sharing one identity backbone.',
-          'pt-BR': 'Duas gerações do mesmo produto, dividindo uma única base de identidade.',
+          en: 'The core project, its data, the scheduled job beside it, and the Azure app it deploys onto.',
+          'pt-BR': 'O projeto principal, seus dados, o job agendado ao lado dele, e o app Azure onde é publicado.',
         },
         steps: [
           {
-            label: 'Legacy platform',
+            label: 'Web application',
             detail: {
-              en: 'The .NET Framework monolith the product grew on, and still its largest codebase.',
+              en: 'The core project and its satellites — catalogs, enums, shared infrastructure, resources and reports — behind a gulp-built front end using Kendo UI.',
               'pt-BR':
-                'O monolito .NET Framework em que o produto cresceu, e ainda sua maior base de código.',
+                'O projeto principal e seus satélites — catálogos, enums, infraestrutura compartilhada, recursos e relatórios — atrás de um front end construído em gulp com Kendo UI.',
             },
           },
           {
-            label: 'Identity',
+            label: 'Data layer',
             detail: {
-              en: 'Azure AD B2C with custom policies, one set per audience, over a single directory.',
-              'pt-BR':
-                'Azure AD B2C com políticas customizadas, um conjunto por público, sobre um único diretório.',
+              en: 'Entity Framework over SQL Server, the store the monolith reads and writes through.',
+              'pt-BR': 'Entity Framework sobre SQL Server, a base que o monolito lê e grava.',
             },
           },
           {
-            label: 'Portal service',
+            label: 'Background jobs',
             detail: {
-              en: 'The newer generation: a layered domain over shared building blocks, with event sourcing where the questions are historical.',
+              en: 'A webjob project for scheduled work — a single daily job — sitting in the repository but outside the solution the release builds, and published on its own.',
               'pt-BR':
-                'A geração mais nova: um domínio em camadas sobre blocos compartilhados, com event sourcing onde as perguntas são históricas.',
+                'Um projeto de webjob para trabalho agendado — um único job diário — que fica no repositório mas fora da solution que a release compila, e é publicado por fora.',
             },
           },
           {
-            label: 'Realtime',
+            label: 'Azure App Service',
             detail: {
-              en: 'A dedicated socket server, scaled horizontally behind a Redis adapter.',
+              en: 'A Windows app with a staging slot: the release deploys the built artifact to the slot, then swaps the slot into production.',
               'pt-BR':
-                'Um servidor de sockets dedicado, escalado horizontalmente atrás de um adaptador Redis.',
-            },
-          },
-          {
-            label: 'Azure',
-            detail: {
-              en: 'The estate I configured, with delivery through Azure DevOps.',
-              'pt-BR': 'O ambiente que configurei, com entrega via Azure DevOps.',
+                'Um app Windows com um slot de staging: a release publica o artefato construído no slot e depois faz o swap do slot para produção.',
             },
           },
         ],
@@ -699,80 +666,1085 @@ export const projects: Project[] = [
       decisions: [
         {
           heading: {
-            en: 'Custom identity policies instead of a hosted login',
-            'pt-BR': 'Políticas de identidade customizadas em vez de um login pronto',
+            en: 'One core, many satellites',
+            'pt-BR': 'Um núcleo, vários satélites',
           },
           body: {
-            en: 'Two audiences share a product but not a journey: a practitioner signing up for a subscription, a patient invited by the one treating them. Custom B2C policies gave each its own sign-up, sign-in and password flow, branded per audience, over one identity backbone instead of two user stores to keep in sync.',
+            en: "The core project doesn't carry catalogs, enums, shared infrastructure, resources and reports itself — each lives in its own satellite project. A change to reference data doesn't touch the same project as a change to the request path.",
             'pt-BR':
-              'Dois públicos dividem um produto, mas não um caminho: a profissional que assina, o paciente convidado por ela. Políticas customizadas de B2C deram a cada um seu próprio fluxo de cadastro, login e senha, com marca própria, sobre uma única base de identidade em vez de duas bases de usuários para manter sincronizadas.',
+              'O projeto principal não carrega catálogos, enums, infraestrutura compartilhada, recursos e relatórios sozinho — cada um vive em seu próprio projeto satélite. Uma mudança em dado de referência não toca o mesmo projeto que uma mudança no caminho de requisição.',
           },
         },
         {
           heading: {
-            en: 'Shared building blocks before shared services',
-            'pt-BR': 'Blocos compartilhados antes de serviços compartilhados',
+            en: 'The release builds a target, not the solution',
+            'pt-BR': 'A release compila um alvo, não a solution',
           },
           body: {
-            en: 'The newer services start from a common domain, infrastructure and identity layer rather than each inventing its own. It is what let a small team add a service without each new one arriving in a new style.',
+            en: "The release pipeline restores the solution but builds a single target — the site project — and archives only what that target publishes. The webjob project sitting beside it in the repository is not in the solution at all: it still targets 4.7.2 where the site targets 4.8, carries its own daily-schedule publish settings, and has not been touched since 2021. Naming a target rather than a solution is what keeps a project in that state from riding into a release nobody meant to include it in.",
             'pt-BR':
-              'Os serviços mais novos partem de uma camada comum de domínio, infraestrutura e identidade em vez de cada um inventar a sua. É o que permitiu a um time pequeno adicionar um serviço sem que cada novo chegasse num estilo novo.',
+              'O pipeline de release restaura a solution mas compila um único alvo — o projeto do site — e arquiva apenas o que aquele alvo publica. O projeto de webjob que fica ao lado, no mesmo repositório, não está na solution: ainda tem 4.7.2 como alvo enquanto o site tem 4.8, carrega as próprias configurações de publicação com agendamento diário, e não é tocado desde 2021. Nomear um alvo em vez de uma solution é o que impede um projeto nesse estado de entrar de carona numa release em que ninguém pretendia incluí-lo.',
           },
         },
         {
           heading: {
-            en: 'Event sourcing in the portal, not everywhere',
-            'pt-BR': 'Event sourcing no portal, não em tudo',
+            en: 'Release by slot swap, not by overwrite',
+            'pt-BR': 'Release por troca de slot, não por sobrescrita',
           },
           body: {
-            en: 'The portal’s questions are historical — what changed, when, and by whom — so its state is derived from events. The rest of the platform is not, because the rest of the platform is not asking that, and event sourcing charges rent on every service that adopts it.',
+            en: 'The pipeline builds once and deploys that one artifact to the app’s staging slot; production changes by swapping the slot in, not by writing over the site while it is serving. What goes live is a build that was already running before it took traffic, and the way back is the same swap in the other direction. That is what a deploy has to be before it can happen in daylight rather than at night.',
             'pt-BR':
-              'As perguntas do portal são históricas — o que mudou, quando e por quem —, então seu estado é derivado de eventos. O resto da plataforma não é, porque o resto da plataforma não faz essa pergunta, e event sourcing tem um custo de manutenção em todo serviço que o adota.',
+              'O pipeline compila uma vez e publica esse único artefato no slot de staging do app; produção muda pelo swap do slot, não por sobrescrever o site enquanto ele atende. O que vai ao ar é um build que já estava rodando antes de receber tráfego, e o caminho de volta é o mesmo swap na direção contrária. É isso que um deploy precisa ser antes de poder acontecer de dia em vez de de madrugada.',
           },
         },
         {
-          heading: { en: 'Realtime as its own service', 'pt-BR': 'Tempo real como serviço próprio' },
+          heading: {
+            en: 'A monolith you strangle, not rewrite',
+            'pt-BR': 'Um monolito que se estrangula, não se reescreve',
+          },
           body: {
-            en: 'Long-lived connections scale on a different axis from request traffic, and behind a Redis adapter any instance can push to a client connected to any other. Keeping it inside the monolith would have tied both to the same deploy — and the monolith deployed once a night.',
+            en: 'New capability went into the services beside the monolith, not into the monolith itself. It kept the surface it already served, without a rewrite competing for the same hours as the features shipping everywhere else.',
             'pt-BR':
-              'Conexões de longa duração escalam num eixo diferente do tráfego de requisições, e atrás de um adaptador Redis qualquer instância consegue enviar a um cliente conectado em outra. Mantê-lo dentro do monolito teria amarrado os dois ao mesmo deploy — e o monolito subia uma vez por madrugada.',
+              'Nova capacidade foi para os serviços ao lado do monolito, não para dentro dele. Ele manteve a superfície que já atendia, sem uma reescrita disputando as mesmas horas com as funcionalidades entregues no resto da plataforma.',
           },
         },
       ],
-      leadership: [
-        {
-          heading: { en: 'From one nightly deploy to several a day', 'pt-BR': 'De um deploy noturno a vários por dia' },
-          body: {
-            en: 'I brought in Scrum and trunk-based development. A deploy in daylight stopped being an event.',
+    },
+  },
+  {
+    slug: 'dietbox-b2c',
+    name: 'Dietbox B2C',
+    tagline: {
+      en: 'One identity backbone, two audiences, custom sign-in journeys.',
+      'pt-BR': 'Uma base de identidade, dois públicos, jornadas de login customizadas.',
+    },
+    description: {
+      en: 'Custom Azure AD B2C policies for a product whose two audiences share nothing but an account: a practitioner subscribing, and a patient invited by the one treating them. Federated sign-in, silent migration off the legacy store, and revocation that actually signs a session out everywhere.',
+      'pt-BR':
+        'Políticas customizadas de Azure AD B2C para um produto cujos dois públicos não dividem nada além da conta: a profissional que assina e o paciente convidado por ela. Login federado, migração silenciosa da base legada e revogação que de fato encerra a sessão em todo lugar.',
+    },
+    tech: ['Azure AD B2C', 'Identity Experience Framework', 'XML', 'OpenID Connect', 'OAuth 2.0', '.NET 6', 'HTML', 'CSS', 'Azure DevOps'],
+    role: {
+      en: 'Senior Software Engineer, then Head of Technology',
+      'pt-BR': 'Engenheiro de Software Sênior, depois Head de Tecnologia',
+    },
+    period: { en: '2021–2024', 'pt-BR': '2021–2024' },
+    visibility: 'private',
+    screenshot: '/screenshots/dietbox-b2c.webp',
+    links: [{ label: 'Website', href: 'https://dietbox.me' }],
+    venture: 'dietbox',
+    detail: {
+      overview: {
+        en: 'One Azure AD B2C identity system carrying two audiences that share nothing but the account: a nutritionist subscribing and paying, and a patient arriving by invitation from the one treating them. Three years of custom sign-in journeys, federated providers, silent migration off the legacy store, and session revocation that reaches every open browser.',
+        'pt-BR':
+          'Um único sistema de identidade em Azure AD B2C carregando dois públicos que não dividem nada além da conta: a nutricionista que assina e paga, e o paciente que chega por convite de quem o atende. Três anos de jornadas de login customizadas, provedores federados, migração silenciosa da base legada e revogação de sessão que alcança todo navegador aberto.',
+      },
+      contribution: {
+        summary: {
+          en: 'This is the author’s largest personal ownership in the Dietbox estate: half the commits over three years, across both audiences’ sign-in journeys.',
+          'pt-BR':
+            'Esta é a maior propriedade pessoal do autor no conjunto Dietbox: metade dos commits ao longo de três anos, cobrindo as jornadas de login dos dois públicos.',
+        },
+        areas: [
+          {
+            en: 'The two policy sets — one for the practitioner, one for the patient — each its own sign-up, sign-in and password-reset journey.',
             'pt-BR':
-              'Trouxe Scrum e trunk-based development. Deploy em horário comercial deixou de ser evento.',
+              'Os dois conjuntos de políticas — um para a profissional, um para o paciente — cada um com sua própria jornada de cadastro, login e redefinição de senha.',
           },
+          {
+            en: 'Federation with Google, Facebook and Apple, each mapped through its own exchange profile into a common subject claim.',
+            'pt-BR':
+              'Federação com Google, Facebook e Apple, cada uma mapeada por seu próprio exchange profile para uma claim de subject comum.',
+          },
+          {
+            en: 'The first-sign-in migration that moves a legacy-store user into the directory during the same journey they log in with.',
+            'pt-BR':
+              'A migração no primeiro login, que move um usuário da base legada para o diretório na própria jornada em que ele entra.',
+          },
+          {
+            en: 'Session revocation: a stamp on the user compared against the token’s issue time, so a password change or an admin revoke signs the account out everywhere.',
+            'pt-BR':
+              'Revogação de sessão: um carimbo no usuário comparado com o momento de emissão do token, para que uma troca de senha ou uma revogação administrativa encerre a conta em todo lugar.',
+          },
+          {
+            en: 'The custom sign-in pages, one set per audience, served and filled in at runtime.',
+            'pt-BR':
+              'As páginas de login customizadas, um conjunto por público, servidas e preenchidas em tempo de execução.',
+          },
+        ],
+      },
+      problem: {
+        en: 'A hosted login gives a product one journey. This one needed several: a subscriber signing up and paying, a patient arriving by invitation with no password to set, an academy student, and a receptionist acting on someone else’s behalf — all over one directory, without four separate user stores to keep in sync.',
+        'pt-BR':
+          'Um login hospedado dá a um produto uma única jornada. Este precisava de várias: uma assinante se cadastrando e pagando, um paciente chegando por convite sem senha para definir, uma aluna de academy, e uma recepcionista agindo em nome de outra pessoa — tudo sobre um único diretório, sem quatro bases de usuário separadas para manter sincronizadas.',
+      },
+      metrics: [
+        {
+          value: { en: '~7.2k', 'pt-BR': '~7,2 mil' },
+          label: { en: 'lines of policy XML', 'pt-BR': 'linhas de XML de política' },
+          note: { en: 'across two policy sets', 'pt-BR': 'em dois conjuntos de políticas' },
         },
         {
-          heading: { en: 'A payment migration nobody noticed', 'pt-BR': 'Uma migração de pagamentos que ninguém notou' },
-          body: {
-            en: 'I planned and ran the move of thousands of active subscribers from Iugu to Pagar.me. Revenue never paused — the kind of change whose measure of success is that nothing happened.',
-            'pt-BR':
-              'Planejei e conduzi a migração de milhares de assinantes ativos de Iugu para Pagar.me. A receita não parou em momento nenhum — o tipo de mudança cuja medida de sucesso é não ter acontecido nada.',
-          },
+          value: { en: '~730', 'pt-BR': '~730' },
+          label: { en: 'commits', 'pt-BR': 'commits' },
+          note: { en: 'mine, of ~1.5k total', 'pt-BR': 'meus, de ~1,5 mil no total' },
         },
+      ],
+      metricsNote: {
+        en: 'The line count is a plain line count over the committed policy files; the commit share comes from the repository.',
+        'pt-BR':
+          'A contagem de linhas é uma contagem simples sobre os arquivos de política versionados; a proporção de commits vem do repositório.',
+      },
+      states: {
+        caption: { en: 'The sign-in journey', 'pt-BR': 'A jornada de login' },
+        summary: {
+          en: 'Every step below corresponds to a technical profile that exists in the policy — this is the orchestration as written, not a simplification of it.',
+          'pt-BR':
+            'Cada etapa abaixo corresponde a um technical profile que existe na política — é a orquestração como está escrita, não uma simplificação dela.',
+        },
+        steps: [
+          {
+            label: 'Sign-in',
+            detail: {
+              en: 'Local credentials, or a federated provider — Google, Facebook or Apple — exchanged into a common subject claim.',
+              'pt-BR':
+                'Credenciais locais, ou um provedor federado — Google, Facebook ou Apple — trocado por uma claim de subject comum.',
+            },
+          },
+          {
+            label: 'Legacy check',
+            detail: {
+              en: 'Is this a legacy-store user who has not yet been migrated?',
+              'pt-BR': 'É um usuário da base legada que ainda não foi migrado?',
+            },
+          },
+          {
+            label: 'Migration',
+            detail: {
+              en: 'If so, the account is written into the directory with an alternative security identifier linking it back to the legacy credential — in the same journey as the sign-in, not a separate step.',
+              'pt-BR':
+                'Se sim, a conta é escrita no diretório com um identificador de segurança alternativo que a liga de volta à credencial legada — na mesma jornada do login, não numa etapa separada.',
+            },
+          },
+          {
+            label: 'Entitlement',
+            detail: {
+              en: 'Is the account enabled, and does it belong to a gated journey — subscriber, academy — that requires an active entitlement?',
+              'pt-BR':
+                'A conta está habilitada, e ela pertence a uma jornada com restrição — assinante, academy — que exige um direito de acesso ativo?',
+            },
+          },
+          {
+            label: 'Token',
+            detail: {
+              en: 'A token is issued, stamped with the time the user’s security record was last valid from.',
+              'pt-BR':
+                'Um token é emitido, carimbado com o momento a partir do qual o registro de segurança do usuário é válido.',
+            },
+          },
+        ],
+      },
+      architecture: {
+        summary: {
+          en: 'Two independent policy sets sit above one directory, and everything downstream trusts the tokens they issue.',
+          'pt-BR':
+            'Dois conjuntos de políticas independentes ficam acima de um diretório único, e tudo a jusante confia nos tokens que eles emitem.',
+        },
+        steps: [
+          {
+            label: 'Practitioner policies',
+            detail: {
+              en: 'Sign-up, sign-in, subscriber and academy journeys for the nutritionist audience.',
+              'pt-BR': 'Jornadas de cadastro, login, assinante e academy para o público de nutricionistas.',
+            },
+          },
+          {
+            label: 'Patient policies',
+            detail: {
+              en: 'Sign-up and sign-in for the patient audience, invited rather than self-registering.',
+              'pt-BR': 'Cadastro e login para o público de pacientes, convidados em vez de autocadastrados.',
+            },
+          },
+          {
+            label: 'Directory',
+            detail: {
+              en: 'One user store beneath both policy sets, holding local and federated accounts alike.',
+              'pt-BR': 'Uma única base de usuários abaixo dos dois conjuntos de políticas, com contas locais e federadas.',
+            },
+          },
+          {
+            label: 'Auth service',
+            detail: {
+              en: 'Validates the tokens this system issues. Reads and writes against the directory itself go through a shared gateway package that several services in the platform take a dependency on.',
+              'pt-BR':
+                'Valida os tokens que este sistema emite. Leituras e escritas no próprio diretório passam por um pacote de gateway compartilhado do qual vários serviços da plataforma dependem.',
+            },
+          },
+          {
+            label: 'Custom UI pages',
+            detail: {
+              en: 'Static markup, one set per audience, served by the identity platform and filled in at runtime.',
+              'pt-BR': 'Marcação estática, um conjunto por público, servida pela plataforma de identidade e preenchida em tempo de execução.',
+            },
+          },
+        ],
+      },
+      decisions: [
         {
-          heading: { en: 'Cloud spend as an engineering problem', 'pt-BR': 'Custo de nuvem como problema de engenharia' },
+          heading: {
+            en: 'Custom policies instead of a hosted login',
+            'pt-BR': 'Políticas customizadas em vez de um login hospedado',
+          },
           body: {
-            en: 'I took a cost pass over the Azure estate — without a feature freeze to pay for it.',
-            'pt-BR': 'Fiz uma revisão de custos no ambiente Azure — sem congelar entregas para bancar a economia.',
+            en: 'A hosted login gives one journey. This product needed a subscriber signing up and paying, a patient arriving by invitation, an academy student, and a receptionist — over one directory, without four user stores to keep in sync. Writing the policy directly was the only way to get gated journeys and a first-sign-in migration without forking the user base.',
+            'pt-BR':
+              'Um login hospedado dá uma única jornada. Este produto precisava de uma assinante se cadastrando e pagando, um paciente chegando por convite, uma aluna de academy e uma recepcionista — sobre um único diretório, sem quatro bases de usuário para manter sincronizadas. Escrever a política diretamente foi a única forma de ter jornadas com restrição e migração no primeiro login sem bifurcar a base de usuários.',
           },
         },
         {
           heading: {
-            en: 'Reporting engineering in the executive’s language',
-            'pt-BR': 'Reportar engenharia na língua da diretoria',
+            en: 'Migration as a side effect of signing in',
+            'pt-BR': 'Migração como efeito colateral do login',
           },
           body: {
-            en: 'I started bringing DORA metrics and a roadmap to the executive team, so investment in technology was argued with evidence rather than conviction.',
+            en: 'Nobody was asked to reset a password or re-register. The user experiences a login; the system experiences a migration, writing the account into the directory and linking it back to the legacy credential in the same journey.',
             'pt-BR':
-              'Passei a levar métricas DORA e um roadmap à diretoria, para que o investimento em tecnologia fosse defendido com evidências, não com convicção.',
+              'Ninguém foi solicitado a redefinir senha ou se recadastrar. O usuário vive um login; o sistema vive uma migração, escrevendo a conta no diretório e ligando-a de volta à credencial legada na mesma jornada.',
           },
+        },
+        {
+          heading: {
+            en: 'Revocation that reaches open sessions',
+            'pt-BR': 'Revogação que alcança sessões abertas',
+          },
+          body: {
+            en: 'A token that is merely unrenewable is not revoked. Comparing the token’s issue time against a stamp on the user record is what makes "sign this account out everywhere" actually mean it, rather than "stop this account from getting a new token next time."',
+            'pt-BR':
+              'Um token apenas não renovável não está revogado. Comparar o momento de emissão do token com um carimbo no registro do usuário é o que faz "encerrar a conta em todo lugar" significar isso de fato, e não "impedir que a conta consiga um novo token da próxima vez".',
+          },
+        },
+        {
+          heading: {
+            en: 'One directory, several journeys',
+            'pt-BR': 'Um diretório, várias jornadas',
+          },
+          body: {
+            en: 'Separate policies per audience over one shared user store, rather than one policy branching on audience or several stores that would have to be reconciled. The audiences share an identity, not a form.',
+            'pt-BR':
+              'Políticas separadas por público sobre uma única base de usuários compartilhada, em vez de uma política com ramificação por público ou várias bases para reconciliar. Os públicos compartilham uma identidade, não um formulário.',
+          },
+        },
+      ],
+      highlights: [
+        {
+          en: 'Federated sign-in with three providers, each exchanged into a common subject claim.',
+          'pt-BR': 'Login federado com três provedores, cada um trocado por uma claim de subject comum.',
+        },
+        {
+          en: 'Silent migration off the legacy store during the user’s own sign-in journey.',
+          'pt-BR': 'Migração silenciosa da base legada durante a própria jornada de login do usuário.',
+        },
+        {
+          en: 'Per-audience branded pages, one set for the practitioner and one for the patient.',
+          'pt-BR': 'Páginas com marca por público, um conjunto para a profissional e um para o paciente.',
+        },
+        {
+          en: 'Entitlement gates for subscriber and academy journeys, enforced inside the sign-in flow rather than after it.',
+          'pt-BR':
+            'Bloqueios de direito de acesso para jornadas de assinante e academy, aplicados dentro do fluxo de login em vez de depois dele.',
+        },
+      ],
+    },
+  },
+  {
+    slug: 'dietbox-payment',
+    name: 'Dietbox Payment',
+    tagline: {
+      en: 'Subscriptions and recurring billing, behind a checkout of its own.',
+      'pt-BR': 'Assinaturas e cobrança recorrente, atrás de um checkout próprio.',
+    },
+    description: {
+      en: 'The service that carries the revenue: subscription commands on one side, a webhook endpoint per gateway on the other, and two payment gateways in packages of their own — with a Vue checkout in front of it.',
+      'pt-BR':
+        'O serviço que carrega a receita: comandos de assinatura de um lado, um endpoint de webhook por gateway do outro, e dois gateways de pagamento em pacotes próprios — com um checkout em Vue na frente.',
+    },
+    tech: ['.NET 6', 'C#', 'CQRS', 'Vue 3', 'Vite', 'PrimeVue', 'Pinia', 'Cypress', 'Azure DevOps'],
+    role: {
+      en: 'Head of Technology',
+      'pt-BR': 'Head de Tecnologia',
+    },
+    period: { en: '2023–2024', 'pt-BR': '2023–2024' },
+    visibility: 'private',
+    screenshot: '/screenshots/dietbox-payment.webp',
+    links: [{ label: 'Website', href: 'https://dietbox.me' }],
+    venture: 'dietbox',
+    detail: {
+      overview: {
+        en: 'The service responsible for the money: subscription commands on one side, a webhook handler for every event a payment gateway raises on the other, and two gateway integrations in between — Iugu and TSPay, each in a crosscutting package of its own. It is kept separate because money has a different failure mode from everything else in the product — its own release train, in a repository it shares with the platform’s other services.',
+        'pt-BR':
+          'O serviço responsável pelo dinheiro: comandos de assinatura de um lado, um handler de webhook para cada evento que um gateway de pagamento emite do outro, e duas integrações de gateway no meio — Iugu e TSPay, cada uma no próprio pacote transversal. Ele é mantido separado porque dinheiro tem um modo de falha diferente do resto do produto — trem de release próprio, num repositório que compartilha com os outros serviços da plataforma.',
+      },
+      contribution: {
+        summary: {
+          en: 'As principal architect across the estate, I set the patterns this service is built on: the path-filtered release pipeline that lets it ship on its own train, and the crosscutting-package convention every third-party integration is wrapped in before a service takes a dependency on it. The commands, the webhook handlers and the checkout itself were the team’s to write.',
+          'pt-BR':
+            'Como arquiteto principal do conjunto, defini os padrões sobre os quais este serviço é construído: o pipeline de release com filtro de caminho que permite que ele suba no próprio trem, e a convenção de pacote transversal em que toda integração de terceiro é embrulhada antes de um serviço depender dela. Os comandos, os handlers de webhook e o próprio checkout foram escritos pelo time.',
+        },
+        areas: [
+          {
+            en: 'The release pipeline’s path filter, so a payment hotfix ships on its own branch without redeploying the other four services.',
+            'pt-BR':
+              'O filtro de caminho do pipeline de release, para que um hotfix de pagamento suba pelo próprio branch sem redeployar os outros quatro serviços.',
+          },
+          {
+            en: 'The crosscutting package each gateway integration lives in, and the one shared project that pulls them in for whichever service needs them.',
+            'pt-BR':
+              'O pacote transversal em que cada integração de gateway vive, e o único projeto compartilhado que os traz para qualquer serviço que precise deles.',
+          },
+          {
+            en: 'The Azure estate this service deploys onto, configured the same way as its neighbours.',
+            'pt-BR': 'O ambiente Azure onde este serviço é publicado, configurado da mesma forma que seus vizinhos.',
+          },
+        ],
+        boundary: {
+          en: 'The subscription commands, the webhook handlers and the checkout client are a team’s work: the author holds roughly a tenth of the checkout client’s commits, across February 2023 to July 2024, and about a fifth of the service’s, whose repository does not begin until October 2023 — the bulk of both belongs to other engineers.',
+          'pt-BR':
+            'Os comandos de assinatura, os handlers de webhook e o cliente de checkout foram trabalho de um time: o autor tem aproximadamente um décimo dos commits do cliente de checkout, entre fevereiro de 2023 e julho de 2024, e cerca de um quinto dos do serviço, cujo repositório só começa em outubro de 2023 — a maior parte dos dois pertence a outros engenheiros.',
+        },
+      },
+      problem: {
+        en: 'A subscription doesn’t live only in the product’s own database — it also lives in whichever gateway is processing it, and that gateway’s opinion of the subscription’s state arrives asynchronously, by webhook, on its own schedule. Two gateways were live at once while subscribers were being moved between them, each with its own event names, its own payload shape and its own idea of what a subscription is. And every one of those webhook deliveries has to be reconciled with what the product already believes happened, not simply trusted.',
+        'pt-BR':
+          'Uma assinatura não mora só no banco de dados do próprio produto — ela também mora em qualquer gateway que esteja processando, e a opinião desse gateway sobre o estado da assinatura chega de forma assíncrona, por webhook, no tempo dele. Dois gateways ficaram ativos ao mesmo tempo enquanto os assinantes eram migrados de um para o outro, cada um com seus próprios nomes de evento, seu próprio formato de payload e sua própria ideia do que é uma assinatura. E cada entrega de webhook precisa ser reconciliada com o que o produto já acredita ter acontecido, não simplesmente aceita como verdade.',
+      },
+      states: {
+        caption: { en: 'The subscription lifecycle', 'pt-BR': 'O ciclo de vida da assinatura' },
+        summary: {
+          en: 'Every step below is a directory in the webhook handler tree, named for the gateway event it answers.',
+          'pt-BR':
+            'Cada etapa abaixo é um diretório na árvore de handlers de webhook, nomeado pelo evento do gateway que ela responde.',
+        },
+        steps: [
+          {
+            label: 'Created',
+            detail: {
+              en: 'The gateway has created the subscription on its side; the service records it before the first invoice exists.',
+              'pt-BR': 'O gateway criou a assinatura do lado dele; o serviço a registra antes de existir a primeira fatura.',
+            },
+          },
+          {
+            label: 'Activated',
+            detail: {
+              en: 'The subscription’s first payment cleared; the service marks it active and the customer’s access follows.',
+              'pt-BR':
+                'O primeiro pagamento da assinatura foi confirmado; o serviço marca como ativa e o acesso do cliente segue essa marcação.',
+            },
+          },
+          {
+            label: 'Changed',
+            detail: {
+              en: 'A plan, a price or a payment method changed on the gateway’s side; the service updates its own record to match.',
+              'pt-BR':
+                'Um plano, um preço ou uma forma de pagamento mudou do lado do gateway; o serviço atualiza seu próprio registro para acompanhar.',
+            },
+          },
+          {
+            label: 'Payment failed',
+            detail: {
+              en: 'An invoice on the subscription failed to charge on the gateway’s side; the service records the failure.',
+              'pt-BR': 'Uma fatura da assinatura falhou ao cobrar do lado do gateway; o serviço registra a falha.',
+            },
+          },
+          {
+            label: 'Suspended',
+            detail: {
+              en: 'The gateway has suspended the subscription; the service mirrors the state, and access follows it.',
+              'pt-BR': 'O gateway suspendeu a assinatura; o serviço espelha o estado, e o acesso segue essa marcação.',
+            },
+          },
+          {
+            label: 'Expired',
+            detail: {
+              en: 'The subscription has run its course and the gateway has closed it; the service marks the record accordingly.',
+              'pt-BR': 'A assinatura completou seu ciclo e o gateway a encerrou; o serviço marca o registro de acordo.',
+            },
+          },
+          {
+            label: 'Invoice paid',
+            detail: {
+              en: 'A marketplace invoice has been paid; the service records the payment against the subaccount it belongs to.',
+              'pt-BR': 'Uma fatura do marketplace foi paga; o serviço registra o pagamento na subconta a que ela pertence.',
+            },
+          },
+          {
+            label: 'Invoice released',
+            detail: {
+              en: 'The marketplace has released the funds from a paid invoice to the subaccount holder.',
+              'pt-BR': 'O marketplace liberou os valores de uma fatura paga para quem detém a subconta.',
+            },
+          },
+          {
+            label: 'Invoice refunded',
+            detail: {
+              en: 'A marketplace invoice has been refunded; the service reverses what it recorded against the subaccount.',
+              'pt-BR': 'Uma fatura do marketplace foi reembolsada; o serviço reverte o que havia registrado na subconta.',
+            },
+          },
+        ],
+      },
+      architecture: {
+        summary: {
+          en: 'A Vue checkout out front, CQRS commands and controllers in the middle, and two gateway integrations each in a package of its own — with each gateway closing the loop asynchronously through a webhook endpoint of its own.',
+          'pt-BR':
+            'Um checkout em Vue na frente, comandos e controllers CQRS no meio, e duas integrações de gateway, cada uma no próprio pacote — com cada gateway fechando o ciclo de forma assíncrona por um endpoint de webhook próprio.',
+        },
+        steps: [
+          {
+            label: 'Checkout client',
+            detail: {
+              en: 'The Vue checkout — subscription, renewal and thank-you views — calls the service’s commands: subscribe, create an invoice, generate a payment link.',
+              'pt-BR':
+                'O checkout em Vue — telas de assinatura, renovação e páginas de agradecimento — chama os comandos do serviço: assinar, criar fatura, gerar link de pagamento.',
+            },
+          },
+          {
+            label: 'Payment service',
+            detail: {
+              en: 'Subscription, transaction, voucher, extension and webhook controllers sit in front of the CQRS commands that do the work.',
+              'pt-BR': 'Controllers de assinatura, transação, voucher, extensão e webhook ficam na frente dos comandos CQRS que fazem o trabalho.',
+            },
+          },
+          {
+            label: 'Gateway packages',
+            detail: {
+              en: 'Iugu and TSPay each live in a crosscutting package with an interface of their own, reached through the one shared project every service in this repository references.',
+              'pt-BR':
+                'Iugu e TSPay vivem cada um em um pacote transversal com interface própria, alcançados pelo único projeto compartilhado que todo serviço deste repositório referencia.',
+            },
+          },
+          {
+            label: 'Gateway webhooks',
+            detail: {
+              en: 'Each gateway posts its own opinion of the subscription back to an endpoint of its own, where a factory maps that gateway’s event names onto commands — one handler directory per event.',
+              'pt-BR':
+                'Cada gateway publica de volta a própria opinião sobre a assinatura num endpoint próprio, onde uma fábrica mapeia os nomes de evento daquele gateway em comandos — um diretório de handler por evento.',
+            },
+          },
+        ],
+      },
+      decisions: [
+        {
+          heading: { en: 'One repository, five release trains', 'pt-BR': 'Um repositório, cinco trens de release' },
+          body: {
+            en: 'The payment service shares its repository with the core, auth, foods and jobs services, and each of the five ships on its own release train: its own pipeline file, its own branch trigger, and a path filter naming the other four services’ directories as reasons not to build. A payment hotfix does not redeploy auth. A monorepo without a shared deploy.',
+            'pt-BR':
+              'O serviço de pagamento compartilha o repositório com os serviços core, de autenticação, de alimentos e de jobs, e cada um dos cinco sobe no próprio trem de release: arquivo de pipeline próprio, gatilho de branch próprio, e um filtro de caminho que nomeia os diretórios dos outros quatro serviços como motivo para não construir. Um hotfix de pagamento não redeploya a autenticação. Um monorepo sem deploy compartilhado.',
+          },
+        },
+        {
+          heading: { en: 'A package per gateway, not one interface for all', 'pt-BR': 'Um pacote por gateway, não uma interface para todos' },
+          body: {
+            en: 'Iugu and TSPay do not share an interface — they have nothing in common to share. Each sits in its own crosscutting package with its own vocabulary, its own webhook endpoint and its own command factory, and a handler asks for the gateway it actually needs by name. Which gateway a subscription belongs to is a value in the domain, not a detail hidden from it, and that is what made moving subscribers between the two possible one at a time: a TSPay webhook can still reach into Iugu to suspend the old subscription of a nutritionist who has just been moved across.',
+            'pt-BR':
+              'Iugu e TSPay não compartilham interface — não têm nada em comum para compartilhar. Cada um fica no próprio pacote transversal, com vocabulário próprio, endpoint de webhook próprio e fábrica de comandos própria, e um handler pede pelo nome o gateway de que realmente precisa. A qual gateway uma assinatura pertence é um valor do domínio, não um detalhe escondido dele, e foi isso que permitiu mover os assinantes de um para o outro um a um: um webhook do TSPay ainda consegue chegar ao Iugu para suspender a assinatura antiga de uma nutricionista que acabou de ser migrada.',
+          },
+        },
+        {
+          heading: { en: 'The webhook tree is the state machine', 'pt-BR': 'A árvore de webhooks é a máquina de estados' },
+          body: {
+            en: 'There is one handler per gateway event, named for the event itself — subscription created, invoice paid, invoice refunded — rather than one endpoint switching on a payload field. The directory structure is the lifecycle, readable without opening a single file.',
+            'pt-BR':
+              'Existe um handler por evento do gateway, nomeado pelo próprio evento — assinatura criada, fatura paga, fatura reembolsada — em vez de um único endpoint que decide com base num campo do payload. A estrutura de diretórios é o ciclo de vida, legível sem abrir um único arquivo.',
+          },
+        },
+        {
+          heading: { en: 'A checkout that is not the app', 'pt-BR': 'Um checkout que não é o aplicativo' },
+          body: {
+            en: 'The purchase funnel ships as its own client — its own Vue app, its own Cypress suite reporting through Allure — separately from the rest of the product, on its own cadence.',
+            'pt-BR':
+              'O funil de compra sobe como um cliente próprio — seu próprio app em Vue, sua própria suíte de Cypress reportando via Allure — separado do resto do produto, no próprio ritmo.',
+          },
+        },
+      ],
+      highlights: [
+        {
+          en: 'Subscribing and renewing, with a suspend path when a payment lapses.',
+          'pt-BR': 'Assinatura e renovação, com um caminho de suspensão quando um pagamento falha.',
+        },
+        {
+          en: 'Vouchers and plan extensions, adjusting a subscription without cancelling and re-creating it.',
+          'pt-BR': 'Vouchers e extensões de plano, ajustando uma assinatura sem cancelar e recriar.',
+        },
+        {
+          en: 'Payment links generated on demand, for a charge outside the regular checkout flow.',
+          'pt-BR': 'Links de pagamento gerados sob demanda, para uma cobrança fora do fluxo normal de checkout.',
+        },
+        {
+          en: 'Marketplace subaccounts, with their own invoice-paid, released and refunded events.',
+          'pt-BR': 'Subcontas de marketplace, com seus próprios eventos de fatura paga, liberada e reembolsada.',
+        },
+      ],
+    },
+  },
+  {
+    slug: 'dietbox-portal',
+    name: 'Dietbox Portal',
+    tagline: {
+      en: 'The back office, and the newest generation of the platform’s architecture.',
+      'pt-BR': 'O back office, e a geração mais nova da arquitetura da plataforma.',
+    },
+    description: {
+      en: 'The internal tool the company runs the product from — subscriptions, vouchers, the food catalogue, marketing — built as a layered service with commands, queries and domain events dispatched at save time, and an admin client that can act as the user it is helping.',
+      'pt-BR':
+        'A ferramenta interna com que a empresa opera o produto — assinaturas, vouchers, catálogo de alimentos, marketing — construída como um serviço em camadas com comandos, queries e eventos de domínio despachados no momento da gravação, e um cliente admin capaz de agir como o usuário que está atendendo.',
+    },
+    tech: ['.NET 6', 'C#', 'CQRS', 'MediatR', 'EF Core', 'SQL Server', 'ASP.NET Identity', 'JWT', 'Vue 3', 'Vuex', 'Azure DevOps'],
+    role: {
+      en: 'Head of Technology',
+      'pt-BR': 'Head de Tecnologia',
+    },
+    period: { en: '2023–2024', 'pt-BR': '2023–2024' },
+    visibility: 'private',
+    links: [{ label: 'Website', href: 'https://dietbox.me' }],
+    venture: 'dietbox',
+    detail: {
+      overview: {
+        en: 'A back office is where a SaaS company’s real operating procedure lives — the subscriptions, the vouchers, the food catalogue, marketing — and this was the first place the platform’s newer patterns were carried through end to end: layers numbered on disk, commands and queries behind a pipeline behaviour that logs every one of them, and a domain that raises its own events and has them dispatched the moment its changes are saved.',
+        'pt-BR':
+          'Um back office é onde vive o procedimento real de operação de uma empresa SaaS — as assinaturas, os vouchers, o catálogo de alimentos, o marketing — e este foi o primeiro lugar em que os padrões mais novos da plataforma foram aplicados de ponta a ponta: camadas numeradas em disco, comandos e queries atrás de um pipeline behaviour que registra cada um deles, e um domínio que emite os próprios eventos e os tem despachados no instante em que suas mudanças são gravadas.',
+      },
+      contribution: {
+        summary: {
+          en: 'The layered design this service is built on — the numbered directories, the command/query pipeline, and where the domain-event dispatch sits inside it — the identity building block, and the shared building blocks the platform’s newer services now start from, are the author’s. The eighteen business-domain controllers and the admin client’s views were the team’s to build out.',
+          'pt-BR':
+            'O design em camadas sobre o qual este serviço é construído — os diretórios numerados, o pipeline de comandos e queries, e o lugar onde o despacho de eventos de domínio se encaixa nele — o bloco de identidade e os blocos de construção compartilhados dos quais os serviços mais novos da plataforma partem, são do autor. Os dezoito controllers de domínio de negócio e as telas do cliente admin foram construídos pelo time.',
+        },
+        areas: [
+          {
+            en: 'The numbered directory layout — building blocks, services, application, domain, infrastructure — and the dependency direction it makes legible before a file is opened.',
+            'pt-BR':
+              'A estrutura de diretórios numerados — building blocks, services, application, domain, infrastructure — e a direção de dependência que ela deixa legível antes de abrir um arquivo.',
+          },
+          {
+            en: 'The identity building block: its own user store, a JWT builder and validator, access and refresh tokens, and claim-based authorization.',
+            'pt-BR':
+              'O bloco de identidade: base de usuários própria, um builder e validador de JWT, tokens de acesso e refresh, e autorização baseada em claims.',
+          },
+          {
+            en: 'The message and event base types among the shared building blocks, and the dispatch that publishes what an aggregate raised once the unit of work has saved it.',
+            'pt-BR':
+              'Os tipos base de mensagem e evento entre os blocos de construção compartilhados, e o despacho que publica o que um agregado emitiu assim que a unidade de trabalho o grava.',
+          },
+          {
+            en: 'The shared building blocks — domain, infrastructure and identity — the platform’s newer services start from instead of each inventing its own.',
+            'pt-BR':
+              'Os blocos de construção compartilhados — domínio, infraestrutura e identidade — dos quais os serviços mais novos da plataforma partem, em vez de cada um inventar o próprio.',
+          },
+          {
+            en: 'The client’s persisted token pair and its refresh flow against the accounts endpoint.',
+            'pt-BR': 'O par de tokens persistido no cliente e o fluxo de refresh contra o endpoint de contas.',
+          },
+        ],
+        boundary: {
+          en: 'Across the service and the admin client together, roughly a third of the commits are the author’s — the rest, including most of the eighteen business-domain controllers and the client’s views, is the team’s.',
+          'pt-BR':
+            'Entre o serviço e o cliente admin juntos, cerca de um terço dos commits são do autor — o restante, incluindo a maior parte dos dezoito controllers de domínio de negócio e das telas do cliente, é do time.',
+        },
+      },
+      problem: {
+        en: 'Support and operations were reaching straight into the product database, or into the monolith’s own admin surface, to do what the business runs on day to day — adjusting a subscription, issuing a voucher, updating the food catalogue. A back office with its own domain, its own staff identity and its own command surface was the alternative: the same operations, but as named commands logged on the way through, behind sign-in that isn’t the customer’s.',
+        'pt-BR':
+          'Suporte e operações estavam entrando direto no banco de dados do produto, ou na própria superfície de admin do monolito, para fazer o que o negócio roda no dia a dia — ajustar uma assinatura, emitir um voucher, atualizar o catálogo de alimentos. Um back office com domínio próprio, identidade de equipe própria e superfície de comandos própria foi a alternativa: as mesmas operações, mas como comandos nomeados e registrados em log na passagem, atrás de um login que não é o do cliente.',
+      },
+      metrics: [
+        {
+          value: { en: '~276', 'pt-BR': '~276' },
+          label: { en: 'commits across both repositories', 'pt-BR': 'commits nos dois repositórios' },
+          note: { en: 'mine, of ~780 total', 'pt-BR': 'meus, de ~780 no total' },
+        },
+        {
+          value: { en: '3', 'pt-BR': '3' },
+          label: { en: 'test projects', 'pt-BR': 'projetos de teste' },
+          note: { en: 'domain, application, and integration', 'pt-BR': 'domínio, aplicação e integração' },
+        },
+      ],
+      metricsNote: {
+        en: 'Both figures come from the two repositories’ own commit history.',
+        'pt-BR': 'Os dois números vêm do próprio histórico de commits dos dois repositórios.',
+      },
+      architecture: {
+        summary: {
+          en: 'An admin client in front, a service exposing the eighteen controllers, an application layer of commands and queries behind a logging pipeline behaviour, a domain layer underneath, and infrastructure at the bottom — where saving a change is also what releases the events that change raised.',
+          'pt-BR':
+            'Um cliente admin na frente, um serviço expondo os dezoito controllers, uma camada de aplicação com comandos e queries atrás de um pipeline behaviour de log, uma camada de domínio embaixo dela, e infraestrutura na base — onde gravar uma mudança é também o que libera os eventos que aquela mudança emitiu.',
+        },
+        steps: [
+          {
+            label: 'Admin client',
+            detail: {
+              en: 'The Vue 3 client — dashboard, charts, and the eighteen controllers’ views — including the impersonate controls in the navbar and the patient view.',
+              'pt-BR':
+                'O cliente em Vue 3 — dashboard, gráficos e as telas dos dezoito controllers — incluindo os controles de impersonate na navbar e na tela do paciente.',
+            },
+          },
+          {
+            label: 'Service',
+            detail: {
+              en: 'Controllers behind the claim-requirement authorization filter, validating the access token before a request reaches a command or query.',
+              'pt-BR':
+                'Controllers atrás do filtro de autorização por claim, validando o token de acesso antes de a requisição chegar a um comando ou query.',
+            },
+          },
+          {
+            label: 'Application',
+            detail: {
+              en: 'Commands and queries behind a pipeline behaviour that logs each one by name, and the handlers that turn a domain event into the integration event other services consume.',
+              'pt-BR':
+                'Comandos e queries atrás de um pipeline behaviour que registra cada um pelo nome, e os handlers que transformam um evento de domínio no evento de integração que outros serviços consomem.',
+            },
+          },
+          {
+            label: 'Domain',
+            detail: {
+              en: 'The business rules for the eighteen areas administered — nutritionists, patients, subscriptions, vouchers, the food catalogue, and the rest — raising the events the layers above and below both care about.',
+              'pt-BR':
+                'As regras de negócio das dezoito áreas administradas — nutricionistas, pacientes, assinaturas, vouchers, catálogo de alimentos, e o resto — emitindo os eventos que as camadas acima e abaixo se importam.',
+            },
+          },
+          {
+            label: 'Infrastructure',
+            detail: {
+              en: 'An EF Core context over SQL Server: it writes the aggregate’s current state, then hands the events that aggregate collected while changing to MediatR, once the write has already landed.',
+              'pt-BR':
+                'Um contexto EF Core sobre SQL Server: grava o estado atual do agregado e então entrega ao MediatR os eventos que aquele agregado acumulou ao mudar, depois que a escrita já foi feita.',
+            },
+          },
+        ],
+      },
+      decisions: [
+        {
+          heading: { en: 'Layers numbered on disk', 'pt-BR': 'Camadas numeradas em disco' },
+          body: {
+            en: 'The service’s directories are numbered by layer — building blocks, services, application, domain, infrastructure — so the dependency direction is legible from a directory listing alone, before a single file is open. A layer importing from the wrong direction is a violation visible in the file tree, not just in a code review.',
+            'pt-BR':
+              'Os diretórios do serviço são numerados por camada — building blocks, services, application, domain, infrastructure — então a direção de dependência é legível só de olhar a listagem de diretórios, antes de abrir um único arquivo. Uma camada importando na direção errada é uma violação visível na árvore de arquivos, não só numa revisão de código.',
+          },
+        },
+        {
+          heading: { en: 'Staff identity is not customer identity', 'pt-BR': 'Identidade de equipe não é identidade de cliente' },
+          body: {
+            en: 'The back office authenticates against its own store — an identity building block with its own user database, a JWT builder and validator, access and refresh tokens, and claim-based authorization — not the customer directory. Giving support staff accounts in the customer identity system would have meant handing customer-grade identities administrative scopes; keeping the two separate keeps a back-office session a different thing from a customer session, by construction.',
+            'pt-BR':
+              'O back office se autentica contra a própria base — um bloco de identidade com base de usuários própria, um builder e validador de JWT, tokens de acesso e refresh, e autorização baseada em claims — não o diretório do cliente. Dar contas de equipe de suporte no sistema de identidade do cliente teria significado conceder escopos administrativos a identidades de grau cliente; manter os dois separados faz de uma sessão do back office algo diferente de uma sessão de cliente, por construção.',
+          },
+        },
+        {
+          heading: { en: 'Events dispatched at save time, not stored', 'pt-BR': 'Eventos despachados na gravação, não armazenados' },
+          body: {
+            en: 'An aggregate collects the events it raises while a command changes it; the unit of work writes the row, then publishes those events through MediatR after that write has committed. Nothing is replayed and no state is rebuilt from a log — the table still holds the current row. What this buys is that a consequence of an operation is a subscriber to something the domain said, rather than one more paragraph inside the command that said it.',
+            'pt-BR':
+              'Um agregado acumula os eventos que emite enquanto um comando o altera; a unidade de trabalho grava a linha e então publica esses eventos via MediatR depois que essa escrita foi confirmada. Nada é reproduzido e nenhum estado é reconstruído a partir de um log — a tabela continua guardando a linha atual. O que isso compra é que a consequência de uma operação vira assinante de algo que o domínio disse, em vez de mais um parágrafo dentro do comando que o disse.',
+          },
+        },
+        {
+          heading: { en: 'Shared building blocks before shared services', 'pt-BR': 'Blocos de construção compartilhados antes de serviços compartilhados' },
+          body: {
+            en: 'The newer services, this one included, start from a common domain, infrastructure and identity layer instead of each inventing its own — the same message and event base types, the same identity building block, the same base entities. That shared foundation is what let a small team add a service without each one arriving in a different style.',
+            'pt-BR':
+              'Os serviços mais novos, este incluído, partem de uma camada comum de domínio, infraestrutura e identidade em vez de cada um inventar a própria — os mesmos tipos base de mensagem e evento, o mesmo bloco de identidade, as mesmas entidades base. Essa fundação compartilhada é o que permitiu que um time pequeno acrescentasse um serviço sem cada um chegar num estilo diferente.',
+          },
+        },
+      ],
+      highlights: [
+        {
+          en: 'Impersonation as a first-class feature: support can act as the nutritionist or patient they’re helping, from the client’s navbar or the patient view, and step back out.',
+          'pt-BR':
+            'Impersonation como funcionalidade de primeira classe: o suporte pode agir como a nutricionista ou o paciente que está atendendo, pela navbar do cliente ou pela tela do paciente, e voltar a ser quem é.',
+        },
+        {
+          en: 'Eighteen controllers spanning the business administered: nutritionists and patients, subscriptions and their configuration, transactions, vouchers, the food catalogue, tags, marketing, materials, events, universities, metrics, accounts.',
+          'pt-BR':
+            'Dezoito controllers cobrindo o negócio administrado: nutricionistas e pacientes, assinaturas e suas configurações, transações, vouchers, catálogo de alimentos, tags, marketing, materiais, eventos, universidades, métricas, contas.',
+        },
+        {
+          en: 'A dashboard with charts mirroring those same domains, so the numbers support looks at come from the same commands that changed them.',
+          'pt-BR':
+            'Um dashboard com gráficos espelhando esses mesmos domínios, então os números que o suporte olha vêm dos mesmos comandos que os alteraram.',
+        },
+        {
+          en: 'Domain events kept separate from integration events, so a change another service needs to hear about is an explicit publication, not a side effect of one that only matters inside this one.',
+          'pt-BR':
+            'Eventos de domínio mantidos separados dos eventos de integração, então uma mudança que outro serviço precisa saber é uma publicação explícita, não efeito colateral de uma que só importa aqui dentro.',
+        },
+      ],
+    },
+  },
+  {
+    slug: 'dietbox-notifications',
+    name: 'Dietbox Notifications',
+    tagline: {
+      en: 'A messaging bill turned into a product constraint.',
+      'pt-BR': 'Uma conta de mensageria transformada em restrição de produto.',
+    },
+    description: {
+      en: 'An isolated service that meters outbound messaging: a pre-paid send quota per practitioner, a log of every quota change, and a record of every notification sent. Built beside the product rather than inside it, so a cost problem did not become a platform problem.',
+      'pt-BR':
+        'Um serviço isolado que mede a mensageria de saída: uma cota pré-paga de envios por profissional, um log de cada mudança de cota e um registro de cada notificação enviada. Construído ao lado do produto, e não dentro dele, para que um problema de custo não virasse um problema de plataforma.',
+    },
+    tech: ['.NET 6', 'C#', 'CQRS', 'SQL Server', 'WhatsApp Business API', 'Azure DevOps'],
+    role: {
+      en: 'Head of Technology',
+      'pt-BR': 'Head de Tecnologia',
+    },
+    period: { en: '2023–2024', 'pt-BR': '2023–2024' },
+    visibility: 'private',
+    links: [{ label: 'Website', href: 'https://dietbox.me' }],
+    venture: 'dietbox',
+    detail: {
+      overview: {
+        en: 'This service exists because of a number on an invoice: the official WhatsApp messaging bill in May 2023. The answer was not a rate limit bolted onto the existing product, but a small domain of its own — a quota, a log of who changed it, and a record of every send.',
+        'pt-BR':
+          'Este serviço existe por causa de um número numa fatura: a conta de mensageria oficial do WhatsApp em maio de 2023. A resposta não foi um limite de taxa colado no produto existente, mas um pequeno domínio próprio — uma cota, um log de quem a alterou, e um registro de cada envio.',
+      },
+      contribution: {
+        summary: {
+          en: 'The design document, the domain and the service are the author’s: nineteen of the twenty commits, from the first estimate to the running service.',
+          'pt-BR':
+            'O documento de design, o domínio e o serviço são do autor: dezenove dos vinte commits, da primeira estimativa ao serviço em produção.',
+        },
+        areas: [
+          {
+            en: 'The capacity-planning document itself — the volume, query-rate and storage estimates the service was built to meet.',
+            'pt-BR':
+              'O próprio documento de planejamento de capacidade — as estimativas de volume, taxa de consultas e armazenamento que o serviço foi construído para atender.',
+          },
+          {
+            en: 'The domain model: a notification limit per practitioner, a log of every change to it, and a record of every notification sent.',
+            'pt-BR':
+              'O modelo de domínio: um limite de notificações por profissional, um log de cada mudança nele, e um registro de cada notificação enviada.',
+          },
+          {
+            en: 'The two controllers and their commands and queries — adding a limit, sending a notification, and querying both limits and sent records.',
+            'pt-BR':
+              'Os dois controllers e seus comandos e queries — adicionar um limite, enviar uma notificação, e consultar tanto limites quanto registros enviados.',
+          },
+          {
+            en: 'The crosscutting packages behind the layers: the WhatsApp provider integration and dependency injection.',
+            'pt-BR':
+              'Os pacotes transversais atrás das camadas: a integração com o provedor do WhatsApp e a injeção de dependência.',
+          },
+        ],
+      },
+      problem: {
+        en: 'The official WhatsApp Business API bill arrived in May 2023, and the product had no way to meter what it was spending on it. The obvious place to add a limit was the main product itself — but the main product was already too complex to extend safely, and a cost control that risks the product it is protecting is not a cost control. The alternative was a service with zero impact on the product, able to serve other notification channels later.',
+        'pt-BR':
+          'A conta oficial da API do WhatsApp Business chegou em maio de 2023, e o produto não tinha como medir o que estava gastando com ela. O lugar óbvio para adicionar um limite era o próprio produto principal — mas o produto principal já era complexo demais para ser estendido com segurança, e um controle de custo que arrisca o produto que está protegendo não é um controle de custo. A alternativa foi um serviço com zero impacto no produto, capaz de atender outros canais de notificação depois.',
+      },
+      metrics: [
+        {
+          value: { en: '~51k', 'pt-BR': '~51 mil' },
+          label: { en: 'messages a month', 'pt-BR': 'mensagens por mês' },
+          note: { en: 'the volume being paid for', 'pt-BR': 'o volume que estava sendo pago' },
+        },
+        {
+          value: { en: '~30k', 'pt-BR': '~30 mil' },
+          label: { en: 'queries a day', 'pt-BR': 'consultas por dia' },
+          note: { en: '0.3 QPS average', 'pt-BR': '0,3 QPS em média' },
+        },
+        {
+          value: { en: '5', 'pt-BR': '5' },
+          label: { en: 'peak QPS planned for', 'pt-BR': 'QPS de pico previsto' },
+        },
+        {
+          value: { en: '~1.4 GB', 'pt-BR': '~1,4 GB' },
+          label: { en: 'storage over ten years', 'pt-BR': 'armazenamento em dez anos' },
+          note: { en: '214 bytes per notification', 'pt-BR': '214 bytes por notificação' },
+        },
+      ],
+      metricsNote: {
+        en: 'These four figures come from the service’s own design document, written before a line of it existed — a capacity plan, not a production measurement taken afterward.',
+        'pt-BR':
+          'Esses quatro números vêm do próprio documento de design do serviço, escrito antes de existir uma linha dele — um plano de capacidade, não uma medição de produção feita depois.',
+      },
+      architecture: {
+        summary: {
+          en: 'A calling service reaches the notify endpoint, which checks the practitioner’s quota before anything is sent, hands the message to the provider, and records the result either way.',
+          'pt-BR':
+            'Um serviço chamador chega ao endpoint de notificação, que verifica a cota do profissional antes de qualquer envio, entrega a mensagem ao provedor, e registra o resultado de qualquer forma.',
+        },
+        steps: [
+          {
+            label: 'Calling service',
+            detail: {
+              en: 'Another service in the platform requests a notification on a practitioner’s behalf.',
+              'pt-BR': 'Outro serviço da plataforma solicita uma notificação em nome de um profissional.',
+            },
+          },
+          {
+            label: 'Notify endpoint',
+            detail: {
+              en: 'The notify controller receives the request and dispatches the send command.',
+              'pt-BR': 'O controller de notificação recebe a requisição e dispara o comando de envio.',
+            },
+          },
+          {
+            label: 'Quota check',
+            detail: {
+              en: 'The practitioner’s limit is read before the send proceeds — no quota, no message.',
+              'pt-BR': 'O limite do profissional é lido antes de o envio prosseguir — sem cota, sem mensagem.',
+            },
+          },
+          {
+            label: 'Provider',
+            detail: {
+              en: 'The WhatsApp integration sends the message through the official API, behind the crosscutting provider package.',
+              'pt-BR': 'A integração com o WhatsApp envia a mensagem pela API oficial, atrás do pacote transversal do provedor.',
+            },
+          },
+          {
+            label: 'Sent record',
+            detail: {
+              en: 'The outcome — sent or refused — is written to the record every notification leaves behind.',
+              'pt-BR': 'O resultado — enviado ou recusado — é gravado no registro que toda notificação deixa.',
+            },
+          },
+        ],
+      },
+      states: {
+        caption: {
+          en: 'A notification, from request to record',
+          'pt-BR': 'Uma notificação, do pedido ao registro',
+        },
+        steps: [
+          {
+            label: 'Requested',
+            detail: {
+              en: 'A calling service asks for a notification to be sent to a practitioner.',
+              'pt-BR': 'Um serviço chamador pede o envio de uma notificação a um profissional.',
+            },
+          },
+          {
+            label: 'Quota checked',
+            detail: {
+              en: 'The practitioner’s remaining limit is read against the request.',
+              'pt-BR': 'O limite restante do profissional é verificado contra o pedido.',
+            },
+          },
+          {
+            label: 'Dispatched or refused',
+            detail: {
+              en: 'Within quota, the message goes to the WhatsApp provider; over quota, the send is refused before it costs anything.',
+              'pt-BR': 'Dentro da cota, a mensagem segue para o provedor do WhatsApp; fora da cota, o envio é recusado antes de custar algo.',
+            },
+          },
+          {
+            label: 'Recorded',
+            detail: {
+              en: 'Either outcome is written to the log of notifications sent, so the answer to "why was this blocked" already exists.',
+              'pt-BR': 'Qualquer resultado é gravado no log de notificações enviadas, então a resposta para "por que isso foi bloqueado" já existe.',
+            },
+          },
+        ],
+      },
+      decisions: [
+        {
+          heading: { en: 'A separate service specifically to be ignorable', 'pt-BR': 'Um serviço separado especificamente para ser ignorável' },
+          body: {
+            en: 'The stated goal was zero impact on the main product. Isolating the notification service meant it could be switched off, redeployed or rewritten without taking the product down with it — the opposite of bolting a limiter onto code that was already too complex to touch safely.',
+            'pt-BR':
+              'O objetivo declarado era zero impacto no produto principal. Isolar o serviço de notificações significou que ele podia ser desligado, reimplantado ou reescrito sem derrubar o produto junto — o oposto de colar um limitador num código que já era complexo demais para tocar com segurança.',
+          },
+        },
+        {
+          heading: { en: 'A quota is a domain model, not a rate limit', 'pt-BR': 'Uma cota é um modelo de domínio, não um rate limit' },
+          body: {
+            en: 'A bare counter would have answered "can this send happen." Instead, the limit, a log of every change to it, and a record of every send together answer a harder question: why was this one blocked, and who changed the limit that blocked it.',
+            'pt-BR':
+              'Um contador simples responderia apenas "esse envio pode acontecer". Em vez disso, o limite, um log de cada mudança nele, e um registro de cada envio respondem juntos uma pergunta mais difícil: por que este foi bloqueado, e quem alterou o limite que o bloqueou.',
+          },
+        },
+        {
+          heading: { en: 'Capacity planned before the first line', 'pt-BR': 'Capacidade planejada antes da primeira linha' },
+          body: {
+            en: 'The monthly volume, the query rate and the ten-year storage footprint were estimated in the design document before the service was built, which is why the storage decision — how much space this would ever need — was a boring, already-answered question rather than a surprise.',
+            'pt-BR':
+              'O volume mensal, a taxa de consultas e o espaço ocupado em dez anos foram estimados no documento de design antes de o serviço ser construído, e é por isso que a decisão de armazenamento — quanto espaço isso jamais precisaria — foi uma pergunta entediante e já respondida, não uma surpresa.',
+          },
+        },
+        {
+          heading: { en: 'One provider first, the interface for more', 'pt-BR': 'Um provedor primeiro, a interface para mais' },
+          body: {
+            en: 'WhatsApp was the bill that started this, so it is the only provider that sends today — but email, SMS and push were the shape the domain and the API were designed to accept later, without the quota model or the sent record needing to change.',
+            'pt-BR':
+              'O WhatsApp foi a conta que originou tudo isso, então é o único provedor que envia hoje — mas email, SMS e push foram o formato que o domínio e a API foram desenhados para aceitar depois, sem que o modelo de cota ou o registro de envio precisassem mudar.',
+          },
+        },
+      ],
+      highlights: [
+        {
+          en: 'A notify controller and commands to send a notification and to add a practitioner’s limit.',
+          'pt-BR': 'Um controller de notificação e comandos para enviar uma notificação e para adicionar o limite de um profissional.',
+        },
+        {
+          en: 'A nutritionist controller and queries over that practitioner’s current limit and history of sent notifications.',
+          'pt-BR': 'Um controller de nutricionista e queries sobre o limite atual e o histórico de notificações enviadas desse profissional.',
+        },
+        {
+          en: 'Three domain models: the notification limit itself, a log of every change to it, and a record of every notification sent.',
+          'pt-BR': 'Três modelos de domínio: o próprio limite de notificações, um log de cada mudança nele, e um registro de cada notificação enviada.',
+        },
+        {
+          en: 'A layered service with crosscutting packages for the WhatsApp provider and dependency injection, kept separate from the domain they support.',
+          'pt-BR': 'Um serviço em camadas com pacotes transversais para o provedor do WhatsApp e injeção de dependência, mantidos separados do domínio que sustentam.',
+        },
+      ],
+    },
+  },
+  {
+    slug: 'dietbox-socket',
+    name: 'Dietbox Socket',
+    tagline: {
+      en: 'Live updates as a service of its own, so they ship on their own clock.',
+      'pt-BR': 'Atualizações ao vivo como serviço próprio, para subirem no próprio relógio.',
+    },
+    description: {
+      en: 'A small realtime server that holds the open connections: a room per user, a shared-secret handshake, and one endpoint the platform posts to when something needs pushing. Separate from the product because long-lived connections and request traffic do not scale on the same axis — and because the monolith deployed once a night.',
+      'pt-BR':
+        'Um servidor de tempo real pequeno que mantém as conexões abertas: uma sala por usuário, um handshake com segredo compartilhado e um endpoint para onde a plataforma posta quando algo precisa ser empurrado. Separado do produto porque conexões de longa duração e tráfego de requisição não escalam no mesmo eixo — e porque o monolito subia uma vez por madrugada.',
+    },
+    tech: ['Node', 'Express', 'Socket.IO', 'Application Insights', 'Azure App Service', 'Azure DevOps'],
+    role: { en: 'Senior Software Engineer', 'pt-BR': 'Engenheiro de Software Sênior' },
+    period: { en: '2022', 'pt-BR': '2022' },
+    visibility: 'private',
+    links: [{ label: 'Website', href: 'https://dietbox.me' }],
+    venture: 'dietbox',
+    detail: {
+      overview: {
+        en: 'Thirty-four commits over two months in 2022, for a service that has outlived both: a socket server that holds every open connection, joins each client to a room named for its user id, and exposes one endpoint the rest of the platform posts to when something needs pushing out. It sits outside the product because a long-lived connection and a request are not the same kind of traffic.',
+        'pt-BR':
+          'Trinta e quatro commits em dois meses de 2022, para um serviço que sobreviveu a ambos: um servidor de tempo real que mantém cada conexão aberta, junta cada cliente a uma sala com o nome do seu id de usuário, e expõe um único endpoint para onde o resto da plataforma posta quando algo precisa ser empurrado. Ele fica fora do produto porque uma conexão de longa duração e uma requisição não são o mesmo tipo de tráfego.',
+      },
+      contribution: {
+        summary: {
+          en: 'Effectively a solo build: thirty-three of the thirty-four commits, from the handshake to the load-test harness that proved it held up.',
+          'pt-BR':
+            'Praticamente uma construção solo: trinta e três dos trinta e quatro commits, do handshake ao harness de carga que comprovou que ele aguentava.',
+        },
+        areas: [
+          {
+            en: 'The socket server itself: the shared-secret handshake, room assignment by user id, and an immediate disconnect for a client that ends up joined to no room.',
+            'pt-BR':
+              'O próprio servidor de tempo real: o handshake com segredo compartilhado, a atribuição de sala por id de usuário, e a desconexão imediata de um cliente que acaba sem entrar em nenhuma sala.',
+          },
+          {
+            en: 'The notify endpoint the rest of the platform posts to, and the info and health endpoints used to watch the service itself.',
+            'pt-BR':
+              'O endpoint de notificação para onde o resto da plataforma posta, e os endpoints de info e de saúde usados para observar o próprio serviço.',
+          },
+          {
+            en: 'The handler-loading convention: an event handler is a file, picked up automatically from a directory.',
+            'pt-BR':
+              'A convenção de carregamento de handlers: um handler de evento é um arquivo, carregado automaticamente a partir de um diretório.',
+          },
+          {
+            en: 'The load-test harness, built to deliberately hold a share of clients on long-polling instead of letting all of them upgrade.',
+            'pt-BR':
+              'O harness de teste de carga, construído para manter deliberadamente uma parte dos clientes em long-polling em vez de deixar todos fazerem upgrade.',
+          },
+        ],
+      },
+      problem: {
+        en: 'The monolith deployed once a night, and anything sharing its pipeline shared its cadence — a realtime channel that can only change at three in the morning is a realtime channel nobody changes. Separately, open connections and request traffic do not want the same instance count: one scales with how many people are online, the other with how many requests arrive.',
+        'pt-BR':
+          'O monolito subia uma vez por madrugada, e qualquer coisa que compartilhasse seu pipeline compartilhava seu ritmo — um canal de tempo real que só pode mudar às três da manhã é um canal de tempo real que ninguém muda. Separadamente, conexões abertas e tráfego de requisição não querem a mesma quantidade de instâncias: uma escala com quantas pessoas estão online, a outra com quantas requisições chegam.',
+      },
+      architecture: {
+        summary: {
+          en: 'The platform posts a room, an event name and a payload to the notify endpoint; the server resolves who is in that room right now and pushes the event straight to them.',
+          'pt-BR':
+            'A plataforma posta uma sala, um nome de evento e um payload para o endpoint de notificação; o servidor resolve quem está naquela sala agora e empurra o evento diretamente para eles.',
+        },
+        steps: [
+          {
+            label: 'Platform',
+            detail: {
+              en: 'Another service in the platform posts a room, an event name and a payload to the notify endpoint.',
+              'pt-BR': 'Outro serviço da plataforma posta uma sala, um nome de evento e um payload para o endpoint de notificação.',
+            },
+          },
+          {
+            label: 'Room resolved',
+            detail: {
+              en: 'The server looks up which connections are actually joined to that room right now.',
+              'pt-BR': 'O servidor verifica quais conexões estão de fato naquela sala agora.',
+            },
+          },
+          {
+            label: 'Fan-out',
+            detail: {
+              en: 'The event is pushed to every client currently joined to the room.',
+              'pt-BR': 'O evento é empurrado para cada cliente atualmente na sala.',
+            },
+          },
+          {
+            label: 'Browser',
+            detail: {
+              en: 'The client receives the event and updates without a refresh.',
+              'pt-BR': 'O cliente recebe o evento e atualiza sem um refresh.',
+            },
+          },
+        ],
+      },
+      decisions: [
+        {
+          heading: { en: 'Realtime as its own deployable', 'pt-BR': 'Tempo real como implantação própria' },
+          body: {
+            en: 'Two reasons, both real: open connections and request traffic scale on different axes, and the product deployed once a night — a channel that can only change at three in the morning is one nobody changes. Splitting it into its own service let each axis scale on its own terms and let this one ship on its own clock.',
+            'pt-BR':
+              'Dois motivos, ambos reais: conexões abertas e tráfego de requisição escalam em eixos diferentes, e o produto subia uma vez por madrugada — um canal que só pode mudar às três da manhã é um canal que ninguém muda. Separá-lo em um serviço próprio deixou cada eixo escalar nos seus próprios termos, e deixou este subir no próprio relógio.',
+          },
+        },
+        {
+          heading: { en: 'A room per user id', 'pt-BR': 'Uma sala por id de usuário' },
+          body: {
+            en: 'Addressing is by identity, not by connection, so the platform can push to a person without knowing how many tabs, devices or reconnects that person currently has open.',
+            'pt-BR':
+              'O endereçamento é por identidade, não por conexão, então a plataforma consegue empurrar para uma pessoa sem saber quantas abas, dispositivos ou reconexões essa pessoa tem abertos no momento.',
+          },
+        },
+        {
+          heading: { en: 'Handlers auto-loaded from a directory', 'pt-BR': 'Handlers carregados automaticamente de um diretório' },
+          body: {
+            en: 'Adding an event is adding a file — there is no registry to remember to update, and no handler that exists in the code but was never wired in.',
+            'pt-BR':
+              'Adicionar um evento é adicionar um arquivo — não existe registro para lembrar de atualizar, nem handler que existe no código mas nunca foi ligado.',
+          },
+        },
+        {
+          heading: { en: 'A load test that keeps clients on long-polling', 'pt-BR': 'Um teste de carga que mantém clientes em long-polling' },
+          body: {
+            en: 'Not every client upgrades to a websocket. A load test where all of them do measures a population that does not exist, so the harness deliberately holds a share of clients on HTTP long-polling instead.',
+            'pt-BR':
+              'Nem todo cliente faz upgrade para um websocket. Um teste de carga em que todos fazem mede uma população que não existe, então o harness mantém deliberadamente uma parte dos clientes em long-polling via HTTP.',
+          },
+        },
+      ],
+      highlights: [
+        {
+          en: 'The notify endpoint the rest of the platform posts to when something needs pushing out.',
+          'pt-BR': 'O endpoint de notificação para onde o resto da plataforma posta quando algo precisa ser empurrado.',
+        },
+        {
+          en: 'An info endpoint reporting the live connection count, for monitoring.',
+          'pt-BR': 'Um endpoint de info que reporta a contagem de conexões ao vivo, para monitoramento.',
+        },
+        {
+          en: 'A health endpoint reporting its own latency.',
+          'pt-BR': 'Um endpoint de saúde que reporta a própria latência.',
+        },
+        {
+          en: 'A shared-secret handshake that disconnects a client immediately if it ends up joined to no room.',
+          'pt-BR': 'Um handshake com segredo compartilhado que desconecta um cliente imediatamente se ele acabar sem entrar em nenhuma sala.',
         },
       ],
     },

@@ -321,21 +321,21 @@ describe('ProjectDetail', () => {
     ]);
   });
 
-  it('renders the Dietbox case study in section order, with leadership last', async () => {
+  it('renders the Dietbox case study in section order, with no leadership section', async () => {
     await renderDetail('dietbox');
 
     await screen.findAllByRole('heading', { level: 1 });
     expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
     expect(screen.getByText(/lives in the tool all day/i)).toBeInTheDocument();
-    expect(screen.getByText('~1.7k')).toBeInTheDocument();
-    expect(screen.getByText(/its own sign-up, sign-in and password flow/i)).toBeInTheDocument();
-    expect(screen.getByText(/Revenue never paused/i)).toBeInTheDocument();
-    expect(screen.getByText(/the kind of change whose measure of success/i)).toBeInTheDocument();
+    expect(screen.getByText('~600')).toBeInTheDocument();
+    expect(screen.getByText(/not by writing over the site while it is serving/i)).toBeInTheDocument();
 
     const websiteLink = screen.getByRole('link', { name: /website/i });
     expect(websiteLink).toHaveAttribute('href', 'https://dietbox.me');
     expect(screen.getByText('Private')).toBeInTheDocument();
 
+    // The leadership narrative moved up to the Dietbox venture — it renders
+    // as `practices` above the project cards, not as a section here.
     const headings = screen.getAllByRole('heading', { level: 2 }).map((h) => h.textContent);
     expect(headings).toEqual([
       'Overview',
@@ -345,7 +345,6 @@ describe('ProjectDetail', () => {
       'Architecture',
       'What it does',
       'Engineering decisions',
-      'What changed under my direction',
     ]);
   });
 
@@ -364,7 +363,6 @@ describe('ProjectDetail', () => {
       'Arquitetura',
       'O que faz',
       'Decisões de engenharia',
-      'O que mudou sob minha direção',
     ]);
   });
 
