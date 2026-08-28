@@ -730,6 +730,7 @@ export const projects: Project[] = [
     },
     period: { en: '2021–2024', 'pt-BR': '2021–2024' },
     visibility: 'private',
+    screenshot: '/screenshots/dietbox-b2c.webp',
     links: [{ label: 'Website', href: 'https://dietbox.me' }],
     venture: 'dietbox',
     detail: {
@@ -974,6 +975,7 @@ export const projects: Project[] = [
     },
     period: { en: '2023–2024', 'pt-BR': '2023–2024' },
     visibility: 'private',
+    screenshot: '/screenshots/dietbox-payment.webp',
     links: [{ label: 'Website', href: 'https://dietbox.me' }],
     venture: 'dietbox',
     detail: {
