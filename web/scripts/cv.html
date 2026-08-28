@@ -1,0 +1,389 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Felipe_de_Almeida_Resume</title>
+    <style>
+      /*
+        Letter, to match the Google Docs export this file replaces (612x792pt).
+        The @page margin is the printable frame; nothing else here sets size.
+      */
+      @page {
+        size: letter;
+        margin: 0.5in 0.55in;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+
+      body {
+        margin: 0;
+        /* Explicit, so the source file reads the same on screen as it prints. */
+        background: #fff;
+        font-family: Calibri, Carlito, 'Segoe UI', system-ui, sans-serif;
+        font-size: 9.5pt;
+        line-height: 1.26;
+        color: #111;
+      }
+
+      p {
+        margin: 0;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: 20pt;
+        font-weight: 700;
+        letter-spacing: 0.2pt;
+      }
+
+      .title {
+        margin-top: 2pt;
+        font-size: 9.5pt;
+        font-weight: 700;
+        letter-spacing: 1.1pt;
+        text-transform: uppercase;
+        color: #333;
+      }
+
+      .contact {
+        margin-top: 4pt;
+        font-size: 9pt;
+        color: #333;
+      }
+
+      h2 {
+        margin: 9.5pt 0 3.5pt;
+        padding-bottom: 1.5pt;
+        border-bottom: 0.75pt solid #999;
+        font-size: 9.4pt;
+        font-weight: 700;
+        letter-spacing: 1pt;
+        text-transform: uppercase;
+      }
+
+      /*
+        Every label/value pair — skills, roles, degrees — is one line box rather
+        than two columns, because a resume is read twice: once by a person and
+        once by a parser. Laying the right-hand half out as its own column (grid,
+        flex, a table cell, a float) makes the extractor treat it as a separate
+        column of the document and emit every date, or every label, in a block of
+        its own, divorced from the entry it belongs to. Verified with `pdftotext`
+        in both reading order and layout mode after each change.
+      */
+      .skill {
+        margin-bottom: 2pt;
+        padding-left: 62pt;
+        text-indent: -62pt;
+      }
+
+      .role {
+        margin-top: 6pt;
+        font-weight: 700;
+      }
+
+      .dates {
+        font-weight: 400;
+        color: #333;
+      }
+
+      .stack {
+        margin-top: 1pt;
+        font-size: 8.8pt;
+        font-style: italic;
+        color: #444;
+      }
+
+      ul {
+        margin: 2pt 0 0;
+        padding-left: 12pt;
+      }
+
+      li {
+        margin-bottom: 1pt;
+        padding-left: 1pt;
+      }
+
+      .venture,
+      .edu {
+        margin-top: 3pt;
+      }
+
+      .languages {
+        margin-top: 7pt;
+      }
+
+      /*
+        An entry split across the page break costs the reader more than the
+        whitespace that avoiding the split costs the page.
+      */
+      .entry {
+        break-inside: avoid;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Felipe Rodrigues de Almeida</h1>
+      <p class="title">Engineering Leader &middot; Senior Software Engineer</p>
+      <p class="contact">
+        Porto Alegre, Brazil &middot; Open to remote roles in US time zones &middot; +55 51 98346-8863<br />
+        felipe.allmeida.dev@gmail.com &middot; linkedin.com/in/felipe-allmeida &middot; github.com/felipe-allmeida
+      </p>
+    </header>
+
+    <h2>Summary</h2>
+    <p>
+      Hands-on engineering leader with 12+ years building and running production platforms in .NET and
+      Node.js/TypeScript. Led teams of up to 13 across engineering, QA, UX, and support as Head of Technology while
+      staying active in architecture and delivery. Track record in cloud migration (Azure, AWS), event-driven and
+      realtime systems, and turning legacy platforms into maintainable, cost-efficient products.
+    </p>
+
+    <h2>Core Skills</h2>
+    <p class="skill"><b>Languages:</b> C#, TypeScript, JavaScript, SQL, Python</p>
+    <p class="skill">
+      <b>Backend:</b> .NET / ASP.NET Core, Node.js (Express, Socket.IO), EF Core, SignalR, MassTransit/RabbitMQ, gRPC
+    </p>
+    <p class="skill"><b>Frontend:</b> React 19, Vue 3, TanStack Router, Vite, Tailwind, Cypress</p>
+    <p class="skill">
+      <b>Cloud &amp; Infra:</b> Azure, AWS, Digital Ocean, Hetzner, Docker, Docker Swarm, Kubernetes, Terraform, Azure
+      DevOps, GitHub Actions, GitLab CI
+    </p>
+    <p class="skill"><b>Data:</b> PostgreSQL, SQL Server, MongoDB, Cosmos DB, Redis, EF Core</p>
+    <p class="skill">
+      <b>Architecture:</b> Event-driven systems, CQRS, REST/HATEOAS, WebSockets, Modular monoliths, DDD, AMQP,
+      OpenTelemetry
+    </p>
+    <p class="skill">
+      <b>Leadership:</b> Team building &amp; mentoring, Scrum/Kanban, Trunk Based Development, DORA metrics, roadmap
+      &amp; budget ownership, executive stakeholder communication
+    </p>
+
+    <h2>Experience</h2>
+
+    <div class="entry">
+      <p class="role">
+        ULBRA &mdash; Head of Technology (engagement via Pampa Devs)
+        <span class="dates">&middot; Apr 2026 &ndash; Current</span>
+      </p>
+      <p class="stack">
+        University internal platform &middot; .NET 10, React 19, TypeScript, PostgreSQL 17, MongoDB, RabbitMQ, Docker
+        Swarm
+      </p>
+      <ul>
+        <li>
+          Lead a three-engineer team building the university&rsquo;s internal platform from scratch &mdash; an IT
+          service desk in production, an ERP replacing the legacy systems, board and student dashboards, and the
+          datacenter automation all of it deploys onto.
+        </li>
+        <li>
+          Directed the rebuild of an inherited CRM from 0% to 100% automated test coverage, including a routing
+          migration that made filter state survive navigation.
+        </li>
+        <li>
+          Designed and run the on-premise infrastructure: Docker Swarm behind Traefik, GitHub Actions pipelines, and
+          OpenTelemetry/SigNoz observability.
+        </li>
+        <li>
+          Introduced a spec-first, AI-assisted delivery model in which the team&rsquo;s time goes to specification and
+          code review.
+        </li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <p class="role">
+        Kota &mdash; Senior Product Engineer <span class="dates">&middot; Oct 2025 &ndash; Jul 2026</span>
+      </p>
+      <p class="stack">
+        Health insurance platform &middot; .NET 10, C#, PostgreSQL, EF Core, MassTransit/RabbitMQ, AWS
+      </p>
+      <ul>
+        <li>
+          Designed and shipped the platform&rsquo;s intent layer &mdash; enrollment, policy amendment, dependents
+          management, and renewal &mdash; with full CRUD APIs, compliance screening, and multi-provider support.
+        </li>
+        <li>
+          Migrated the platform&rsquo;s webhooks to an event-driven V2 architecture with granular change-tracking
+          events.
+        </li>
+        <li>
+          Built an adaptive requirements system spanning enrollment and quoting flows, shipped behind feature flags via
+          a reusable client library with provider-agnostic contracts.
+        </li>
+        <li>
+          Built a copy-on-write taxonomy and versioning module for insurance benefits, covering the full lifecycle
+          (publish, supersede, deprecate, retire) plus version diffing.
+        </li>
+        <li>
+          Delivered integrations across 8+ insurers and led compliance re-screening workflows for employees, employers,
+          and dependents.
+        </li>
+        <li>
+          Led the company-wide .NET 10 upgrade and designed a multi-agent AI code-review pipeline with verdict-gated
+          auto-approval for low-risk PRs, cutting review turnaround from 2~3 days to less than an hour.
+        </li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <p class="role">
+        Airia &mdash; R&amp;D Engineer (contract via Pampa Devs, part-time)
+        <span class="dates">&middot; Jun 2025 &ndash; Oct 2025</span>
+      </p>
+      <ul>
+        <li>Built web, console, and on-premise applications in .NET 9.</li>
+        <li>Integrated multiple AI providers (AWS Bedrock, Azure AI Foundry, n8n) into production workflows.</li>
+        <li>Owned architecture and CI/CD pipeline design for new projects.</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <p class="role">
+        ADP Brazil &mdash; Lead Software Engineer <span class="dates">&middot; Aug 2024 &ndash; Jun 2025</span>
+      </p>
+      <ul>
+        <li>
+          Led architecture and planning for legacy modernization across C# .NET Framework and .NET Core applications.
+        </li>
+        <li>Introduced automated test coverage to legacy projects, raising coverage from 0% to 80%.</li>
+        <li>Optimized SQL Server data models and queries, improving performance on query time.</li>
+        <li>Built and consumed REST and SOAP services (JSON/XML); owned IIS configuration and CI/CD pipelines.</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <p class="role">
+        Dietbox &mdash; Head of Technology <span class="dates">&middot; Aug 2022 &ndash; Aug 2024</span>
+      </p>
+      <ul>
+        <li>
+          Led a 13-person technology and UX organization &mdash; engineering, QA, UX, and support &mdash; owning the
+          entire Dietbox product.
+        </li>
+        <li>
+          Set the architecture across the estate: .NET 6 CQRS services with Vue 3 / TypeScript front ends, a
+          path-filtered release pipeline so payments ship on their own train, and a crosscutting package per
+          third-party integration.
+        </li>
+        <li>
+          Introduced Scrum and Trunk Based Development, cutting lead time from 1 month to 1.5 weeks and increasing
+          deploy frequency from once a day (only at night) to multiple times a day.
+        </li>
+        <li>
+          Planned and executed migration of the payment stack from Iugu to Pagar.me, moving thousands of active
+          subscribers with no revenue disruption.
+        </li>
+        <li>Drove Azure cost optimization, reducing monthly cloud spend by 21%.</li>
+        <li>Reported technology metrics and roadmap (KPIs, DORA) to the executive team to guide investment decisions.</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <p class="role">
+        Dietbox &mdash; Senior Software Engineer <span class="dates">&middot; Sep 2020 &ndash; Aug 2022</span>
+      </p>
+      <ul>
+        <li>
+          Built the platform&rsquo;s realtime service in Node.js &mdash; Express and Socket.IO on Azure App Service
+          &mdash; with a shared-secret handshake, a room per connected user, notify/health/info endpoints, and
+          file-per-handler event loading; 33 of its 34 commits are mine and it is still in production.
+        </li>
+        <li>
+          Load-tested it with a harness that deliberately held a share of clients on long-polling instead of letting
+          every one upgrade, and split the service out of the nightly-deploy monolith so open connections and request
+          traffic could scale &mdash; and ship &mdash; on separate clocks.
+        </li>
+        <li>
+          Led migration of the legacy platform from .NET Framework 4.7 on Azure App Service (Windows) to .NET 6 on App
+          Service (Linux).
+        </li>
+        <li>Established CI/CD pipelines in Azure DevOps to automate deployment and shorten release cycles.</li>
+        <li>Owned production availability and incident response; ran code reviews and mentored junior engineers.</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <p class="role">
+        Poatek &mdash; Senior Software Engineer &amp; Consultant
+        <span class="dates">&middot; Jun 2020 &ndash; Sep 2020</span>
+      </p>
+      <ul>
+        <li>
+          Delivered backend and DevOps work for multiple clients using Azure, AKS, Terraform, Vault, .NET Core, and
+          ReactJS.
+        </li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <p class="role">Dell &mdash; Software Engineer <span class="dates">&middot; Nov 2018 &ndash; Jun 2020</span></p>
+      <ul>
+        <li>
+          Built an automated regression-testing application for Dell&rsquo;s interactive voice response system using
+          Twilio, replacing 1 month of manual testing for 2 to 3 hours a day.
+        </li>
+        <li>
+          Led a parallel project delivering a sales-rep tool that automated customer eligibility checks previously
+          requiring lookups across multiple systems.
+        </li>
+        <li>Stack: .NET Core, Angular, Blazor, Flutter, and JavaScript on Pivotal Cloud Foundry.</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <p class="role">
+        Vox Game Studio &mdash; Development Lead (promoted from Intern)
+        <span class="dates">&middot; Dec 2015 &ndash; Nov 2018</span>
+      </p>
+      <ul>
+        <li>
+          Promoted to Development Lead in final year; ran the team&rsquo;s development, code review, testing, and
+          release schedule for the Alphabeta financial-education platform.
+        </li>
+        <li>
+          Designed core system architecture covering security, payments, financial calculations, and memory management
+          in Unity3D / .NET.
+        </li>
+      </ul>
+    </div>
+
+    <h2>Side Ventures</h2>
+    <p class="venture">
+      <b>ROL&Ecirc; &mdash; Partner</b> <span class="dates">&middot; Oct 2023 &ndash; May 2025</span> &mdash; Events and
+      nightlife promotion platform; owned web and mobile architecture and delivery.
+    </p>
+    <p class="venture">
+      <b>Pampa Devs &mdash; Founder</b> <span class="dates">&middot; Mar 2020 &ndash; Aug 2022</span> &mdash; Built an IT
+      practice serving SMBs, delivering everything from landing pages to e-commerce platforms on Azure, .NET, Node.js,
+      and Vue.js.
+    </p>
+    <p class="venture">
+      <b>Mubbi.com.br &mdash; Partner &amp; Engineer</b> <span class="dates">&middot; Nov 2018 &ndash; Jun 2020</span>
+      &mdash; Rebuilt and migrated the platform to Azure using .NET Core 3.1 with CQRS and automated CI/CD.
+    </p>
+
+    <h2>Education</h2>
+    <p class="edu">
+      MBA, Business Management &mdash; Funda&ccedil;&atilde;o Get&uacute;lio Vargas, Brazil
+      <span class="dates">&middot; Aug 2023 &ndash; Oct 2026</span>
+    </p>
+    <p class="edu">
+      Postgraduate Program, Software Engineering &mdash; Universidade do Vale do Rio dos Sinos, Brazil
+      <span class="dates">&middot; Feb 2021 &ndash; Oct 2022</span>
+    </p>
+    <p class="edu">
+      B.S., Digital Games &mdash; Universidade do Vale do Rio dos Sinos, Brazil
+      <span class="dates">&middot; Mar 2013 &ndash; Jan 2018</span>
+    </p>
+
+    <p class="languages"><b>Languages:</b> Portuguese (native) &middot; English (advanced)</p>
+  </body>
+</html>
