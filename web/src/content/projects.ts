@@ -607,8 +607,8 @@ export const projects: Project[] = [
       },
       architecture: {
         summary: {
-          en: "The core project, its data, the jobs beside it, and the Azure estate it deploys onto.",
-          'pt-BR': 'O projeto principal, seus dados, os jobs ao lado dele, e o ambiente Azure onde é publicado.',
+          en: 'The core project, its data, the scheduled job beside it, and the Azure app it deploys onto.',
+          'pt-BR': 'O projeto principal, seus dados, o job agendado ao lado dele, e o app Azure onde é publicado.',
         },
         steps: [
           {
@@ -629,17 +629,17 @@ export const projects: Project[] = [
           {
             label: 'Background jobs',
             detail: {
-              en: "The webjobs that run the monolith's scheduled and background work, deployed beside it rather than as a separate service.",
+              en: 'A webjob project for scheduled work — a single daily job — sitting in the repository but outside the solution the release builds, and published on its own.',
               'pt-BR':
-                'Os webjobs que executam o trabalho agendado e em segundo plano do monolito, publicados ao lado dele em vez de como um serviço separado.',
+                'Um projeto de webjob para trabalho agendado — um único job diário — que fica no repositório mas fora da solution que a release compila, e é publicado por fora.',
             },
           },
           {
-            label: 'Azure estate',
+            label: 'Azure App Service',
             detail: {
-              en: 'The Azure App Service plan, its staging slots, and the VNet integration to SQL Server — declared in Terraform.',
+              en: 'A Windows app with a staging slot: the release deploys the built artifact to the slot, then swaps the slot into production.',
               'pt-BR':
-                'O plano do Azure App Service, seus slots de staging e a integração de VNet com o SQL Server — declarados em Terraform.',
+                'Um app Windows com um slot de staging: a release publica o artefato construído no slot e depois faz o swap do slot para produção.',
             },
           },
         ],
@@ -670,31 +670,31 @@ export const projects: Project[] = [
             'pt-BR': 'Um núcleo, vários satélites',
           },
           body: {
-            en: "The core project doesn't carry catalogs, enums, shared infrastructure, resources and reports itself — each lives in its own satellite project, and the scheduled and background work lives in its own webjobs. A change to reference data doesn't touch the same project as a change to the request path.",
+            en: "The core project doesn't carry catalogs, enums, shared infrastructure, resources and reports itself — each lives in its own satellite project. A change to reference data doesn't touch the same project as a change to the request path.",
             'pt-BR':
-              'O projeto principal não carrega catálogos, enums, infraestrutura compartilhada, recursos e relatórios sozinho — cada um vive em seu próprio projeto satélite, e o trabalho agendado e em segundo plano vive em seus próprios webjobs. Uma mudança em dado de referência não toca o mesmo projeto que uma mudança no caminho de requisição.',
+              'O projeto principal não carrega catálogos, enums, infraestrutura compartilhada, recursos e relatórios sozinho — cada um vive em seu próprio projeto satélite. Uma mudança em dado de referência não toca o mesmo projeto que uma mudança no caminho de requisição.',
           },
         },
         {
           heading: {
-            en: 'Background work ships with the core',
-            'pt-BR': 'O trabalho em segundo plano sobe junto com o núcleo',
+            en: 'The release builds a target, not the solution',
+            'pt-BR': 'A release compila um alvo, não a solution',
           },
           body: {
-            en: "The webjobs that run the monolith's scheduled and background work ship in the same deploy as the core project, rather than as services of their own. One pipeline, one release, one thing to roll back if it goes wrong.",
+            en: "The release pipeline restores the solution but builds a single target — the site project — and archives only what that target publishes. The webjob project sitting beside it in the repository is not in the solution at all: it still targets 4.7.2 where the site targets 4.8, carries its own daily-schedule publish settings, and has not been touched since 2021. Naming a target rather than a solution is what keeps a project in that state from riding into a release nobody meant to include it in.",
             'pt-BR':
-              'Os webjobs que executam o trabalho agendado e em segundo plano do monolito sobem no mesmo deploy do projeto principal, em vez de existirem como serviços à parte. Um pipeline, uma release, uma coisa só para reverter se der errado.',
+              'O pipeline de release restaura a solution mas compila um único alvo — o projeto do site — e arquiva apenas o que aquele alvo publica. O projeto de webjob que fica ao lado, no mesmo repositório, não está na solution: ainda tem 4.7.2 como alvo enquanto o site tem 4.8, carrega as próprias configurações de publicação com agendamento diário, e não é tocado desde 2021. Nomear um alvo em vez de uma solution é o que impede um projeto nesse estado de entrar de carona numa release em que ninguém pretendia incluí-lo.',
           },
         },
         {
           heading: {
-            en: 'The estate as code',
-            'pt-BR': 'O ambiente como código',
+            en: 'Release by slot swap, not by overwrite',
+            'pt-BR': 'Release por troca de slot, não por sobrescrita',
           },
           body: {
-            en: 'The Azure estate is declared in Terraform: the resource groups, the Linux app service plans, the production staging slots, and the VNet integration to SQL Server. The environment a service lands in is reviewable in a diff, not clicked into existence.',
+            en: 'The pipeline builds once and deploys that one artifact to the app’s staging slot; production changes by swapping the slot in, not by writing over the site while it is serving. What goes live is a build that was already running before it took traffic, and the way back is the same swap in the other direction. That is what a deploy has to be before it can happen in daylight rather than at night.',
             'pt-BR':
-              'O ambiente Azure é declarado em Terraform: os grupos de recursos, os planos de Linux App Service, os slots de staging de produção e a integração de VNet com o SQL Server. O ambiente em que um serviço é publicado fica revisável em um diff, não configurado manualmente na tela.',
+              'O pipeline compila uma vez e publica esse único artefato no slot de staging do app; produção muda pelo swap do slot, não por sobrescrever o site enquanto ele atende. O que vai ao ar é um build que já estava rodando antes de receber tráfego, e o caminho de volta é o mesmo swap na direção contrária. É isso que um deploy precisa ser antes de poder acontecer de dia em vez de de madrugada.',
           },
         },
         {
@@ -735,15 +735,15 @@ export const projects: Project[] = [
     venture: 'dietbox',
     detail: {
       overview: {
-        en: 'One Azure AD B2C identity system carrying two audiences that share nothing but the account: a nutritionist subscribing and paying, and a patient arriving by invitation from the one treating them. Four years of custom sign-in journeys, federated providers, silent migration off the legacy store, and session revocation that reaches every open browser.',
+        en: 'One Azure AD B2C identity system carrying two audiences that share nothing but the account: a nutritionist subscribing and paying, and a patient arriving by invitation from the one treating them. Three years of custom sign-in journeys, federated providers, silent migration off the legacy store, and session revocation that reaches every open browser.',
         'pt-BR':
-          'Um único sistema de identidade em Azure AD B2C carregando dois públicos que não dividem nada além da conta: a nutricionista que assina e paga, e o paciente que chega por convite de quem o atende. Quatro anos de jornadas de login customizadas, provedores federados, migração silenciosa da base legada e revogação de sessão que alcança todo navegador aberto.',
+          'Um único sistema de identidade em Azure AD B2C carregando dois públicos que não dividem nada além da conta: a nutricionista que assina e paga, e o paciente que chega por convite de quem o atende. Três anos de jornadas de login customizadas, provedores federados, migração silenciosa da base legada e revogação de sessão que alcança todo navegador aberto.',
       },
       contribution: {
         summary: {
-          en: 'This is the author’s largest personal ownership in the Dietbox estate: half the commits over four years, across both audiences’ sign-in journeys.',
+          en: 'This is the author’s largest personal ownership in the Dietbox estate: half the commits over three years, across both audiences’ sign-in journeys.',
           'pt-BR':
-            'Esta é a maior propriedade pessoal do autor no conjunto Dietbox: metade dos commits ao longo de quatro anos, cobrindo as jornadas de login dos dois públicos.',
+            'Esta é a maior propriedade pessoal do autor no conjunto Dietbox: metade dos commits ao longo de três anos, cobrindo as jornadas de login dos dois públicos.',
         },
         areas: [
           {
@@ -875,9 +875,9 @@ export const projects: Project[] = [
           {
             label: 'Auth service',
             detail: {
-              en: 'Validates the tokens this system issues; the rest of the platform never talks to the directory directly.',
+              en: 'Validates the tokens this system issues. Reads and writes against the directory itself go through a shared gateway package that several services in the platform take a dependency on.',
               'pt-BR':
-                'Valida os tokens que este sistema emite; o resto da plataforma nunca fala com o diretório diretamente.',
+                'Valida os tokens que este sistema emite. Leituras e escritas no próprio diretório passam por um pacote de gateway compartilhado do qual vários serviços da plataforma dependem.',
             },
           },
           {
@@ -964,14 +964,14 @@ export const projects: Project[] = [
       'pt-BR': 'Assinaturas e cobrança recorrente, atrás de um checkout próprio.',
     },
     description: {
-      en: 'The service that carries the revenue: subscription commands on one side, a webhook handler per gateway event on the other, and three payment providers behind a common interface — with a Vue checkout in front of it.',
+      en: 'The service that carries the revenue: subscription commands on one side, a webhook endpoint per gateway on the other, and two payment gateways in packages of their own — with a Vue checkout in front of it.',
       'pt-BR':
-        'O serviço que carrega a receita: comandos de assinatura de um lado, um handler de webhook por evento do gateway do outro, e três provedores de pagamento atrás de uma interface comum — com um checkout em Vue na frente.',
+        'O serviço que carrega a receita: comandos de assinatura de um lado, um endpoint de webhook por gateway do outro, e dois gateways de pagamento em pacotes próprios — com um checkout em Vue na frente.',
     },
     tech: ['.NET 6', 'C#', 'CQRS', 'Vue 3', 'Vite', 'PrimeVue', 'Pinia', 'Cypress', 'Azure DevOps'],
     role: {
-      en: 'Senior Software Engineer, then Head of Technology',
-      'pt-BR': 'Engenheiro de Software Sênior, depois Head de Tecnologia',
+      en: 'Head of Technology',
+      'pt-BR': 'Head de Tecnologia',
     },
     period: { en: '2023–2024', 'pt-BR': '2023–2024' },
     visibility: 'private',
@@ -980,26 +980,26 @@ export const projects: Project[] = [
     venture: 'dietbox',
     detail: {
       overview: {
-        en: 'The service responsible for the money: subscription commands on one side, a webhook handler for every event a payment gateway raises on the other, and three gateway integrations behind a common boundary in between. It is kept separate because money has a different failure mode from everything else in the product — its own release train, in a repository it shares with the platform’s other services.',
+        en: 'The service responsible for the money: subscription commands on one side, a webhook handler for every event a payment gateway raises on the other, and two gateway integrations in between — Iugu and TSPay, each in a crosscutting package of its own. It is kept separate because money has a different failure mode from everything else in the product — its own release train, in a repository it shares with the platform’s other services.',
         'pt-BR':
-          'O serviço responsável pelo dinheiro: comandos de assinatura de um lado, um handler de webhook para cada evento que um gateway de pagamento emite do outro, e três integrações de gateway atrás de uma fronteira comum no meio. Ele é mantido separado porque dinheiro tem um modo de falha diferente do resto do produto — trem de release próprio, num repositório que compartilha com os outros serviços da plataforma.',
+          'O serviço responsável pelo dinheiro: comandos de assinatura de um lado, um handler de webhook para cada evento que um gateway de pagamento emite do outro, e duas integrações de gateway no meio — Iugu e TSPay, cada uma no próprio pacote transversal. Ele é mantido separado porque dinheiro tem um modo de falha diferente do resto do produto — trem de release próprio, num repositório que compartilha com os outros serviços da plataforma.',
       },
       contribution: {
         summary: {
-          en: 'As principal architect across the estate, I set the patterns this service is built on: the path-filtered release pipeline that lets it ship on its own train, and the package boundary that keeps a gateway change from becoming a domain change. The commands, the webhook handlers and the checkout itself were the team’s to write.',
+          en: 'As principal architect across the estate, I set the patterns this service is built on: the path-filtered release pipeline that lets it ship on its own train, and the crosscutting-package convention every third-party integration is wrapped in before a service takes a dependency on it. The commands, the webhook handlers and the checkout itself were the team’s to write.',
           'pt-BR':
-            'Como arquiteto principal do conjunto, defini os padrões sobre os quais este serviço é construído: o pipeline de release com filtro de caminho que permite que ele suba no próprio trem, e a fronteira de pacote que impede que uma troca de gateway vire uma troca de domínio. Os comandos, os handlers de webhook e o próprio checkout foram escritos pelo time.',
+            'Como arquiteto principal do conjunto, defini os padrões sobre os quais este serviço é construído: o pipeline de release com filtro de caminho que permite que ele suba no próprio trem, e a convenção de pacote transversal em que toda integração de terceiro é embrulhada antes de um serviço depender dela. Os comandos, os handlers de webhook e o próprio checkout foram escritos pelo time.',
         },
         areas: [
           {
-            en: 'The release pipeline’s path filter, so a payment hotfix ships on its own branch without redeploying the other three services.',
+            en: 'The release pipeline’s path filter, so a payment hotfix ships on its own branch without redeploying the other four services.',
             'pt-BR':
-              'O filtro de caminho do pipeline de release, para que um hotfix de pagamento suba pelo próprio branch sem redeployar os outros três serviços.',
+              'O filtro de caminho do pipeline de release, para que um hotfix de pagamento suba pelo próprio branch sem redeployar os outros quatro serviços.',
           },
           {
-            en: 'The package boundary each gateway integration sits behind, carried over from the same pattern used across the platform.',
+            en: 'The crosscutting package each gateway integration lives in, and the one shared project that pulls them in for whichever service needs them.',
             'pt-BR':
-              'A fronteira de pacote atrás da qual cada integração de gateway fica, herdada do mesmo padrão usado no resto da plataforma.',
+              'O pacote transversal em que cada integração de gateway vive, e o único projeto compartilhado que os traz para qualquer serviço que precise deles.',
           },
           {
             en: 'The Azure estate this service deploys onto, configured the same way as its neighbours.',
@@ -1007,15 +1007,15 @@ export const projects: Project[] = [
           },
         ],
         boundary: {
-          en: 'The subscription commands, the webhook handlers and the checkout client are a team’s work: across February 2023 to July 2024, the author holds roughly a tenth of the client’s commits and about a fifth of the service’s — the bulk of both belongs to other engineers.',
+          en: 'The subscription commands, the webhook handlers and the checkout client are a team’s work: the author holds roughly a tenth of the checkout client’s commits, across February 2023 to July 2024, and about a fifth of the service’s, whose repository does not begin until October 2023 — the bulk of both belongs to other engineers.',
           'pt-BR':
-            'Os comandos de assinatura, os handlers de webhook e o cliente de checkout foram trabalho de um time: entre fevereiro de 2023 e julho de 2024, o autor tem aproximadamente um décimo dos commits do cliente e cerca de um quinto dos do serviço — a maior parte dos dois pertence a outros engenheiros.',
+            'Os comandos de assinatura, os handlers de webhook e o cliente de checkout foram trabalho de um time: o autor tem aproximadamente um décimo dos commits do cliente de checkout, entre fevereiro de 2023 e julho de 2024, e cerca de um quinto dos do serviço, cujo repositório só começa em outubro de 2023 — a maior parte dos dois pertence a outros engenheiros.',
         },
       },
       problem: {
-        en: 'A subscription doesn’t live only in the product’s own database — it also lives in whichever gateway is processing it, and that gateway’s opinion of the subscription’s state arrives asynchronously, by webhook, on its own schedule. Which gateway processes it is a vendor decision, not a domain one: swapping providers should not mean touching what a subscription command does. And every one of those webhook deliveries has to be reconciled with what the product already believes happened, not simply trusted.',
+        en: 'A subscription doesn’t live only in the product’s own database — it also lives in whichever gateway is processing it, and that gateway’s opinion of the subscription’s state arrives asynchronously, by webhook, on its own schedule. Two gateways were live at once while subscribers were being moved between them, each with its own event names, its own payload shape and its own idea of what a subscription is. And every one of those webhook deliveries has to be reconciled with what the product already believes happened, not simply trusted.',
         'pt-BR':
-          'Uma assinatura não mora só no banco de dados do próprio produto — ela também mora em qualquer gateway que esteja processando, e a opinião desse gateway sobre o estado da assinatura chega de forma assíncrona, por webhook, no tempo dele. Qual gateway processa é uma decisão de fornecedor, não de domínio: trocar de provedor não deveria significar mexer no que um comando de assinatura faz. E cada entrega de webhook precisa ser reconciliada com o que o produto já acredita ter acontecido, não simplesmente aceita como verdade.',
+          'Uma assinatura não mora só no banco de dados do próprio produto — ela também mora em qualquer gateway que esteja processando, e a opinião desse gateway sobre o estado da assinatura chega de forma assíncrona, por webhook, no tempo dele. Dois gateways ficaram ativos ao mesmo tempo enquanto os assinantes eram migrados de um para o outro, cada um com seus próprios nomes de evento, seu próprio formato de payload e sua própria ideia do que é uma assinatura. E cada entrega de webhook precisa ser reconciliada com o que o produto já acredita ter acontecido, não simplesmente aceita como verdade.',
       },
       states: {
         caption: { en: 'The subscription lifecycle', 'pt-BR': 'O ciclo de vida da assinatura' },
@@ -1094,9 +1094,9 @@ export const projects: Project[] = [
       },
       architecture: {
         summary: {
-          en: 'A Vue checkout out front, CQRS commands and controllers in the middle, and three gateway integrations behind one package boundary — with the gateway’s own webhooks closing the loop asynchronously.',
+          en: 'A Vue checkout out front, CQRS commands and controllers in the middle, and two gateway integrations each in a package of its own — with each gateway closing the loop asynchronously through a webhook endpoint of its own.',
           'pt-BR':
-            'Um checkout em Vue na frente, comandos e controllers CQRS no meio, e três integrações de gateway atrás de uma única fronteira de pacote — com os próprios webhooks do gateway fechando o ciclo de forma assíncrona.',
+            'Um checkout em Vue na frente, comandos e controllers CQRS no meio, e duas integrações de gateway, cada uma no próprio pacote — com cada gateway fechando o ciclo de forma assíncrona por um endpoint de webhook próprio.',
         },
         steps: [
           {
@@ -1115,37 +1115,38 @@ export const projects: Project[] = [
             },
           },
           {
-            label: 'Gateway package',
+            label: 'Gateway packages',
             detail: {
-              en: 'A shared package boundary hides which of the three gateway integrations is handling a given call.',
-              'pt-BR': 'Uma fronteira de pacote compartilhada esconde qual das três integrações de gateway está atendendo uma chamada específica.',
+              en: 'Iugu and TSPay each live in a crosscutting package with an interface of their own, reached through the one shared project every service in this repository references.',
+              'pt-BR':
+                'Iugu e TSPay vivem cada um em um pacote transversal com interface própria, alcançados pelo único projeto compartilhado que todo serviço deste repositório referencia.',
             },
           },
           {
             label: 'Gateway webhooks',
             detail: {
-              en: 'The gateway posts its own opinion of the subscription back asynchronously, one webhook handler directory per event.',
+              en: 'Each gateway posts its own opinion of the subscription back to an endpoint of its own, where a factory maps that gateway’s event names onto commands — one handler directory per event.',
               'pt-BR':
-                'O gateway publica de volta, de forma assíncrona, a própria opinião sobre a assinatura — um diretório de handler de webhook por evento.',
+                'Cada gateway publica de volta a própria opinião sobre a assinatura num endpoint próprio, onde uma fábrica mapeia os nomes de evento daquele gateway em comandos — um diretório de handler por evento.',
             },
           },
         ],
       },
       decisions: [
         {
-          heading: { en: 'One repository, four release trains', 'pt-BR': 'Um repositório, quatro trens de release' },
+          heading: { en: 'One repository, five release trains', 'pt-BR': 'Um repositório, cinco trens de release' },
           body: {
-            en: 'The payment service shares its repository with the auth, foods and jobs services, but each ships on its own release train: its own branch trigger, and a path filter that excludes the other three services’ directories. A payment hotfix does not redeploy auth. A monorepo without a shared deploy.',
+            en: 'The payment service shares its repository with the core, auth, foods and jobs services, and each of the five ships on its own release train: its own pipeline file, its own branch trigger, and a path filter naming the other four services’ directories as reasons not to build. A payment hotfix does not redeploy auth. A monorepo without a shared deploy.',
             'pt-BR':
-              'O serviço de pagamento compartilha o repositório com os serviços de autenticação, alimentos e jobs, mas cada um sobe no próprio trem de release: gatilho de branch próprio, e um filtro de caminho que exclui os diretórios dos outros três serviços. Um hotfix de pagamento não redeploya a autenticação. Um monorepo sem deploy compartilhado.',
+              'O serviço de pagamento compartilha o repositório com os serviços core, de autenticação, de alimentos e de jobs, e cada um dos cinco sobe no próprio trem de release: arquivo de pipeline próprio, gatilho de branch próprio, e um filtro de caminho que nomeia os diretórios dos outros quatro serviços como motivo para não construir. Um hotfix de pagamento não redeploya a autenticação. Um monorepo sem deploy compartilhado.',
           },
         },
         {
-          heading: { en: 'The gateway behind a package boundary', 'pt-BR': 'O gateway atrás de uma fronteira de pacote' },
+          heading: { en: 'A package per gateway, not one interface for all', 'pt-BR': 'Um pacote por gateway, não uma interface para todos' },
           body: {
-            en: 'Three gateway integrations — Iugu, Ebanx and TSPay — implement the same interface behind a shared package. Which one processes a given call is an implementation detail the rest of the service does not see, which is what lets a gateway change be an implementation change rather than a domain one.',
+            en: 'Iugu and TSPay do not share an interface — they have nothing in common to share. Each sits in its own crosscutting package with its own vocabulary, its own webhook endpoint and its own command factory, and a handler asks for the gateway it actually needs by name. Which gateway a subscription belongs to is a value in the domain, not a detail hidden from it, and that is what made moving subscribers between the two possible one at a time: a TSPay webhook can still reach into Iugu to suspend the old subscription of a nutritionist who has just been moved across.',
             'pt-BR':
-              'Três integrações de gateway — Iugu, Ebanx e TSPay — implementam a mesma interface atrás de um pacote compartilhado. Qual delas processa uma chamada é um detalhe de implementação que o resto do serviço não enxerga, e é isso que permite que uma troca de gateway seja uma mudança de implementação, não de domínio.',
+              'Iugu e TSPay não compartilham interface — não têm nada em comum para compartilhar. Cada um fica no próprio pacote transversal, com vocabulário próprio, endpoint de webhook próprio e fábrica de comandos própria, e um handler pede pelo nome o gateway de que realmente precisa. A qual gateway uma assinatura pertence é um valor do domínio, não um detalhe escondido dele, e foi isso que permitiu mover os assinantes de um para o outro um a um: um webhook do TSPay ainda consegue chegar ao Iugu para suspender a assinatura antiga de uma nutricionista que acabou de ser migrada.',
           },
         },
         {
@@ -1193,14 +1194,14 @@ export const projects: Project[] = [
       'pt-BR': 'O back office, e a geração mais nova da arquitetura da plataforma.',
     },
     description: {
-      en: 'The internal tool the company runs the product from — subscriptions, vouchers, the food catalogue, marketing — built as a layered service with commands, queries and event sourcing, and an admin client that can act as the user it is helping.',
+      en: 'The internal tool the company runs the product from — subscriptions, vouchers, the food catalogue, marketing — built as a layered service with commands, queries and domain events dispatched at save time, and an admin client that can act as the user it is helping.',
       'pt-BR':
-        'A ferramenta interna com que a empresa opera o produto — assinaturas, vouchers, catálogo de alimentos, marketing — construída como um serviço em camadas com comandos, queries e event sourcing, e um cliente admin capaz de agir como o usuário que está atendendo.',
+        'A ferramenta interna com que a empresa opera o produto — assinaturas, vouchers, catálogo de alimentos, marketing — construída como um serviço em camadas com comandos, queries e eventos de domínio despachados no momento da gravação, e um cliente admin capaz de agir como o usuário que está atendendo.',
     },
-    tech: ['.NET 6', 'C#', 'CQRS', 'MediatR', 'Event sourcing', 'ASP.NET Identity', 'JWT', 'Vue 3', 'Vuex', 'Azure DevOps'],
+    tech: ['.NET 6', 'C#', 'CQRS', 'MediatR', 'EF Core', 'SQL Server', 'ASP.NET Identity', 'JWT', 'Vue 3', 'Vuex', 'Azure DevOps'],
     role: {
-      en: 'Senior Software Engineer, then Head of Technology',
-      'pt-BR': 'Engenheiro de Software Sênior, depois Head de Tecnologia',
+      en: 'Head of Technology',
+      'pt-BR': 'Head de Tecnologia',
     },
     period: { en: '2023–2024', 'pt-BR': '2023–2024' },
     visibility: 'private',
@@ -1208,15 +1209,15 @@ export const projects: Project[] = [
     venture: 'dietbox',
     detail: {
       overview: {
-        en: 'A back office is where a SaaS company’s real operating procedure lives — the subscriptions, the vouchers, the food catalogue, marketing — and this was the first place the platform’s newer patterns were carried through end to end: layers numbered on disk, commands and queries behind pipeline behaviours, and a core whose state is derived from events rather than only from a current row.',
+        en: 'A back office is where a SaaS company’s real operating procedure lives — the subscriptions, the vouchers, the food catalogue, marketing — and this was the first place the platform’s newer patterns were carried through end to end: layers numbered on disk, commands and queries behind a pipeline behaviour that logs every one of them, and a domain that raises its own events and has them dispatched the moment its changes are saved.',
         'pt-BR':
-          'Um back office é onde vive o procedimento real de operação de uma empresa SaaS — as assinaturas, os vouchers, o catálogo de alimentos, o marketing — e este foi o primeiro lugar em que os padrões mais novos da plataforma foram aplicados de ponta a ponta: camadas numeradas em disco, comandos e queries atrás de pipeline behaviours, e um núcleo cujo estado é derivado de eventos, não apenas da linha atual de uma tabela.',
+          'Um back office é onde vive o procedimento real de operação de uma empresa SaaS — as assinaturas, os vouchers, o catálogo de alimentos, o marketing — e este foi o primeiro lugar em que os padrões mais novos da plataforma foram aplicados de ponta a ponta: camadas numeradas em disco, comandos e queries atrás de um pipeline behaviour que registra cada um deles, e um domínio que emite os próprios eventos e os tem despachados no instante em que suas mudanças são gravadas.',
       },
       contribution: {
         summary: {
-          en: 'The layered design this service is built on — the numbered directories, the command/query pipeline, and where the event-sourced core sits inside it — the identity building block, and the shared building blocks the platform’s newer services now start from, are the author’s. The eighteen business-domain controllers and the admin client’s views were the team’s to build out.',
+          en: 'The layered design this service is built on — the numbered directories, the command/query pipeline, and where the domain-event dispatch sits inside it — the identity building block, and the shared building blocks the platform’s newer services now start from, are the author’s. The eighteen business-domain controllers and the admin client’s views were the team’s to build out.',
           'pt-BR':
-            'O design em camadas sobre o qual este serviço é construído — os diretórios numerados, o pipeline de comandos e queries, e o lugar onde o núcleo com event sourcing se encaixa nele — o bloco de identidade e os blocos de construção compartilhados dos quais os serviços mais novos da plataforma partem, são do autor. Os dezoito controllers de domínio de negócio e as telas do cliente admin foram construídos pelo time.',
+            'O design em camadas sobre o qual este serviço é construído — os diretórios numerados, o pipeline de comandos e queries, e o lugar onde o despacho de eventos de domínio se encaixa nele — o bloco de identidade e os blocos de construção compartilhados dos quais os serviços mais novos da plataforma partem, são do autor. Os dezoito controllers de domínio de negócio e as telas do cliente admin foram construídos pelo time.',
         },
         areas: [
           {
@@ -1230,9 +1231,9 @@ export const projects: Project[] = [
               'O bloco de identidade: base de usuários própria, um builder e validador de JWT, tokens de acesso e refresh, e autorização baseada em claims.',
           },
           {
-            en: 'The event-sourcing package among the shared building blocks, and where it sits in the layers below the domain.',
+            en: 'The message and event base types among the shared building blocks, and the dispatch that publishes what an aggregate raised once the unit of work has saved it.',
             'pt-BR':
-              'O pacote de event sourcing entre os blocos de construção compartilhados, e o lugar onde ele fica nas camadas abaixo do domínio.',
+              'Os tipos base de mensagem e evento entre os blocos de construção compartilhados, e o despacho que publica o que um agregado emitiu assim que a unidade de trabalho o grava.',
           },
           {
             en: 'The shared building blocks — domain, infrastructure and identity — the platform’s newer services start from instead of each inventing its own.',
@@ -1251,9 +1252,9 @@ export const projects: Project[] = [
         },
       },
       problem: {
-        en: 'Support and operations were reaching straight into the product database, or into the monolith’s own admin surface, to do what the business runs on day to day — adjusting a subscription, issuing a voucher, updating the food catalogue. A back office with its own domain, its own audit trail and its own identity was the alternative: the same operations, but through commands that record what happened and who did it, behind sign-in that isn’t the customer’s.',
+        en: 'Support and operations were reaching straight into the product database, or into the monolith’s own admin surface, to do what the business runs on day to day — adjusting a subscription, issuing a voucher, updating the food catalogue. A back office with its own domain, its own staff identity and its own command surface was the alternative: the same operations, but as named commands logged on the way through, behind sign-in that isn’t the customer’s.',
         'pt-BR':
-          'Suporte e operações estavam entrando direto no banco de dados do produto, ou na própria superfície de admin do monolito, para fazer o que o negócio roda no dia a dia — ajustar uma assinatura, emitir um voucher, atualizar o catálogo de alimentos. Um back office com domínio próprio, trilha de auditoria própria e identidade própria foi a alternativa: as mesmas operações, mas por comandos que registram o que aconteceu e quem fez, atrás de um login que não é o do cliente.',
+          'Suporte e operações estavam entrando direto no banco de dados do produto, ou na própria superfície de admin do monolito, para fazer o que o negócio roda no dia a dia — ajustar uma assinatura, emitir um voucher, atualizar o catálogo de alimentos. Um back office com domínio próprio, identidade de equipe própria e superfície de comandos própria foi a alternativa: as mesmas operações, mas como comandos nomeados e registrados em log na passagem, atrás de um login que não é o do cliente.',
       },
       metrics: [
         {
@@ -1273,9 +1274,9 @@ export const projects: Project[] = [
       },
       architecture: {
         summary: {
-          en: 'An admin client in front, a service exposing the eighteen controllers, an application layer of commands and queries behind pipeline behaviours, a domain layer underneath, and infrastructure at the bottom — where the event store from the shared building blocks persists what the domain raises.',
+          en: 'An admin client in front, a service exposing the eighteen controllers, an application layer of commands and queries behind a logging pipeline behaviour, a domain layer underneath, and infrastructure at the bottom — where saving a change is also what releases the events that change raised.',
           'pt-BR':
-            'Um cliente admin na frente, um serviço expondo os dezoito controllers, uma camada de aplicação com comandos e queries atrás de pipeline behaviours, uma camada de domínio embaixo dela, e infraestrutura na base — onde o event store dos blocos de construção compartilhados persiste o que o domínio emite.',
+            'Um cliente admin na frente, um serviço expondo os dezoito controllers, uma camada de aplicação com comandos e queries atrás de um pipeline behaviour de log, uma camada de domínio embaixo dela, e infraestrutura na base — onde gravar uma mudança é também o que libera os eventos que aquela mudança emitiu.',
         },
         steps: [
           {
@@ -1297,9 +1298,9 @@ export const projects: Project[] = [
           {
             label: 'Application',
             detail: {
-              en: 'Commands and queries with pipeline behaviours, keeping domain events separate from the integration events other services consume.',
+              en: 'Commands and queries behind a pipeline behaviour that logs each one by name, and the handlers that turn a domain event into the integration event other services consume.',
               'pt-BR':
-                'Comandos e queries com pipeline behaviours, mantendo os eventos de domínio separados dos eventos de integração que outros serviços consomem.',
+                'Comandos e queries atrás de um pipeline behaviour que registra cada um pelo nome, e os handlers que transformam um evento de domínio no evento de integração que outros serviços consomem.',
             },
           },
           {
@@ -1313,9 +1314,9 @@ export const projects: Project[] = [
           {
             label: 'Infrastructure',
             detail: {
-              en: 'Persistence at the bottom, including the event store from the shared building blocks — the domain’s events land here, not just its current state.',
+              en: 'An EF Core context over SQL Server: it writes the aggregate’s current state, then hands the events that aggregate collected while changing to MediatR, before the transaction closes.',
               'pt-BR':
-                'Persistência na base, incluindo o event store dos blocos de construção compartilhados — os eventos do domínio pousam aqui, não só o estado atual dele.',
+                'Um contexto EF Core sobre SQL Server: grava o estado atual do agregado e então entrega ao MediatR os eventos que aquele agregado acumulou ao mudar, antes de a transação fechar.',
             },
           },
         ],
@@ -1338,19 +1339,19 @@ export const projects: Project[] = [
           },
         },
         {
-          heading: { en: 'Event sourcing here, not everywhere', 'pt-BR': 'Event sourcing aqui, não em todo lugar' },
+          heading: { en: 'Events dispatched at save time, not stored', 'pt-BR': 'Eventos despachados na gravação, não armazenados' },
           body: {
-            en: 'The portal’s questions are historical — what changed, when, and by whom — so its state is derived from a stream of domain events rather than only from the current row in a table. The rest of the platform isn’t asking that question the same way, so the rest of the platform isn’t built that way; event sourcing earns its place here because the back office’s job is auditability, not because it is the newer pattern.',
+            en: 'An aggregate collects the events it raises while a command changes it; the unit of work writes the row, then publishes those events through MediatR before the transaction closes. Nothing is replayed and no state is rebuilt from a log — the table still holds the current row. What this buys is that a consequence of an operation is a subscriber to something the domain said, rather than one more paragraph inside the command that said it.',
             'pt-BR':
-              'As perguntas do portal são históricas — o que mudou, quando, e por quem — então o estado dele é derivado de um stream de eventos de domínio, não só da linha atual de uma tabela. O resto da plataforma não faz essa pergunta do mesmo jeito, então o resto da plataforma não é construído desse jeito; event sourcing ganha seu lugar aqui porque o trabalho do back office é auditabilidade, não porque é o padrão mais novo.',
+              'Um agregado acumula os eventos que emite enquanto um comando o altera; a unidade de trabalho grava a linha e então publica esses eventos via MediatR antes de a transação fechar. Nada é reproduzido e nenhum estado é reconstruído a partir de um log — a tabela continua guardando a linha atual. O que isso compra é que a consequência de uma operação vira assinante de algo que o domínio disse, em vez de mais um parágrafo dentro do comando que o disse.',
           },
         },
         {
           heading: { en: 'Shared building blocks before shared services', 'pt-BR': 'Blocos de construção compartilhados antes de serviços compartilhados' },
           body: {
-            en: 'The newer services, this one included, start from a common domain, infrastructure and identity layer instead of each inventing its own — the same event-sourcing package, the same identity building block, the same base entities. That shared foundation is what let a small team add a service without each one arriving in a different style.',
+            en: 'The newer services, this one included, start from a common domain, infrastructure and identity layer instead of each inventing its own — the same message and event base types, the same identity building block, the same base entities. That shared foundation is what let a small team add a service without each one arriving in a different style.',
             'pt-BR':
-              'Os serviços mais novos, este incluído, partem de uma camada comum de domínio, infraestrutura e identidade em vez de cada um inventar a própria — o mesmo pacote de event sourcing, o mesmo bloco de identidade, as mesmas entidades base. Essa fundação compartilhada é o que permitiu que um time pequeno acrescentasse um serviço sem cada um chegar num estilo diferente.',
+              'Os serviços mais novos, este incluído, partem de uma camada comum de domínio, infraestrutura e identidade em vez de cada um inventar a própria — os mesmos tipos base de mensagem e evento, o mesmo bloco de identidade, as mesmas entidades base. Essa fundação compartilhada é o que permitiu que um time pequeno acrescentasse um serviço sem cada um chegar num estilo diferente.',
           },
         },
       ],
@@ -1390,7 +1391,7 @@ export const projects: Project[] = [
       'pt-BR':
         'Um serviço isolado que mede a mensageria de saída: uma cota pré-paga de envios por profissional, um log de cada mudança de cota e um registro de cada notificação enviada. Construído ao lado do produto, e não dentro dele, para que um problema de custo não virasse um problema de plataforma.',
     },
-    tech: ['.NET 6', 'C#', 'CQRS', 'Redis', 'SQL Server', 'WhatsApp Business API', 'Azure DevOps'],
+    tech: ['.NET 6', 'C#', 'CQRS', 'SQL Server', 'WhatsApp Business API', 'Azure DevOps'],
     role: {
       en: 'Head of Technology',
       'pt-BR': 'Head de Tecnologia',
@@ -1428,9 +1429,9 @@ export const projects: Project[] = [
               'Os dois controllers e seus comandos e queries — adicionar um limite, enviar uma notificação, e consultar tanto limites quanto registros enviados.',
           },
           {
-            en: 'The crosscutting packages behind the layers: the WhatsApp provider integration, Redis, and dependency injection.',
+            en: 'The crosscutting packages behind the layers: the WhatsApp provider integration and dependency injection.',
             'pt-BR':
-              'Os pacotes transversais atrás das camadas: a integração com o provedor do WhatsApp, Redis e injeção de dependência.',
+              'Os pacotes transversais atrás das camadas: a integração com o provedor do WhatsApp e a injeção de dependência.',
           },
         ],
       },
@@ -1593,8 +1594,8 @@ export const projects: Project[] = [
           'pt-BR': 'Três modelos de domínio: o próprio limite de notificações, um log de cada mudança nele, e um registro de cada notificação enviada.',
         },
         {
-          en: 'A layered service with crosscutting packages for the WhatsApp provider, Redis and dependency injection, kept separate from the domain they support.',
-          'pt-BR': 'Um serviço em camadas com pacotes transversais para o provedor do WhatsApp, Redis e injeção de dependência, mantidos separados do domínio que sustentam.',
+          en: 'A layered service with crosscutting packages for the WhatsApp provider and dependency injection, kept separate from the domain they support.',
+          'pt-BR': 'Um serviço em camadas com pacotes transversais para o provedor do WhatsApp e injeção de dependência, mantidos separados do domínio que sustentam.',
         },
       ],
     },

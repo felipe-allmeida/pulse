@@ -154,6 +154,42 @@ it('every ulbra project is led as Head of Technology, not as a nameless engineer
   }
 });
 
+/*
+  Two Dietbox cards once read "Senior Software Engineer, then Head of
+  Technology" over a `2023–2024` period, but `profile.experience` puts Senior
+  Software Engineer at Sep 2020 – Aug 2022 and Head of Technology at Aug 2022 –
+  Aug 2024: there is no transition inside 2023–2024 for a card to claim. A
+  card's role has to be one the CV supports for the whole period the card
+  shows, so a project that starts after the promotion cannot claim the title
+  that preceded it.
+*/
+it('no dietbox project claims a role the CV does not support for its period', () => {
+  // Read off `profile.experience` rather than hard-coded blind: if either CV
+  // row moves, this assertion is what notices before the rule below is wrong.
+  const dietboxRoles = profile.experience.filter((entry) => entry.org === 'Dietbox');
+  expect(dietboxRoles.map((entry) => `${entry.role.en} (${entry.period.en})`)).toEqual([
+    'Head of Technology (Aug 2022 – Aug 2024)',
+    'Senior Software Engineer (Sep 2020 – Aug 2022)',
+  ]);
+  const seniorEngineerEndedIn = 2022;
+
+  const dietbox = projects.filter((p) => p.venture === 'dietbox');
+  expect(dietbox, 'all six Dietbox projects').toHaveLength(6);
+  for (const project of dietbox) {
+    expect(project.period, `${project.slug} has no period`).toBeDefined();
+    // '2023–2024' and '2022' alike: the first four digits are the start year.
+    const startYear = Number.parseInt(project.period!.en.slice(0, 4), 10);
+    expect(startYear, `${project.slug} period does not start with a year`).not.toBeNaN();
+    if (startYear <= seniorEngineerEndedIn) continue;
+
+    expect(
+      project.role.en,
+      `${project.slug} (${project.period!.en}) begins after the promotion, so it cannot claim the earlier title`,
+    ).toBe('Head of Technology');
+    expect(project.role['pt-BR'], `${project.slug} role (pt-BR)`).toBe('Head de Tecnologia');
+  }
+});
+
 it('ulbra-atende has a full case study, localized in every locale', () => {
   const project = projects.find((p) => p.slug === 'ulbra-atende');
   expect(project).toBeDefined();
@@ -438,6 +474,22 @@ it('publishes no hostname, URL or credential in any project narrative', () => {
     expect(narrative, `${project.slug} detail contains a token-like string`).not.toMatch(
       /\b[a-f0-9]{32,}\b/i,
     );
+  }
+});
+
+it('publishes no hostname, URL or credential in any venture narrative', () => {
+  // `ventures.ts` is the second body of user-facing prose — summary, team and
+  // the practices blocks — and until this guard existed it was unscanned, so
+  // the rule the project guard above enforces stopped at the file boundary.
+  // Same patterns, same neutraliser, same reasoning; `url` is excluded for
+  // exactly the reason `links` is over there: an organization's own public
+  // site is the one URL that belongs in content.
+  for (const venture of ventures) {
+    const { url: _publicSite, ...prose } = venture;
+    const narrative = withoutSanctionedPlaceholders(JSON.stringify(prose));
+    expect(narrative, `${venture.slug} contains a URL`).not.toMatch(/https?:\/\//);
+    expect(narrative, `${venture.slug} contains a hostname`).not.toMatch(/\b[a-z0-9-]+\.[a-z]{2,}\b/i);
+    expect(narrative, `${venture.slug} contains a token-like string`).not.toMatch(/\b[a-f0-9]{32,}\b/i);
   }
 });
 
