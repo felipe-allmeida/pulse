@@ -554,6 +554,7 @@ export const projects: Project[] = [
     visibility: 'private',
     screenshot: '/screenshots/dietbox.webp',
     links: [{ label: 'Website', href: 'https://dietbox.me' }],
+    venture: 'dietbox',
     detail: {
       overview: {
         en: 'A Brazilian SaaS used by nutritionists to plan diets and by their patients to follow them. Two audiences with almost nothing in common share one product, one identity system and one platform — and that platform spans a decade-old monolith and a newer generation of services running beside it.',
@@ -736,42 +737,6 @@ export const projects: Project[] = [
             en: 'Long-lived connections scale on a different axis from request traffic, and behind a Redis adapter any instance can push to a client connected to any other. Keeping it inside the monolith would have tied both to the same deploy — and the monolith deployed once a night.',
             'pt-BR':
               'Conexões de longa duração escalam num eixo diferente do tráfego de requisições, e atrás de um adaptador Redis qualquer instância consegue enviar a um cliente conectado em outra. Mantê-lo dentro do monolito teria amarrado os dois ao mesmo deploy — e o monolito subia uma vez por madrugada.',
-          },
-        },
-      ],
-      leadership: [
-        {
-          heading: { en: 'From one nightly deploy to several a day', 'pt-BR': 'De um deploy noturno a vários por dia' },
-          body: {
-            en: 'I brought in Scrum and trunk-based development. A deploy in daylight stopped being an event.',
-            'pt-BR':
-              'Trouxe Scrum e trunk-based development. Deploy em horário comercial deixou de ser evento.',
-          },
-        },
-        {
-          heading: { en: 'A payment migration nobody noticed', 'pt-BR': 'Uma migração de pagamentos que ninguém notou' },
-          body: {
-            en: 'I planned and ran the move of thousands of active subscribers from Iugu to Pagar.me. Revenue never paused — the kind of change whose measure of success is that nothing happened.',
-            'pt-BR':
-              'Planejei e conduzi a migração de milhares de assinantes ativos de Iugu para Pagar.me. A receita não parou em momento nenhum — o tipo de mudança cuja medida de sucesso é não ter acontecido nada.',
-          },
-        },
-        {
-          heading: { en: 'Cloud spend as an engineering problem', 'pt-BR': 'Custo de nuvem como problema de engenharia' },
-          body: {
-            en: 'I took a cost pass over the Azure estate — without a feature freeze to pay for it.',
-            'pt-BR': 'Fiz uma revisão de custos no ambiente Azure — sem congelar entregas para bancar a economia.',
-          },
-        },
-        {
-          heading: {
-            en: 'Reporting engineering in the executive’s language',
-            'pt-BR': 'Reportar engenharia na língua da diretoria',
-          },
-          body: {
-            en: 'I started bringing DORA metrics and a roadmap to the executive team, so investment in technology was argued with evidence rather than conviction.',
-            'pt-BR':
-              'Passei a levar métricas DORA e um roadmap à diretoria, para que o investimento em tecnologia fosse defendido com evidências, não com convicção.',
           },
         },
       ],

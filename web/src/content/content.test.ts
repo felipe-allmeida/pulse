@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { profile } from './profile';
 import { projects } from './projects';
-import { ventures } from './ventures';
+import { ventureBySlug, ventures } from './ventures';
 import { expectBothLocales } from '@/test/expect-both-locales';
 
 it('profile has bio, skills and experience', () => {
@@ -134,7 +134,7 @@ it('projects sharing a venture are contiguous in the array', () => {
 */
 it('every venture project is private with no repository link', () => {
   const inVentures = projects.filter((p) => p.venture !== undefined);
-  expect(inVentures, 'all six ULBRA projects').toHaveLength(6);
+  expect(inVentures, 'six ULBRA projects and one Dietbox card so far').toHaveLength(7);
   for (const project of inVentures) {
     expect(project.visibility, `${project.slug} visibility`).toBe('private');
     expect(
@@ -568,15 +568,17 @@ it('dietbox links to its product, not its source', () => {
   expect(dietbox.links).toEqual([{ label: 'Website', href: 'https://dietbox.me' }]);
 });
 
-it('dietbox is the only project with a leadership section, localized and non-empty', () => {
-  const withLeadership = projects.filter((p) => p.detail?.leadership);
-  expect(withLeadership.map((p) => p.slug)).toEqual(['dietbox']);
+it('no project carries a leadership section — it belongs to the venture', () => {
+  // It moved rather than duplicated: the venture header renders `practices`
+  // directly above the cards, so a project repeating it would put the same
+  // four claims on screen twice, three inches apart.
+  expect(projects.filter((p) => p.detail?.leadership).map((p) => p.slug)).toEqual([]);
 
-  const leadership = withLeadership[0]!.detail!.leadership!;
-  expect(leadership).toHaveLength(4);
-  for (const section of leadership) {
-    expectBothLocales(section.heading, 'dietbox leadership heading');
-    expectBothLocales(section.body, 'dietbox leadership body');
+  const practices = ventureBySlug('dietbox')!.practices!;
+  expect(practices).toHaveLength(4);
+  for (const section of practices) {
+    expectBothLocales(section.heading, 'dietbox practices heading');
+    expectBothLocales(section.body, 'dietbox practices body');
   }
 });
 

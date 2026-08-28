@@ -46,3 +46,11 @@ it('ULBRA is held as a client engagement, and says whose', () => {
   expect(ulbra!.engagement!.en).toMatch(/pampa devs/i);
   expect(ulbra!.engagement!['pt-BR']).toMatch(/pampa devs/i);
 });
+
+it('Dietbox is direct employment — no engagement qualifier', () => {
+  const dietbox = ventureBySlug('dietbox');
+  expect(dietbox, 'the Dietbox venture exists').toBeDefined();
+  expect(dietbox!.engagement, 'employment needs no qualifier').toBeUndefined();
+  expect(dietbox!.url).toBe('https://dietbox.me');
+  expect(dietbox!.practices, 'the leadership narrative lives here now').toHaveLength(4);
+});
