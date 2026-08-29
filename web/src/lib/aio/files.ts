@@ -172,7 +172,8 @@ export function renderLlmsTxt(pages: AioPage[], base: string): string {
     '## Optional',
     '',
     `- [Full site content in one file](${base}/llms-full.txt)`,
-    `- [CV (PDF)](${base}/cv.pdf)`,
+    `- [CV (PDF, English)](${base}/cv.pdf)`,
+    `- [CV (PDF, Português)](${base}/cv-pt.pdf)`,
     '',
   ];
 
