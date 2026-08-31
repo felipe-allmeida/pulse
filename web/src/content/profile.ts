@@ -154,9 +154,9 @@ export const profile: Profile = {
       url: 'https://pampadevs.com',
       period: { en: 'Mar 2026 – Current', 'pt-BR': 'Mar 2026 – Atual' },
       summary: {
-        en: 'My software studio — internal enterprise platforms (support/ticketing + ERP) in .NET & React, and web and e-commerce delivery for small and mid-sized businesses on Azure.',
+        en: 'My software studio — internal enterprise platforms (support/ticketing + ERP) in .NET & React, and web and e-commerce delivery for small and mid-sized businesses on Azure, .NET, Node.js and Vue.js.',
         'pt-BR':
-          'Meu estúdio de software — plataformas internas corporativas (suporte/chamados + ERP) em .NET & React, e entrega de web e e-commerce para pequenas e médias empresas na Azure.',
+          'Meu estúdio de software — plataformas internas corporativas (suporte/chamados + ERP) em .NET & React, e entrega de web e e-commerce para pequenas e médias empresas em Azure, .NET, Node.js e Vue.js.',
       },
     },
     {
@@ -171,7 +171,7 @@ export const profile: Profile = {
       },
     },
     {
-      role: { en: 'R&D Engineer (contract)', 'pt-BR': 'Engenheiro de P&D (contrato)' },
+      role: { en: 'R&D Engineer (contract via Pampa Devs)', 'pt-BR': 'Engenheiro de P&D (contrato via Pampa Devs)' },
       org: 'Airia',
       url: 'https://airia.com',
       period: { en: 'Jun 2025 – Oct 2025', 'pt-BR': 'Jun 2025 – Out 2025' },
@@ -225,9 +225,9 @@ export const profile: Profile = {
       url: 'https://dietbox.me',
       period: { en: 'Sep 2020 – Aug 2022', 'pt-BR': 'Set 2020 – Ago 2022' },
       summary: {
-        en: 'I migrated the legacy platform from .NET Framework 4.7 on Windows App Service to .NET 6 on Linux, and established CI/CD pipelines in Azure DevOps.',
+        en: 'I migrated the legacy platform from .NET Framework 4.7 on Windows App Service to .NET 6 on Linux, established CI/CD pipelines in Azure DevOps, and built the platform’s realtime service in Node.js — Express and Socket.IO — as a deployment of its own.',
         'pt-BR':
-          'Migrei a plataforma legada de .NET Framework 4.7 no App Service Windows para .NET 6 no Linux e estabeleci os pipelines de CI/CD no Azure DevOps.',
+          'Migrei a plataforma legada de .NET Framework 4.7 no App Service Windows para .NET 6 no Linux, estabeleci os pipelines de CI/CD no Azure DevOps e construí o serviço de tempo real da plataforma em Node.js — Express e Socket.IO — como um deploy próprio.',
       },
     },
     {
@@ -239,6 +239,23 @@ export const profile: Profile = {
         en: 'I did backend and DevOps work for multiple clients using Azure, AKS, Terraform, Vault, .NET Core and React.',
         'pt-BR':
           'Fiz trabalho de backend e DevOps para múltiplos clientes usando Azure, AKS, Terraform, Vault, .NET Core e React.',
+      },
+    },
+    /*
+      The studio's first run, alongside the day jobs of those years — the CV
+      carries both spans on one date line, which this timeline cannot: a row
+      holds a single period, and it is ordered by start date. So the two runs
+      are two rows, distinguished by role, and this one sits where it began.
+    */
+    {
+      role: { en: 'Founder (side venture)', 'pt-BR': 'Fundador (projeto paralelo)' },
+      org: 'Pampa Devs',
+      url: 'https://pampadevs.com',
+      period: { en: 'Mar 2020 – Aug 2022', 'pt-BR': 'Mar 2020 – Ago 2022' },
+      summary: {
+        en: 'An IT practice serving small and mid-sized businesses, from landing pages to e-commerce platforms on Azure, .NET, Node.js and Vue.js.',
+        'pt-BR':
+          'Uma prática de TI atendendo pequenas e médias empresas, de landing pages a plataformas de e-commerce em Azure, .NET, Node.js e Vue.js.',
       },
     },
     {
