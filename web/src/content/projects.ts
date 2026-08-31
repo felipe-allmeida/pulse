@@ -3010,7 +3010,7 @@ export const projects: Project[] = [
     },
     tech: ['Vue 3', 'TypeScript', 'Vite', 'Vue Router', 'Vue I18n', 'SCSS', 'Azure Static Web Apps'],
     role: { en: 'Founder — design & implementation', 'pt-BR': 'Fundador — design & implementação' },
-    period: { en: '2020 – Current', 'pt-BR': '2020 – Atual' },
+    period: { en: '2020–2021, 2025 – Current', 'pt-BR': '2020–2021, 2025 – Atual' },
     visibility: 'private',
     screenshot: '/screenshots/pampa-devs.webp',
     links: [{ label: 'Live site', href: 'https://www.pampadevs.com' }],
@@ -3022,8 +3022,8 @@ export const projects: Project[] = [
       },
       contribution: {
         summary: {
-          en: 'I built it and I keep it running — about two thirds of the commits over six years.',
-          'pt-BR': 'Eu construí e mantenho — cerca de dois terços dos commits ao longo de seis anos.',
+          en: 'I built it and I keep it running — about two thirds of the commits, across two stretches: the first version in 2020–2021, and the work that resumed in 2025.',
+          'pt-BR': 'Eu construí e mantenho — cerca de dois terços dos commits, em duas fases: a primeira versão em 2020–2021, e o trabalho que retomou em 2025.',
         },
         areas: [
           {

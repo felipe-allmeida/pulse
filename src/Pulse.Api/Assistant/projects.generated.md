@@ -513,11 +513,11 @@ system Felipe worked on; the "What Felipe did" line is the authoritative stateme
 
 ### Pampa Devs — My studio’s site, and the tool it sends proposals with.
 
-- **Role:** Founder — design & implementation (2020 – Current)
+- **Role:** Founder — design & implementation (2020–2021, 2025 – Current)
 - **Source:** closed — professional work described without the code (Live site: https://www.pampadevs.com)
 - **Stack:** Vue 3, TypeScript, Vite, Vue Router, Vue I18n, SCSS, Azure Static Web Apps
 - **What it is:** Pampa Devs is my software studio, and this is where a prospective client meets it. The site carries the service catalogue, a blog in two languages, and three landing pages aimed at particular services. Two parts of it are not what a studio site usually does: the services are demonstrated by working versions of themselves rather than by screenshots, and a commercial proposal is rendered as a page here instead of attached to an email.
-- **What Felipe did:** I built it and I keep it running — about two thirds of the commits over six years.
+- **What Felipe did:** I built it and I keep it running — about two thirds of the commits, across two stretches: the first version in 2020–2021, and the work that resumed in 2025.
   - The site itself: the catalogue, the landing pages, the blog and the two locales it all renders in.
   - The embedded demos — the storefront, the chat assistant, the checkout and the lead form.
   - The proposal renderer: diagnosis, strategy, timeline, cost, return and architecture as sections of a page.
