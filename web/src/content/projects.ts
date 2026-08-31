@@ -138,407 +138,11 @@ export interface Project {
 
 export const projects: Project[] = [
   {
-    slug: 'pulse',
-    name: 'Pulse',
-    tagline: {
-      en: 'A live, real-time system embedded in a portfolio.',
-      'pt-BR': 'Um sistema ao vivo, em tempo real, embutido em um portfólio.',
-    },
-    description: {
-      en: 'Visitors see who else is online, a live world map, and public metrics — a thin client over an event-driven .NET backend (SignalR presence, RabbitMQ outbox, Postgres, OpenTelemetry), an ops dashboard, and an AI assistant. Deployed with Docker/Caddy + IaC.',
-      'pt-BR':
-        'Os visitantes veem quem mais está online, um mapa-múndi ao vivo e métricas públicas — um client fino sobre um backend .NET orientado a eventos (presença via SignalR, outbox com RabbitMQ, Postgres, OpenTelemetry), um dashboard de operações e um assistente de IA. Deploy com Docker/Caddy + IaC.',
-    },
-    tech: ['.NET 10', 'SignalR', 'RabbitMQ', 'Redis', 'Postgres', 'React 19', 'Docker', 'Terraform'],
-    role: { en: 'Design & implementation', 'pt-BR': 'Design & implementação' },
-    visibility: 'public',
-    screenshot: '/screenshots/pulse.webp',
-    links: [
-      { label: 'Live site', href: 'https://felipealmeida.tech' },
-      { label: 'GitHub', href: 'https://github.com/felipe-allmeida/pulse' },
-    ],
-    detail: {
-      overview: {
-        en: 'A self-hosted portfolio that doubles as a live systems demo: presence, visits, and metrics travel through a real event-driven backend in real time, not canned data.',
-        'pt-BR':
-          'Um portfólio auto-hospedado que também funciona como demo de sistemas ao vivo: presença, visitas e métricas passam por um backend real orientado a eventos em tempo real, não dados simulados.',
-      },
-      contribution: {
-        summary: {
-          en: 'I built this one alone — the design, the event-driven backend, the front end, and the infrastructure it runs on.',
-          'pt-BR':
-            'Construí este sozinho — o design, o backend orientado a eventos, o front-end e a infraestrutura em que roda.',
-        },
-        areas: [
-          { en: 'The realtime presence pipeline and its world map.', 'pt-BR': 'O pipeline de presença em tempo real e seu mapa-múndi.' },
-          { en: 'The transactional outbox and the event-driven backend behind it.', 'pt-BR': 'O outbox transacional e o backend orientado a eventos por trás dele.' },
-          { en: 'The public ops dashboard and the metrics it exposes.', 'pt-BR': 'O dashboard de operações público e as métricas que ele expõe.' },
-          { en: 'The AI assistant and the profile that grounds it.', 'pt-BR': 'O assistente de IA e o perfil que o fundamenta.' },
-          { en: 'Deployment, from container build to the machine it lands on.', 'pt-BR': 'O deploy, do build do container à máquina onde ele roda.' },
-        ],
-      },
-      problem: {
-        en: 'A CV asserts seniority and a repository demands that someone read it; neither lets a stranger watch a system work. Pulse closes that gap by being both the portfolio and the thing being demonstrated. The constraint it was built against was not a user need but an evidentiary one — make the claim checkable in the thirty seconds someone actually spends.',
-        'pt-BR':
-          'Um currículo afirma senioridade e um repositório exige que alguém o leia; nenhum dos dois deixa um estranho ver um sistema funcionando. O Pulse fecha essa lacuna sendo ao mesmo tempo o portfólio e a coisa demonstrada. O que guiou sua construção não foi uma necessidade de usuário, e sim de evidência — tornar a afirmação conferível nos trinta segundos que alguém de fato gasta.',
-      },
-      architecture: {
-        summary: {
-          en: 'A .NET backend behind a React client. A new connection resolves the visitor’s rough location and publishes a visit event through a transactional outbox, flushed in the same save as the write. A worker drains that outbox over RabbitMQ and appends the audit trail in Postgres. SignalR carries live presence — the connection count, and reactions — while the world map reads the accumulated visits by polling, so the map draws on its own schedule instead of blocking on that round trip. Tracing runs through OpenTelemetry, and the whole thing ships as containers behind Caddy.',
-          'pt-BR':
-            'Um backend .NET por trás de um cliente React. Uma conexão nova resolve a localização aproximada do visitante e publica um evento de visita por um outbox transacional, descarregado no mesmo save da escrita. Um worker drena esse outbox via RabbitMQ e acrescenta a trilha de auditoria no Postgres. O SignalR carrega a presença ao vivo — a contagem de conexões e as reações — enquanto o mapa-múndi lê as visitas acumuladas por polling, então o mapa desenha no próprio ritmo em vez de travar esperando esse round trip. O tracing passa por OpenTelemetry, e tudo sobe como containers atrás do Caddy.',
-        },
-        steps: [
-          {
-            label: 'Browser',
-            detail: {
-              en: 'A React client holding a SignalR connection open.',
-              'pt-BR': 'Um cliente React mantendo uma conexão SignalR aberta.',
-            },
-          },
-          {
-            label: 'API',
-            detail: {
-              en: 'Resolves the visitor’s rough location, publishes the visit, and broadcasts the new presence count to everyone.',
-              'pt-BR':
-                'Resolve a localização aproximada do visitante, publica a visita e transmite a nova contagem de presença para todos.',
-            },
-          },
-          {
-            label: 'Outbox',
-            detail: {
-              en: 'The event is buffered and flushed in the same save as the write, so it cannot be published for something that did not commit.',
-              'pt-BR':
-                'O evento é bufferizado e descarregado no mesmo save da escrita, então não pode ser publicado para algo que não commitou.',
-            },
-          },
-          {
-            label: 'Worker',
-            detail: {
-              en: 'Drains the outbox over RabbitMQ and appends the visit to the audit trail.',
-              'pt-BR': 'Drena o outbox via RabbitMQ e acrescenta a visita à trilha de auditoria.',
-            },
-          },
-          {
-            label: 'World map',
-            detail: {
-              en: 'Polls the accumulated visits on its own schedule, so the map never blocks on the round trip that fills it.',
-              'pt-BR':
-                'Consulta as visitas acumuladas no próprio ritmo, então o mapa nunca trava esperando o round trip que o alimenta.',
-            },
-          },
-        ],
-      },
-      highlights: [
-        {
-          en: 'Live presence via SignalR — see who else is on the site right now, on a world map.',
-          'pt-BR': 'Presença ao vivo via SignalR — veja quem mais está no site agora, num mapa-múndi.',
-        },
-        {
-          en: 'Event-driven .NET backend with a RabbitMQ transactional outbox, Postgres, and OpenTelemetry tracing.',
-          'pt-BR':
-            'Backend .NET orientado a eventos com outbox transacional via RabbitMQ, Postgres e tracing com OpenTelemetry.',
-        },
-        {
-          en: 'A public ops dashboard exposing real metrics — live connections, visits over time, and the event feed as it happens.',
-          'pt-BR':
-            'Um dashboard de operações público expondo métricas reais — conexões ao vivo, visitas ao longo do tempo e o feed de eventos conforme acontece.',
-        },
-        {
-          en: 'An AI assistant grounded in a maintained profile, streaming answers about me.',
-          'pt-BR': 'Um assistente de IA baseado em um perfil mantido, respondendo em streaming sobre mim.',
-        },
-        {
-          en: 'Deployed with Docker Compose + Caddy behind Terraform-managed infrastructure.',
-          'pt-BR': 'Deploy com Docker Compose + Caddy sobre infraestrutura gerenciada com Terraform.',
-        },
-      ],
-      decisions: [
-        {
-          heading: {
-            en: 'A transactional outbox behind a visit counter',
-            'pt-BR': 'Um outbox transacional atrás de um contador de visitas',
-          },
-          body: {
-            en: 'Nothing about counting visits requires one. The point is not the counter — it is that the pattern is here, wired end to end, in something a reader can watch rather than a diagram they have to trust. On a product this would be over-engineering; on a demonstration it is the deliverable.',
-            'pt-BR':
-              'Nada em contar visitas exige um. O ponto não é o contador — é que o padrão está aqui, ligado de ponta a ponta, em algo que o leitor pode ver funcionando em vez de um diagrama em que precisa acreditar. Num produto isso seria over-engineering; numa demonstração é a entrega.',
-          },
-        },
-        {
-          heading: {
-            en: 'Real telemetry, published',
-            'pt-BR': 'Telemetria real, publicada',
-          },
-          body: {
-            en: 'The ops dashboard exposes the system’s actual numbers, which means a reader can catch the site lying about itself. Most portfolios make claims that cannot be checked; this one chose the version that can be.',
-            'pt-BR':
-              'O dashboard de operações expõe os números reais do sistema, o que significa que um leitor pode flagrar o site mentindo sobre si mesmo. A maioria dos portfólios faz afirmações que não dá para conferir; este escolheu a versão que dá.',
-          },
-        },
-        {
-          heading: {
-            en: 'Prerendered pages over a client-only app',
-            'pt-BR': 'Páginas pré-renderizadas em vez de app só no cliente',
-          },
-          body: {
-            en: 'The site renders its content into HTML at build time, so a first visit does not wait on JavaScript and a crawler sees the same page a person does — and, usefully, a deploy can be verified with a single request rather than a browser.',
-            'pt-BR':
-              'O site renderiza seu conteúdo em HTML no build, então a primeira visita não espera JavaScript e um crawler vê a mesma página que uma pessoa — e, de quebra, um deploy pode ser verificado com uma única requisição em vez de um navegador.',
-          },
-        },
-        {
-          heading: {
-            en: 'An assistant grounded in a maintained profile',
-            'pt-BR': 'Um assistente fundamentado num perfil mantido',
-          },
-          body: {
-            en: 'The assistant answers from a file I keep current, and says it does not know rather than inventing. Ungrounded, it would be a demonstration of exactly the wrong thing.',
-            'pt-BR':
-              'O assistente responde a partir de um arquivo que eu mantenho atualizado, e diz que não sabe em vez de inventar. Sem fundamento, ele seria a demonstração exatamente do oposto.',
-          },
-        },
-      ],
-    },
-  },
-  {
-    slug: 'kota-embed',
-    name: 'Kota Embed',
-    tagline: {
-      en: "Health insurance enrollment, embedded inside other companies' platforms.",
-      'pt-BR': 'Adesão a plano de saúde, embutida dentro das plataformas de outras empresas.',
-    },
-    description: {
-      en: 'A multi-tenant .NET service behind an embedded enrollment flow: employers offer health insurance to their employees without leaving the software they already use, while the backend integrates with nine insurers across three regulatory regions.',
-      'pt-BR':
-        'Um serviço .NET multi-tenant por trás de um fluxo de adesão embutido: empregadores oferecem plano de saúde aos funcionários sem sair do software que já usam, enquanto o backend integra com nove seguradoras em três regiões regulatórias.',
-    },
-    tech: ['.NET', 'PostgreSQL', 'EF Core', 'AWS', 'OpenTelemetry', 'Multi-tenant', 'Webhooks'],
-    role: {
-      en: 'Senior Product Engineer, platform team',
-      'pt-BR': 'Senior Product Engineer, time de plataforma',
-    },
-    period: { en: 'Professional work', 'pt-BR': 'Trabalho profissional' },
-    visibility: 'private',
-    screenshot: '/screenshots/kota.webp',
-    links: [{ label: 'Website', href: 'https://kota.io' }],
-    detail: {
-      overview: {
-        en: 'Kota Embed lets employers offer health insurance to their employees without leaving the software they already use — the enrollment flow runs embedded in a third-party platform, backed by a multi-tenant .NET service that integrates directly with insurers.',
-        'pt-BR':
-          'O Kota Embed permite que empregadores ofereçam plano de saúde aos funcionários sem sair do software que já usam — o fluxo de adesão roda embutido numa plataforma de terceiro, apoiado por um serviço .NET multi-tenant que integra direto com as seguradoras.',
-      },
-      contribution: {
-        summary: {
-          en: 'I owned the multi-tenant core — the part that turns an enrollment request into a policy across nine insurers that each behave differently.',
-          'pt-BR':
-            'O núcleo multi-tenant foi meu — a parte que transforma um pedido de adesão numa apólice, através de nove seguradoras que se comportam de formas diferentes.',
-        },
-        areas: [
-          { en: 'The intent state machines behind enrollment, quoting, amendment and renewal.', 'pt-BR': 'As máquinas de estado de intent por trás de adesão, cotação, alteração e renovação.' },
-          { en: 'Adaptive requirements: asking a service what a case must collect instead of hardcoding a form per insurer.', 'pt-BR': 'Requisitos adaptativos: perguntar a um serviço o que um caso precisa coletar, em vez de codificar um formulário por seguradora.' },
-          { en: 'The versioned public API contract and its webhooks.', 'pt-BR': 'O contrato versionado da API pública e seus webhooks.' },
-          { en: 'Provider contracts introduced behind feature flags and migrated without stopping the product.', 'pt-BR': 'Contratos de provedor introduzidos atrás de feature flags e migrados sem parar o produto.' },
-          { en: 'Idempotency and duplicate suppression, and the integration suite that covers them.', 'pt-BR': 'Idempotência e supressão de duplicatas, e a suíte de integração que cobre as duas.' },
-        ],
-        boundary: {
-          en: 'The front end — the embedded flow and its SDK — was built by others; I have no commits in it.',
-          'pt-BR':
-            'O front-end — o fluxo embutido e seu SDK — foi feito por outros; não tenho commits nele.',
-        },
-      },
-      problem: {
-        en: 'Enrolling someone in health insurance looks like a form. It is not. Each insurer wants different data in a different shape on its own schedule; some answer over HTTP, others by exchanging files over SFTP. Regulatory disclosure obligations differ by region. And all of it happens inside an iframe hosted on another company’s platform, where the user expects it to feel immediate. A form hardcoded per insurer does not survive the second insurer.',
-        'pt-BR':
-          'Inscrever alguém num plano de saúde parece um formulário. Não é. Cada seguradora quer dados diferentes, em formato diferente, no tempo dela; umas respondem por HTTP, outras trocando arquivos por SFTP. As obrigações regulatórias de disclosure mudam conforme a região. E tudo isso acontece dentro de um iframe hospedado na plataforma de outra empresa, onde o usuário espera que seja imediato. Um formulário hardcoded por seguradora não sobrevive à segunda seguradora.',
-      },
-      metrics: [
-        {
-          value: { en: '9', 'pt-BR': '9' },
-          label: { en: 'insurer integrations', 'pt-BR': 'integrações de seguradora' },
-          note: { en: 'HTTP APIs and SFTP file exchange', 'pt-BR': 'APIs HTTP e troca de arquivos por SFTP' },
-        },
-        {
-          value: { en: '3', 'pt-BR': '3' },
-          label: { en: 'regulatory regions', 'pt-BR': 'regiões regulatórias' },
-          note: { en: 'disclosure rules differ per region', 'pt-BR': 'as regras de disclosure mudam por região' },
-        },
-        {
-          value: { en: '7', 'pt-BR': '7' },
-          label: { en: 'intent workflow types', 'pt-BR': 'tipos de fluxo de intent' },
-          note: { en: 'enrollment, quote, amendment, renewal…', 'pt-BR': 'adesão, cotação, alteração, renovação…' },
-        },
-      ],
-      architecture: {
-        summary: {
-          en: 'A .NET modular monolith split by bounded context: the multi-tenant platform core, one module per insurer, plus compliance, webhooks, and financial reporting. The core never calls an insurer directly — every provider call goes through an adapter factory, so the code that runs an enrollment does not know which insurer it is talking to. Long-running work is modeled as an intent: a persisted state machine rather than a request held open.',
-          'pt-BR':
-            'Um monólito modular em .NET dividido por contexto delimitado: o núcleo multi-tenant da plataforma, um módulo por seguradora, mais compliance, webhooks e relatório financeiro. O núcleo nunca chama uma seguradora direto — toda chamada a provedor passa por uma adapter factory, então o código que roda uma adesão não sabe com qual seguradora está falando. Trabalho de longa duração é modelado como intent: uma máquina de estados persistida, e não uma requisição mantida aberta.',
-        },
-        steps: [
-          {
-            label: 'Third-party platform',
-            detail: {
-              en: 'The host application, embedding the enrollment flow in an iframe.',
-              'pt-BR': 'A aplicação hospedeira, embutindo o fluxo de adesão num iframe.',
-            },
-          },
-          {
-            label: 'Public API',
-            detail: {
-              en: 'Versioned contract and signed webhooks for the platforms doing the embedding.',
-              'pt-BR': 'Contrato versionado e webhooks assinados para as plataformas que embutem o fluxo.',
-            },
-          },
-          {
-            label: 'Platform core',
-            detail: {
-              en: 'Employers, employees, eligibility, and the intent state machines.',
-              'pt-BR': 'Empregadores, funcionários, elegibilidade e as máquinas de estado dos intents.',
-            },
-          },
-          {
-            label: 'Adapter factory',
-            detail: {
-              en: 'The single door to every insurer, keeping the core provider-agnostic.',
-              'pt-BR': 'A única porta para cada seguradora, mantendo o núcleo agnóstico de provedor.',
-            },
-          },
-          {
-            label: 'Insurer integrations',
-            detail: {
-              en: 'One module per insurer, over HTTP or scheduled SFTP file exchange.',
-              'pt-BR': 'Um módulo por seguradora, por HTTP ou troca agendada de arquivos via SFTP.',
-            },
-          },
-        ],
-      },
-      states: {
-        caption: { en: 'The life of an enrollment', 'pt-BR': 'A vida de uma adesão' },
-        summary: {
-          en: 'These are the statuses an enrollment actually moves through. It can also end ineligible, or not undertaken at all — the happy path below is not the only way out.',
-          'pt-BR':
-            'Estes são os status pelos quais uma adesão realmente passa. Ela também pode terminar inelegível, ou nem ser realizada — o caminho feliz abaixo não é a única saída.',
-        },
-        steps: [
-          {
-            label: 'Processing',
-            detail: {
-              en: 'The request is recorded against its idempotency key and validated, before anything external is called.',
-              'pt-BR': 'O pedido é registrado sob sua chave de idempotência e validado, antes de qualquer chamada externa.',
-            },
-          },
-          {
-            label: 'ActionRequired',
-            detail: {
-              en: 'Something is missing that only a person can supply. The intent says so and waits, instead of failing.',
-              'pt-BR': 'Falta algo que só uma pessoa pode fornecer. O intent declara isso e espera, em vez de falhar.',
-            },
-          },
-          {
-            label: 'PendingConfirmation',
-            detail: {
-              en: 'Everything the insurer and the region require is gathered; the requester confirms before it is sent.',
-              'pt-BR': 'Tudo o que a seguradora e a região exigem está reunido; quem pediu confirma antes do envio.',
-            },
-          },
-          {
-            label: 'Enrolling',
-            detail: {
-              en: 'Handed to the insurer through its adapter, which answers on its own schedule.',
-              'pt-BR': 'Entregue à seguradora pelo adapter dela, que responde no tempo dela.',
-            },
-          },
-          {
-            label: 'Enrolled',
-            detail: {
-              en: 'The policy exists. The platform reports it back to whoever asked.',
-              'pt-BR': 'A apólice existe. A plataforma reporta de volta a quem pediu.',
-            },
-          },
-        ],
-      },
-      highlights: [
-        {
-          en: 'Multi-tenant by construction: platform → employer → employee → group, isolated per tenant.',
-          'pt-BR': 'Multi-tenant por construção: plataforma → empregador → funcionário → grupo, isolados por tenant.',
-        },
-        {
-          en: 'Group setup, enrollment, quoting, amendment, renewal, policy import, and dependant management, each as its own workflow.',
-          'pt-BR':
-            'Configuração de grupo, adesão, cotação, alteração, renovação, importação de apólice e gestão de dependentes, cada uma como seu próprio fluxo.',
-        },
-        {
-          en: 'Eligibility computed from provider rules rather than stored as a flag.',
-          'pt-BR': 'Elegibilidade calculada a partir das regras do provedor, em vez de guardada como flag.',
-        },
-        {
-          en: 'Policy and plan data aggregated across insurers into a single response.',
-          'pt-BR': 'Dados de apólice e plano agregados entre seguradoras numa resposta única.',
-        },
-        {
-          en: 'A versioned public API and signed webhooks for the platforms doing the embedding.',
-          'pt-BR': 'Uma API pública versionada e webhooks assinados para as plataformas que embutem o fluxo.',
-        },
-        {
-          en: 'Insurer integrations over both HTTP APIs and scheduled SFTP file exchange.',
-          'pt-BR': 'Integrações de seguradora tanto por API HTTP quanto por troca agendada de arquivos via SFTP.',
-        },
-      ],
-      decisions: [
-        {
-          heading: {
-            en: 'Intents instead of request/response',
-            'pt-BR': 'Intent em vez de request/response',
-          },
-          body: {
-            en: 'An enrollment cannot finish inside one call — an insurer may take minutes or days. Modeling it as a persisted state machine with its own status makes the in-between state something the system can query, resume, and report on, instead of a transaction held open and hoped for.',
-            'pt-BR':
-              'Uma adesão não termina dentro de uma chamada — uma seguradora pode levar minutos ou dias. Modelar isso como máquina de estados persistida, com status próprio, transforma o estado intermediário em algo que o sistema consulta, retoma e reporta, em vez de uma transação mantida aberta na esperança.',
-          },
-        },
-        {
-          heading: {
-            en: 'Adaptive requirements instead of a form per insurer',
-            'pt-BR': 'Requisitos adaptativos em vez de um formulário por seguradora',
-          },
-          body: {
-            en: 'What a given case must collect depends on the insurer and the regulatory region at once. Rather than encoding nine forms, the platform asks a requirements service what this case needs and renders that. Adding an insurer stops being a front-end change. The lookup happens behind the same adapter boundary, so the core still never handles a provider identity itself.',
-            'pt-BR':
-              'O que um caso precisa coletar depende da seguradora e da região regulatória ao mesmo tempo. Em vez de codificar nove formulários, a plataforma pergunta a um serviço de requisitos o que aquele caso exige e renderiza isso. Adicionar uma seguradora deixa de ser mudança de front-end. A consulta acontece atrás da mesma fronteira de adapter, então o núcleo continua sem manipular a identidade de nenhum provedor.',
-          },
-        },
-        {
-          heading: {
-            en: 'An adapter factory as the only door to a provider',
-            'pt-BR': 'Uma adapter factory como única porta para o provedor',
-          },
-          body: {
-            en: 'The platform core resolves an adapter and talks to that. It never learns which insurer it is serving, which is what keeps a tenth integration from touching enrollment logic — and what let provider contracts be introduced behind feature flags and migrated without stopping the product.',
-            'pt-BR':
-              'O núcleo da plataforma resolve um adapter e fala com ele. Nunca fica sabendo qual seguradora está atendendo, e é isso que impede uma décima integração de tocar na lógica de adesão — e o que permitiu introduzir contratos de provedor atrás de feature flags e migrar sem parar o produto.',
-          },
-        },
-        {
-          heading: {
-            en: 'Idempotency and duplicate suppression as a requirement, not a repair',
-            'pt-BR': 'Idempotência e supressão de duplicata como requisito, não conserto',
-          },
-          body: {
-            en: 'Retries happen, webhooks arrive twice, and consumers run concurrently against the same rows. Intent creation takes an idempotency key, auto-enrollment suppresses the duplicate intent-and-webhook pair, and the eligibility-screening consumer handles serialization conflicts rather than assuming they cannot happen.',
-            'pt-BR':
-              'Retry acontece, webhook chega duas vezes e consumidores rodam concorrentes sobre as mesmas linhas. A criação de intent aceita chave de idempotência, a adesão automática suprime o par intent-e-webhook duplicado, e o consumer de triagem de elegibilidade trata conflito de serialização em vez de assumir que ele não ocorre.',
-          },
-        },
-      ],
-    },
-  },
-  {
     slug: 'dietbox',
     name: 'Dietbox Webapp',
     tagline: {
-      en: 'The decade-old monolith the product grew on, and still its largest codebase.',
-      'pt-BR': 'O monolito de dez anos em que o produto cresceu, e ainda sua maior base de código.',
+      en: 'None of today’s APIs existed. All of it started in here.',
+      'pt-BR': 'Nenhuma das APIs de hoje existia. Tudo começou aqui dentro.',
     },
     description: {
       en: 'The monolith that carried both the nutritionist and the patient experience before any other service existed, deploying once a night because that was the only window that felt safe — and the codebase a newer generation of services has since grown up beside.',
@@ -557,15 +161,15 @@ export const projects: Project[] = [
     links: [{ label: 'Website', href: 'https://dietbox.me' }],
     detail: {
       overview: {
-        en: "The monolith is the product's centre of gravity: for years it was the only codebase, carrying both the nutritionist and the patient experience through the same release. Everything the product did shipped through this one pipeline, on the one schedule that pipeline allowed.",
+        en: 'When I arrived, this was the product. The nutritionist’s tool, the patient’s, subscriptions, food data, sign-in — one codebase, one release, one schedule. None of the services that run beside it now existed yet. Over four years I took the logic out of it a piece at a time and stood each piece up as an API of its own, leaving the monolith serving whatever had not moved. It is still the product’s largest codebase.',
         'pt-BR':
-          'O monolito é o centro de gravidade do produto: por anos foi a única base de código, levando tanto a experiência da nutricionista quanto a do paciente na mesma entrega. Tudo que o produto fazia passava por esse único pipeline, na única janela que esse pipeline permitia.',
+          'Quando cheguei, isto era o produto. A ferramenta da nutricionista, a do paciente, assinaturas, dados de alimentos, login — uma base de código, uma entrega, um horário. Nenhum dos serviços que rodam ao lado hoje existia ainda. Ao longo de quatro anos fui tirando a lógica de dentro dele uma peça por vez e levantando cada peça como uma API própria, deixando o monolito atendendo o que ainda não tinha saído. Ele segue sendo a maior base de código do produto.',
       },
       contribution: {
         summary: {
-          en: 'Principal architect for four years — I set the platform’s patterns and configured the Azure estate, including for services other people wrote. Later the whole technology organization reported to me.',
+          en: 'Principal architect for four years. I ran the extraction — what came out of the monolith, in what order, and what shape it took on the other side — set the platform’s patterns, and configured the Azure estate, including for services other people wrote. Later the whole technology organization reported to me.',
           'pt-BR':
-            'Arquiteto principal por quatro anos — defini os padrões da plataforma e configurei o ambiente Azure, inclusive para serviços escritos por outras pessoas. Depois, toda a área de tecnologia passou a se reportar a mim.',
+            'Arquiteto principal por quatro anos. Conduzi a extração — o que saía do monolito, em que ordem, e que forma tomava do outro lado —, defini os padrões da plataforma e configurei o ambiente Azure, inclusive para serviços escritos por outras pessoas. Depois, toda a área de tecnologia passou a se reportar a mim.',
         },
         areas: [
           {
@@ -585,9 +189,9 @@ export const projects: Project[] = [
         },
       },
       problem: {
-        en: 'The nutritionist lives in the tool all day; the patient opens it to read a meal plan. Same product, same identity backbone, opposite expectations. And in 2020 a .NET Framework monolith carried both on Windows App Service, shipping once a day, at night, because that was the only window that felt safe.',
+        en: 'The nutritionist lives in the tool all day; the patient opens it to read a meal plan. Same product, opposite expectations. In 2020 a .NET Framework monolith carried both on Windows App Service — and sign-in, subscriptions and the food data with them — shipping once a day, at night, because that was the only window that felt safe. Anything the product needed to do differently had to be done inside it.',
         'pt-BR':
-          'A nutricionista vive na ferramenta o dia inteiro; o paciente abre para ler um plano alimentar. Mesmo produto, mesma base de identidade, expectativas opostas. E em 2020 um monolito .NET Framework carregava os dois no Windows App Service, com deploy uma vez por dia, de madrugada, porque era a única janela que parecia segura.',
+          'A nutricionista vive na ferramenta o dia inteiro; o paciente abre para ler um plano alimentar. Mesmo produto, expectativas opostas. Em 2020 um monolito .NET Framework carregava os dois no Windows App Service — e o login, as assinaturas e os dados de alimentos junto —, com deploy uma vez por dia, de madrugada, porque era a única janela que parecia segura. Qualquer coisa que o produto precisasse fazer diferente tinha que ser feita lá dentro.',
       },
       metrics: [
         {
@@ -703,9 +307,9 @@ export const projects: Project[] = [
             'pt-BR': 'Um monolito que se estrangula, não se reescreve',
           },
           body: {
-            en: 'New capability went into the services beside the monolith, not into the monolith itself. It kept the surface it already served, without a rewrite competing for the same hours as the features shipping everywhere else.',
+            en: 'The monolith was not ported and not rewritten. Logic came out of it a piece at a time — sign-in, payments, food data, the back office, notifications, realtime — and each piece became an API running beside it, while the monolith kept serving whatever had not moved yet. A rewrite would have competed for the same hours as the features shipping everywhere else, and the product could not stop while it happened.',
             'pt-BR':
-              'Nova capacidade foi para os serviços ao lado do monolito, não para dentro dele. Ele manteve a superfície que já atendia, sem uma reescrita disputando as mesmas horas com as funcionalidades entregues no resto da plataforma.',
+              'O monolito não foi portado nem reescrito. A lógica saiu dele uma peça por vez — login, pagamentos, dados de alimentos, o back office, notificações, tempo real — e cada peça virou uma API rodando ao lado, enquanto o monolito seguia atendendo o que ainda não tinha saído. Uma reescrita disputaria as mesmas horas com as funcionalidades entregues no resto da plataforma, e o produto não podia parar enquanto isso acontecia.',
           },
         },
       ],
@@ -715,13 +319,13 @@ export const projects: Project[] = [
     slug: 'dietbox-b2c',
     name: 'Dietbox B2C',
     tagline: {
-      en: 'One identity backbone, two audiences, custom sign-in journeys.',
-      'pt-BR': 'Uma base de identidade, dois públicos, jornadas de login customizadas.',
+      en: 'One login for all of the product’s systems.',
+      'pt-BR': 'Um único login para todos os sistemas.',
     },
     description: {
-      en: 'Custom Azure AD B2C policies for a product whose two audiences share nothing but an account: a practitioner subscribing, and a patient invited by the one treating them. Federated sign-in, silent migration off the legacy store, and revocation that actually signs a session out everywhere.',
+      en: 'One account signs a person into all five of the product’s systems — the nutritionist’s app, the patient’s Android and iOS apps, the web product and the checkout — across two audiences that share nothing else. Custom Azure AD B2C policies behind it: federated sign-in, silent migration off the legacy store, and revocation that ends sessions already open.',
       'pt-BR':
-        'Políticas customizadas de Azure AD B2C para um produto cujos dois públicos não dividem nada além da conta: a profissional que assina e o paciente convidado por ela. Login federado, migração silenciosa da base legada e revogação que de fato encerra a sessão em todo lugar.',
+        'Uma conta só leva a pessoa a todos os cinco sistemas do produto — o app da nutricionista, os apps Android e iOS do paciente, o produto web e o checkout — em dois públicos que não dividem mais nada. Políticas customizadas de Azure AD B2C por trás: login federado, migração silenciosa da base legada e revogação que encerra sessões já abertas.',
     },
     tech: ['Azure AD B2C', 'Identity Experience Framework', 'XML', 'OpenID Connect', 'OAuth 2.0', '.NET 6', 'HTML', 'CSS', 'Azure DevOps'],
     role: {
@@ -735,9 +339,9 @@ export const projects: Project[] = [
     venture: 'dietbox',
     detail: {
       overview: {
-        en: 'One Azure AD B2C identity system carrying two audiences that share nothing but the account: a nutritionist subscribing and paying, and a patient arriving by invitation from the one treating them. Five clients sign in through it — the nutritionist’s mobile app, the patient’s Android app, the patient’s iOS app, the web product both audiences use, and the checkout — across three platforms and two tenants. Three years of custom sign-in journeys, federated providers, silent migration off the legacy store, and session revocation that reaches every open browser.',
+        en: 'One account gets a person into every part of the product. The nutritionist signs in once and reaches her mobile app, the web product and the checkout with the same credentials; the patient signs in once and reaches the Android app, the iOS app and the web product. Five clients across three platforms, over two audiences that share nothing but the login — a nutritionist subscribing and paying, and a patient arriving by invitation from the one treating her. Three years of custom sign-in journeys, federated providers, silent migration off the legacy store, and session revocation that reaches every open browser.',
         'pt-BR':
-          'Um único sistema de identidade em Azure AD B2C carregando dois públicos que não dividem nada além da conta: a nutricionista que assina e paga, e o paciente que chega por convite de quem o atende. Cinco clientes fazem login por ele — o app da nutricionista, o app Android do paciente, o app iOS do paciente, o produto web que os dois públicos usam e o checkout — em três plataformas e dois tenants. Três anos de jornadas de login customizadas, provedores federados, migração silenciosa da base legada e revogação de sessão que alcança todo navegador aberto.',
+          'Uma conta só leva a pessoa a todas as partes do produto. A nutricionista faz login uma vez e chega ao app dela, ao produto web e ao checkout com as mesmas credenciais; o paciente faz login uma vez e chega ao app Android, ao app iOS e ao produto web. Cinco clientes em três plataformas, sobre dois públicos que não dividem nada além do login — a nutricionista que assina e paga, e o paciente que chega por convite de quem o atende. Três anos de jornadas de login customizadas, provedores federados, migração silenciosa da base legada e revogação de sessão que alcança todo navegador aberto.',
       },
       contribution: {
         summary: {
@@ -914,9 +518,9 @@ export const projects: Project[] = [
             'pt-BR': 'Migração como efeito colateral do login',
           },
           body: {
-            en: 'Nobody was asked to reset a password or re-register. The user experiences a login; the system experiences a migration, writing the account into the directory and linking it back to the legacy credential in the same journey.',
+            en: 'Nobody was asked to reset a password or re-register. The account is written into the directory and linked back to the legacy credential during the same sign-in the user was already doing.',
             'pt-BR':
-              'Ninguém foi solicitado a redefinir senha ou se recadastrar. O usuário vive um login; o sistema vive uma migração, escrevendo a conta no diretório e ligando-a de volta à credencial legada na mesma jornada.',
+              'Ninguém foi solicitado a redefinir senha ou se recadastrar. A conta é escrita no diretório e ligada de volta à credencial legada durante o mesmo login que o usuário já estava fazendo.',
           },
         },
         {
@@ -925,9 +529,9 @@ export const projects: Project[] = [
             'pt-BR': 'Revogação que alcança sessões abertas',
           },
           body: {
-            en: 'A token that is merely unrenewable is not revoked. Comparing the token’s issue time against a stamp on the user record is what makes "sign this account out everywhere" actually mean it, rather than "stop this account from getting a new token next time."',
+            en: 'Revoking an account has to end the sessions that are already open, not only stop the next token from being issued. The policy compares the token’s issue time against a stamp on the user record, so moving that stamp stops an open session working.',
             'pt-BR':
-              'Um token apenas não renovável não está revogado. Comparar o momento de emissão do token com um carimbo no registro do usuário é o que faz "encerrar a conta em todo lugar" significar isso de fato, e não "impedir que a conta consiga um novo token da próxima vez".',
+              'Revogar uma conta precisa encerrar as sessões que já estão abertas, não só impedir a emissão do próximo token. A política compara o momento de emissão do token com um carimbo no registro do usuário, então mover esse carimbo faz uma sessão aberta parar de funcionar.',
           },
         },
         {
@@ -1228,13 +832,13 @@ export const projects: Project[] = [
     slug: 'dietbox-portal',
     name: 'Dietbox Portal',
     tagline: {
-      en: 'The back office, and the newest generation of the platform’s architecture.',
-      'pt-BR': 'O back office, e a geração mais nova da arquitetura da plataforma.',
+      en: 'The back office that handed the product’s daily operations to the operations team.',
+      'pt-BR': 'O back office que passou a operação do produto para o time de operações.',
     },
     description: {
-      en: 'The internal tool the company runs the product from — subscriptions, vouchers, the food catalogue, marketing — built as a layered service with commands, queries and domain events dispatched at save time, and an admin client that can act as the user it is helping.',
+      en: 'The internal tool the company runs the product from. Cancel a subscription, grant a special one, issue a voucher, import the food catalogue from a file, change a plan’s limits, publish a banner, clear a nutritionist’s cache — forty-four actions across ten areas, every one of which used to be a ticket to an engineer.',
       'pt-BR':
-        'A ferramenta interna com que a empresa opera o produto — assinaturas, vouchers, catálogo de alimentos, marketing — construída como um serviço em camadas com comandos, queries e eventos de domínio despachados no momento da gravação, e um cliente admin capaz de agir como o usuário que está atendendo.',
+        'A ferramenta interna com que a empresa opera o produto. Cancelar uma assinatura, conceder uma especial, emitir um voucher, importar o catálogo de alimentos de um arquivo, mudar os limites de um plano, publicar um banner, limpar o cache de uma nutricionista — quarenta e quatro ações em dez áreas, e cada uma delas antes era um chamado para um engenheiro.',
     },
     tech: ['.NET 6', 'C#', 'CQRS', 'MediatR', 'EF Core', 'SQL Server', 'ASP.NET Identity', 'JWT', 'Vue 3', 'Vuex', 'Azure DevOps'],
     role: {
@@ -1248,21 +852,21 @@ export const projects: Project[] = [
     venture: 'dietbox',
     detail: {
       overview: {
-        en: 'A back office is where a SaaS company’s real operating procedure lives — the subscriptions, the vouchers, the food catalogue, marketing — and this was the first place the platform’s newer patterns were carried through end to end: layers numbered on disk, commands and queries behind a pipeline behaviour that logs every one of them, and a domain that raises its own events and has them dispatched the moment its changes are saved.',
+        en: 'Until 2023, any change to the product’s data went through the technology team: adjusting a subscription, correcting a record, loading a food table. The portal put those actions on screens, with the product’s own rules in front of them and a sign-in separate from the customer’s. The operations team started doing them directly — forty-four actions across ten areas.',
         'pt-BR':
-          'Um back office é onde vive o procedimento real de operação de uma empresa SaaS — as assinaturas, os vouchers, o catálogo de alimentos, o marketing — e este foi o primeiro lugar em que os padrões mais novos da plataforma foram aplicados de ponta a ponta: camadas numeradas em disco, comandos e queries atrás de um pipeline behaviour que registra cada um deles, e um domínio que emite os próprios eventos e os tem despachados no instante em que suas mudanças são gravadas.',
+          'Até 2023, qualquer alteração nos dados do produto passava pelo time de tecnologia: ajustar uma assinatura, corrigir um cadastro, carregar uma tabela de alimentos. O portal colocou essas ações em telas, com as regras do produto na frente e um login separado do login do cliente. O time de operações passou a fazê-las direto — quarenta e quatro ações em dez áreas.',
       },
       contribution: {
         summary: {
-          en: 'I set the layered design this service is built on — the numbered directories, the command/query pipeline, and where the domain-event dispatch sits inside it — and I wrote the identity building block and the shared building blocks the platform’s newer services now start from. The eighteen business-domain controllers and the admin client’s views were the team’s to build out.',
+          en: 'I decided what operations should be able to do without us, and built what it takes to let them do it safely: the staff identity and permissions the whole thing runs behind, the command surface under the screens, and the design the rest of the team built the eighteen business areas on top of.',
           'pt-BR':
-            'Defini o design em camadas sobre o qual este serviço é construído — os diretórios numerados, o pipeline de comandos e queries, e o lugar onde o despacho de eventos de domínio se encaixa nele — e escrevi o bloco de identidade e os blocos compartilhados dos quais os serviços mais novos da plataforma partem. Os dezoito controllers de domínio de negócio e as telas do cliente admin foram construídos pelo time.',
+            'Decidi o que a operação deveria conseguir fazer sem a gente, e construí o que era preciso para que fizesse com segurança: a identidade de equipe e as permissões atrás das quais tudo roda, a superfície de comandos por baixo das telas, e o desenho sobre o qual o resto do time construiu as dezoito áreas de negócio.',
         },
         areas: [
           {
-            en: 'The numbered directory layout — building blocks, services, application, domain, infrastructure — and the dependency direction it makes legible before a file is opened.',
+            en: 'Choosing the actions: which requests we were tired of receiving, and which of those were safe to hand over.',
             'pt-BR':
-              'A estrutura de diretórios numerados — building blocks, services, application, domain, infrastructure — e a direção de dependência que ela deixa legível antes de abrir um arquivo.',
+              'A escolha das ações: de quais pedidos a gente estava cansado, e quais deles dava para entregar com segurança.',
           },
           {
             en: 'The identity building block: its own user store, a JWT builder and validator, access and refresh tokens, and claim-based authorization.',
@@ -1270,18 +874,14 @@ export const projects: Project[] = [
               'O bloco de identidade: base de usuários própria, um builder e validador de JWT, tokens de acesso e refresh, e autorização baseada em claims.',
           },
           {
-            en: 'The message and event base types among the shared building blocks, and the dispatch that publishes what an aggregate raised once the unit of work has saved it.',
+            en: 'Impersonation, in both directions and both ways back out, and the rule that it lives behind a staff account rather than a customer one.',
             'pt-BR':
-              'Os tipos base de mensagem e evento entre os blocos de construção compartilhados, e o despacho que publica o que um agregado emitiu assim que a unidade de trabalho o grava.',
+              'A impersonation, nas duas direções e nos dois caminhos de volta, e a regra de que ela mora atrás de uma conta de equipe, não de cliente.',
           },
           {
-            en: 'The shared building blocks — domain, infrastructure and identity — the platform’s newer services start from instead of each inventing its own.',
+            en: 'The design the team built the eighteen business areas on top of, so a new area was a day rather than an argument.',
             'pt-BR':
-              'Os blocos de construção compartilhados — domínio, infraestrutura e identidade — dos quais os serviços mais novos da plataforma partem, em vez de cada um inventar o próprio.',
-          },
-          {
-            en: 'The client’s persisted token pair and its refresh flow against the accounts endpoint.',
-            'pt-BR': 'O par de tokens persistido no cliente e o fluxo de refresh contra o endpoint de contas.',
+              'O desenho sobre o qual o time construiu as dezoito áreas de negócio, para que uma área nova fosse um dia de trabalho e não uma discussão.',
           },
         ],
         boundary: {
@@ -1291,9 +891,9 @@ export const projects: Project[] = [
         },
       },
       problem: {
-        en: 'Support and operations were reaching straight into the product database, or into the monolith’s own admin surface, to do what the business runs on day to day — adjusting a subscription, issuing a voucher, updating the food catalogue. A back office with its own domain, its own staff identity and its own command surface was the alternative: the same operations, but as named commands logged on the way through, behind sign-in that isn’t the customer’s.',
+        en: 'Support could not adjust a subscription, marketing could not publish a banner, and nobody outside engineering could load a new food table. Each was a request to the technology team, and an engineer running the change by hand against the product database or the monolith’s admin surface — no rules in front of it and no name on it afterwards.',
         'pt-BR':
-          'Suporte e operações estavam entrando direto no banco de dados do produto, ou na própria superfície de admin do monolito, para fazer o que o negócio roda no dia a dia — ajustar uma assinatura, emitir um voucher, atualizar o catálogo de alimentos. Um back office com domínio próprio, identidade de equipe própria e superfície de comandos própria foi a alternativa: as mesmas operações, mas como comandos nomeados e registrados em log na passagem, atrás de um login que não é o do cliente.',
+          'O suporte não conseguia ajustar uma assinatura, o marketing não conseguia publicar um banner, e ninguém fora da engenharia conseguia carregar uma tabela nova de alimentos. Cada coisa era um pedido ao time de tecnologia, e um engenheiro rodando a mudança na mão contra o banco do produto ou a superfície de admin do monolito — sem regra na frente e sem nome depois.',
       },
       metrics: [
         {
@@ -1302,71 +902,71 @@ export const projects: Project[] = [
           note: { en: 'mine, of ~780 total', 'pt-BR': 'meus, de ~780 no total' },
         },
         {
-          value: { en: '3', 'pt-BR': '3' },
-          label: { en: 'test projects', 'pt-BR': 'projetos de teste' },
-          note: { en: 'domain, application, and integration', 'pt-BR': 'domínio, aplicação e integração' },
+          value: { en: '44', 'pt-BR': '44' },
+          label: { en: 'actions ops could take alone', 'pt-BR': 'ações que ops passou a fazer sozinha' },
+          note: { en: 'across ten areas of the product', 'pt-BR': 'em dez áreas do produto' },
         },
       ],
       metricsNote: {
-        en: 'Both figures come from the two repositories’ own commit history.',
-        'pt-BR': 'Os dois números vêm do próprio histórico de commits dos dois repositórios.',
+        en: 'The commit share comes from the two repositories. The forty-four is a count of the write actions the service exposes — the commands behind the screens ops uses.',
+        'pt-BR': 'A fatia de commits vem dos dois repositórios. O quarenta e quatro é a contagem das ações de escrita que o serviço expõe — os comandos por trás das telas que a operação usa.',
       },
       architecture: {
         summary: {
-          en: 'An admin client in front, a service exposing the eighteen controllers, an application layer of commands and queries behind a logging pipeline behaviour, a domain layer underneath, and infrastructure at the bottom — where saving a change is also what releases the events that change raised.',
+          en: 'Someone on the operations team picks an action on a screen, and it travels as a named command through the product’s own rules before it reaches the product’s data.',
           'pt-BR':
-            'Um cliente admin na frente, um serviço expondo os dezoito controllers, uma camada de aplicação com comandos e queries atrás de um pipeline behaviour de log, uma camada de domínio embaixo dela, e infraestrutura na base — onde gravar uma mudança é também o que libera os eventos que aquela mudança emitiu.',
+            'Alguém do time de operações escolhe uma ação numa tela, e ela viaja como um comando nomeado pelas regras do próprio produto antes de chegar aos dados do produto.',
         },
         steps: [
           {
-            label: 'Admin client',
+            label: 'Ops',
             detail: {
-              en: 'The Vue 3 client — dashboard, charts, and the eighteen controllers’ views — including the impersonate controls in the navbar and the patient view.',
+              en: 'Someone on the operations team, signed in with a staff account, on the Vue screens for the ten areas — including the impersonate controls in the navbar and the patient view.',
               'pt-BR':
-                'O cliente em Vue 3 — dashboard, gráficos e as telas dos dezoito controllers — incluindo os controles de impersonate na navbar e na tela do paciente.',
+                'Alguém do time de operações, logado com uma conta de equipe, nas telas em Vue das dez áreas — incluindo os controles de impersonate na navbar e na tela do paciente.',
             },
           },
           {
-            label: 'Service',
+            label: 'Permissions',
             detail: {
-              en: 'Controllers behind the claim-requirement authorization filter, validating the access token before a request reaches a command or query.',
+              en: 'The token decides which of the actions this person is allowed at all — a claim-requirement filter in front of every controller.',
               'pt-BR':
-                'Controllers atrás do filtro de autorização por claim, validando o token de acesso antes de a requisição chegar a um comando ou query.',
+                'O token decide quais das ações essa pessoa pode executar — um filtro de exigência de claim na frente de cada controller.',
             },
           },
           {
-            label: 'Application',
+            label: 'Command',
             detail: {
-              en: 'Commands and queries behind a pipeline behaviour that logs each one by name, and the handlers that turn a domain event into the integration event other services consume.',
+              en: 'The action runs as one of the forty-four commands, logged by name on the way through, rather than as an edit to a table.',
               'pt-BR':
-                'Comandos e queries atrás de um pipeline behaviour que registra cada um pelo nome, e os handlers que transformam um evento de domínio no evento de integração que outros serviços consomem.',
+                'A ação roda como um dos quarenta e quatro comandos, registrada pelo nome no caminho, em vez de como uma edição numa tabela.',
             },
           },
           {
-            label: 'Domain',
+            label: 'Rules',
             detail: {
-              en: 'The business rules for the eighteen areas administered — nutritionists, patients, subscriptions, vouchers, the food catalogue, and the rest — raising the events the layers above and below both care about.',
+              en: 'The same rules the product itself enforces stand in front of the write — which is the difference between ops doing this and an engineer doing it by hand.',
               'pt-BR':
-                'As regras de negócio das dezoito áreas administradas — nutricionistas, pacientes, assinaturas, vouchers, catálogo de alimentos, e o resto — emitindo os eventos que as camadas acima e abaixo se importam.',
+                'As mesmas regras que o próprio produto aplica ficam na frente da escrita — que é a diferença entre a operação fazer isso e um engenheiro fazer na mão.',
             },
           },
           {
-            label: 'Infrastructure',
+            label: 'Database',
             detail: {
-              en: 'An EF Core context over SQL Server: it writes the aggregate’s current state, then hands the events that aggregate collected while changing to MediatR, once the write has already landed.',
+              en: 'The change lands in the same database the product serves from — which is exactly why it goes through the rules above rather than around them.',
               'pt-BR':
-                'Um contexto EF Core sobre SQL Server: grava o estado atual do agregado e então entrega ao MediatR os eventos que aquele agregado acumulou ao mudar, depois que a escrita já foi feita.',
+                'A mudança cai no mesmo banco de onde o produto serve — que é exatamente por que ela passa pelas regras acima, e não por fora delas.',
             },
           },
         ],
       },
       decisions: [
         {
-          heading: { en: 'Layers numbered on disk', 'pt-BR': 'Camadas numeradas em disco' },
+          heading: { en: 'Handing over the actions instead of answering the requests', 'pt-BR': 'Entregar as ações em vez de atender os pedidos' },
           body: {
-            en: 'The service’s directories are numbered by layer — building blocks, services, application, domain, infrastructure — so the dependency direction is legible from a directory listing alone, before a single file is open. A layer importing from the wrong direction is a violation visible in the file tree, not just in a code review.',
+            en: 'The cheaper option was to keep answering the requests as they came. Answering does not get faster with repetition, though, and each request costs engineering time on work that is not engineering. The screens built here are the requests that arrived often enough to be worth replacing.',
             'pt-BR':
-              'Os diretórios do serviço são numerados por camada — building blocks, services, application, domain, infrastructure — então a direção de dependência é legível só de olhar a listagem de diretórios, antes de abrir um único arquivo. Uma camada importando na direção errada é uma violação visível na árvore de arquivos, não só numa revisão de código.',
+              'A opção mais barata era continuar atendendo os pedidos conforme chegavam. Só que atender não fica mais rápido com a repetição, e cada pedido custa tempo de engenharia num trabalho que não é de engenharia. As telas construídas aqui são os pedidos que chegavam com frequência suficiente para valer a substituição.',
           },
         },
         {
@@ -1378,19 +978,19 @@ export const projects: Project[] = [
           },
         },
         {
-          heading: { en: 'Events dispatched at save time, not stored', 'pt-BR': 'Eventos despachados na gravação, não armazenados' },
+          heading: { en: 'An action, not a database edit', 'pt-BR': 'Uma ação, não uma edição no banco' },
           body: {
-            en: 'An aggregate collects the events it raises while a command changes it; the unit of work writes the row, then publishes those events through MediatR after that write has committed. Nothing is replayed and no state is rebuilt from a log — the table still holds the current row. What this buys is that a consequence of an operation is a subscriber to something the domain said, rather than one more paragraph inside the command that said it.',
+            en: 'Ops invokes one of forty-four named actions, each with the product’s own rules in front of it, and each logged by name as it passes through a pipeline behaviour. The manual route it replaced — an engineer writing an update statement against the database — ran none of those rules and left no record of having run.',
             'pt-BR':
-              'Um agregado acumula os eventos que emite enquanto um comando o altera; a unidade de trabalho grava a linha e então publica esses eventos via MediatR depois que essa escrita foi confirmada. Nada é reproduzido e nenhum estado é reconstruído a partir de um log — a tabela continua guardando a linha atual. O que isso compra é que a consequência de uma operação vira assinante de algo que o domínio disse, em vez de mais um parágrafo dentro do comando que o disse.',
+              'A operação invoca uma de quarenta e quatro ações nomeadas, cada uma com as regras do próprio produto na frente, e cada uma registrada pelo nome ao passar por um pipeline behaviour. O caminho manual que isso substituiu — um engenheiro escrevendo um update contra o banco — não passava por nenhuma dessas regras e não deixava registro de ter rodado.',
           },
         },
         {
-          heading: { en: 'Shared building blocks before shared services', 'pt-BR': 'Blocos de construção compartilhados antes de serviços compartilhados' },
+          heading: { en: 'Support sees the screen, instead of a description of it', 'pt-BR': 'O suporte vê a tela, em vez de uma descrição dela' },
           body: {
-            en: 'The newer services, this one included, start from a common domain, infrastructure and identity layer instead of each inventing its own — the same message and event base types, the same identity building block, the same base entities. That shared foundation is what let a small team add a service without each one arriving in a different style.',
+            en: 'Part of what reached engineering was not a change request but a reproduction problem — someone unable to see what a customer was describing. Impersonation answers that directly: support steps into the nutritionist’s or the patient’s own session, sees what they see, and steps back out. It concentrates a lot of access in one feature, which is why it sits behind the staff identity rather than anywhere near a customer account.',
             'pt-BR':
-              'Os serviços mais novos, este incluído, partem de uma camada comum de domínio, infraestrutura e identidade em vez de cada um inventar a própria — os mesmos tipos base de mensagem e evento, o mesmo bloco de identidade, as mesmas entidades base. Essa fundação compartilhada é o que permitiu que um time pequeno acrescentasse um serviço sem cada um chegar num estilo diferente.',
+              'Parte do que chegava na engenharia não era pedido de mudança, e sim problema de reprodução — alguém sem conseguir ver o que o cliente descrevia. A impersonation responde isso direto: o suporte entra na sessão da própria nutricionista ou do próprio paciente, vê o que a pessoa vê, e sai de volta. É muito acesso concentrado numa funcionalidade só, e por isso ela fica atrás da identidade de equipe, não perto de uma conta de cliente.',
           },
         },
       ],
@@ -1401,19 +1001,34 @@ export const projects: Project[] = [
             'Impersonation como funcionalidade de primeira classe: o suporte pode agir como a nutricionista ou o paciente que está atendendo, pela navbar do cliente ou pela tela do paciente, e voltar a ser quem é.',
         },
         {
-          en: 'Eighteen controllers spanning the business administered: nutritionists and patients, subscriptions and their configuration, transactions, vouchers, the food catalogue, tags, marketing, materials, events, universities, metrics, accounts.',
+          en: 'Subscriptions: cancel one, grant a special one, change a plan’s limits, and move a nutritionist onto the new payment gateway.',
           'pt-BR':
-            'Dezoito controllers cobrindo o negócio administrado: nutricionistas e pacientes, assinaturas e suas configurações, transações, vouchers, catálogo de alimentos, tags, marketing, materiais, eventos, universidades, métricas, contas.',
+            'Assinaturas: cancelar uma, conceder uma especial, mudar os limites de um plano e migrar uma nutricionista para o novo gateway de pagamento.',
         },
         {
-          en: 'A dashboard with charts mirroring those same domains, so the numbers support looks at come from the same commands that changed them.',
+          en: 'The food catalogue: create, edit, retire and bulk-activate foods and food groups — or import a whole table from a file, which used to be an engineer with a script.',
           'pt-BR':
-            'Um dashboard com gráficos espelhando esses mesmos domínios, então os números que o suporte olha vêm dos mesmos comandos que os alteraram.',
+            'O catálogo de alimentos: criar, editar, desativar e ativar alimentos e grupos em lote — ou importar uma tabela inteira de um arquivo, que antes era um engenheiro com um script.',
         },
         {
-          en: 'Domain events kept separate from integration events, so a change another service needs to hear about is an explicit publication, not a side effect of one that only matters inside this one.',
+          en: 'Vouchers, external vouchers and gift configuration, created and retired by whoever is running the campaign.',
           'pt-BR':
-            'Eventos de domínio mantidos separados dos eventos de integração, então uma mudança que outro serviço precisa saber é uma publicação explícita, não efeito colateral de uma que só importa aqui dentro.',
+            'Vouchers, vouchers externos e configuração de brindes, criados e encerrados por quem está tocando a campanha.',
+        },
+        {
+          en: 'Marketing: featured banners, the customizable cards on the product’s own screens, and the material library.',
+          'pt-BR':
+            'Marketing: banners em destaque, os cards customizáveis nas telas do próprio produto e a biblioteca de materiais.',
+        },
+        {
+          en: 'Nutritionist and patient records: update details, correct an email, and clear a cache that is serving something stale.',
+          'pt-BR':
+            'Cadastros de nutricionista e paciente: atualizar dados, corrigir um e-mail e limpar um cache que está servindo algo desatualizado.',
+        },
+        {
+          en: 'A dashboard whose numbers come from the same commands that changed them, so ops reads its own results.',
+          'pt-BR':
+            'Um dashboard cujos números vêm dos mesmos comandos que os alteraram, então a operação lê os próprios resultados.',
         },
       ],
     },
@@ -1597,9 +1212,9 @@ export const projects: Project[] = [
         {
           heading: { en: 'The metering was built and never switched on', 'pt-BR': 'A medição foi construída e nunca foi ligada' },
           body: {
-            en: 'The design went further than the deployment did. A per-practitioner limit and a log of who changed it are in the domain, built so the cost could eventually be charged back to whoever generated it — and that part was never put to use. What the service actually did, every day, was send and record. I am keeping the decision here rather than quietly deleting it: the useful half shipped, the ambitious half did not, and a case study that only lists the half that worked is not a case study.',
+            en: 'A per-practitioner limit and a log of who changed it are in the domain, built so the cost could eventually be charged back to whoever generated it. That part was never put to use — what the service did every day was send and record. The decision stays on the card because the limit is still in the code, and leaving it out would describe a service that was never built.',
             'pt-BR':
-              'O desenho foi mais longe que o uso. Existe no domínio um limite por profissional e um log de quem o alterou, construídos para que o custo pudesse um dia ser cobrado de quem o gerou — e essa parte nunca foi usada. O que o serviço fez, todo dia, foi enviar e registrar. Mantenho a decisão aqui em vez de apagá-la em silêncio: a metade útil entrou em produção, a metade ambiciosa não, e um estudo de caso que só lista a metade que deu certo não é um estudo de caso.',
+              'Existe no domínio um limite por profissional e um log de quem o alterou, construídos para que o custo pudesse um dia ser cobrado de quem o gerou. Essa parte nunca foi usada — o que o serviço fez todo dia foi enviar e registrar. A decisão continua no card porque o limite ainda está no código, e deixá-la de fora descreveria um serviço que nunca foi construído.',
           },
         },
         {
@@ -1643,13 +1258,13 @@ export const projects: Project[] = [
     slug: 'dietbox-realtime',
     name: 'Dietbox Realtime',
     tagline: {
-      en: 'Live updates as a service of its own, so they ship on their own clock.',
-      'pt-BR': 'Atualizações ao vivo como serviço próprio, para subirem no próprio relógio.',
+      en: 'Chat between a nutritionist and her patient, and anything else that has to arrive now.',
+      'pt-BR': 'Chat entre a nutricionista e o paciente, e qualquer outra coisa que precise chegar agora.',
     },
     description: {
-      en: 'A small realtime server that holds the open connections: a room per user, a shared-secret handshake, and one endpoint the platform posts to when something needs pushing. Separate from the product because long-lived connections and request traffic do not scale on the same axis — and because the monolith deployed once a night.',
+      en: 'The socket server behind two features: the chat a nutritionist and her patient hold inside the product, and the notifications the platform needs to land on a screen that is already open. A room per user, a shared-secret handshake, and one endpoint the rest of the platform posts to.',
       'pt-BR':
-        'Um servidor de tempo real pequeno que mantém as conexões abertas: uma sala por usuário, um handshake com segredo compartilhado e um endpoint para onde a plataforma posta quando algo precisa ser empurrado. Separado do produto porque conexões de longa duração e tráfego de requisição não escalam no mesmo eixo — e porque o monolito subia uma vez por madrugada.',
+        'O servidor de sockets por trás de duas funcionalidades: o chat que a nutricionista e o paciente mantêm dentro do produto, e as notificações que a plataforma precisa entregar numa tela que já está aberta. Uma sala por usuário, um handshake com segredo compartilhado e um endpoint para onde o resto da plataforma posta.',
     },
     tech: ['Node', 'Express', 'Socket.IO', 'Application Insights', 'Azure App Service', 'Azure DevOps'],
     role: { en: 'Senior Software Engineer', 'pt-BR': 'Engenheiro de Software Sênior' },
@@ -1659,26 +1274,26 @@ export const projects: Project[] = [
     venture: 'dietbox',
     detail: {
       overview: {
-        en: 'Thirty-four commits over two months in 2022, for a service that has outlived both: a socket server that holds every open connection, joins each client to a room named for its user id, and exposes one endpoint the rest of the platform posts to when something needs pushing out. It sits outside the product because a long-lived connection and a request are not the same kind of traffic.',
+        en: 'This exists so two people can talk inside the product. A nutritionist and her patient each hold an open connection, and a message sent from one lands on the other’s screen without either of them reloading anything. The same channel carries the platform’s own notifications — anything that has to reach someone now rather than at their next page load. Thirty-four commits over two months in 2022, for a service that outlived both.',
         'pt-BR':
-          'Trinta e quatro commits em dois meses de 2022, para um serviço que sobreviveu a ambos: um servidor de tempo real que mantém cada conexão aberta, junta cada cliente a uma sala com o nome do seu id de usuário, e expõe um único endpoint para onde o resto da plataforma posta quando algo precisa ser empurrado. Ele fica fora do produto porque uma conexão de longa duração e uma requisição não são o mesmo tipo de tráfego.',
+          'Isto existe para que duas pessoas possam conversar dentro do produto. A nutricionista e o paciente mantêm cada um uma conexão aberta, e uma mensagem enviada por um aparece na tela do outro sem que nenhum dos dois recarregue nada. O mesmo canal carrega as notificações da própria plataforma — qualquer coisa que precise alcançar alguém agora, e não no próximo carregamento de página. Trinta e quatro commits em dois meses de 2022, para um serviço que sobreviveu a ambos.',
       },
       contribution: {
         summary: {
-          en: 'I built this one effectively alone: thirty-three of the thirty-four commits, from the handshake to the load-test harness that proved it held up.',
+          en: 'I built this one effectively alone: thirty-three of the thirty-four commits, from the chat relay to the load-test harness that proved it held up.',
           'pt-BR':
-            'Construí este praticamente sozinho: trinta e três dos trinta e quatro commits, do handshake ao harness de carga que comprovou que ele aguentava.',
+            'Construí este praticamente sozinho: trinta e três dos trinta e quatro commits, do relay de chat ao harness de carga que comprovou que ele aguentava.',
         },
         areas: [
           {
-            en: 'The socket server itself: the shared-secret handshake, room assignment by user id, and an immediate disconnect for a client that ends up joined to no room.',
+            en: 'The chat relay: a message emitted by one client is pushed straight into the recipient’s room, so it reaches an open screen rather than waiting for a reload.',
             'pt-BR':
-              'O próprio servidor de tempo real: o handshake com segredo compartilhado, a atribuição de sala por id de usuário, e a desconexão imediata de um cliente que acaba sem entrar em nenhuma sala.',
+              'O relay de chat: uma mensagem emitida por um cliente é empurrada direto para a sala do destinatário, chegando a uma tela aberta em vez de esperar um recarregamento.',
           },
           {
-            en: 'The notify endpoint the rest of the platform posts to, and the info and health endpoints used to watch the service itself.',
+            en: 'The socket server underneath both: the shared-secret handshake, room assignment by user id, the notify endpoint the platform posts to, and the info and health endpoints used to watch it.',
             'pt-BR':
-              'O endpoint de notificação para onde o resto da plataforma posta, e os endpoints de info e de saúde usados para observar o próprio serviço.',
+              'O servidor de sockets embaixo dos dois: o handshake com segredo compartilhado, a atribuição de sala por id de usuário, o endpoint de notificação para onde a plataforma posta, e os endpoints de info e de saúde usados para observá-lo.',
           },
           {
             en: 'The handler-loading convention: an event handler is a file, picked up automatically from a directory.',
@@ -1693,22 +1308,22 @@ export const projects: Project[] = [
         ],
       },
       problem: {
-        en: 'The monolith deployed once a night, and anything sharing its pipeline shared its cadence — a realtime channel that can only change at three in the morning is a realtime channel nobody changes. Separately, open connections and request traffic do not want the same instance count: one scales with how many people are online, the other with how many requests arrive.',
+        en: 'A nutritionist and her patient had no way to talk inside the product, and anything the platform needed to tell someone waited until that person reloaded the page. Putting the open connections inside the monolith was not an option: it deployed once a night, so anything sharing that pipeline could only be changed then. Open connections also scale with how many people are online, while requests scale with how many arrive.',
         'pt-BR':
-          'O monolito subia uma vez por madrugada, e qualquer coisa que compartilhasse seu pipeline compartilhava seu ritmo — um canal de tempo real que só pode mudar às três da manhã é um canal de tempo real que ninguém muda. Separadamente, conexões abertas e tráfego de requisição não querem a mesma quantidade de instâncias: uma escala com quantas pessoas estão online, a outra com quantas requisições chegam.',
+          'A nutricionista e o paciente não tinham como conversar dentro do produto, e qualquer coisa que a plataforma precisasse avisar ficava esperando a pessoa recarregar a página. Colocar as conexões abertas dentro do monolito não era opção: ele subia uma vez por madrugada, então qualquer coisa que dividisse esse pipeline só podia ser mudada nesse horário. Conexões abertas também escalam com quantas pessoas estão online, enquanto requisições escalam com quantas chegam.',
       },
       architecture: {
         summary: {
-          en: 'The platform posts a room, an event name and a payload to the notify endpoint; the server resolves who is in that room right now and pushes the event straight to them.',
+          en: 'Two things arrive the same way: a chat message emitted by one of the two people talking, or a push from another service in the platform. Either resolves to a room, and whoever is in that room right now gets it.',
           'pt-BR':
-            'A plataforma posta uma sala, um nome de evento e um payload para o endpoint de notificação; o servidor resolve quem está naquela sala agora e empurra o evento diretamente para eles.',
+            'Duas coisas chegam pelo mesmo caminho: uma mensagem de chat emitida por uma das duas pessoas conversando, ou um push de outro serviço da plataforma. Qualquer uma resolve para uma sala, e quem estiver naquela sala agora recebe.',
         },
         steps: [
           {
-            label: 'Platform',
+            label: 'Origin',
             detail: {
-              en: 'Another service in the platform posts a room, an event name and a payload to the notify endpoint.',
-              'pt-BR': 'Outro serviço da plataforma posta uma sala, um nome de evento e um payload para o endpoint de notificação.',
+              en: 'Either one of the two people talking emits a chat message, or another service in the platform posts a room, an event name and a payload to the notify endpoint.',
+              'pt-BR': 'Ou uma das duas pessoas conversando emite uma mensagem de chat, ou outro serviço da plataforma posta uma sala, um nome de evento e um payload para o endpoint de notificação.',
             },
           },
           {
@@ -1738,9 +1353,9 @@ export const projects: Project[] = [
         {
           heading: { en: 'Realtime as its own deployable', 'pt-BR': 'Tempo real como implantação própria' },
           body: {
-            en: 'Two reasons, both real: open connections and request traffic scale on different axes, and the product deployed once a night — a channel that can only change at three in the morning is one nobody changes. Splitting it into its own service let each axis scale on its own terms and let this one ship on its own clock.',
+            en: 'Two reasons, both real: open connections and request traffic scale on different axes, and the product deployed once a night, which set the pace for anything inside it. Splitting it into its own service let each axis scale on its own terms and let this one ship on its own schedule.',
             'pt-BR':
-              'Dois motivos, ambos reais: conexões abertas e tráfego de requisição escalam em eixos diferentes, e o produto subia uma vez por madrugada — um canal que só pode mudar às três da manhã é um canal que ninguém muda. Separá-lo em um serviço próprio deixou cada eixo escalar nos seus próprios termos, e deixou este subir no próprio relógio.',
+              'Dois motivos, ambos reais: conexões abertas e tráfego de requisição escalam em eixos diferentes, e o produto subia uma vez por madrugada, o que ditava o ritmo de tudo que estava dentro dele. Separá-lo em um serviço próprio deixou cada eixo escalar nos seus próprios termos, e deixou este subir no próprio ritmo.',
           },
         },
         {
@@ -1770,16 +1385,16 @@ export const projects: Project[] = [
       ],
       highlights: [
         {
-          en: 'The notify endpoint the rest of the platform posts to when something needs pushing out.',
-          'pt-BR': 'O endpoint de notificação para onde o resto da plataforma posta quando algo precisa ser empurrado.',
+          en: 'Chat between a nutritionist and her patient, carried over the connection both of them already hold open.',
+          'pt-BR': 'Chat entre a nutricionista e o paciente, carregado pela conexão que os dois já mantêm aberta.',
         },
         {
-          en: 'An info endpoint reporting the live connection count, for monitoring.',
-          'pt-BR': 'Um endpoint de info que reporta a contagem de conexões ao vivo, para monitoramento.',
+          en: 'Notifications the platform pushes to a person, landing on whatever screen they already have open.',
+          'pt-BR': 'Notificações que a plataforma empurra para uma pessoa, chegando na tela que ela já tem aberta.',
         },
         {
-          en: 'A health endpoint reporting its own latency.',
-          'pt-BR': 'Um endpoint de saúde que reporta a própria latência.',
+          en: 'An info endpoint reporting the live connection count, and a health endpoint reporting its own latency.',
+          'pt-BR': 'Um endpoint de info reportando a contagem de conexões ao vivo, e um endpoint de saúde reportando a própria latência.',
         },
         {
           en: 'A shared-secret handshake that disconnects a client immediately if it ends up joined to no room.',
@@ -2037,13 +1652,13 @@ export const projects: Project[] = [
     slug: 'ulbra-one',
     name: 'Ulbra One',
     tagline: {
-      en: 'Internal ERP replacing legacy systems.',
-      'pt-BR': 'ERP interno substituindo sistemas legados.',
+      en: 'The ERP being built to take the university off Senior.',
+      'pt-BR': 'O ERP que está sendo construído para tirar a universidade do Senior.',
     },
     description: {
-      en: "An internal ERP replacing the university’s legacy systems — a modular .NET monolith on PostgreSQL with a React front end. In testing, ahead of launch.",
+      en: 'The university runs its internal operations on Senior. This is the system being built to replace it — a modular .NET monolith on PostgreSQL with a React front end. In testing, ahead of launch.',
       'pt-BR':
-        'Um ERP interno substituindo os sistemas legados da universidade — um monólito modular em .NET sobre PostgreSQL com front-end em React. Em teste, antes do lançamento.',
+        'A universidade roda a operação interna no Senior. Este é o sistema que está sendo construído para substituí-lo — um monólito modular em .NET sobre PostgreSQL com front-end em React. Em teste, antes do lançamento.',
     },
     tech: ['.NET 10', 'PostgreSQL 17', 'EF Core', 'React', 'Tailwind', 'shadcn/ui'],
     role: { en: 'Head of Technology', 'pt-BR': 'Head de Tecnologia' },
@@ -2139,13 +1754,13 @@ export const projects: Project[] = [
     slug: 'ulbra-crm',
     name: 'Ulbra CRM',
     tagline: {
-      en: 'An inherited CRM taken from no tests to full coverage.',
-      'pt-BR': 'Um CRM herdado levado de zero testes a cobertura total.',
+      en: 'Where the university works the leads for its next intake of students.',
+      'pt-BR': 'Onde a universidade trabalha os leads da próxima entrada de alunos.',
     },
     description: {
-      en: "The university’s CRM platform, inherited with no automated tests and little structure. Rebuilt under my direction to full test coverage, with a front-end migration that stopped every screen change from throwing away the user’s filters.",
+      en: 'The platform the university captures and works prospective-student leads on. Inherited with no automated tests and little structure, and rebuilt under my direction to full coverage, with a front-end migration that stopped every screen change from throwing away the filters someone was working a list through.',
       'pt-BR':
-        'A plataforma de CRM da universidade, herdada sem testes automatizados e com pouca estrutura. Reconstruída sob a minha direção até cobertura total de testes, com uma migração de front-end que acabou com a perda dos filtros do usuário a cada troca de tela.',
+        'A plataforma em que a universidade capta e trabalha leads de futuros alunos. Herdada sem testes automatizados e com pouca estrutura, e reconstruída sob a minha direção até cobertura total, com uma migração de front-end que acabou com a perda dos filtros a cada troca de tela para quem estava trabalhando uma lista.',
     },
     tech: ['React', 'TanStack Router', 'MongoDB', 'Docker Swarm'],
     role: { en: 'Head of Technology — direction & review', 'pt-BR': 'Head de Tecnologia — direção & revisão' },
@@ -2155,9 +1770,9 @@ export const projects: Project[] = [
     links: [],
     detail: {
       overview: {
-        en: "The CRM the university runs on, inherited rather than built: no automated tests, and a codebase whose structure had not kept up with it. It is now fully covered by tests and materially better to use, and the work was done by the team under my direction — I set the direction and reviewed it, and did not write it.",
+        en: "Prospective students arrive as leads — from a campaign, a form, an event — and someone works each one until it becomes an enrolment or does not. This is where that happens. I inherited it rather than built it: no automated tests, and a structure that had not kept up with the product. It is now fully covered by tests and materially better to work in, and that work was the team’s — I set the direction and reviewed it, and did not write it.",
         'pt-BR':
-          'O CRM em que a universidade opera, herdado e não construído: sem testes automatizados e com uma estrutura que não acompanhou o próprio crescimento. Hoje está totalmente coberto por testes e sensivelmente melhor de usar, e o trabalho foi feito pelo time sob a minha direção — eu defini a direção e revisei, não escrevi.',
+          'Futuros alunos chegam como leads — de uma campanha, de um formulário, de um evento — e alguém trabalha cada um até virar matrícula ou não. É aqui que isso acontece. Eu o herdei, não o construí: sem testes automatizados e com uma estrutura que não acompanhou o produto. Hoje está totalmente coberto por testes e sensivelmente melhor de trabalhar, e esse trabalho foi do time — eu defini a direção e revisei, não escrevi.',
       },
       contribution: {
         summary: {
@@ -2196,9 +1811,9 @@ export const projects: Project[] = [
         {
           heading: { en: 'Tests first, behaviour second', 'pt-BR': 'Primeiro os testes, depois o comportamento' },
           body: {
-            en: 'The codebase was unstructured and untested, and the temptation with both is to restructure first. The order was inverted: cover the existing behaviour, then change it. Coverage on code nobody has changed yet is what makes the later restructuring safe rather than hopeful — and it is the reason the number is worth quoting.',
+            en: 'The codebase was unstructured and untested. Coverage came first and the restructuring second: tests written against the behaviour as it already worked, then the behaviour changed underneath them. That order is why the coverage number is worth quoting at all.',
             'pt-BR':
-              'O código estava desestruturado e sem testes, e a tentação diante dos dois é reestruturar primeiro. A ordem foi invertida: cobrir o comportamento existente e só então mudá-lo. Cobertura sobre código que ninguém mexeu ainda é o que torna a reestruturação posterior segura em vez de esperançosa — e é a razão de o número valer a pena ser citado.',
+              'O código estava desestruturado e sem testes. A cobertura veio primeiro e a reestruturação depois: testes escritos contra o comportamento como ele já funcionava, e só então o comportamento mudou por baixo deles. É essa ordem que faz o número de cobertura valer alguma coisa.',
           },
         },
         {
@@ -2560,6 +2175,238 @@ export const projects: Project[] = [
             en: 'A dashboard reads the team’s task tracker through an ETL sidecar, so delivery is visible in the same place the systems’ numbers are. It is a small piece of plumbing carrying a large claim: a working model that is measured can be argued about with evidence, and one that is only asserted cannot.',
             'pt-BR':
               'Um painel lê o rastreador de tarefas do time por um sidecar de ETL, então a entrega fica visível no mesmo lugar em que estão os números dos sistemas. É um encanamento pequeno carregando uma afirmação grande: um modelo de trabalho que é medido pode ser discutido com evidência, e um que é apenas afirmado, não.',
+          },
+        },
+      ],
+    },
+  },
+  {
+    slug: 'kota-embed',
+    name: 'Kota Embed',
+    tagline: {
+      en: "Health insurance enrollment, embedded inside other companies' platforms.",
+      'pt-BR': 'Adesão a plano de saúde, embutida dentro das plataformas de outras empresas.',
+    },
+    description: {
+      en: 'A multi-tenant .NET service behind an embedded enrollment flow: employers offer health insurance to their employees without leaving the software they already use, while the backend integrates with nine insurers across three regulatory regions.',
+      'pt-BR':
+        'Um serviço .NET multi-tenant por trás de um fluxo de adesão embutido: empregadores oferecem plano de saúde aos funcionários sem sair do software que já usam, enquanto o backend integra com nove seguradoras em três regiões regulatórias.',
+    },
+    tech: ['.NET', 'PostgreSQL', 'EF Core', 'AWS', 'OpenTelemetry', 'Multi-tenant', 'Webhooks'],
+    role: {
+      en: 'Senior Product Engineer, platform team',
+      'pt-BR': 'Senior Product Engineer, time de plataforma',
+    },
+    period: { en: 'Professional work', 'pt-BR': 'Trabalho profissional' },
+    visibility: 'private',
+    screenshot: '/screenshots/kota.webp',
+    links: [{ label: 'Website', href: 'https://kota.io' }],
+    detail: {
+      overview: {
+        en: 'Kota Embed lets employers offer health insurance to their employees without leaving the software they already use — the enrollment flow runs embedded in a third-party platform, backed by a multi-tenant .NET service that integrates directly with insurers.',
+        'pt-BR':
+          'O Kota Embed permite que empregadores ofereçam plano de saúde aos funcionários sem sair do software que já usam — o fluxo de adesão roda embutido numa plataforma de terceiro, apoiado por um serviço .NET multi-tenant que integra direto com as seguradoras.',
+      },
+      contribution: {
+        summary: {
+          en: 'I owned the multi-tenant core — the part that turns an enrollment request into a policy across nine insurers that each behave differently.',
+          'pt-BR':
+            'O núcleo multi-tenant foi meu — a parte que transforma um pedido de adesão numa apólice, através de nove seguradoras que se comportam de formas diferentes.',
+        },
+        areas: [
+          { en: 'The intent state machines behind enrollment, quoting, amendment and renewal.', 'pt-BR': 'As máquinas de estado de intent por trás de adesão, cotação, alteração e renovação.' },
+          { en: 'Adaptive requirements: asking a service what a case must collect instead of hardcoding a form per insurer.', 'pt-BR': 'Requisitos adaptativos: perguntar a um serviço o que um caso precisa coletar, em vez de codificar um formulário por seguradora.' },
+          { en: 'The versioned public API contract and its webhooks.', 'pt-BR': 'O contrato versionado da API pública e seus webhooks.' },
+          { en: 'Provider contracts introduced behind feature flags and migrated without stopping the product.', 'pt-BR': 'Contratos de provedor introduzidos atrás de feature flags e migrados sem parar o produto.' },
+          { en: 'Idempotency and duplicate suppression, and the integration suite that covers them.', 'pt-BR': 'Idempotência e supressão de duplicatas, e a suíte de integração que cobre as duas.' },
+        ],
+        boundary: {
+          en: 'The front end — the embedded flow and its SDK — was built by others; I have no commits in it.',
+          'pt-BR':
+            'O front-end — o fluxo embutido e seu SDK — foi feito por outros; não tenho commits nele.',
+        },
+      },
+      problem: {
+        en: 'Enrolling someone in health insurance looks like a form. It is not. Each insurer wants different data in a different shape on its own schedule; some answer over HTTP, others by exchanging files over SFTP. Regulatory disclosure obligations differ by region. And all of it happens inside an iframe hosted on another company’s platform, where the user expects it to feel immediate. A form hardcoded per insurer does not survive the second insurer.',
+        'pt-BR':
+          'Inscrever alguém num plano de saúde parece um formulário. Não é. Cada seguradora quer dados diferentes, em formato diferente, no tempo dela; umas respondem por HTTP, outras trocando arquivos por SFTP. As obrigações regulatórias de disclosure mudam conforme a região. E tudo isso acontece dentro de um iframe hospedado na plataforma de outra empresa, onde o usuário espera que seja imediato. Um formulário hardcoded por seguradora não sobrevive à segunda seguradora.',
+      },
+      metrics: [
+        {
+          value: { en: '9', 'pt-BR': '9' },
+          label: { en: 'insurer integrations', 'pt-BR': 'integrações de seguradora' },
+          note: { en: 'HTTP APIs and SFTP file exchange', 'pt-BR': 'APIs HTTP e troca de arquivos por SFTP' },
+        },
+        {
+          value: { en: '3', 'pt-BR': '3' },
+          label: { en: 'regulatory regions', 'pt-BR': 'regiões regulatórias' },
+          note: { en: 'disclosure rules differ per region', 'pt-BR': 'as regras de disclosure mudam por região' },
+        },
+        {
+          value: { en: '7', 'pt-BR': '7' },
+          label: { en: 'intent workflow types', 'pt-BR': 'tipos de fluxo de intent' },
+          note: { en: 'enrollment, quote, amendment, renewal…', 'pt-BR': 'adesão, cotação, alteração, renovação…' },
+        },
+      ],
+      architecture: {
+        summary: {
+          en: 'A .NET modular monolith split by bounded context: the multi-tenant platform core, one module per insurer, plus compliance, webhooks, and financial reporting. The core never calls an insurer directly — every provider call goes through an adapter factory, so the code that runs an enrollment does not know which insurer it is talking to. Long-running work is modeled as an intent: a persisted state machine rather than a request held open.',
+          'pt-BR':
+            'Um monólito modular em .NET dividido por contexto delimitado: o núcleo multi-tenant da plataforma, um módulo por seguradora, mais compliance, webhooks e relatório financeiro. O núcleo nunca chama uma seguradora direto — toda chamada a provedor passa por uma adapter factory, então o código que roda uma adesão não sabe com qual seguradora está falando. Trabalho de longa duração é modelado como intent: uma máquina de estados persistida, e não uma requisição mantida aberta.',
+        },
+        steps: [
+          {
+            label: 'Third-party platform',
+            detail: {
+              en: 'The host application, embedding the enrollment flow in an iframe.',
+              'pt-BR': 'A aplicação hospedeira, embutindo o fluxo de adesão num iframe.',
+            },
+          },
+          {
+            label: 'Public API',
+            detail: {
+              en: 'Versioned contract and signed webhooks for the platforms doing the embedding.',
+              'pt-BR': 'Contrato versionado e webhooks assinados para as plataformas que embutem o fluxo.',
+            },
+          },
+          {
+            label: 'Platform core',
+            detail: {
+              en: 'Employers, employees, eligibility, and the intent state machines.',
+              'pt-BR': 'Empregadores, funcionários, elegibilidade e as máquinas de estado dos intents.',
+            },
+          },
+          {
+            label: 'Adapter factory',
+            detail: {
+              en: 'The single door to every insurer, keeping the core provider-agnostic.',
+              'pt-BR': 'A única porta para cada seguradora, mantendo o núcleo agnóstico de provedor.',
+            },
+          },
+          {
+            label: 'Insurer integrations',
+            detail: {
+              en: 'One module per insurer, over HTTP or scheduled SFTP file exchange.',
+              'pt-BR': 'Um módulo por seguradora, por HTTP ou troca agendada de arquivos via SFTP.',
+            },
+          },
+        ],
+      },
+      states: {
+        caption: { en: 'The life of an enrollment', 'pt-BR': 'A vida de uma adesão' },
+        summary: {
+          en: 'These are the statuses an enrollment actually moves through. It can also end ineligible, or not undertaken at all — the happy path below is not the only way out.',
+          'pt-BR':
+            'Estes são os status pelos quais uma adesão realmente passa. Ela também pode terminar inelegível, ou nem ser realizada — o caminho feliz abaixo não é a única saída.',
+        },
+        steps: [
+          {
+            label: 'Processing',
+            detail: {
+              en: 'The request is recorded against its idempotency key and validated, before anything external is called.',
+              'pt-BR': 'O pedido é registrado sob sua chave de idempotência e validado, antes de qualquer chamada externa.',
+            },
+          },
+          {
+            label: 'ActionRequired',
+            detail: {
+              en: 'Something is missing that only a person can supply. The intent says so and waits, instead of failing.',
+              'pt-BR': 'Falta algo que só uma pessoa pode fornecer. O intent declara isso e espera, em vez de falhar.',
+            },
+          },
+          {
+            label: 'PendingConfirmation',
+            detail: {
+              en: 'Everything the insurer and the region require is gathered; the requester confirms before it is sent.',
+              'pt-BR': 'Tudo o que a seguradora e a região exigem está reunido; quem pediu confirma antes do envio.',
+            },
+          },
+          {
+            label: 'Enrolling',
+            detail: {
+              en: 'Handed to the insurer through its adapter, which answers on its own schedule.',
+              'pt-BR': 'Entregue à seguradora pelo adapter dela, que responde no tempo dela.',
+            },
+          },
+          {
+            label: 'Enrolled',
+            detail: {
+              en: 'The policy exists. The platform reports it back to whoever asked.',
+              'pt-BR': 'A apólice existe. A plataforma reporta de volta a quem pediu.',
+            },
+          },
+        ],
+      },
+      highlights: [
+        {
+          en: 'Multi-tenant by construction: platform → employer → employee → group, isolated per tenant.',
+          'pt-BR': 'Multi-tenant por construção: plataforma → empregador → funcionário → grupo, isolados por tenant.',
+        },
+        {
+          en: 'Group setup, enrollment, quoting, amendment, renewal, policy import, and dependant management, each as its own workflow.',
+          'pt-BR':
+            'Configuração de grupo, adesão, cotação, alteração, renovação, importação de apólice e gestão de dependentes, cada uma como seu próprio fluxo.',
+        },
+        {
+          en: 'Eligibility computed from provider rules rather than stored as a flag.',
+          'pt-BR': 'Elegibilidade calculada a partir das regras do provedor, em vez de guardada como flag.',
+        },
+        {
+          en: 'Policy and plan data aggregated across insurers into a single response.',
+          'pt-BR': 'Dados de apólice e plano agregados entre seguradoras numa resposta única.',
+        },
+        {
+          en: 'A versioned public API and signed webhooks for the platforms doing the embedding.',
+          'pt-BR': 'Uma API pública versionada e webhooks assinados para as plataformas que embutem o fluxo.',
+        },
+        {
+          en: 'Insurer integrations over both HTTP APIs and scheduled SFTP file exchange.',
+          'pt-BR': 'Integrações de seguradora tanto por API HTTP quanto por troca agendada de arquivos via SFTP.',
+        },
+      ],
+      decisions: [
+        {
+          heading: {
+            en: 'Intents instead of request/response',
+            'pt-BR': 'Intent em vez de request/response',
+          },
+          body: {
+            en: 'An enrollment cannot finish inside one call — an insurer may take minutes or days. Modeling it as a persisted state machine with its own status makes the in-between state something the system can query, resume, and report on, instead of a transaction held open and hoped for.',
+            'pt-BR':
+              'Uma adesão não termina dentro de uma chamada — uma seguradora pode levar minutos ou dias. Modelar isso como máquina de estados persistida, com status próprio, transforma o estado intermediário em algo que o sistema consulta, retoma e reporta, em vez de uma transação mantida aberta na esperança.',
+          },
+        },
+        {
+          heading: {
+            en: 'Adaptive requirements instead of a form per insurer',
+            'pt-BR': 'Requisitos adaptativos em vez de um formulário por seguradora',
+          },
+          body: {
+            en: 'What a given case must collect depends on the insurer and the regulatory region at once. Rather than encoding nine forms, the platform asks a requirements service what this case needs and renders that. Adding an insurer stops being a front-end change. The lookup happens behind the same adapter boundary, so the core still never handles a provider identity itself.',
+            'pt-BR':
+              'O que um caso precisa coletar depende da seguradora e da região regulatória ao mesmo tempo. Em vez de codificar nove formulários, a plataforma pergunta a um serviço de requisitos o que aquele caso exige e renderiza isso. Adicionar uma seguradora deixa de ser mudança de front-end. A consulta acontece atrás da mesma fronteira de adapter, então o núcleo continua sem manipular a identidade de nenhum provedor.',
+          },
+        },
+        {
+          heading: {
+            en: 'An adapter factory as the only door to a provider',
+            'pt-BR': 'Uma adapter factory como única porta para o provedor',
+          },
+          body: {
+            en: 'The platform core resolves an adapter and talks to that. It never learns which insurer it is serving, which is what keeps a tenth integration from touching enrollment logic — and what let provider contracts be introduced behind feature flags and migrated without stopping the product.',
+            'pt-BR':
+              'O núcleo da plataforma resolve um adapter e fala com ele. Nunca fica sabendo qual seguradora está atendendo, e é isso que impede uma décima integração de tocar na lógica de adesão — e o que permitiu introduzir contratos de provedor atrás de feature flags e migrar sem parar o produto.',
+          },
+        },
+        {
+          heading: {
+            en: 'Idempotency and duplicate suppression as a requirement, not a repair',
+            'pt-BR': 'Idempotência e supressão de duplicata como requisito, não conserto',
+          },
+          body: {
+            en: 'Retries happen, webhooks arrive twice, and consumers run concurrently against the same rows. Intent creation takes an idempotency key, auto-enrollment suppresses the duplicate intent-and-webhook pair, and the eligibility-screening consumer handles serialization conflicts rather than assuming they cannot happen.',
+            'pt-BR':
+              'Retry acontece, webhook chega duas vezes e consumidores rodam concorrentes sobre as mesmas linhas. A criação de intent aceita chave de idempotência, a adesão automática suprime o par intent-e-webhook duplicado, e o consumer de triagem de elegibilidade trata conflito de serialização em vez de assumir que ele não ocorre.',
           },
         },
       ],
@@ -3144,6 +2991,278 @@ export const projects: Project[] = [
             en: 'A feed saying a policy was broken is an alert; a feed saying which execution broke it is an investigation. Carrying the execution identifier through to the violation row is a one-column change that moves the feed from something a security team watches to something they can act on.',
             'pt-BR':
               'Um feed dizendo que uma política foi quebrada é um alerta; um feed dizendo qual execução quebrou é uma investigação. Levar o identificador de execução até a linha da violação é uma mudança de uma coluna que tira o feed do lugar de algo que o time de segurança observa e o coloca no de algo sobre o que consegue agir.',
+          },
+        },
+      ],
+    },
+  },
+  {
+    slug: 'pampa-devs',
+    name: 'Pampa Devs',
+    tagline: {
+      en: 'My studio’s site, and the tool it sends proposals with.',
+      'pt-BR': 'O site do meu estúdio, e a ferramenta com que ele manda proposta.',
+    },
+    description: {
+      en: 'The site for the software studio I run: bilingual, with a blog, three landing pages for the services it sells, and working demos of those services built into the page — a storefront with a cart, a chat assistant, a checkout. Client proposals are pages on it rather than documents sent by email.',
+      'pt-BR':
+        'O site do estúdio de software que eu toco: bilíngue, com blog, três landing pages para os serviços que ele vende, e demos funcionais desses serviços dentro da própria página — uma loja com carrinho, um assistente de chat, um checkout. Proposta de cliente é página aqui, não documento mandado por e-mail.',
+    },
+    tech: ['Vue 3', 'TypeScript', 'Vite', 'Vue Router', 'Vue I18n', 'SCSS', 'Azure Static Web Apps'],
+    role: { en: 'Founder — design & implementation', 'pt-BR': 'Fundador — design & implementação' },
+    period: { en: '2020 – Current', 'pt-BR': '2020 – Atual' },
+    visibility: 'private',
+    screenshot: '/screenshots/pampa-devs.webp',
+    links: [{ label: 'Live site', href: 'https://www.pampadevs.com' }],
+    detail: {
+      overview: {
+        en: 'Pampa Devs is my software studio, and this is where a prospective client meets it. The site carries the service catalogue, a blog in two languages, and three landing pages aimed at particular services. Two parts of it are not what a studio site usually does: the services are demonstrated by working versions of themselves rather than by screenshots, and a commercial proposal is rendered as a page here instead of attached to an email.',
+        'pt-BR':
+          'A Pampa Devs é o meu estúdio de software, e é aqui que um cliente em potencial o encontra. O site carrega o catálogo de serviços, um blog em dois idiomas e três landing pages voltadas a serviços específicos. Duas partes dele não são o que um site de estúdio costuma fazer: os serviços são demonstrados por versões funcionais de si mesmos, e não por prints, e uma proposta comercial é renderizada como página aqui, em vez de anexada a um e-mail.',
+      },
+      contribution: {
+        summary: {
+          en: 'I built it and I keep it running — about two thirds of the commits over six years.',
+          'pt-BR': 'Eu construí e mantenho — cerca de dois terços dos commits ao longo de seis anos.',
+        },
+        areas: [
+          {
+            en: 'The site itself: the catalogue, the landing pages, the blog and the two locales it all renders in.',
+            'pt-BR': 'O site em si: o catálogo, as landing pages, o blog e os dois idiomas em que tudo é renderizado.',
+          },
+          {
+            en: 'The embedded demos — the storefront, the chat assistant, the checkout and the lead form.',
+            'pt-BR': 'As demos embutidas — a loja, o assistente de chat, o checkout e o formulário de lead.',
+          },
+          {
+            en: 'The proposal renderer: diagnosis, strategy, timeline, cost, return and architecture as sections of a page.',
+            'pt-BR': 'O renderizador de proposta: diagnóstico, estratégia, cronograma, custo, retorno e arquitetura como seções de uma página.',
+          },
+        ],
+        boundary: {
+          en: 'Two engineers from the studio worked on it with me; roughly a third of the commits are theirs.',
+          'pt-BR': 'Dois engenheiros do estúdio trabalharam nele comigo; cerca de um terço dos commits é deles.',
+        },
+      },
+      problem: {
+        en: 'A studio selling websites, online stores and automations to small businesses has to show that it can build them, to people who do not read code. Screenshots of past work prove less than they look like they do — the reader cannot tell what is a real product and what is a mockup made for the pitch.',
+        'pt-BR':
+          'Um estúdio que vende site, loja online e automação para pequenas empresas precisa mostrar que sabe construir isso, para gente que não lê código. Print de trabalho passado prova menos do que parece — quem lê não consegue distinguir o que é produto real do que é mockup feito para a apresentação.',
+      },
+      highlights: [
+        {
+          en: 'A storefront demo you can actually use: pick a size, add to the cart, watch the total change.',
+          'pt-BR': 'Uma demo de loja que dá para usar de verdade: escolher tamanho, jogar no carrinho, ver o total mudar.',
+        },
+        {
+          en: 'A chat assistant demo that answers, and a lead form that walks through to its confirmation.',
+          'pt-BR': 'Uma demo de assistente de chat que responde, e um formulário de lead que vai até a confirmação.',
+        },
+        {
+          en: 'A blog with posts written in both languages, not one language machine-translated into the other.',
+          'pt-BR': 'Um blog com posts escritos nos dois idiomas, e não um idioma traduzido automaticamente para o outro.',
+        },
+        {
+          en: 'Client proposals as pages: diagnosis, strategy, timeline, cost, return, before and after, architecture.',
+          'pt-BR': 'Propostas de cliente como páginas: diagnóstico, estratégia, cronograma, custo, retorno, antes e depois, arquitetura.',
+        },
+      ],
+      decisions: [
+        {
+          heading: {
+            en: 'Demonstrating the services instead of describing them',
+            'pt-BR': 'Demonstrar os serviços em vez de descrevê-los',
+          },
+          body: {
+            en: 'The storefront, the chat assistant and the checkout on the services page are working front ends, not images. Someone deciding whether to buy an online store can put something in a cart before deciding. It costs more to build than a screenshot, and it is the part of the site that does the selling.',
+            'pt-BR':
+              'A loja, o assistente de chat e o checkout na página de serviços são front-ends funcionais, não imagens. Quem está decidindo se compra uma loja online consegue colocar algo no carrinho antes de decidir. Custa mais para construir do que um print, e é a parte do site que vende.',
+          },
+        },
+        {
+          heading: {
+            en: 'A proposal is a page, not a document',
+            'pt-BR': 'Proposta é página, não documento',
+          },
+          body: {
+            en: 'A commercial proposal is a view on this site, assembled from the same sections every time: the diagnosis, the strategy, how the work runs, the timeline, the cost, the expected return, a before and after, the architecture, and the questions clients ask. The client opens a link. Changing the offer means changing a page, not re-exporting a file and hoping the right version was attached.',
+            'pt-BR':
+              'Uma proposta comercial é uma view deste site, montada sempre com as mesmas seções: o diagnóstico, a estratégia, como o trabalho acontece, o cronograma, o custo, o retorno esperado, um antes e depois, a arquitetura e as perguntas que os clientes fazem. O cliente abre um link. Mudar a oferta é mudar uma página, não reexportar um arquivo e torcer para ter anexado a versão certa.',
+          },
+        },
+        {
+          heading: {
+            en: 'Static, and deployed as static',
+            'pt-BR': 'Estático, e publicado como estático',
+          },
+          body: {
+            en: 'There is no server behind it. The blog posts are files in the repository, the demos run in the browser, and the whole thing is published as a static site with a rewrite rule for client-side routing. A marketing site that goes down because a backend went down is a cost with no matching benefit.',
+            'pt-BR':
+              'Não há servidor por trás. Os posts do blog são arquivos no repositório, as demos rodam no navegador, e tudo é publicado como site estático com uma regra de rewrite para o roteamento no cliente. Um site institucional que cai porque um backend caiu é custo sem benefício correspondente.',
+          },
+        },
+      ],
+    },
+  },
+  {
+    slug: 'pulse',
+    name: 'Pulse',
+    tagline: {
+      en: 'A live, real-time system embedded in a portfolio.',
+      'pt-BR': 'Um sistema ao vivo, em tempo real, embutido em um portfólio.',
+    },
+    description: {
+      en: 'Visitors see who else is online, a live world map, and public metrics — a thin client over an event-driven .NET backend (SignalR presence, RabbitMQ outbox, Postgres, OpenTelemetry), an ops dashboard, and an AI assistant. Deployed with Docker/Caddy + IaC.',
+      'pt-BR':
+        'Os visitantes veem quem mais está online, um mapa-múndi ao vivo e métricas públicas — um client fino sobre um backend .NET orientado a eventos (presença via SignalR, outbox com RabbitMQ, Postgres, OpenTelemetry), um dashboard de operações e um assistente de IA. Deploy com Docker/Caddy + IaC.',
+    },
+    tech: ['.NET 10', 'SignalR', 'RabbitMQ', 'Redis', 'Postgres', 'React 19', 'Docker', 'Terraform'],
+    role: { en: 'Design & implementation', 'pt-BR': 'Design & implementação' },
+    visibility: 'public',
+    screenshot: '/screenshots/pulse.webp',
+    links: [
+      { label: 'Live site', href: 'https://felipealmeida.tech' },
+      { label: 'GitHub', href: 'https://github.com/felipe-allmeida/pulse' },
+    ],
+    detail: {
+      overview: {
+        en: 'A self-hosted portfolio that doubles as a live systems demo: presence, visits, and metrics travel through a real event-driven backend in real time, not canned data.',
+        'pt-BR':
+          'Um portfólio auto-hospedado que também funciona como demo de sistemas ao vivo: presença, visitas e métricas passam por um backend real orientado a eventos em tempo real, não dados simulados.',
+      },
+      contribution: {
+        summary: {
+          en: 'I built this one alone — the design, the event-driven backend, the front end, and the infrastructure it runs on.',
+          'pt-BR':
+            'Construí este sozinho — o design, o backend orientado a eventos, o front-end e a infraestrutura em que roda.',
+        },
+        areas: [
+          { en: 'The realtime presence pipeline and its world map.', 'pt-BR': 'O pipeline de presença em tempo real e seu mapa-múndi.' },
+          { en: 'The transactional outbox and the event-driven backend behind it.', 'pt-BR': 'O outbox transacional e o backend orientado a eventos por trás dele.' },
+          { en: 'The public ops dashboard and the metrics it exposes.', 'pt-BR': 'O dashboard de operações público e as métricas que ele expõe.' },
+          { en: 'The AI assistant and the profile that grounds it.', 'pt-BR': 'O assistente de IA e o perfil que o fundamenta.' },
+          { en: 'Deployment, from container build to the machine it lands on.', 'pt-BR': 'O deploy, do build do container à máquina onde ele roda.' },
+        ],
+      },
+      problem: {
+        en: 'A CV asserts seniority and a repository demands that someone read it; neither lets a stranger watch a system work. Pulse closes that gap by being both the portfolio and the thing being demonstrated. The constraint it was built against was not a user need but an evidentiary one — make the claim checkable in the thirty seconds someone actually spends.',
+        'pt-BR':
+          'Um currículo afirma senioridade e um repositório exige que alguém o leia; nenhum dos dois deixa um estranho ver um sistema funcionando. O Pulse fecha essa lacuna sendo ao mesmo tempo o portfólio e a coisa demonstrada. O que guiou sua construção não foi uma necessidade de usuário, e sim de evidência — tornar a afirmação conferível nos trinta segundos que alguém de fato gasta.',
+      },
+      architecture: {
+        summary: {
+          en: 'A .NET backend behind a React client. A new connection resolves the visitor’s rough location and publishes a visit event through a transactional outbox, flushed in the same save as the write. A worker drains that outbox over RabbitMQ and appends the audit trail in Postgres. SignalR carries live presence — the connection count, and reactions — while the world map reads the accumulated visits by polling, so the map draws on its own schedule instead of blocking on that round trip. Tracing runs through OpenTelemetry, and the whole thing ships as containers behind Caddy.',
+          'pt-BR':
+            'Um backend .NET por trás de um cliente React. Uma conexão nova resolve a localização aproximada do visitante e publica um evento de visita por um outbox transacional, descarregado no mesmo save da escrita. Um worker drena esse outbox via RabbitMQ e acrescenta a trilha de auditoria no Postgres. O SignalR carrega a presença ao vivo — a contagem de conexões e as reações — enquanto o mapa-múndi lê as visitas acumuladas por polling, então o mapa desenha no próprio ritmo em vez de travar esperando esse round trip. O tracing passa por OpenTelemetry, e tudo sobe como containers atrás do Caddy.',
+        },
+        steps: [
+          {
+            label: 'Browser',
+            detail: {
+              en: 'A React client holding a SignalR connection open.',
+              'pt-BR': 'Um cliente React mantendo uma conexão SignalR aberta.',
+            },
+          },
+          {
+            label: 'API',
+            detail: {
+              en: 'Resolves the visitor’s rough location, publishes the visit, and broadcasts the new presence count to everyone.',
+              'pt-BR':
+                'Resolve a localização aproximada do visitante, publica a visita e transmite a nova contagem de presença para todos.',
+            },
+          },
+          {
+            label: 'Outbox',
+            detail: {
+              en: 'The event is buffered and flushed in the same save as the write, so it cannot be published for something that did not commit.',
+              'pt-BR':
+                'O evento é bufferizado e descarregado no mesmo save da escrita, então não pode ser publicado para algo que não commitou.',
+            },
+          },
+          {
+            label: 'Worker',
+            detail: {
+              en: 'Drains the outbox over RabbitMQ and appends the visit to the audit trail.',
+              'pt-BR': 'Drena o outbox via RabbitMQ e acrescenta a visita à trilha de auditoria.',
+            },
+          },
+          {
+            label: 'World map',
+            detail: {
+              en: 'Polls the accumulated visits on its own schedule, so the map never blocks on the round trip that fills it.',
+              'pt-BR':
+                'Consulta as visitas acumuladas no próprio ritmo, então o mapa nunca trava esperando o round trip que o alimenta.',
+            },
+          },
+        ],
+      },
+      highlights: [
+        {
+          en: 'Live presence via SignalR — see who else is on the site right now, on a world map.',
+          'pt-BR': 'Presença ao vivo via SignalR — veja quem mais está no site agora, num mapa-múndi.',
+        },
+        {
+          en: 'Event-driven .NET backend with a RabbitMQ transactional outbox, Postgres, and OpenTelemetry tracing.',
+          'pt-BR':
+            'Backend .NET orientado a eventos com outbox transacional via RabbitMQ, Postgres e tracing com OpenTelemetry.',
+        },
+        {
+          en: 'A public ops dashboard exposing real metrics — live connections, visits over time, and the event feed as it happens.',
+          'pt-BR':
+            'Um dashboard de operações público expondo métricas reais — conexões ao vivo, visitas ao longo do tempo e o feed de eventos conforme acontece.',
+        },
+        {
+          en: 'An AI assistant grounded in a maintained profile, streaming answers about me.',
+          'pt-BR': 'Um assistente de IA baseado em um perfil mantido, respondendo em streaming sobre mim.',
+        },
+        {
+          en: 'Deployed with Docker Compose + Caddy behind Terraform-managed infrastructure.',
+          'pt-BR': 'Deploy com Docker Compose + Caddy sobre infraestrutura gerenciada com Terraform.',
+        },
+      ],
+      decisions: [
+        {
+          heading: {
+            en: 'A transactional outbox behind a visit counter',
+            'pt-BR': 'Um outbox transacional atrás de um contador de visitas',
+          },
+          body: {
+            en: 'Nothing about counting visits requires one. It is here because the pattern is what the site exists to demonstrate, wired end to end and running where a reader can watch it instead of reading a diagram. On a product it would be over-engineering.',
+            'pt-BR':
+              'Nada em contar visitas exige um. Ele está aqui porque o padrão é o que o site existe para demonstrar, ligado de ponta a ponta e rodando onde o leitor pode ver, em vez de ler um diagrama. Num produto seria over-engineering.',
+          },
+        },
+        {
+          heading: {
+            en: 'Real telemetry, published',
+            'pt-BR': 'Telemetria real, publicada',
+          },
+          body: {
+            en: 'The ops dashboard exposes the system’s actual numbers, which means a reader can catch the site lying about itself. Most portfolios make claims that cannot be checked; this one chose the version that can be.',
+            'pt-BR':
+              'O dashboard de operações expõe os números reais do sistema, o que significa que um leitor pode flagrar o site mentindo sobre si mesmo. A maioria dos portfólios faz afirmações que não dá para conferir; este escolheu a versão que dá.',
+          },
+        },
+        {
+          heading: {
+            en: 'Prerendered pages over a client-only app',
+            'pt-BR': 'Páginas pré-renderizadas em vez de app só no cliente',
+          },
+          body: {
+            en: 'The site renders its content into HTML at build time, so a first visit does not wait on JavaScript and a crawler sees the same page a person does — and, usefully, a deploy can be verified with a single request rather than a browser.',
+            'pt-BR':
+              'O site renderiza seu conteúdo em HTML no build, então a primeira visita não espera JavaScript e um crawler vê a mesma página que uma pessoa — e, de quebra, um deploy pode ser verificado com uma única requisição em vez de um navegador.',
+          },
+        },
+        {
+          heading: {
+            en: 'An assistant grounded in a maintained profile',
+            'pt-BR': 'Um assistente fundamentado num perfil mantido',
+          },
+          body: {
+            en: 'The assistant answers from a file I keep current, and says it does not know rather than inventing. Ungrounded, it would be a demonstration of exactly the wrong thing.',
+            'pt-BR':
+              'O assistente responde a partir de um arquivo que eu mantenho atualizado, e diz que não sabe em vez de inventar. Sem fundamento, ele seria a demonstração exatamente do oposto.',
           },
         },
       ],

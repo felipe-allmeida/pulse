@@ -6,88 +6,17 @@
 These are the projects written up on the site, in the order they appear there. Each one is a real
 system Felipe worked on; the "What Felipe did" line is the authoritative statement of his part in it.
 
-### Pulse — A live, real-time system embedded in a portfolio.
-
-- **Role:** Design & implementation
-- **Source:** public — Live site: https://felipealmeida.tech · GitHub: https://github.com/felipe-allmeida/pulse
-- **Stack:** .NET 10, SignalR, RabbitMQ, Redis, Postgres, React 19, Docker, Terraform
-- **What it is:** A self-hosted portfolio that doubles as a live systems demo: presence, visits, and metrics travel through a real event-driven backend in real time, not canned data.
-- **What Felipe did:** I built this one alone — the design, the event-driven backend, the front end, and the infrastructure it runs on.
-  - The realtime presence pipeline and its world map.
-  - The transactional outbox and the event-driven backend behind it.
-  - The public ops dashboard and the metrics it exposes.
-  - The AI assistant and the profile that grounds it.
-  - Deployment, from container build to the machine it lands on.
-- **Problem it solved:** A CV asserts seniority and a repository demands that someone read it; neither lets a stranger watch a system work. Pulse closes that gap by being both the portfolio and the thing being demonstrated. The constraint it was built against was not a user need but an evidentiary one — make the claim checkable in the thirty seconds someone actually spends.
-- **Architecture:** A .NET backend behind a React client. A new connection resolves the visitor’s rough location and publishes a visit event through a transactional outbox, flushed in the same save as the write. A worker drains that outbox over RabbitMQ and appends the audit trail in Postgres. SignalR carries live presence — the connection count, and reactions — while the world map reads the accumulated visits by polling, so the map draws on its own schedule instead of blocking on that round trip. Tracing runs through OpenTelemetry, and the whole thing ships as containers behind Caddy.
-  - Browser — A React client holding a SignalR connection open.
-  - API — Resolves the visitor’s rough location, publishes the visit, and broadcasts the new presence count to everyone.
-  - Outbox — The event is buffered and flushed in the same save as the write, so it cannot be published for something that did not commit.
-  - Worker — Drains the outbox over RabbitMQ and appends the visit to the audit trail.
-  - World map — Polls the accumulated visits on its own schedule, so the map never blocks on the round trip that fills it.
-- **What it does:**
-  - Live presence via SignalR — see who else is on the site right now, on a world map.
-  - Event-driven .NET backend with a RabbitMQ transactional outbox, Postgres, and OpenTelemetry tracing.
-  - A public ops dashboard exposing real metrics — live connections, visits over time, and the event feed as it happens.
-  - An AI assistant grounded in a maintained profile, streaming answers about me.
-  - Deployed with Docker Compose + Caddy behind Terraform-managed infrastructure.
-- **Engineering decisions:**
-  - **A transactional outbox behind a visit counter** — Nothing about counting visits requires one. The point is not the counter — it is that the pattern is here, wired end to end, in something a reader can watch rather than a diagram they have to trust. On a product this would be over-engineering; on a demonstration it is the deliverable.
-  - **Real telemetry, published** — The ops dashboard exposes the system’s actual numbers, which means a reader can catch the site lying about itself. Most portfolios make claims that cannot be checked; this one chose the version that can be.
-  - **Prerendered pages over a client-only app** — The site renders its content into HTML at build time, so a first visit does not wait on JavaScript and a crawler sees the same page a person does — and, usefully, a deploy can be verified with a single request rather than a browser.
-  - **An assistant grounded in a maintained profile** — The assistant answers from a file I keep current, and says it does not know rather than inventing. Ungrounded, it would be a demonstration of exactly the wrong thing.
-
-### Kota Embed — Health insurance enrollment, embedded inside other companies' platforms.
-
-- **Role:** Senior Product Engineer, platform team (Professional work)
-- **Source:** closed — professional work described without the code (Website: https://kota.io)
-- **Stack:** .NET, PostgreSQL, EF Core, AWS, OpenTelemetry, Multi-tenant, Webhooks
-- **What it is:** Kota Embed lets employers offer health insurance to their employees without leaving the software they already use — the enrollment flow runs embedded in a third-party platform, backed by a multi-tenant .NET service that integrates directly with insurers.
-- **What Felipe did:** I owned the multi-tenant core — the part that turns an enrollment request into a policy across nine insurers that each behave differently.
-  - The intent state machines behind enrollment, quoting, amendment and renewal.
-  - Adaptive requirements: asking a service what a case must collect instead of hardcoding a form per insurer.
-  - The versioned public API contract and its webhooks.
-  - Provider contracts introduced behind feature flags and migrated without stopping the product.
-  - Idempotency and duplicate suppression, and the integration suite that covers them.
-  - NOT his work: The front end — the embedded flow and its SDK — was built by others; I have no commits in it.
-- **Problem it solved:** Enrolling someone in health insurance looks like a form. It is not. Each insurer wants different data in a different shape on its own schedule; some answer over HTTP, others by exchanging files over SFTP. Regulatory disclosure obligations differ by region. And all of it happens inside an iframe hosted on another company’s platform, where the user expects it to feel immediate. A form hardcoded per insurer does not survive the second insurer.
-- **Results:** 9 insurer integrations (HTTP APIs and SFTP file exchange); 3 regulatory regions (disclosure rules differ per region); 7 intent workflow types (enrollment, quote, amendment, renewal…)
-- **Architecture:** A .NET modular monolith split by bounded context: the multi-tenant platform core, one module per insurer, plus compliance, webhooks, and financial reporting. The core never calls an insurer directly — every provider call goes through an adapter factory, so the code that runs an enrollment does not know which insurer it is talking to. Long-running work is modeled as an intent: a persisted state machine rather than a request held open.
-  - Third-party platform — The host application, embedding the enrollment flow in an iframe.
-  - Public API — Versioned contract and signed webhooks for the platforms doing the embedding.
-  - Platform core — Employers, employees, eligibility, and the intent state machines.
-  - Adapter factory — The single door to every insurer, keeping the core provider-agnostic.
-  - Insurer integrations — One module per insurer, over HTTP or scheduled SFTP file exchange.
-- **The life of an enrollment:** These are the statuses an enrollment actually moves through. It can also end ineligible, or not undertaken at all — the happy path below is not the only way out.
-  - Processing — The request is recorded against its idempotency key and validated, before anything external is called.
-  - ActionRequired — Something is missing that only a person can supply. The intent says so and waits, instead of failing.
-  - PendingConfirmation — Everything the insurer and the region require is gathered; the requester confirms before it is sent.
-  - Enrolling — Handed to the insurer through its adapter, which answers on its own schedule.
-  - Enrolled — The policy exists. The platform reports it back to whoever asked.
-- **What it does:**
-  - Multi-tenant by construction: platform → employer → employee → group, isolated per tenant.
-  - Group setup, enrollment, quoting, amendment, renewal, policy import, and dependant management, each as its own workflow.
-  - Eligibility computed from provider rules rather than stored as a flag.
-  - Policy and plan data aggregated across insurers into a single response.
-  - A versioned public API and signed webhooks for the platforms doing the embedding.
-  - Insurer integrations over both HTTP APIs and scheduled SFTP file exchange.
-- **Engineering decisions:**
-  - **Intents instead of request/response** — An enrollment cannot finish inside one call — an insurer may take minutes or days. Modeling it as a persisted state machine with its own status makes the in-between state something the system can query, resume, and report on, instead of a transaction held open and hoped for.
-  - **Adaptive requirements instead of a form per insurer** — What a given case must collect depends on the insurer and the regulatory region at once. Rather than encoding nine forms, the platform asks a requirements service what this case needs and renders that. Adding an insurer stops being a front-end change. The lookup happens behind the same adapter boundary, so the core still never handles a provider identity itself.
-  - **An adapter factory as the only door to a provider** — The platform core resolves an adapter and talks to that. It never learns which insurer it is serving, which is what keeps a tenth integration from touching enrollment logic — and what let provider contracts be introduced behind feature flags and migrated without stopping the product.
-  - **Idempotency and duplicate suppression as a requirement, not a repair** — Retries happen, webhooks arrive twice, and consumers run concurrently against the same rows. Intent creation takes an idempotency key, auto-enrollment suppresses the duplicate intent-and-webhook pair, and the eligibility-screening consumer handles serialization conflicts rather than assuming they cannot happen.
-
-### Dietbox Webapp — The decade-old monolith the product grew on, and still its largest codebase.
+### Dietbox Webapp — None of today’s APIs existed. All of it started in here.
 
 - **Role:** Senior Software Engineer, then Head of Technology (2020–2024)
 - **Source:** closed — professional work described without the code (Website: https://dietbox.me)
 - **Stack:** C#, ASP.NET MVC, Entity Framework, SQL Server, Azure App Service, Kendo UI, Azure DevOps
-- **What it is:** The monolith is the product's centre of gravity: for years it was the only codebase, carrying both the nutritionist and the patient experience through the same release. Everything the product did shipped through this one pipeline, on the one schedule that pipeline allowed.
-- **What Felipe did:** Principal architect for four years — I set the platform’s patterns and configured the Azure estate, including for services other people wrote. Later the whole technology organization reported to me.
+- **What it is:** When I arrived, this was the product. The nutritionist’s tool, the patient’s, subscriptions, food data, sign-in — one codebase, one release, one schedule. None of the services that run beside it now existed yet. Over four years I took the logic out of it a piece at a time and stood each piece up as an API of its own, leaving the monolith serving whatever had not moved. It is still the product’s largest codebase.
+- **What Felipe did:** Principal architect for four years. I ran the extraction — what came out of the monolith, in what order, and what shape it took on the other side — set the platform’s patterns, and configured the Azure estate, including for services other people wrote. Later the whole technology organization reported to me.
   - The build and release pipeline in Azure DevOps, shipping the core project together with its satellites and its gulp-built, Kendo UI front end.
   - Production availability and incident response.
   - NOT his work: The product’s largest codebase was a team effort — about a sixth of that repository’s commits are mine.
-- **Problem it solved:** The nutritionist lives in the tool all day; the patient opens it to read a meal plan. Same product, same identity backbone, opposite expectations. And in 2020 a .NET Framework monolith carried both on Windows App Service, shipping once a day, at night, because that was the only window that felt safe.
+- **Problem it solved:** The nutritionist lives in the tool all day; the patient opens it to read a meal plan. Same product, opposite expectations. In 2020 a .NET Framework monolith carried both on Windows App Service — and sign-in, subscriptions and the food data with them — shipping once a day, at night, because that was the only window that felt safe. Anything the product needed to do differently had to be done inside it.
 - **Results:** ~600 commits in the monolith (mine, of ~3.9k total); 4 years in the same codebase (2020 to 2024) — The commit counts come from the repository. The rest is my own record of the period.
 - **Architecture:** The core project, its data, the scheduled job beside it, and the Azure app it deploys onto.
   - Web application — The core project and its satellites — catalogs, enums, shared infrastructure, resources and reports — behind a gulp-built front end using Kendo UI.
@@ -103,14 +32,14 @@ system Felipe worked on; the "What Felipe did" line is the authoritative stateme
   - **One core, many satellites** — The core project doesn't carry catalogs, enums, shared infrastructure, resources and reports itself — each lives in its own satellite project. A change to reference data doesn't touch the same project as a change to the request path.
   - **The release builds a target, not the solution** — The release pipeline restores the solution but builds a single target — the site project — and archives only what that target publishes. The webjob project sitting beside it in the repository is not in the solution at all: it still targets 4.7.2 where the site targets 4.8, carries its own daily-schedule publish settings, and has not been touched since 2021. Naming a target rather than a solution is what keeps a project in that state from riding into a release nobody meant to include it in.
   - **Release by slot swap, not by overwrite** — The pipeline builds once and deploys that one artifact to the app’s staging slot; production changes by swapping the slot in, not by writing over the site while it is serving. What goes live is a build that was already running before it took traffic, and the way back is the same swap in the other direction. That is what a deploy has to be before it can happen in daylight rather than at night.
-  - **A monolith you strangle, not rewrite** — New capability went into the services beside the monolith, not into the monolith itself. It kept the surface it already served, without a rewrite competing for the same hours as the features shipping everywhere else.
+  - **A monolith you strangle, not rewrite** — The monolith was not ported and not rewritten. Logic came out of it a piece at a time — sign-in, payments, food data, the back office, notifications, realtime — and each piece became an API running beside it, while the monolith kept serving whatever had not moved yet. A rewrite would have competed for the same hours as the features shipping everywhere else, and the product could not stop while it happened.
 
-### Dietbox B2C — One identity backbone, two audiences, custom sign-in journeys.
+### Dietbox B2C — One login for all of the product’s systems.
 
 - **Role:** Senior Software Engineer, then Head of Technology (2021–2024)
 - **Source:** closed — professional work described without the code (Website: https://dietbox.me)
 - **Stack:** Azure AD B2C, Identity Experience Framework, XML, OpenID Connect, OAuth 2.0, .NET 6, HTML, CSS, Azure DevOps
-- **What it is:** One Azure AD B2C identity system carrying two audiences that share nothing but the account: a nutritionist subscribing and paying, and a patient arriving by invitation from the one treating them. Five clients sign in through it — the nutritionist’s mobile app, the patient’s Android app, the patient’s iOS app, the web product both audiences use, and the checkout — across three platforms and two tenants. Three years of custom sign-in journeys, federated providers, silent migration off the legacy store, and session revocation that reaches every open browser.
+- **What it is:** One account gets a person into every part of the product. The nutritionist signs in once and reaches her mobile app, the web product and the checkout with the same credentials; the patient signs in once and reaches the Android app, the iOS app and the web product. Five clients across three platforms, over two audiences that share nothing but the login — a nutritionist subscribing and paying, and a patient arriving by invitation from the one treating her. Three years of custom sign-in journeys, federated providers, silent migration off the legacy store, and session revocation that reaches every open browser.
 - **What Felipe did:** This is the most of me there is anywhere in the Dietbox estate: I wrote half the commits over three years, across both audiences’ sign-in journeys.
   - The two policy sets — one for the practitioner, one for the patient — each its own sign-up, sign-in and password-reset journey.
   - Federation with Google, Facebook and Apple, each mapped through its own exchange profile into a common subject claim.
@@ -144,8 +73,8 @@ system Felipe worked on; the "What Felipe did" line is the authoritative stateme
   - Entitlement gates for subscriber and academy journeys, enforced inside the sign-in flow rather than after it.
 - **Engineering decisions:**
   - **Custom policies instead of a hosted login** — A hosted login gives one journey. This product needed a subscriber signing up and paying, a patient arriving by invitation, an academy student, and a receptionist — over one directory, without four user stores to keep in sync. Writing the policy directly was the only way to get gated journeys and a first-sign-in migration without forking the user base.
-  - **Migration as a side effect of signing in** — Nobody was asked to reset a password or re-register. The user experiences a login; the system experiences a migration, writing the account into the directory and linking it back to the legacy credential in the same journey.
-  - **Revocation that reaches open sessions** — A token that is merely unrenewable is not revoked. Comparing the token’s issue time against a stamp on the user record is what makes "sign this account out everywhere" actually mean it, rather than "stop this account from getting a new token next time."
+  - **Migration as a side effect of signing in** — Nobody was asked to reset a password or re-register. The account is written into the directory and linked back to the legacy credential during the same sign-in the user was already doing.
+  - **Revocation that reaches open sessions** — Revoking an account has to end the sessions that are already open, not only stop the next token from being issued. The policy compares the token’s issue time against a stamp on the user record, so moving that stamp stops an open session working.
   - **Two ways in, because a phone cannot open a redirect** — Three of the five clients are native apps, and a native app signing a user in through a browser redirect is a bad experience and a worse one to recover from. So the same directory answers two shapes of request: the redirect journey the web product and the checkout use, and a direct credential exchange the apps use, each with its own refresh-token redemption. The entitlement checks and the migration behaviour live in the policy, not in the client, so the two shapes cannot drift into two different sets of rules.
   - **One directory, several journeys** — Separate policies per audience over one shared user store, rather than one policy branching on audience or several stores that would have to be reconciled. The audiences share an identity, not a form.
 
@@ -187,37 +116,39 @@ system Felipe worked on; the "What Felipe did" line is the authoritative stateme
   - **The webhook tree is the state machine** — There is one handler per gateway event, named for the event itself — subscription created, invoice paid, invoice refunded — rather than one endpoint switching on a payload field. The directory structure is the lifecycle, readable without opening a single file.
   - **A checkout that is not the app** — The purchase funnel ships as its own client — its own Vue app, its own Cypress suite reporting through Allure — separately from the rest of the product, on its own cadence.
 
-### Dietbox Portal — The back office, and the newest generation of the platform’s architecture.
+### Dietbox Portal — The back office that handed the product’s daily operations to the operations team.
 
 - **Role:** Head of Technology (2023–2024)
 - **Source:** closed — professional work described without the code (Website: https://dietbox.me)
 - **Stack:** .NET 6, C#, CQRS, MediatR, EF Core, SQL Server, ASP.NET Identity, JWT, Vue 3, Vuex, Azure DevOps
-- **What it is:** A back office is where a SaaS company’s real operating procedure lives — the subscriptions, the vouchers, the food catalogue, marketing — and this was the first place the platform’s newer patterns were carried through end to end: layers numbered on disk, commands and queries behind a pipeline behaviour that logs every one of them, and a domain that raises its own events and has them dispatched the moment its changes are saved.
-- **What Felipe did:** I set the layered design this service is built on — the numbered directories, the command/query pipeline, and where the domain-event dispatch sits inside it — and I wrote the identity building block and the shared building blocks the platform’s newer services now start from. The eighteen business-domain controllers and the admin client’s views were the team’s to build out.
-  - The numbered directory layout — building blocks, services, application, domain, infrastructure — and the dependency direction it makes legible before a file is opened.
+- **What it is:** Until 2023, any change to the product’s data went through the technology team: adjusting a subscription, correcting a record, loading a food table. The portal put those actions on screens, with the product’s own rules in front of them and a sign-in separate from the customer’s. The operations team started doing them directly — forty-four actions across ten areas.
+- **What Felipe did:** I decided what operations should be able to do without us, and built what it takes to let them do it safely: the staff identity and permissions the whole thing runs behind, the command surface under the screens, and the design the rest of the team built the eighteen business areas on top of.
+  - Choosing the actions: which requests we were tired of receiving, and which of those were safe to hand over.
   - The identity building block: its own user store, a JWT builder and validator, access and refresh tokens, and claim-based authorization.
-  - The message and event base types among the shared building blocks, and the dispatch that publishes what an aggregate raised once the unit of work has saved it.
-  - The shared building blocks — domain, infrastructure and identity — the platform’s newer services start from instead of each inventing its own.
-  - The client’s persisted token pair and its refresh flow against the accounts endpoint.
+  - Impersonation, in both directions and both ways back out, and the rule that it lives behind a staff account rather than a customer one.
+  - The design the team built the eighteen business areas on top of, so a new area was a day rather than an argument.
   - NOT his work: Across the service and the admin client together, roughly a third of the commits are mine — the rest, including most of the eighteen business-domain controllers and the client’s views, is the team’s.
-- **Problem it solved:** Support and operations were reaching straight into the product database, or into the monolith’s own admin surface, to do what the business runs on day to day — adjusting a subscription, issuing a voucher, updating the food catalogue. A back office with its own domain, its own staff identity and its own command surface was the alternative: the same operations, but as named commands logged on the way through, behind sign-in that isn’t the customer’s.
-- **Results:** ~276 commits across both repositories (mine, of ~780 total); 3 test projects (domain, application, and integration) — Both figures come from the two repositories’ own commit history.
-- **Architecture:** An admin client in front, a service exposing the eighteen controllers, an application layer of commands and queries behind a logging pipeline behaviour, a domain layer underneath, and infrastructure at the bottom — where saving a change is also what releases the events that change raised.
-  - Admin client — The Vue 3 client — dashboard, charts, and the eighteen controllers’ views — including the impersonate controls in the navbar and the patient view.
-  - Service — Controllers behind the claim-requirement authorization filter, validating the access token before a request reaches a command or query.
-  - Application — Commands and queries behind a pipeline behaviour that logs each one by name, and the handlers that turn a domain event into the integration event other services consume.
-  - Domain — The business rules for the eighteen areas administered — nutritionists, patients, subscriptions, vouchers, the food catalogue, and the rest — raising the events the layers above and below both care about.
-  - Infrastructure — An EF Core context over SQL Server: it writes the aggregate’s current state, then hands the events that aggregate collected while changing to MediatR, once the write has already landed.
+- **Problem it solved:** Support could not adjust a subscription, marketing could not publish a banner, and nobody outside engineering could load a new food table. Each was a request to the technology team, and an engineer running the change by hand against the product database or the monolith’s admin surface — no rules in front of it and no name on it afterwards.
+- **Results:** ~276 commits across both repositories (mine, of ~780 total); 44 actions ops could take alone (across ten areas of the product) — The commit share comes from the two repositories. The forty-four is a count of the write actions the service exposes — the commands behind the screens ops uses.
+- **Architecture:** Someone on the operations team picks an action on a screen, and it travels as a named command through the product’s own rules before it reaches the product’s data.
+  - Ops — Someone on the operations team, signed in with a staff account, on the Vue screens for the ten areas — including the impersonate controls in the navbar and the patient view.
+  - Permissions — The token decides which of the actions this person is allowed at all — a claim-requirement filter in front of every controller.
+  - Command — The action runs as one of the forty-four commands, logged by name on the way through, rather than as an edit to a table.
+  - Rules — The same rules the product itself enforces stand in front of the write — which is the difference between ops doing this and an engineer doing it by hand.
+  - Database — The change lands in the same database the product serves from — which is exactly why it goes through the rules above rather than around them.
 - **What it does:**
   - Impersonation as a first-class feature: support can act as the nutritionist or patient they’re helping, from the client’s navbar or the patient view, and step back out.
-  - Eighteen controllers spanning the business administered: nutritionists and patients, subscriptions and their configuration, transactions, vouchers, the food catalogue, tags, marketing, materials, events, universities, metrics, accounts.
-  - A dashboard with charts mirroring those same domains, so the numbers support looks at come from the same commands that changed them.
-  - Domain events kept separate from integration events, so a change another service needs to hear about is an explicit publication, not a side effect of one that only matters inside this one.
+  - Subscriptions: cancel one, grant a special one, change a plan’s limits, and move a nutritionist onto the new payment gateway.
+  - The food catalogue: create, edit, retire and bulk-activate foods and food groups — or import a whole table from a file, which used to be an engineer with a script.
+  - Vouchers, external vouchers and gift configuration, created and retired by whoever is running the campaign.
+  - Marketing: featured banners, the customizable cards on the product’s own screens, and the material library.
+  - Nutritionist and patient records: update details, correct an email, and clear a cache that is serving something stale.
+  - A dashboard whose numbers come from the same commands that changed them, so ops reads its own results.
 - **Engineering decisions:**
-  - **Layers numbered on disk** — The service’s directories are numbered by layer — building blocks, services, application, domain, infrastructure — so the dependency direction is legible from a directory listing alone, before a single file is open. A layer importing from the wrong direction is a violation visible in the file tree, not just in a code review.
+  - **Handing over the actions instead of answering the requests** — The cheaper option was to keep answering the requests as they came. Answering does not get faster with repetition, though, and each request costs engineering time on work that is not engineering. The screens built here are the requests that arrived often enough to be worth replacing.
   - **Staff identity is not customer identity** — The back office authenticates against its own store — an identity building block with its own user database, a JWT builder and validator, access and refresh tokens, and claim-based authorization — not the customer directory. Giving support staff accounts in the customer identity system would have meant handing customer-grade identities administrative scopes; keeping the two separate keeps a back-office session a different thing from a customer session, by construction.
-  - **Events dispatched at save time, not stored** — An aggregate collects the events it raises while a command changes it; the unit of work writes the row, then publishes those events through MediatR after that write has committed. Nothing is replayed and no state is rebuilt from a log — the table still holds the current row. What this buys is that a consequence of an operation is a subscriber to something the domain said, rather than one more paragraph inside the command that said it.
-  - **Shared building blocks before shared services** — The newer services, this one included, start from a common domain, infrastructure and identity layer instead of each inventing its own — the same message and event base types, the same identity building block, the same base entities. That shared foundation is what let a small team add a service without each one arriving in a different style.
+  - **An action, not a database edit** — Ops invokes one of forty-four named actions, each with the product’s own rules in front of it, and each logged by name as it passes through a pipeline behaviour. The manual route it replaced — an engineer writing an update statement against the database — ran none of those rules and left no record of having run.
+  - **Support sees the screen, instead of a description of it** — Part of what reached engineering was not a change request but a reproduction problem — someone unable to see what a customer was describing. Impersonation answers that directly: support steps into the nutritionist’s or the patient’s own session, sees what they see, and steps back out. It concentrates a lot of access in one feature, which is why it sits behind the staff identity rather than anywhere near a customer account.
 
 ### Dietbox Notifications — Everything the product sends out, moved into a service of its own.
 
@@ -250,34 +181,34 @@ system Felipe worked on; the "What Felipe did" line is the authoritative stateme
   - A layered service with crosscutting packages for the WhatsApp provider and dependency injection, kept separate from the domain they support.
 - **Engineering decisions:**
   - **A separate service specifically to be ignorable** — The stated goal was zero impact on the main product. Isolating the notification service meant it could be switched off, redeployed or rewritten without taking the product down with it — the opposite of bolting a limiter onto code that was already too complex to touch safely.
-  - **The metering was built and never switched on** — The design went further than the deployment did. A per-practitioner limit and a log of who changed it are in the domain, built so the cost could eventually be charged back to whoever generated it — and that part was never put to use. What the service actually did, every day, was send and record. I am keeping the decision here rather than quietly deleting it: the useful half shipped, the ambitious half did not, and a case study that only lists the half that worked is not a case study.
+  - **The metering was built and never switched on** — A per-practitioner limit and a log of who changed it are in the domain, built so the cost could eventually be charged back to whoever generated it. That part was never put to use — what the service did every day was send and record. The decision stays on the card because the limit is still in the code, and leaving it out would describe a service that was never built.
   - **Capacity planned before the first line** — The monthly volume, the query rate and the ten-year storage footprint were estimated in the design document before the service was built, which is why the storage decision — how much space this would ever need — was a boring, already-answered question rather than a surprise.
   - **One provider first, the interface for more** — WhatsApp was the bill that started this, so it is the only provider that sends today — but email, SMS and push were the shape the domain and the API were designed to accept later, without the sent record needing to change.
 
-### Dietbox Realtime — Live updates as a service of its own, so they ship on their own clock.
+### Dietbox Realtime — Chat between a nutritionist and her patient, and anything else that has to arrive now.
 
 - **Role:** Senior Software Engineer (2022)
 - **Source:** closed — professional work described without the code (Website: https://dietbox.me)
 - **Stack:** Node, Express, Socket.IO, Application Insights, Azure App Service, Azure DevOps
-- **What it is:** Thirty-four commits over two months in 2022, for a service that has outlived both: a socket server that holds every open connection, joins each client to a room named for its user id, and exposes one endpoint the rest of the platform posts to when something needs pushing out. It sits outside the product because a long-lived connection and a request are not the same kind of traffic.
-- **What Felipe did:** I built this one effectively alone: thirty-three of the thirty-four commits, from the handshake to the load-test harness that proved it held up.
-  - The socket server itself: the shared-secret handshake, room assignment by user id, and an immediate disconnect for a client that ends up joined to no room.
-  - The notify endpoint the rest of the platform posts to, and the info and health endpoints used to watch the service itself.
+- **What it is:** This exists so two people can talk inside the product. A nutritionist and her patient each hold an open connection, and a message sent from one lands on the other’s screen without either of them reloading anything. The same channel carries the platform’s own notifications — anything that has to reach someone now rather than at their next page load. Thirty-four commits over two months in 2022, for a service that outlived both.
+- **What Felipe did:** I built this one effectively alone: thirty-three of the thirty-four commits, from the chat relay to the load-test harness that proved it held up.
+  - The chat relay: a message emitted by one client is pushed straight into the recipient’s room, so it reaches an open screen rather than waiting for a reload.
+  - The socket server underneath both: the shared-secret handshake, room assignment by user id, the notify endpoint the platform posts to, and the info and health endpoints used to watch it.
   - The handler-loading convention: an event handler is a file, picked up automatically from a directory.
   - The load-test harness, built to deliberately hold a share of clients on long-polling instead of letting all of them upgrade.
-- **Problem it solved:** The monolith deployed once a night, and anything sharing its pipeline shared its cadence — a realtime channel that can only change at three in the morning is a realtime channel nobody changes. Separately, open connections and request traffic do not want the same instance count: one scales with how many people are online, the other with how many requests arrive.
-- **Architecture:** The platform posts a room, an event name and a payload to the notify endpoint; the server resolves who is in that room right now and pushes the event straight to them.
-  - Platform — Another service in the platform posts a room, an event name and a payload to the notify endpoint.
+- **Problem it solved:** A nutritionist and her patient had no way to talk inside the product, and anything the platform needed to tell someone waited until that person reloaded the page. Putting the open connections inside the monolith was not an option: it deployed once a night, so anything sharing that pipeline could only be changed then. Open connections also scale with how many people are online, while requests scale with how many arrive.
+- **Architecture:** Two things arrive the same way: a chat message emitted by one of the two people talking, or a push from another service in the platform. Either resolves to a room, and whoever is in that room right now gets it.
+  - Origin — Either one of the two people talking emits a chat message, or another service in the platform posts a room, an event name and a payload to the notify endpoint.
   - Room resolved — The server looks up which connections are actually joined to that room right now.
   - Fan-out — The event is pushed to every client currently joined to the room.
   - Browser — The client receives the event and updates without a refresh.
 - **What it does:**
-  - The notify endpoint the rest of the platform posts to when something needs pushing out.
-  - An info endpoint reporting the live connection count, for monitoring.
-  - A health endpoint reporting its own latency.
+  - Chat between a nutritionist and her patient, carried over the connection both of them already hold open.
+  - Notifications the platform pushes to a person, landing on whatever screen they already have open.
+  - An info endpoint reporting the live connection count, and a health endpoint reporting its own latency.
   - A shared-secret handshake that disconnects a client immediately if it ends up joined to no room.
 - **Engineering decisions:**
-  - **Realtime as its own deployable** — Two reasons, both real: open connections and request traffic scale on different axes, and the product deployed once a night — a channel that can only change at three in the morning is one nobody changes. Splitting it into its own service let each axis scale on its own terms and let this one ship on its own clock.
+  - **Realtime as its own deployable** — Two reasons, both real: open connections and request traffic scale on different axes, and the product deployed once a night, which set the pace for anything inside it. Splitting it into its own service let each axis scale on its own terms and let this one ship on its own schedule.
   - **A room per user id** — Addressing is by identity, not by connection, so the platform can push to a person without knowing how many tabs, devices or reconnects that person currently has open.
   - **Handlers auto-loaded from a directory** — Adding an event is adding a file — there is no registry to remember to update, and no handler that exists in the code but was never wired in.
   - **A load test that keeps clients on long-polling** — Not every client upgrades to a websocket. A load test where all of them do measures a population that does not exist, so the harness deliberately holds a share of clients on HTTP long-polling instead.
@@ -322,7 +253,7 @@ system Felipe worked on; the "What Felipe did" line is the authoritative stateme
   - **Strongly-typed IDs from a source generator** — Every entity has its own ID struct, rendered as ti_…, tm_…, us_…. Passing a team ID where a ticket ID belongs stops compiling. A whole class of bug moves from runtime to build time, and IDs say what they are in logs and URLs.
   - **Its own OAuth server, and an MCP server behind it** — OpenIddict issues the tokens; the MCP server exposes ticket read/write and lookup tools. Someone connects Claude or ChatGPT to their own account through a consent screen and works tickets in natural language — under exactly the permissions they already have in the UI, with the same scope check on every tool call.
 
-### Ulbra One — Internal ERP replacing legacy systems.
+### Ulbra One — The ERP being built to take the university off Senior.
 
 - **Role:** Head of Technology (Jun 2026 – Current)
 - **Source:** closed — professional work described without the code
@@ -343,12 +274,12 @@ system Felipe worked on; the "What Felipe did" line is the authoritative stateme
   - **The same conventions as the service desk, deliberately** — Endpoint shape, result type and migration strategy are copied from Ulbra Atende rather than reconsidered. With three engineers across six systems, an engineer moving between two codebases should not be learning a second set of rules — the consistency is worth more than any local improvement either codebase might have made alone.
   - **A modular monolith, not services** — An ERP is a set of tightly related domains that transact together. Splitting it into services would buy independent deployment at the cost of distributed transactions across modules that genuinely need consistency — and there is no team here to operate that. Modules give the boundaries; the single process keeps the transactions.
 
-### Ulbra CRM — An inherited CRM taken from no tests to full coverage.
+### Ulbra CRM — Where the university works the leads for its next intake of students.
 
 - **Role:** Head of Technology — direction & review (Apr 2026 – Current)
 - **Source:** closed — professional work described without the code
 - **Stack:** React, TanStack Router, MongoDB, Docker Swarm
-- **What it is:** The CRM the university runs on, inherited rather than built: no automated tests, and a codebase whose structure had not kept up with it. It is now fully covered by tests and materially better to use, and the work was done by the team under my direction — I set the direction and reviewed it, and did not write it.
+- **What it is:** Prospective students arrive as leads — from a campaign, a form, an event — and someone works each one until it becomes an enrolment or does not. This is where that happens. I inherited it rather than built it: no automated tests, and a structure that had not kept up with the product. It is now fully covered by tests and materially better to work in, and that work was the team’s — I set the direction and reviewed it, and did not write it.
 - **What Felipe did:** I set the direction and reviewed the work; the engineering was the team’s.
   - The decision to cover the codebase with tests before changing its behaviour.
   - The routing migration that made filter state survive navigation.
@@ -357,7 +288,7 @@ system Felipe worked on; the "What Felipe did" line is the authoritative stateme
 - **Problem it solved:** The CRM arrived with no automated tests at all, which made every change a gamble, and with usability debt that the people using it every day absorbed silently. The worst of it: changing screens reloaded the application, so the filters someone had just set were gone. Work that goes through the same three or four filters all day pays that cost on every navigation.
 - **Results:** 0% → 100% test coverage
 - **Engineering decisions:**
-  - **Tests first, behaviour second** — The codebase was unstructured and untested, and the temptation with both is to restructure first. The order was inverted: cover the existing behaviour, then change it. Coverage on code nobody has changed yet is what makes the later restructuring safe rather than hopeful — and it is the reason the number is worth quoting.
+  - **Tests first, behaviour second** — The codebase was unstructured and untested. Coverage came first and the restructuring second: tests written against the behaviour as it already worked, then the behaviour changed underneath them. That order is why the coverage number is worth quoting at all.
   - **Routing as state, not as navigation** — Moving to a router that holds application state in the route turned filters from something the page owned into something the URL owned. The visible win is that a screen change no longer discards them; the quieter one is that a filtered view became a link somebody can send to a colleague.
   - **Directed, not written** — This is the one system in the group I did not build. With three engineers and six systems, my leverage as lead is in deciding what gets done and reviewing what comes back, not in adding a fourth pair of hands to a codebase that already has an owner.
 
@@ -445,6 +376,46 @@ system Felipe worked on; the "What Felipe did" line is the authoritative stateme
   - **Alerts investigate themselves; humans still merge** — When application telemetry raises an alert, a coding agent reads the trace and the surrounding code and opens a pull request with a proposed fix. What was automated is the investigation — the part that is mechanical and slow at three in the morning. The merge is not automated, and deliberately so: a change nobody approved reaching production is a worse failure than a slow fix.
   - **An orchestrator sized for the team** — Kubernetes was the default answer and was not taken. The cluster is small, on-premise, and operated by three engineers who are also writing six applications. Swarm gives multi-node scheduling, rolling updates and overlay networking with a fraction of the operational surface — and the cost of the ceiling it imposes is far below the cost of a control plane nobody has time to run.
   - **The team measures itself with its own pipeline** — A dashboard reads the team’s task tracker through an ETL sidecar, so delivery is visible in the same place the systems’ numbers are. It is a small piece of plumbing carrying a large claim: a working model that is measured can be argued about with evidence, and one that is only asserted cannot.
+
+### Kota Embed — Health insurance enrollment, embedded inside other companies' platforms.
+
+- **Role:** Senior Product Engineer, platform team (Professional work)
+- **Source:** closed — professional work described without the code (Website: https://kota.io)
+- **Stack:** .NET, PostgreSQL, EF Core, AWS, OpenTelemetry, Multi-tenant, Webhooks
+- **What it is:** Kota Embed lets employers offer health insurance to their employees without leaving the software they already use — the enrollment flow runs embedded in a third-party platform, backed by a multi-tenant .NET service that integrates directly with insurers.
+- **What Felipe did:** I owned the multi-tenant core — the part that turns an enrollment request into a policy across nine insurers that each behave differently.
+  - The intent state machines behind enrollment, quoting, amendment and renewal.
+  - Adaptive requirements: asking a service what a case must collect instead of hardcoding a form per insurer.
+  - The versioned public API contract and its webhooks.
+  - Provider contracts introduced behind feature flags and migrated without stopping the product.
+  - Idempotency and duplicate suppression, and the integration suite that covers them.
+  - NOT his work: The front end — the embedded flow and its SDK — was built by others; I have no commits in it.
+- **Problem it solved:** Enrolling someone in health insurance looks like a form. It is not. Each insurer wants different data in a different shape on its own schedule; some answer over HTTP, others by exchanging files over SFTP. Regulatory disclosure obligations differ by region. And all of it happens inside an iframe hosted on another company’s platform, where the user expects it to feel immediate. A form hardcoded per insurer does not survive the second insurer.
+- **Results:** 9 insurer integrations (HTTP APIs and SFTP file exchange); 3 regulatory regions (disclosure rules differ per region); 7 intent workflow types (enrollment, quote, amendment, renewal…)
+- **Architecture:** A .NET modular monolith split by bounded context: the multi-tenant platform core, one module per insurer, plus compliance, webhooks, and financial reporting. The core never calls an insurer directly — every provider call goes through an adapter factory, so the code that runs an enrollment does not know which insurer it is talking to. Long-running work is modeled as an intent: a persisted state machine rather than a request held open.
+  - Third-party platform — The host application, embedding the enrollment flow in an iframe.
+  - Public API — Versioned contract and signed webhooks for the platforms doing the embedding.
+  - Platform core — Employers, employees, eligibility, and the intent state machines.
+  - Adapter factory — The single door to every insurer, keeping the core provider-agnostic.
+  - Insurer integrations — One module per insurer, over HTTP or scheduled SFTP file exchange.
+- **The life of an enrollment:** These are the statuses an enrollment actually moves through. It can also end ineligible, or not undertaken at all — the happy path below is not the only way out.
+  - Processing — The request is recorded against its idempotency key and validated, before anything external is called.
+  - ActionRequired — Something is missing that only a person can supply. The intent says so and waits, instead of failing.
+  - PendingConfirmation — Everything the insurer and the region require is gathered; the requester confirms before it is sent.
+  - Enrolling — Handed to the insurer through its adapter, which answers on its own schedule.
+  - Enrolled — The policy exists. The platform reports it back to whoever asked.
+- **What it does:**
+  - Multi-tenant by construction: platform → employer → employee → group, isolated per tenant.
+  - Group setup, enrollment, quoting, amendment, renewal, policy import, and dependant management, each as its own workflow.
+  - Eligibility computed from provider rules rather than stored as a flag.
+  - Policy and plan data aggregated across insurers into a single response.
+  - A versioned public API and signed webhooks for the platforms doing the embedding.
+  - Insurer integrations over both HTTP APIs and scheduled SFTP file exchange.
+- **Engineering decisions:**
+  - **Intents instead of request/response** — An enrollment cannot finish inside one call — an insurer may take minutes or days. Modeling it as a persisted state machine with its own status makes the in-between state something the system can query, resume, and report on, instead of a transaction held open and hoped for.
+  - **Adaptive requirements instead of a form per insurer** — What a given case must collect depends on the insurer and the regulatory region at once. Rather than encoding nine forms, the platform asks a requirements service what this case needs and renders that. Adding an insurer stops being a front-end change. The lookup happens behind the same adapter boundary, so the core still never handles a provider identity itself.
+  - **An adapter factory as the only door to a provider** — The platform core resolves an adapter and talks to that. It never learns which insurer it is serving, which is what keeps a tenth integration from touching enrollment logic — and what let provider contracts be introduced behind feature flags and migrated without stopping the product.
+  - **Idempotency and duplicate suppression as a requirement, not a repair** — Retries happen, webhooks arrive twice, and consumers run concurrently against the same rows. Intent creation takes an idempotency key, auto-enrollment suppresses the duplicate intent-and-webhook pair, and the eligibility-screening consumer handles serialization conflicts rather than assuming they cannot happen.
 
 ### Airia Cloud Connector — A reverse tunnel that reaches into a private network without opening it.
 
@@ -539,6 +510,59 @@ system Felipe worked on; the "What Felipe did" line is the authoritative stateme
   - **A repository layer, added after the fact and on purpose** — The first version queried the database context straight from the services, which is fine until three teams are writing services against the same entities and each invents its own idea of what "the agents for this tenant" means. Moving those queries behind repositories gave the feature one definition of each read, and gave the unit tests something to stand on that is not a database.
   - **A scheduled refresh instead of a webhook per provider** — Webhooks would be fresher, and would require every provider to support them, every customer to configure them, and the platform to be reachable from each one — which is the same perimeter problem the connector exists to avoid. Polling on a schedule is less elegant and works everywhere, and an inventory whose age is known is more useful than one that is silently missing whatever event was dropped.
   - **A violation you can trace to a run** — A feed saying a policy was broken is an alert; a feed saying which execution broke it is an investigation. Carrying the execution identifier through to the violation row is a one-column change that moves the feed from something a security team watches to something they can act on.
+
+### Pampa Devs — My studio’s site, and the tool it sends proposals with.
+
+- **Role:** Founder — design & implementation (2020 – Current)
+- **Source:** closed — professional work described without the code (Live site: https://www.pampadevs.com)
+- **Stack:** Vue 3, TypeScript, Vite, Vue Router, Vue I18n, SCSS, Azure Static Web Apps
+- **What it is:** Pampa Devs is my software studio, and this is where a prospective client meets it. The site carries the service catalogue, a blog in two languages, and three landing pages aimed at particular services. Two parts of it are not what a studio site usually does: the services are demonstrated by working versions of themselves rather than by screenshots, and a commercial proposal is rendered as a page here instead of attached to an email.
+- **What Felipe did:** I built it and I keep it running — about two thirds of the commits over six years.
+  - The site itself: the catalogue, the landing pages, the blog and the two locales it all renders in.
+  - The embedded demos — the storefront, the chat assistant, the checkout and the lead form.
+  - The proposal renderer: diagnosis, strategy, timeline, cost, return and architecture as sections of a page.
+  - NOT his work: Two engineers from the studio worked on it with me; roughly a third of the commits are theirs.
+- **Problem it solved:** A studio selling websites, online stores and automations to small businesses has to show that it can build them, to people who do not read code. Screenshots of past work prove less than they look like they do — the reader cannot tell what is a real product and what is a mockup made for the pitch.
+- **What it does:**
+  - A storefront demo you can actually use: pick a size, add to the cart, watch the total change.
+  - A chat assistant demo that answers, and a lead form that walks through to its confirmation.
+  - A blog with posts written in both languages, not one language machine-translated into the other.
+  - Client proposals as pages: diagnosis, strategy, timeline, cost, return, before and after, architecture.
+- **Engineering decisions:**
+  - **Demonstrating the services instead of describing them** — The storefront, the chat assistant and the checkout on the services page are working front ends, not images. Someone deciding whether to buy an online store can put something in a cart before deciding. It costs more to build than a screenshot, and it is the part of the site that does the selling.
+  - **A proposal is a page, not a document** — A commercial proposal is a view on this site, assembled from the same sections every time: the diagnosis, the strategy, how the work runs, the timeline, the cost, the expected return, a before and after, the architecture, and the questions clients ask. The client opens a link. Changing the offer means changing a page, not re-exporting a file and hoping the right version was attached.
+  - **Static, and deployed as static** — There is no server behind it. The blog posts are files in the repository, the demos run in the browser, and the whole thing is published as a static site with a rewrite rule for client-side routing. A marketing site that goes down because a backend went down is a cost with no matching benefit.
+
+### Pulse — A live, real-time system embedded in a portfolio.
+
+- **Role:** Design & implementation
+- **Source:** public — Live site: https://felipealmeida.tech · GitHub: https://github.com/felipe-allmeida/pulse
+- **Stack:** .NET 10, SignalR, RabbitMQ, Redis, Postgres, React 19, Docker, Terraform
+- **What it is:** A self-hosted portfolio that doubles as a live systems demo: presence, visits, and metrics travel through a real event-driven backend in real time, not canned data.
+- **What Felipe did:** I built this one alone — the design, the event-driven backend, the front end, and the infrastructure it runs on.
+  - The realtime presence pipeline and its world map.
+  - The transactional outbox and the event-driven backend behind it.
+  - The public ops dashboard and the metrics it exposes.
+  - The AI assistant and the profile that grounds it.
+  - Deployment, from container build to the machine it lands on.
+- **Problem it solved:** A CV asserts seniority and a repository demands that someone read it; neither lets a stranger watch a system work. Pulse closes that gap by being both the portfolio and the thing being demonstrated. The constraint it was built against was not a user need but an evidentiary one — make the claim checkable in the thirty seconds someone actually spends.
+- **Architecture:** A .NET backend behind a React client. A new connection resolves the visitor’s rough location and publishes a visit event through a transactional outbox, flushed in the same save as the write. A worker drains that outbox over RabbitMQ and appends the audit trail in Postgres. SignalR carries live presence — the connection count, and reactions — while the world map reads the accumulated visits by polling, so the map draws on its own schedule instead of blocking on that round trip. Tracing runs through OpenTelemetry, and the whole thing ships as containers behind Caddy.
+  - Browser — A React client holding a SignalR connection open.
+  - API — Resolves the visitor’s rough location, publishes the visit, and broadcasts the new presence count to everyone.
+  - Outbox — The event is buffered and flushed in the same save as the write, so it cannot be published for something that did not commit.
+  - Worker — Drains the outbox over RabbitMQ and appends the visit to the audit trail.
+  - World map — Polls the accumulated visits on its own schedule, so the map never blocks on the round trip that fills it.
+- **What it does:**
+  - Live presence via SignalR — see who else is on the site right now, on a world map.
+  - Event-driven .NET backend with a RabbitMQ transactional outbox, Postgres, and OpenTelemetry tracing.
+  - A public ops dashboard exposing real metrics — live connections, visits over time, and the event feed as it happens.
+  - An AI assistant grounded in a maintained profile, streaming answers about me.
+  - Deployed with Docker Compose + Caddy behind Terraform-managed infrastructure.
+- **Engineering decisions:**
+  - **A transactional outbox behind a visit counter** — Nothing about counting visits requires one. It is here because the pattern is what the site exists to demonstrate, wired end to end and running where a reader can watch it instead of reading a diagram. On a product it would be over-engineering.
+  - **Real telemetry, published** — The ops dashboard exposes the system’s actual numbers, which means a reader can catch the site lying about itself. Most portfolios make claims that cannot be checked; this one chose the version that can be.
+  - **Prerendered pages over a client-only app** — The site renders its content into HTML at build time, so a first visit does not wait on JavaScript and a crawler sees the same page a person does — and, usefully, a deploy can be verified with a single request rather than a browser.
+  - **An assistant grounded in a maintained profile** — The assistant answers from a file I keep current, and says it does not know rather than inventing. Ungrounded, it would be a demonstration of exactly the wrong thing.
 
 ### Dell Automated Caller — Automated end-to-end testing for a phone system.
 
