@@ -2997,6 +2997,114 @@ export const projects: Project[] = [
     },
   },
   {
+    slug: 'pampa-devs',
+    name: 'Pampa Devs',
+    tagline: {
+      en: 'My studio’s site, and the tool it sends proposals with.',
+      'pt-BR': 'O site do meu estúdio, e a ferramenta com que ele manda proposta.',
+    },
+    description: {
+      en: 'The site for the software studio I run: bilingual, with a blog, three landing pages for the services it sells, and working demos of those services built into the page — a storefront with a cart, a chat assistant, a checkout. Client proposals are pages on it rather than documents sent by email.',
+      'pt-BR':
+        'O site do estúdio de software que eu toco: bilíngue, com blog, três landing pages para os serviços que ele vende, e demos funcionais desses serviços dentro da própria página — uma loja com carrinho, um assistente de chat, um checkout. Proposta de cliente é página aqui, não documento mandado por e-mail.',
+    },
+    tech: ['Vue 3', 'TypeScript', 'Vite', 'Vue Router', 'Vue I18n', 'SCSS', 'Azure Static Web Apps'],
+    role: { en: 'Founder — design & implementation', 'pt-BR': 'Fundador — design & implementação' },
+    period: { en: '2020 – Current', 'pt-BR': '2020 – Atual' },
+    visibility: 'private',
+    screenshot: '/screenshots/pampa-devs.webp',
+    links: [{ label: 'Live site', href: 'https://www.pampadevs.com' }],
+    detail: {
+      overview: {
+        en: 'Pampa Devs is my software studio, and this is where a prospective client meets it. The site carries the service catalogue, a blog in two languages, and three landing pages aimed at particular services. Two parts of it are not what a studio site usually does: the services are demonstrated by working versions of themselves rather than by screenshots, and a commercial proposal is rendered as a page here instead of attached to an email.',
+        'pt-BR':
+          'A Pampa Devs é o meu estúdio de software, e é aqui que um cliente em potencial o encontra. O site carrega o catálogo de serviços, um blog em dois idiomas e três landing pages voltadas a serviços específicos. Duas partes dele não são o que um site de estúdio costuma fazer: os serviços são demonstrados por versões funcionais de si mesmos, e não por prints, e uma proposta comercial é renderizada como página aqui, em vez de anexada a um e-mail.',
+      },
+      contribution: {
+        summary: {
+          en: 'I built it and I keep it running — about two thirds of the commits over six years.',
+          'pt-BR': 'Eu construí e mantenho — cerca de dois terços dos commits ao longo de seis anos.',
+        },
+        areas: [
+          {
+            en: 'The site itself: the catalogue, the landing pages, the blog and the two locales it all renders in.',
+            'pt-BR': 'O site em si: o catálogo, as landing pages, o blog e os dois idiomas em que tudo é renderizado.',
+          },
+          {
+            en: 'The embedded demos — the storefront, the chat assistant, the checkout and the lead form.',
+            'pt-BR': 'As demos embutidas — a loja, o assistente de chat, o checkout e o formulário de lead.',
+          },
+          {
+            en: 'The proposal renderer: diagnosis, strategy, timeline, cost, return and architecture as sections of a page.',
+            'pt-BR': 'O renderizador de proposta: diagnóstico, estratégia, cronograma, custo, retorno e arquitetura como seções de uma página.',
+          },
+        ],
+        boundary: {
+          en: 'Two engineers from the studio worked on it with me; roughly a third of the commits are theirs.',
+          'pt-BR': 'Dois engenheiros do estúdio trabalharam nele comigo; cerca de um terço dos commits é deles.',
+        },
+      },
+      problem: {
+        en: 'A studio selling websites, online stores and automations to small businesses has to show that it can build them, to people who do not read code. Screenshots of past work prove less than they look like they do — the reader cannot tell what is a real product and what is a mockup made for the pitch.',
+        'pt-BR':
+          'Um estúdio que vende site, loja online e automação para pequenas empresas precisa mostrar que sabe construir isso, para gente que não lê código. Print de trabalho passado prova menos do que parece — quem lê não consegue distinguir o que é produto real do que é mockup feito para a apresentação.',
+      },
+      highlights: [
+        {
+          en: 'A storefront demo you can actually use: pick a size, add to the cart, watch the total change.',
+          'pt-BR': 'Uma demo de loja que dá para usar de verdade: escolher tamanho, jogar no carrinho, ver o total mudar.',
+        },
+        {
+          en: 'A chat assistant demo that answers, and a lead form that walks through to its confirmation.',
+          'pt-BR': 'Uma demo de assistente de chat que responde, e um formulário de lead que vai até a confirmação.',
+        },
+        {
+          en: 'A blog with posts written in both languages, not one language machine-translated into the other.',
+          'pt-BR': 'Um blog com posts escritos nos dois idiomas, e não um idioma traduzido automaticamente para o outro.',
+        },
+        {
+          en: 'Client proposals as pages: diagnosis, strategy, timeline, cost, return, before and after, architecture.',
+          'pt-BR': 'Propostas de cliente como páginas: diagnóstico, estratégia, cronograma, custo, retorno, antes e depois, arquitetura.',
+        },
+      ],
+      decisions: [
+        {
+          heading: {
+            en: 'Demonstrating the services instead of describing them',
+            'pt-BR': 'Demonstrar os serviços em vez de descrevê-los',
+          },
+          body: {
+            en: 'The storefront, the chat assistant and the checkout on the services page are working front ends, not images. Someone deciding whether to buy an online store can put something in a cart before deciding. It costs more to build than a screenshot, and it is the part of the site that does the selling.',
+            'pt-BR':
+              'A loja, o assistente de chat e o checkout na página de serviços são front-ends funcionais, não imagens. Quem está decidindo se compra uma loja online consegue colocar algo no carrinho antes de decidir. Custa mais para construir do que um print, e é a parte do site que vende.',
+          },
+        },
+        {
+          heading: {
+            en: 'A proposal is a page, not a document',
+            'pt-BR': 'Proposta é página, não documento',
+          },
+          body: {
+            en: 'A commercial proposal is a view on this site, assembled from the same sections every time: the diagnosis, the strategy, how the work runs, the timeline, the cost, the expected return, a before and after, the architecture, and the questions clients ask. The client opens a link. Changing the offer means changing a page, not re-exporting a file and hoping the right version was attached.',
+            'pt-BR':
+              'Uma proposta comercial é uma view deste site, montada sempre com as mesmas seções: o diagnóstico, a estratégia, como o trabalho acontece, o cronograma, o custo, o retorno esperado, um antes e depois, a arquitetura e as perguntas que os clientes fazem. O cliente abre um link. Mudar a oferta é mudar uma página, não reexportar um arquivo e torcer para ter anexado a versão certa.',
+          },
+        },
+        {
+          heading: {
+            en: 'Static, and deployed as static',
+            'pt-BR': 'Estático, e publicado como estático',
+          },
+          body: {
+            en: 'There is no server behind it. The blog posts are files in the repository, the demos run in the browser, and the whole thing is published as a static site with a rewrite rule for client-side routing. A marketing site that goes down because a backend went down is a cost with no matching benefit.',
+            'pt-BR':
+              'Não há servidor por trás. Os posts do blog são arquivos no repositório, as demos rodam no navegador, e tudo é publicado como site estático com uma regra de rewrite para o roteamento no cliente. Um site institucional que cai porque um backend caiu é custo sem benefício correspondente.',
+          },
+        },
+      ],
+    },
+  },
+  {
     slug: 'pulse',
     name: 'Pulse',
     tagline: {

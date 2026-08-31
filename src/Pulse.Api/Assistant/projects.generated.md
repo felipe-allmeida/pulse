@@ -511,6 +511,28 @@ system Felipe worked on; the "What Felipe did" line is the authoritative stateme
   - **A scheduled refresh instead of a webhook per provider** — Webhooks would be fresher, and would require every provider to support them, every customer to configure them, and the platform to be reachable from each one — which is the same perimeter problem the connector exists to avoid. Polling on a schedule is less elegant and works everywhere, and an inventory whose age is known is more useful than one that is silently missing whatever event was dropped.
   - **A violation you can trace to a run** — A feed saying a policy was broken is an alert; a feed saying which execution broke it is an investigation. Carrying the execution identifier through to the violation row is a one-column change that moves the feed from something a security team watches to something they can act on.
 
+### Pampa Devs — My studio’s site, and the tool it sends proposals with.
+
+- **Role:** Founder — design & implementation (2020 – Current)
+- **Source:** closed — professional work described without the code (Live site: https://www.pampadevs.com)
+- **Stack:** Vue 3, TypeScript, Vite, Vue Router, Vue I18n, SCSS, Azure Static Web Apps
+- **What it is:** Pampa Devs is my software studio, and this is where a prospective client meets it. The site carries the service catalogue, a blog in two languages, and three landing pages aimed at particular services. Two parts of it are not what a studio site usually does: the services are demonstrated by working versions of themselves rather than by screenshots, and a commercial proposal is rendered as a page here instead of attached to an email.
+- **What Felipe did:** I built it and I keep it running — about two thirds of the commits over six years.
+  - The site itself: the catalogue, the landing pages, the blog and the two locales it all renders in.
+  - The embedded demos — the storefront, the chat assistant, the checkout and the lead form.
+  - The proposal renderer: diagnosis, strategy, timeline, cost, return and architecture as sections of a page.
+  - NOT his work: Two engineers from the studio worked on it with me; roughly a third of the commits are theirs.
+- **Problem it solved:** A studio selling websites, online stores and automations to small businesses has to show that it can build them, to people who do not read code. Screenshots of past work prove less than they look like they do — the reader cannot tell what is a real product and what is a mockup made for the pitch.
+- **What it does:**
+  - A storefront demo you can actually use: pick a size, add to the cart, watch the total change.
+  - A chat assistant demo that answers, and a lead form that walks through to its confirmation.
+  - A blog with posts written in both languages, not one language machine-translated into the other.
+  - Client proposals as pages: diagnosis, strategy, timeline, cost, return, before and after, architecture.
+- **Engineering decisions:**
+  - **Demonstrating the services instead of describing them** — The storefront, the chat assistant and the checkout on the services page are working front ends, not images. Someone deciding whether to buy an online store can put something in a cart before deciding. It costs more to build than a screenshot, and it is the part of the site that does the selling.
+  - **A proposal is a page, not a document** — A commercial proposal is a view on this site, assembled from the same sections every time: the diagnosis, the strategy, how the work runs, the timeline, the cost, the expected return, a before and after, the architecture, and the questions clients ask. The client opens a link. Changing the offer means changing a page, not re-exporting a file and hoping the right version was attached.
+  - **Static, and deployed as static** — There is no server behind it. The blog posts are files in the repository, the demos run in the browser, and the whole thing is published as a static site with a rewrite rule for client-side routing. A marketing site that goes down because a backend went down is a cost with no matching benefit.
+
 ### Pulse — A live, real-time system embedded in a portfolio.
 
 - **Role:** Design & implementation
