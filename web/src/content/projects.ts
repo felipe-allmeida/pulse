@@ -715,13 +715,13 @@ export const projects: Project[] = [
     slug: 'dietbox-b2c',
     name: 'Dietbox B2C',
     tagline: {
-      en: 'One identity backbone, two audiences, custom sign-in journeys.',
-      'pt-BR': 'Uma base de identidade, dois públicos, jornadas de login customizadas.',
+      en: 'One login for all of the product’s systems.',
+      'pt-BR': 'Um único login para todos os sistemas.',
     },
     description: {
-      en: 'Custom Azure AD B2C policies for a product whose two audiences share nothing but an account: a practitioner subscribing, and a patient invited by the one treating them. Federated sign-in, silent migration off the legacy store, and revocation that actually signs a session out everywhere.',
+      en: 'One account signs a person into all five of the product’s systems — the nutritionist’s app, the patient’s Android and iOS apps, the web product and the checkout — across two audiences that share nothing else. Custom Azure AD B2C policies behind it: federated sign-in, silent migration off the legacy store, and revocation that ends sessions already open.',
       'pt-BR':
-        'Políticas customizadas de Azure AD B2C para um produto cujos dois públicos não dividem nada além da conta: a profissional que assina e o paciente convidado por ela. Login federado, migração silenciosa da base legada e revogação que de fato encerra a sessão em todo lugar.',
+        'Uma conta só leva a pessoa a todos os cinco sistemas do produto — o app da nutricionista, os apps Android e iOS do paciente, o produto web e o checkout — em dois públicos que não dividem mais nada. Políticas customizadas de Azure AD B2C por trás: login federado, migração silenciosa da base legada e revogação que encerra sessões já abertas.',
     },
     tech: ['Azure AD B2C', 'Identity Experience Framework', 'XML', 'OpenID Connect', 'OAuth 2.0', '.NET 6', 'HTML', 'CSS', 'Azure DevOps'],
     role: {
@@ -735,9 +735,9 @@ export const projects: Project[] = [
     venture: 'dietbox',
     detail: {
       overview: {
-        en: 'One Azure AD B2C identity system carrying two audiences that share nothing but the account: a nutritionist subscribing and paying, and a patient arriving by invitation from the one treating them. Five clients sign in through it — the nutritionist’s mobile app, the patient’s Android app, the patient’s iOS app, the web product both audiences use, and the checkout — across three platforms and two tenants. Three years of custom sign-in journeys, federated providers, silent migration off the legacy store, and session revocation that reaches every open browser.',
+        en: 'One account gets a person into every part of the product. The nutritionist signs in once and reaches her mobile app, the web product and the checkout with the same credentials; the patient signs in once and reaches the Android app, the iOS app and the web product. Five clients across three platforms, over two audiences that share nothing but the login — a nutritionist subscribing and paying, and a patient arriving by invitation from the one treating her. Three years of custom sign-in journeys, federated providers, silent migration off the legacy store, and session revocation that reaches every open browser.',
         'pt-BR':
-          'Um único sistema de identidade em Azure AD B2C carregando dois públicos que não dividem nada além da conta: a nutricionista que assina e paga, e o paciente que chega por convite de quem o atende. Cinco clientes fazem login por ele — o app da nutricionista, o app Android do paciente, o app iOS do paciente, o produto web que os dois públicos usam e o checkout — em três plataformas e dois tenants. Três anos de jornadas de login customizadas, provedores federados, migração silenciosa da base legada e revogação de sessão que alcança todo navegador aberto.',
+          'Uma conta só leva a pessoa a todas as partes do produto. A nutricionista faz login uma vez e chega ao app dela, ao produto web e ao checkout com as mesmas credenciais; o paciente faz login uma vez e chega ao app Android, ao app iOS e ao produto web. Cinco clientes em três plataformas, sobre dois públicos que não dividem nada além do login — a nutricionista que assina e paga, e o paciente que chega por convite de quem o atende. Três anos de jornadas de login customizadas, provedores federados, migração silenciosa da base legada e revogação de sessão que alcança todo navegador aberto.',
       },
       contribution: {
         summary: {

@@ -105,12 +105,12 @@ system Felipe worked on; the "What Felipe did" line is the authoritative stateme
   - **Release by slot swap, not by overwrite** — The pipeline builds once and deploys that one artifact to the app’s staging slot; production changes by swapping the slot in, not by writing over the site while it is serving. What goes live is a build that was already running before it took traffic, and the way back is the same swap in the other direction. That is what a deploy has to be before it can happen in daylight rather than at night.
   - **A monolith you strangle, not rewrite** — New capability went into the services beside the monolith, not into the monolith itself. It kept the surface it already served, without a rewrite competing for the same hours as the features shipping everywhere else.
 
-### Dietbox B2C — One identity backbone, two audiences, custom sign-in journeys.
+### Dietbox B2C — One login for all of the product’s systems.
 
 - **Role:** Senior Software Engineer, then Head of Technology (2021–2024)
 - **Source:** closed — professional work described without the code (Website: https://dietbox.me)
 - **Stack:** Azure AD B2C, Identity Experience Framework, XML, OpenID Connect, OAuth 2.0, .NET 6, HTML, CSS, Azure DevOps
-- **What it is:** One Azure AD B2C identity system carrying two audiences that share nothing but the account: a nutritionist subscribing and paying, and a patient arriving by invitation from the one treating them. Five clients sign in through it — the nutritionist’s mobile app, the patient’s Android app, the patient’s iOS app, the web product both audiences use, and the checkout — across three platforms and two tenants. Three years of custom sign-in journeys, federated providers, silent migration off the legacy store, and session revocation that reaches every open browser.
+- **What it is:** One account gets a person into every part of the product. The nutritionist signs in once and reaches her mobile app, the web product and the checkout with the same credentials; the patient signs in once and reaches the Android app, the iOS app and the web product. Five clients across three platforms, over two audiences that share nothing but the login — a nutritionist subscribing and paying, and a patient arriving by invitation from the one treating her. Three years of custom sign-in journeys, federated providers, silent migration off the legacy store, and session revocation that reaches every open browser.
 - **What Felipe did:** This is the most of me there is anywhere in the Dietbox estate: I wrote half the commits over three years, across both audiences’ sign-in journeys.
   - The two policy sets — one for the practitioner, one for the patient — each its own sign-up, sign-in and password-reset journey.
   - Federation with Google, Facebook and Apple, each mapped through its own exchange profile into a common subject claim.
