@@ -77,17 +77,17 @@ system Felipe worked on; the "What Felipe did" line is the authoritative stateme
   - **An adapter factory as the only door to a provider** — The platform core resolves an adapter and talks to that. It never learns which insurer it is serving, which is what keeps a tenth integration from touching enrollment logic — and what let provider contracts be introduced behind feature flags and migrated without stopping the product.
   - **Idempotency and duplicate suppression as a requirement, not a repair** — Retries happen, webhooks arrive twice, and consumers run concurrently against the same rows. Intent creation takes an idempotency key, auto-enrollment suppresses the duplicate intent-and-webhook pair, and the eligibility-screening consumer handles serialization conflicts rather than assuming they cannot happen.
 
-### Dietbox Webapp — The decade-old monolith the product grew on, and still its largest codebase.
+### Dietbox Webapp — None of today’s APIs existed. All of it started in here.
 
 - **Role:** Senior Software Engineer, then Head of Technology (2020–2024)
 - **Source:** closed — professional work described without the code (Website: https://dietbox.me)
 - **Stack:** C#, ASP.NET MVC, Entity Framework, SQL Server, Azure App Service, Kendo UI, Azure DevOps
-- **What it is:** The monolith is the product's centre of gravity: for years it was the only codebase, carrying both the nutritionist and the patient experience through the same release. Everything the product did shipped through this one pipeline, on the one schedule that pipeline allowed.
-- **What Felipe did:** Principal architect for four years — I set the platform’s patterns and configured the Azure estate, including for services other people wrote. Later the whole technology organization reported to me.
+- **What it is:** When I arrived, this was the product. The nutritionist’s tool, the patient’s, subscriptions, food data, sign-in — one codebase, one release, one schedule. None of the services that run beside it now existed yet. Over four years I took the logic out of it a piece at a time and stood each piece up as an API of its own, leaving the monolith serving whatever had not moved. It is still the product’s largest codebase.
+- **What Felipe did:** Principal architect for four years. I ran the extraction — what came out of the monolith, in what order, and what shape it took on the other side — set the platform’s patterns, and configured the Azure estate, including for services other people wrote. Later the whole technology organization reported to me.
   - The build and release pipeline in Azure DevOps, shipping the core project together with its satellites and its gulp-built, Kendo UI front end.
   - Production availability and incident response.
   - NOT his work: The product’s largest codebase was a team effort — about a sixth of that repository’s commits are mine.
-- **Problem it solved:** The nutritionist lives in the tool all day; the patient opens it to read a meal plan. Same product, same identity backbone, opposite expectations. And in 2020 a .NET Framework monolith carried both on Windows App Service, shipping once a day, at night, because that was the only window that felt safe.
+- **Problem it solved:** The nutritionist lives in the tool all day; the patient opens it to read a meal plan. Same product, opposite expectations. In 2020 a .NET Framework monolith carried both on Windows App Service — and sign-in, subscriptions and the food data with them — shipping once a day, at night, because that was the only window that felt safe. Anything the product needed to do differently had to be done inside it.
 - **Results:** ~600 commits in the monolith (mine, of ~3.9k total); 4 years in the same codebase (2020 to 2024) — The commit counts come from the repository. The rest is my own record of the period.
 - **Architecture:** The core project, its data, the scheduled job beside it, and the Azure app it deploys onto.
   - Web application — The core project and its satellites — catalogs, enums, shared infrastructure, resources and reports — behind a gulp-built front end using Kendo UI.
@@ -103,7 +103,7 @@ system Felipe worked on; the "What Felipe did" line is the authoritative stateme
   - **One core, many satellites** — The core project doesn't carry catalogs, enums, shared infrastructure, resources and reports itself — each lives in its own satellite project. A change to reference data doesn't touch the same project as a change to the request path.
   - **The release builds a target, not the solution** — The release pipeline restores the solution but builds a single target — the site project — and archives only what that target publishes. The webjob project sitting beside it in the repository is not in the solution at all: it still targets 4.7.2 where the site targets 4.8, carries its own daily-schedule publish settings, and has not been touched since 2021. Naming a target rather than a solution is what keeps a project in that state from riding into a release nobody meant to include it in.
   - **Release by slot swap, not by overwrite** — The pipeline builds once and deploys that one artifact to the app’s staging slot; production changes by swapping the slot in, not by writing over the site while it is serving. What goes live is a build that was already running before it took traffic, and the way back is the same swap in the other direction. That is what a deploy has to be before it can happen in daylight rather than at night.
-  - **A monolith you strangle, not rewrite** — New capability went into the services beside the monolith, not into the monolith itself. It kept the surface it already served, without a rewrite competing for the same hours as the features shipping everywhere else.
+  - **A monolith you strangle, not rewrite** — The monolith was not ported and not rewritten. Logic came out of it a piece at a time — sign-in, payments, food data, the back office, notifications, realtime — and each piece became an API running beside it, while the monolith kept serving whatever had not moved yet. A rewrite would have competed for the same hours as the features shipping everywhere else, and the product could not stop while it happened.
 
 ### Dietbox B2C — One login for all of the product’s systems.
 
@@ -324,7 +324,7 @@ system Felipe worked on; the "What Felipe did" line is the authoritative stateme
   - **Strongly-typed IDs from a source generator** — Every entity has its own ID struct, rendered as ti_…, tm_…, us_…. Passing a team ID where a ticket ID belongs stops compiling. A whole class of bug moves from runtime to build time, and IDs say what they are in logs and URLs.
   - **Its own OAuth server, and an MCP server behind it** — OpenIddict issues the tokens; the MCP server exposes ticket read/write and lookup tools. Someone connects Claude or ChatGPT to their own account through a consent screen and works tickets in natural language — under exactly the permissions they already have in the UI, with the same scope check on every tool call.
 
-### Ulbra One — Internal ERP replacing legacy systems.
+### Ulbra One — The ERP being built to take the university off Senior.
 
 - **Role:** Head of Technology (Jun 2026 – Current)
 - **Source:** closed — professional work described without the code
@@ -345,12 +345,12 @@ system Felipe worked on; the "What Felipe did" line is the authoritative stateme
   - **The same conventions as the service desk, deliberately** — Endpoint shape, result type and migration strategy are copied from Ulbra Atende rather than reconsidered. With three engineers across six systems, an engineer moving between two codebases should not be learning a second set of rules — the consistency is worth more than any local improvement either codebase might have made alone.
   - **A modular monolith, not services** — An ERP is a set of tightly related domains that transact together. Splitting it into services would buy independent deployment at the cost of distributed transactions across modules that genuinely need consistency — and there is no team here to operate that. Modules give the boundaries; the single process keeps the transactions.
 
-### Ulbra CRM — An inherited CRM taken from no tests to full coverage.
+### Ulbra CRM — Where the university works the leads for its next intake of students.
 
 - **Role:** Head of Technology — direction & review (Apr 2026 – Current)
 - **Source:** closed — professional work described without the code
 - **Stack:** React, TanStack Router, MongoDB, Docker Swarm
-- **What it is:** The CRM the university runs on, inherited rather than built: no automated tests, and a codebase whose structure had not kept up with it. It is now fully covered by tests and materially better to use, and the work was done by the team under my direction — I set the direction and reviewed it, and did not write it.
+- **What it is:** Prospective students arrive as leads — from a campaign, a form, an event — and someone works each one until it becomes an enrolment or does not. This is where that happens. I inherited it rather than built it: no automated tests, and a structure that had not kept up with the product. It is now fully covered by tests and materially better to work in, and that work was the team’s — I set the direction and reviewed it, and did not write it.
 - **What Felipe did:** I set the direction and reviewed the work; the engineering was the team’s.
   - The decision to cover the codebase with tests before changing its behaviour.
   - The routing migration that made filter state survive navigation.

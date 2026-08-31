@@ -537,8 +537,8 @@ export const projects: Project[] = [
     slug: 'dietbox',
     name: 'Dietbox Webapp',
     tagline: {
-      en: 'The decade-old monolith the product grew on, and still its largest codebase.',
-      'pt-BR': 'O monolito de dez anos em que o produto cresceu, e ainda sua maior base de código.',
+      en: 'None of today’s APIs existed. All of it started in here.',
+      'pt-BR': 'Nenhuma das APIs de hoje existia. Tudo começou aqui dentro.',
     },
     description: {
       en: 'The monolith that carried both the nutritionist and the patient experience before any other service existed, deploying once a night because that was the only window that felt safe — and the codebase a newer generation of services has since grown up beside.',
@@ -557,15 +557,15 @@ export const projects: Project[] = [
     links: [{ label: 'Website', href: 'https://dietbox.me' }],
     detail: {
       overview: {
-        en: "The monolith is the product's centre of gravity: for years it was the only codebase, carrying both the nutritionist and the patient experience through the same release. Everything the product did shipped through this one pipeline, on the one schedule that pipeline allowed.",
+        en: 'When I arrived, this was the product. The nutritionist’s tool, the patient’s, subscriptions, food data, sign-in — one codebase, one release, one schedule. None of the services that run beside it now existed yet. Over four years I took the logic out of it a piece at a time and stood each piece up as an API of its own, leaving the monolith serving whatever had not moved. It is still the product’s largest codebase.',
         'pt-BR':
-          'O monolito é o centro de gravidade do produto: por anos foi a única base de código, levando tanto a experiência da nutricionista quanto a do paciente na mesma entrega. Tudo que o produto fazia passava por esse único pipeline, na única janela que esse pipeline permitia.',
+          'Quando cheguei, isto era o produto. A ferramenta da nutricionista, a do paciente, assinaturas, dados de alimentos, login — uma base de código, uma entrega, um horário. Nenhum dos serviços que rodam ao lado hoje existia ainda. Ao longo de quatro anos fui tirando a lógica de dentro dele uma peça por vez e levantando cada peça como uma API própria, deixando o monolito atendendo o que ainda não tinha saído. Ele segue sendo a maior base de código do produto.',
       },
       contribution: {
         summary: {
-          en: 'Principal architect for four years — I set the platform’s patterns and configured the Azure estate, including for services other people wrote. Later the whole technology organization reported to me.',
+          en: 'Principal architect for four years. I ran the extraction — what came out of the monolith, in what order, and what shape it took on the other side — set the platform’s patterns, and configured the Azure estate, including for services other people wrote. Later the whole technology organization reported to me.',
           'pt-BR':
-            'Arquiteto principal por quatro anos — defini os padrões da plataforma e configurei o ambiente Azure, inclusive para serviços escritos por outras pessoas. Depois, toda a área de tecnologia passou a se reportar a mim.',
+            'Arquiteto principal por quatro anos. Conduzi a extração — o que saía do monolito, em que ordem, e que forma tomava do outro lado —, defini os padrões da plataforma e configurei o ambiente Azure, inclusive para serviços escritos por outras pessoas. Depois, toda a área de tecnologia passou a se reportar a mim.',
         },
         areas: [
           {
@@ -585,9 +585,9 @@ export const projects: Project[] = [
         },
       },
       problem: {
-        en: 'The nutritionist lives in the tool all day; the patient opens it to read a meal plan. Same product, same identity backbone, opposite expectations. And in 2020 a .NET Framework monolith carried both on Windows App Service, shipping once a day, at night, because that was the only window that felt safe.',
+        en: 'The nutritionist lives in the tool all day; the patient opens it to read a meal plan. Same product, opposite expectations. In 2020 a .NET Framework monolith carried both on Windows App Service — and sign-in, subscriptions and the food data with them — shipping once a day, at night, because that was the only window that felt safe. Anything the product needed to do differently had to be done inside it.',
         'pt-BR':
-          'A nutricionista vive na ferramenta o dia inteiro; o paciente abre para ler um plano alimentar. Mesmo produto, mesma base de identidade, expectativas opostas. E em 2020 um monolito .NET Framework carregava os dois no Windows App Service, com deploy uma vez por dia, de madrugada, porque era a única janela que parecia segura.',
+          'A nutricionista vive na ferramenta o dia inteiro; o paciente abre para ler um plano alimentar. Mesmo produto, expectativas opostas. Em 2020 um monolito .NET Framework carregava os dois no Windows App Service — e o login, as assinaturas e os dados de alimentos junto —, com deploy uma vez por dia, de madrugada, porque era a única janela que parecia segura. Qualquer coisa que o produto precisasse fazer diferente tinha que ser feita lá dentro.',
       },
       metrics: [
         {
@@ -703,9 +703,9 @@ export const projects: Project[] = [
             'pt-BR': 'Um monolito que se estrangula, não se reescreve',
           },
           body: {
-            en: 'New capability went into the services beside the monolith, not into the monolith itself. It kept the surface it already served, without a rewrite competing for the same hours as the features shipping everywhere else.',
+            en: 'The monolith was not ported and not rewritten. Logic came out of it a piece at a time — sign-in, payments, food data, the back office, notifications, realtime — and each piece became an API running beside it, while the monolith kept serving whatever had not moved yet. A rewrite would have competed for the same hours as the features shipping everywhere else, and the product could not stop while it happened.',
             'pt-BR':
-              'Nova capacidade foi para os serviços ao lado do monolito, não para dentro dele. Ele manteve a superfície que já atendia, sem uma reescrita disputando as mesmas horas com as funcionalidades entregues no resto da plataforma.',
+              'O monolito não foi portado nem reescrito. A lógica saiu dele uma peça por vez — login, pagamentos, dados de alimentos, o back office, notificações, tempo real — e cada peça virou uma API rodando ao lado, enquanto o monolito seguia atendendo o que ainda não tinha saído. Uma reescrita disputaria as mesmas horas com as funcionalidades entregues no resto da plataforma, e o produto não podia parar enquanto isso acontecia.',
           },
         },
       ],
@@ -2048,13 +2048,13 @@ export const projects: Project[] = [
     slug: 'ulbra-one',
     name: 'Ulbra One',
     tagline: {
-      en: 'Internal ERP replacing legacy systems.',
-      'pt-BR': 'ERP interno substituindo sistemas legados.',
+      en: 'The ERP being built to take the university off Senior.',
+      'pt-BR': 'O ERP que está sendo construído para tirar a universidade do Senior.',
     },
     description: {
-      en: "An internal ERP replacing the university’s legacy systems — a modular .NET monolith on PostgreSQL with a React front end. In testing, ahead of launch.",
+      en: 'The university runs its internal operations on Senior. This is the system being built to replace it — a modular .NET monolith on PostgreSQL with a React front end. In testing, ahead of launch.',
       'pt-BR':
-        'Um ERP interno substituindo os sistemas legados da universidade — um monólito modular em .NET sobre PostgreSQL com front-end em React. Em teste, antes do lançamento.',
+        'A universidade roda a operação interna no Senior. Este é o sistema que está sendo construído para substituí-lo — um monólito modular em .NET sobre PostgreSQL com front-end em React. Em teste, antes do lançamento.',
     },
     tech: ['.NET 10', 'PostgreSQL 17', 'EF Core', 'React', 'Tailwind', 'shadcn/ui'],
     role: { en: 'Head of Technology', 'pt-BR': 'Head de Tecnologia' },
@@ -2150,13 +2150,13 @@ export const projects: Project[] = [
     slug: 'ulbra-crm',
     name: 'Ulbra CRM',
     tagline: {
-      en: 'An inherited CRM taken from no tests to full coverage.',
-      'pt-BR': 'Um CRM herdado levado de zero testes a cobertura total.',
+      en: 'Where the university works the leads for its next intake of students.',
+      'pt-BR': 'Onde a universidade trabalha os leads da próxima entrada de alunos.',
     },
     description: {
-      en: "The university’s CRM platform, inherited with no automated tests and little structure. Rebuilt under my direction to full test coverage, with a front-end migration that stopped every screen change from throwing away the user’s filters.",
+      en: 'The platform the university captures and works prospective-student leads on. Inherited with no automated tests and little structure, and rebuilt under my direction to full coverage, with a front-end migration that stopped every screen change from throwing away the filters someone was working a list through.',
       'pt-BR':
-        'A plataforma de CRM da universidade, herdada sem testes automatizados e com pouca estrutura. Reconstruída sob a minha direção até cobertura total de testes, com uma migração de front-end que acabou com a perda dos filtros do usuário a cada troca de tela.',
+        'A plataforma em que a universidade capta e trabalha leads de futuros alunos. Herdada sem testes automatizados e com pouca estrutura, e reconstruída sob a minha direção até cobertura total, com uma migração de front-end que acabou com a perda dos filtros a cada troca de tela para quem estava trabalhando uma lista.',
     },
     tech: ['React', 'TanStack Router', 'MongoDB', 'Docker Swarm'],
     role: { en: 'Head of Technology — direction & review', 'pt-BR': 'Head de Tecnologia — direção & revisão' },
@@ -2166,9 +2166,9 @@ export const projects: Project[] = [
     links: [],
     detail: {
       overview: {
-        en: "The CRM the university runs on, inherited rather than built: no automated tests, and a codebase whose structure had not kept up with it. It is now fully covered by tests and materially better to use, and the work was done by the team under my direction — I set the direction and reviewed it, and did not write it.",
+        en: "Prospective students arrive as leads — from a campaign, a form, an event — and someone works each one until it becomes an enrolment or does not. This is where that happens. I inherited it rather than built it: no automated tests, and a structure that had not kept up with the product. It is now fully covered by tests and materially better to work in, and that work was the team’s — I set the direction and reviewed it, and did not write it.",
         'pt-BR':
-          'O CRM em que a universidade opera, herdado e não construído: sem testes automatizados e com uma estrutura que não acompanhou o próprio crescimento. Hoje está totalmente coberto por testes e sensivelmente melhor de usar, e o trabalho foi feito pelo time sob a minha direção — eu defini a direção e revisei, não escrevi.',
+          'Futuros alunos chegam como leads — de uma campanha, de um formulário, de um evento — e alguém trabalha cada um até virar matrícula ou não. É aqui que isso acontece. Eu o herdei, não o construí: sem testes automatizados e com uma estrutura que não acompanhou o produto. Hoje está totalmente coberto por testes e sensivelmente melhor de trabalhar, e esse trabalho foi do time — eu defini a direção e revisei, não escrevi.',
       },
       contribution: {
         summary: {
