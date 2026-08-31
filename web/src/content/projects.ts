@@ -260,9 +260,9 @@ export const projects: Project[] = [
             'pt-BR': 'Um outbox transacional atrás de um contador de visitas',
           },
           body: {
-            en: 'Nothing about counting visits requires one. The point is not the counter — it is that the pattern is here, wired end to end, in something a reader can watch rather than a diagram they have to trust. On a product this would be over-engineering; on a demonstration it is the deliverable.',
+            en: 'Nothing about counting visits requires one. It is here because the pattern is what the site exists to demonstrate, wired end to end and running where a reader can watch it instead of reading a diagram. On a product it would be over-engineering.',
             'pt-BR':
-              'Nada em contar visitas exige um. O ponto não é o contador — é que o padrão está aqui, ligado de ponta a ponta, em algo que o leitor pode ver funcionando em vez de um diagrama em que precisa acreditar. Num produto isso seria over-engineering; numa demonstração é a entrega.',
+              'Nada em contar visitas exige um. Ele está aqui porque o padrão é o que o site existe para demonstrar, ligado de ponta a ponta e rodando onde o leitor pode ver, em vez de ler um diagrama. Num produto seria over-engineering.',
           },
         },
         {
@@ -914,9 +914,9 @@ export const projects: Project[] = [
             'pt-BR': 'Migração como efeito colateral do login',
           },
           body: {
-            en: 'Nobody was asked to reset a password or re-register. The user experiences a login; the system experiences a migration, writing the account into the directory and linking it back to the legacy credential in the same journey.',
+            en: 'Nobody was asked to reset a password or re-register. The account is written into the directory and linked back to the legacy credential during the same sign-in the user was already doing.',
             'pt-BR':
-              'Ninguém foi solicitado a redefinir senha ou se recadastrar. O usuário vive um login; o sistema vive uma migração, escrevendo a conta no diretório e ligando-a de volta à credencial legada na mesma jornada.',
+              'Ninguém foi solicitado a redefinir senha ou se recadastrar. A conta é escrita no diretório e ligada de volta à credencial legada durante o mesmo login que o usuário já estava fazendo.',
           },
         },
         {
@@ -925,9 +925,9 @@ export const projects: Project[] = [
             'pt-BR': 'Revogação que alcança sessões abertas',
           },
           body: {
-            en: 'A token that is merely unrenewable is not revoked. Comparing the token’s issue time against a stamp on the user record is what makes "sign this account out everywhere" actually mean it, rather than "stop this account from getting a new token next time."',
+            en: 'Revoking an account has to end the sessions that are already open, not only stop the next token from being issued. The policy compares the token’s issue time against a stamp on the user record, so moving that stamp stops an open session working.',
             'pt-BR':
-              'Um token apenas não renovável não está revogado. Comparar o momento de emissão do token com um carimbo no registro do usuário é o que faz "encerrar a conta em todo lugar" significar isso de fato, e não "impedir que a conta consiga um novo token da próxima vez".',
+              'Revogar uma conta precisa encerrar as sessões que já estão abertas, não só impedir a emissão do próximo token. A política compara o momento de emissão do token com um carimbo no registro do usuário, então mover esse carimbo faz uma sessão aberta parar de funcionar.',
           },
         },
         {
@@ -1376,9 +1376,9 @@ export const projects: Project[] = [
         {
           heading: { en: 'An action, not a database edit', 'pt-BR': 'Uma ação, não uma edição no banco' },
           body: {
-            en: 'What ops does here is not editing rows — it is invoking one of forty-four named actions, each with the product’s own rules in front of it. Cancelling a subscription is a cancel, not an update statement that happens to set a column, and every one of them passes through a pipeline that logs it by name on the way. An engineer running the same change by hand against the database has none of that: no rule, no name, and nothing left behind saying it happened.',
+            en: 'Ops invokes one of forty-four named actions, each with the product’s own rules in front of it, and each logged by name as it passes through a pipeline behaviour. The manual route it replaced — an engineer writing an update statement against the database — ran none of those rules and left no record of having run.',
             'pt-BR':
-              'O que a operação faz aqui não é editar linhas — é invocar uma de quarenta e quatro ações nomeadas, cada uma com as regras do próprio produto na frente. Cancelar uma assinatura é um cancelamento, não um update que por acaso mexe numa coluna, e cada uma delas passa por um pipeline que a registra pelo nome no caminho. Um engenheiro rodando a mesma mudança na mão contra o banco não tem nada disso: sem regra, sem nome, e sem deixar nada para trás dizendo que aconteceu.',
+              'A operação invoca uma de quarenta e quatro ações nomeadas, cada uma com as regras do próprio produto na frente, e cada uma registrada pelo nome ao passar por um pipeline behaviour. O caminho manual que isso substituiu — um engenheiro escrevendo um update contra o banco — não passava por nenhuma dessas regras e não deixava registro de ter rodado.',
           },
         },
         {
@@ -1608,9 +1608,9 @@ export const projects: Project[] = [
         {
           heading: { en: 'The metering was built and never switched on', 'pt-BR': 'A medição foi construída e nunca foi ligada' },
           body: {
-            en: 'The design went further than the deployment did. A per-practitioner limit and a log of who changed it are in the domain, built so the cost could eventually be charged back to whoever generated it — and that part was never put to use. What the service actually did, every day, was send and record. I am keeping the decision here rather than quietly deleting it: the useful half shipped, the ambitious half did not, and a case study that only lists the half that worked is not a case study.',
+            en: 'A per-practitioner limit and a log of who changed it are in the domain, built so the cost could eventually be charged back to whoever generated it. That part was never put to use — what the service did every day was send and record. The decision stays on the card because the limit is still in the code, and leaving it out would describe a service that was never built.',
             'pt-BR':
-              'O desenho foi mais longe que o uso. Existe no domínio um limite por profissional e um log de quem o alterou, construídos para que o custo pudesse um dia ser cobrado de quem o gerou — e essa parte nunca foi usada. O que o serviço fez, todo dia, foi enviar e registrar. Mantenho a decisão aqui em vez de apagá-la em silêncio: a metade útil entrou em produção, a metade ambiciosa não, e um estudo de caso que só lista a metade que deu certo não é um estudo de caso.',
+              'Existe no domínio um limite por profissional e um log de quem o alterou, construídos para que o custo pudesse um dia ser cobrado de quem o gerou. Essa parte nunca foi usada — o que o serviço fez todo dia foi enviar e registrar. A decisão continua no card porque o limite ainda está no código, e deixá-la de fora descreveria um serviço que nunca foi construído.',
           },
         },
         {
@@ -1704,9 +1704,9 @@ export const projects: Project[] = [
         ],
       },
       problem: {
-        en: 'A nutritionist and her patient had no way to talk inside the product, and anything the platform needed to tell someone waited until that person reloaded the page. Putting the open connections inside the monolith was not an option: it deployed once a night, and a channel that can only change at three in the morning is a channel nobody changes. Open connections also scale with how many people are online, while requests scale with how many arrive — a different problem, and so a different service.',
+        en: 'A nutritionist and her patient had no way to talk inside the product, and anything the platform needed to tell someone waited until that person reloaded the page. Putting the open connections inside the monolith was not an option: it deployed once a night, so anything sharing that pipeline could only be changed then. Open connections also scale with how many people are online, while requests scale with how many arrive.',
         'pt-BR':
-          'A nutricionista e o paciente não tinham como conversar dentro do produto, e qualquer coisa que a plataforma precisasse avisar ficava esperando a pessoa recarregar a página. Colocar as conexões abertas dentro do monolito não era opção: ele subia uma vez por madrugada, e um canal que só pode mudar às três da manhã é um canal que ninguém muda. Conexões abertas também escalam com quantas pessoas estão online, enquanto requisições escalam com quantas chegam — problema diferente, e por isso serviço diferente.',
+          'A nutricionista e o paciente não tinham como conversar dentro do produto, e qualquer coisa que a plataforma precisasse avisar ficava esperando a pessoa recarregar a página. Colocar as conexões abertas dentro do monolito não era opção: ele subia uma vez por madrugada, então qualquer coisa que dividisse esse pipeline só podia ser mudada nesse horário. Conexões abertas também escalam com quantas pessoas estão online, enquanto requisições escalam com quantas chegam.',
       },
       architecture: {
         summary: {
@@ -1749,9 +1749,9 @@ export const projects: Project[] = [
         {
           heading: { en: 'Realtime as its own deployable', 'pt-BR': 'Tempo real como implantação própria' },
           body: {
-            en: 'Two reasons, both real: open connections and request traffic scale on different axes, and the product deployed once a night — a channel that can only change at three in the morning is one nobody changes. Splitting it into its own service let each axis scale on its own terms and let this one ship on its own clock.',
+            en: 'Two reasons, both real: open connections and request traffic scale on different axes, and the product deployed once a night, which set the pace for anything inside it. Splitting it into its own service let each axis scale on its own terms and let this one ship on its own schedule.',
             'pt-BR':
-              'Dois motivos, ambos reais: conexões abertas e tráfego de requisição escalam em eixos diferentes, e o produto subia uma vez por madrugada — um canal que só pode mudar às três da manhã é um canal que ninguém muda. Separá-lo em um serviço próprio deixou cada eixo escalar nos seus próprios termos, e deixou este subir no próprio relógio.',
+              'Dois motivos, ambos reais: conexões abertas e tráfego de requisição escalam em eixos diferentes, e o produto subia uma vez por madrugada, o que ditava o ritmo de tudo que estava dentro dele. Separá-lo em um serviço próprio deixou cada eixo escalar nos seus próprios termos, e deixou este subir no próprio ritmo.',
           },
         },
         {
@@ -2207,9 +2207,9 @@ export const projects: Project[] = [
         {
           heading: { en: 'Tests first, behaviour second', 'pt-BR': 'Primeiro os testes, depois o comportamento' },
           body: {
-            en: 'The codebase was unstructured and untested, and the temptation with both is to restructure first. The order was inverted: cover the existing behaviour, then change it. Coverage on code nobody has changed yet is what makes the later restructuring safe rather than hopeful — and it is the reason the number is worth quoting.',
+            en: 'The codebase was unstructured and untested. Coverage came first and the restructuring second: tests written against the behaviour as it already worked, then the behaviour changed underneath them. That order is why the coverage number is worth quoting at all.',
             'pt-BR':
-              'O código estava desestruturado e sem testes, e a tentação diante dos dois é reestruturar primeiro. A ordem foi invertida: cobrir o comportamento existente e só então mudá-lo. Cobertura sobre código que ninguém mexeu ainda é o que torna a reestruturação posterior segura em vez de esperançosa — e é a razão de o número valer a pena ser citado.',
+              'O código estava desestruturado e sem testes. A cobertura veio primeiro e a reestruturação depois: testes escritos contra o comportamento como ele já funcionava, e só então o comportamento mudou por baixo deles. É essa ordem que faz o número de cobertura valer alguma coisa.',
           },
         },
         {

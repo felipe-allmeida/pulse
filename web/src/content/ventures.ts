@@ -142,9 +142,9 @@ export const ventures: Venture[] = [
       {
         heading: { en: 'A payment migration nobody noticed', 'pt-BR': 'Uma migração de pagamentos que ninguém notou' },
         body: {
-          en: 'I planned and ran the move of thousands of active subscribers from Iugu to Pagar.me. Revenue never paused — the kind of change whose measure of success is that nothing happened.',
+          en: 'I planned and ran the move of thousands of active subscribers from Iugu to Pagar.me, with no pause in revenue.',
           'pt-BR':
-            'Planejei e conduzi a migração de milhares de assinantes ativos de Iugu para Pagar.me. A receita não parou em momento nenhum — o tipo de mudança cuja medida de sucesso é não ter acontecido nada.',
+            'Planejei e conduzi a migração de milhares de assinantes ativos de Iugu para Pagar.me, sem pausa na receita.',
         },
       },
       {
