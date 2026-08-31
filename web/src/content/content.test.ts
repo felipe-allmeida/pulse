@@ -224,9 +224,9 @@ it('airia-cloud-connector does not claim mutual TLS as a shipped property', () =
   expect(decision!.body.en).toMatch(/bearer token/i);
 });
 
-it('the Airia group sits between the ULBRA group and Dell', () => {
+it('the Airia group sits between kota-embed and Dell', () => {
   const slugs = projects.map((p) => p.slug);
-  expect(slugs.indexOf('airia-cloud-connector')).toBeGreaterThan(slugs.indexOf('ulbra-infra'));
+  expect(slugs.indexOf('airia-cloud-connector')).toBeGreaterThan(slugs.indexOf('kota-embed'));
   expect(slugs.indexOf('airia-spm')).toBeLessThan(slugs.indexOf('dell-automated-caller'));
 });
 
@@ -378,10 +378,22 @@ it('kota-embed has a case study, localized in every locale', () => {
   }
 });
 
-it('kota-embed sits between pulse and the ulbra projects', () => {
+/*
+  The list is ordered by what the author wants read first, not by date. The
+  two engagements he ran as Head of Technology lead it; pulse sits near the
+  end because it is this site — a code sample for a technical reader rather
+  than the work a hiring decision turns on — and dell-automated-caller is
+  last as the oldest. Pinning the order here keeps a later edit from quietly
+  restoring date order, which is what it was before.
+*/
+it('the list is ordered by weight, not by date', () => {
   const slugs = projects.map((p) => p.slug);
-  expect(slugs.indexOf('kota-embed')).toBe(1);
-  expect(slugs.indexOf('kota-embed')).toBeLessThan(slugs.indexOf('ulbra-atende'));
+  expect(slugs[0], 'the Dietbox run leads').toBe('dietbox');
+  expect(slugs.indexOf('ulbra-atende')).toBeGreaterThan(slugs.indexOf('dietbox-realtime'));
+  expect(slugs.indexOf('kota-embed')).toBeGreaterThan(slugs.indexOf('ulbra-infra'));
+  expect(slugs.indexOf('airia-cloud-connector')).toBeGreaterThan(slugs.indexOf('kota-embed'));
+  expect(slugs.indexOf('pulse')).toBeGreaterThan(slugs.indexOf('airia-spm'));
+  expect(slugs.at(-1), 'the oldest work is last').toBe('dell-automated-caller');
 });
 
 it('refers to insurers by count', () => {
@@ -714,11 +726,11 @@ it('dietbox names the shared work — its largest codebase was a team effort', (
   expectBothLocales(boundary!, 'dietbox contribution.boundary');
 });
 
-it('the Dietbox run sits between kota-embed and the ULBRA run', () => {
+it('the Dietbox run leads the list, webapp first', () => {
   const slugs = projects.map((p) => p.slug);
   const dietbox = projects.filter((p) => p.venture === 'dietbox').map((p) => p.slug);
-  expect(dietbox[0], 'the webapp card leads the run').toBe('dietbox');
-  expect(slugs.indexOf('dietbox')).toBeGreaterThan(slugs.indexOf('kota-embed'));
+  expect(dietbox[0], 'the webapp card leads the run — everything else came out of it').toBe('dietbox');
+  expect(slugs.indexOf('dietbox')).toBe(0);
   expect(slugs.indexOf(dietbox.at(-1)!)).toBeLessThan(slugs.indexOf('ulbra-atende'));
 });
 

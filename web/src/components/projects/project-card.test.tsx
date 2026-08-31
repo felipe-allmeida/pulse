@@ -10,6 +10,7 @@ import { describe, expect, it } from 'vitest';
 import type { Locale } from '@/content/types';
 import type { Project } from '@/content/projects';
 import { renderWithI18n } from '@/test/render-with-i18n';
+import { FEATURED_PROJECT_SLUG } from './featured';
 import { ProjectCard } from './project-card';
 
 const publicProject: Project = {
@@ -100,14 +101,16 @@ describe('ProjectCard', () => {
     );
   });
 
-  it('marks pulse as the featured card', async () => {
-    await renderCard(publicProject);
+  // Keyed on the constant rather than on a slug: which project is featured
+  // follows the list's order and has changed once already.
+  it('marks the featured project’s card', async () => {
+    await renderCard({ ...publicProject, slug: FEATURED_PROJECT_SLUG });
 
     const article = await screen.findByRole('article');
     expect(article).toHaveAttribute('data-featured', 'true');
   });
 
-  it('does not mark a non-pulse project as featured', async () => {
+  it('does not mark any other project as featured', async () => {
     await renderCard(privateProject);
 
     const article = await screen.findByRole('article');

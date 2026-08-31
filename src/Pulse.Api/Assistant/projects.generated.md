@@ -6,77 +6,6 @@
 These are the projects written up on the site, in the order they appear there. Each one is a real
 system Felipe worked on; the "What Felipe did" line is the authoritative statement of his part in it.
 
-### Pulse — A live, real-time system embedded in a portfolio.
-
-- **Role:** Design & implementation
-- **Source:** public — Live site: https://felipealmeida.tech · GitHub: https://github.com/felipe-allmeida/pulse
-- **Stack:** .NET 10, SignalR, RabbitMQ, Redis, Postgres, React 19, Docker, Terraform
-- **What it is:** A self-hosted portfolio that doubles as a live systems demo: presence, visits, and metrics travel through a real event-driven backend in real time, not canned data.
-- **What Felipe did:** I built this one alone — the design, the event-driven backend, the front end, and the infrastructure it runs on.
-  - The realtime presence pipeline and its world map.
-  - The transactional outbox and the event-driven backend behind it.
-  - The public ops dashboard and the metrics it exposes.
-  - The AI assistant and the profile that grounds it.
-  - Deployment, from container build to the machine it lands on.
-- **Problem it solved:** A CV asserts seniority and a repository demands that someone read it; neither lets a stranger watch a system work. Pulse closes that gap by being both the portfolio and the thing being demonstrated. The constraint it was built against was not a user need but an evidentiary one — make the claim checkable in the thirty seconds someone actually spends.
-- **Architecture:** A .NET backend behind a React client. A new connection resolves the visitor’s rough location and publishes a visit event through a transactional outbox, flushed in the same save as the write. A worker drains that outbox over RabbitMQ and appends the audit trail in Postgres. SignalR carries live presence — the connection count, and reactions — while the world map reads the accumulated visits by polling, so the map draws on its own schedule instead of blocking on that round trip. Tracing runs through OpenTelemetry, and the whole thing ships as containers behind Caddy.
-  - Browser — A React client holding a SignalR connection open.
-  - API — Resolves the visitor’s rough location, publishes the visit, and broadcasts the new presence count to everyone.
-  - Outbox — The event is buffered and flushed in the same save as the write, so it cannot be published for something that did not commit.
-  - Worker — Drains the outbox over RabbitMQ and appends the visit to the audit trail.
-  - World map — Polls the accumulated visits on its own schedule, so the map never blocks on the round trip that fills it.
-- **What it does:**
-  - Live presence via SignalR — see who else is on the site right now, on a world map.
-  - Event-driven .NET backend with a RabbitMQ transactional outbox, Postgres, and OpenTelemetry tracing.
-  - A public ops dashboard exposing real metrics — live connections, visits over time, and the event feed as it happens.
-  - An AI assistant grounded in a maintained profile, streaming answers about me.
-  - Deployed with Docker Compose + Caddy behind Terraform-managed infrastructure.
-- **Engineering decisions:**
-  - **A transactional outbox behind a visit counter** — Nothing about counting visits requires one. It is here because the pattern is what the site exists to demonstrate, wired end to end and running where a reader can watch it instead of reading a diagram. On a product it would be over-engineering.
-  - **Real telemetry, published** — The ops dashboard exposes the system’s actual numbers, which means a reader can catch the site lying about itself. Most portfolios make claims that cannot be checked; this one chose the version that can be.
-  - **Prerendered pages over a client-only app** — The site renders its content into HTML at build time, so a first visit does not wait on JavaScript and a crawler sees the same page a person does — and, usefully, a deploy can be verified with a single request rather than a browser.
-  - **An assistant grounded in a maintained profile** — The assistant answers from a file I keep current, and says it does not know rather than inventing. Ungrounded, it would be a demonstration of exactly the wrong thing.
-
-### Kota Embed — Health insurance enrollment, embedded inside other companies' platforms.
-
-- **Role:** Senior Product Engineer, platform team (Professional work)
-- **Source:** closed — professional work described without the code (Website: https://kota.io)
-- **Stack:** .NET, PostgreSQL, EF Core, AWS, OpenTelemetry, Multi-tenant, Webhooks
-- **What it is:** Kota Embed lets employers offer health insurance to their employees without leaving the software they already use — the enrollment flow runs embedded in a third-party platform, backed by a multi-tenant .NET service that integrates directly with insurers.
-- **What Felipe did:** I owned the multi-tenant core — the part that turns an enrollment request into a policy across nine insurers that each behave differently.
-  - The intent state machines behind enrollment, quoting, amendment and renewal.
-  - Adaptive requirements: asking a service what a case must collect instead of hardcoding a form per insurer.
-  - The versioned public API contract and its webhooks.
-  - Provider contracts introduced behind feature flags and migrated without stopping the product.
-  - Idempotency and duplicate suppression, and the integration suite that covers them.
-  - NOT his work: The front end — the embedded flow and its SDK — was built by others; I have no commits in it.
-- **Problem it solved:** Enrolling someone in health insurance looks like a form. It is not. Each insurer wants different data in a different shape on its own schedule; some answer over HTTP, others by exchanging files over SFTP. Regulatory disclosure obligations differ by region. And all of it happens inside an iframe hosted on another company’s platform, where the user expects it to feel immediate. A form hardcoded per insurer does not survive the second insurer.
-- **Results:** 9 insurer integrations (HTTP APIs and SFTP file exchange); 3 regulatory regions (disclosure rules differ per region); 7 intent workflow types (enrollment, quote, amendment, renewal…)
-- **Architecture:** A .NET modular monolith split by bounded context: the multi-tenant platform core, one module per insurer, plus compliance, webhooks, and financial reporting. The core never calls an insurer directly — every provider call goes through an adapter factory, so the code that runs an enrollment does not know which insurer it is talking to. Long-running work is modeled as an intent: a persisted state machine rather than a request held open.
-  - Third-party platform — The host application, embedding the enrollment flow in an iframe.
-  - Public API — Versioned contract and signed webhooks for the platforms doing the embedding.
-  - Platform core — Employers, employees, eligibility, and the intent state machines.
-  - Adapter factory — The single door to every insurer, keeping the core provider-agnostic.
-  - Insurer integrations — One module per insurer, over HTTP or scheduled SFTP file exchange.
-- **The life of an enrollment:** These are the statuses an enrollment actually moves through. It can also end ineligible, or not undertaken at all — the happy path below is not the only way out.
-  - Processing — The request is recorded against its idempotency key and validated, before anything external is called.
-  - ActionRequired — Something is missing that only a person can supply. The intent says so and waits, instead of failing.
-  - PendingConfirmation — Everything the insurer and the region require is gathered; the requester confirms before it is sent.
-  - Enrolling — Handed to the insurer through its adapter, which answers on its own schedule.
-  - Enrolled — The policy exists. The platform reports it back to whoever asked.
-- **What it does:**
-  - Multi-tenant by construction: platform → employer → employee → group, isolated per tenant.
-  - Group setup, enrollment, quoting, amendment, renewal, policy import, and dependant management, each as its own workflow.
-  - Eligibility computed from provider rules rather than stored as a flag.
-  - Policy and plan data aggregated across insurers into a single response.
-  - A versioned public API and signed webhooks for the platforms doing the embedding.
-  - Insurer integrations over both HTTP APIs and scheduled SFTP file exchange.
-- **Engineering decisions:**
-  - **Intents instead of request/response** — An enrollment cannot finish inside one call — an insurer may take minutes or days. Modeling it as a persisted state machine with its own status makes the in-between state something the system can query, resume, and report on, instead of a transaction held open and hoped for.
-  - **Adaptive requirements instead of a form per insurer** — What a given case must collect depends on the insurer and the regulatory region at once. Rather than encoding nine forms, the platform asks a requirements service what this case needs and renders that. Adding an insurer stops being a front-end change. The lookup happens behind the same adapter boundary, so the core still never handles a provider identity itself.
-  - **An adapter factory as the only door to a provider** — The platform core resolves an adapter and talks to that. It never learns which insurer it is serving, which is what keeps a tenth integration from touching enrollment logic — and what let provider contracts be introduced behind feature flags and migrated without stopping the product.
-  - **Idempotency and duplicate suppression as a requirement, not a repair** — Retries happen, webhooks arrive twice, and consumers run concurrently against the same rows. Intent creation takes an idempotency key, auto-enrollment suppresses the duplicate intent-and-webhook pair, and the eligibility-screening consumer handles serialization conflicts rather than assuming they cannot happen.
-
 ### Dietbox Webapp — None of today’s APIs existed. All of it started in here.
 
 - **Role:** Senior Software Engineer, then Head of Technology (2020–2024)
@@ -448,6 +377,46 @@ system Felipe worked on; the "What Felipe did" line is the authoritative stateme
   - **An orchestrator sized for the team** — Kubernetes was the default answer and was not taken. The cluster is small, on-premise, and operated by three engineers who are also writing six applications. Swarm gives multi-node scheduling, rolling updates and overlay networking with a fraction of the operational surface — and the cost of the ceiling it imposes is far below the cost of a control plane nobody has time to run.
   - **The team measures itself with its own pipeline** — A dashboard reads the team’s task tracker through an ETL sidecar, so delivery is visible in the same place the systems’ numbers are. It is a small piece of plumbing carrying a large claim: a working model that is measured can be argued about with evidence, and one that is only asserted cannot.
 
+### Kota Embed — Health insurance enrollment, embedded inside other companies' platforms.
+
+- **Role:** Senior Product Engineer, platform team (Professional work)
+- **Source:** closed — professional work described without the code (Website: https://kota.io)
+- **Stack:** .NET, PostgreSQL, EF Core, AWS, OpenTelemetry, Multi-tenant, Webhooks
+- **What it is:** Kota Embed lets employers offer health insurance to their employees without leaving the software they already use — the enrollment flow runs embedded in a third-party platform, backed by a multi-tenant .NET service that integrates directly with insurers.
+- **What Felipe did:** I owned the multi-tenant core — the part that turns an enrollment request into a policy across nine insurers that each behave differently.
+  - The intent state machines behind enrollment, quoting, amendment and renewal.
+  - Adaptive requirements: asking a service what a case must collect instead of hardcoding a form per insurer.
+  - The versioned public API contract and its webhooks.
+  - Provider contracts introduced behind feature flags and migrated without stopping the product.
+  - Idempotency and duplicate suppression, and the integration suite that covers them.
+  - NOT his work: The front end — the embedded flow and its SDK — was built by others; I have no commits in it.
+- **Problem it solved:** Enrolling someone in health insurance looks like a form. It is not. Each insurer wants different data in a different shape on its own schedule; some answer over HTTP, others by exchanging files over SFTP. Regulatory disclosure obligations differ by region. And all of it happens inside an iframe hosted on another company’s platform, where the user expects it to feel immediate. A form hardcoded per insurer does not survive the second insurer.
+- **Results:** 9 insurer integrations (HTTP APIs and SFTP file exchange); 3 regulatory regions (disclosure rules differ per region); 7 intent workflow types (enrollment, quote, amendment, renewal…)
+- **Architecture:** A .NET modular monolith split by bounded context: the multi-tenant platform core, one module per insurer, plus compliance, webhooks, and financial reporting. The core never calls an insurer directly — every provider call goes through an adapter factory, so the code that runs an enrollment does not know which insurer it is talking to. Long-running work is modeled as an intent: a persisted state machine rather than a request held open.
+  - Third-party platform — The host application, embedding the enrollment flow in an iframe.
+  - Public API — Versioned contract and signed webhooks for the platforms doing the embedding.
+  - Platform core — Employers, employees, eligibility, and the intent state machines.
+  - Adapter factory — The single door to every insurer, keeping the core provider-agnostic.
+  - Insurer integrations — One module per insurer, over HTTP or scheduled SFTP file exchange.
+- **The life of an enrollment:** These are the statuses an enrollment actually moves through. It can also end ineligible, or not undertaken at all — the happy path below is not the only way out.
+  - Processing — The request is recorded against its idempotency key and validated, before anything external is called.
+  - ActionRequired — Something is missing that only a person can supply. The intent says so and waits, instead of failing.
+  - PendingConfirmation — Everything the insurer and the region require is gathered; the requester confirms before it is sent.
+  - Enrolling — Handed to the insurer through its adapter, which answers on its own schedule.
+  - Enrolled — The policy exists. The platform reports it back to whoever asked.
+- **What it does:**
+  - Multi-tenant by construction: platform → employer → employee → group, isolated per tenant.
+  - Group setup, enrollment, quoting, amendment, renewal, policy import, and dependant management, each as its own workflow.
+  - Eligibility computed from provider rules rather than stored as a flag.
+  - Policy and plan data aggregated across insurers into a single response.
+  - A versioned public API and signed webhooks for the platforms doing the embedding.
+  - Insurer integrations over both HTTP APIs and scheduled SFTP file exchange.
+- **Engineering decisions:**
+  - **Intents instead of request/response** — An enrollment cannot finish inside one call — an insurer may take minutes or days. Modeling it as a persisted state machine with its own status makes the in-between state something the system can query, resume, and report on, instead of a transaction held open and hoped for.
+  - **Adaptive requirements instead of a form per insurer** — What a given case must collect depends on the insurer and the regulatory region at once. Rather than encoding nine forms, the platform asks a requirements service what this case needs and renders that. Adding an insurer stops being a front-end change. The lookup happens behind the same adapter boundary, so the core still never handles a provider identity itself.
+  - **An adapter factory as the only door to a provider** — The platform core resolves an adapter and talks to that. It never learns which insurer it is serving, which is what keeps a tenth integration from touching enrollment logic — and what let provider contracts be introduced behind feature flags and migrated without stopping the product.
+  - **Idempotency and duplicate suppression as a requirement, not a repair** — Retries happen, webhooks arrive twice, and consumers run concurrently against the same rows. Intent creation takes an idempotency key, auto-enrollment suppresses the duplicate intent-and-webhook pair, and the eligibility-screening consumer handles serialization conflicts rather than assuming they cannot happen.
+
 ### Airia Cloud Connector — A reverse tunnel that reaches into a private network without opening it.
 
 - **Role:** R&D Engineer — security, routing and command surface (Jun 2025 – Oct 2025)
@@ -541,6 +510,37 @@ system Felipe worked on; the "What Felipe did" line is the authoritative stateme
   - **A repository layer, added after the fact and on purpose** — The first version queried the database context straight from the services, which is fine until three teams are writing services against the same entities and each invents its own idea of what "the agents for this tenant" means. Moving those queries behind repositories gave the feature one definition of each read, and gave the unit tests something to stand on that is not a database.
   - **A scheduled refresh instead of a webhook per provider** — Webhooks would be fresher, and would require every provider to support them, every customer to configure them, and the platform to be reachable from each one — which is the same perimeter problem the connector exists to avoid. Polling on a schedule is less elegant and works everywhere, and an inventory whose age is known is more useful than one that is silently missing whatever event was dropped.
   - **A violation you can trace to a run** — A feed saying a policy was broken is an alert; a feed saying which execution broke it is an investigation. Carrying the execution identifier through to the violation row is a one-column change that moves the feed from something a security team watches to something they can act on.
+
+### Pulse — A live, real-time system embedded in a portfolio.
+
+- **Role:** Design & implementation
+- **Source:** public — Live site: https://felipealmeida.tech · GitHub: https://github.com/felipe-allmeida/pulse
+- **Stack:** .NET 10, SignalR, RabbitMQ, Redis, Postgres, React 19, Docker, Terraform
+- **What it is:** A self-hosted portfolio that doubles as a live systems demo: presence, visits, and metrics travel through a real event-driven backend in real time, not canned data.
+- **What Felipe did:** I built this one alone — the design, the event-driven backend, the front end, and the infrastructure it runs on.
+  - The realtime presence pipeline and its world map.
+  - The transactional outbox and the event-driven backend behind it.
+  - The public ops dashboard and the metrics it exposes.
+  - The AI assistant and the profile that grounds it.
+  - Deployment, from container build to the machine it lands on.
+- **Problem it solved:** A CV asserts seniority and a repository demands that someone read it; neither lets a stranger watch a system work. Pulse closes that gap by being both the portfolio and the thing being demonstrated. The constraint it was built against was not a user need but an evidentiary one — make the claim checkable in the thirty seconds someone actually spends.
+- **Architecture:** A .NET backend behind a React client. A new connection resolves the visitor’s rough location and publishes a visit event through a transactional outbox, flushed in the same save as the write. A worker drains that outbox over RabbitMQ and appends the audit trail in Postgres. SignalR carries live presence — the connection count, and reactions — while the world map reads the accumulated visits by polling, so the map draws on its own schedule instead of blocking on that round trip. Tracing runs through OpenTelemetry, and the whole thing ships as containers behind Caddy.
+  - Browser — A React client holding a SignalR connection open.
+  - API — Resolves the visitor’s rough location, publishes the visit, and broadcasts the new presence count to everyone.
+  - Outbox — The event is buffered and flushed in the same save as the write, so it cannot be published for something that did not commit.
+  - Worker — Drains the outbox over RabbitMQ and appends the visit to the audit trail.
+  - World map — Polls the accumulated visits on its own schedule, so the map never blocks on the round trip that fills it.
+- **What it does:**
+  - Live presence via SignalR — see who else is on the site right now, on a world map.
+  - Event-driven .NET backend with a RabbitMQ transactional outbox, Postgres, and OpenTelemetry tracing.
+  - A public ops dashboard exposing real metrics — live connections, visits over time, and the event feed as it happens.
+  - An AI assistant grounded in a maintained profile, streaming answers about me.
+  - Deployed with Docker Compose + Caddy behind Terraform-managed infrastructure.
+- **Engineering decisions:**
+  - **A transactional outbox behind a visit counter** — Nothing about counting visits requires one. It is here because the pattern is what the site exists to demonstrate, wired end to end and running where a reader can watch it instead of reading a diagram. On a product it would be over-engineering.
+  - **Real telemetry, published** — The ops dashboard exposes the system’s actual numbers, which means a reader can catch the site lying about itself. Most portfolios make claims that cannot be checked; this one chose the version that can be.
+  - **Prerendered pages over a client-only app** — The site renders its content into HTML at build time, so a first visit does not wait on JavaScript and a crawler sees the same page a person does — and, usefully, a deploy can be verified with a single request rather than a browser.
+  - **An assistant grounded in a maintained profile** — The assistant answers from a file I keep current, and says it does not know rather than inventing. Ungrounded, it would be a demonstration of exactly the wrong thing.
 
 ### Dell Automated Caller — Automated end-to-end testing for a phone system.
 
