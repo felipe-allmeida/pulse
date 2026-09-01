@@ -1767,6 +1767,7 @@ export const projects: Project[] = [
     period: { en: 'Apr 2026 – Current', 'pt-BR': 'Abr 2026 – Atual' },
     venture: 'ulbra',
     visibility: 'private',
+    screenshot: '/screenshots/ulbra-crm.webp',
     links: [],
     detail: {
       overview: {
@@ -2045,6 +2046,7 @@ export const projects: Project[] = [
     period: { en: 'Apr 2026 – Current', 'pt-BR': 'Abr 2026 – Atual' },
     venture: 'ulbra',
     visibility: 'private',
+    screenshot: '/screenshots/ulbra-infra.webp',
     links: [],
     detail: {
       overview: {
